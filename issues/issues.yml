@@ -1,0 +1,35 @@
+next_id: 4
+issues:
+  - id: 1
+    title: Test issue
+    status: done
+    owner: "test-session"
+    created: "2026-02-21T09:59:59Z"
+    updated: "2026-02-21T10:01:03Z"
+    blocked_by: ""
+    report: ""
+    labels:
+      - infra
+    description: ""
+  - id: 2
+    title: Debian 12 自動インストール & Proxmox VE セットアップ
+    status: done
+    owner: "debian-pve-setup"
+    created: "2026-02-21T12:59:55Z"
+    updated: "2026-02-21T16:53:15Z"
+    blocked_by: ""
+    report: "report/2026-02-22_015123_debian_proxmox_setup.md"
+    labels:
+      - infra
+    description: Supermicro SYS-6019U-TN4R4T に Debian 12 を Redfish VirtualMedia 経由で自動インストールし、Proxmox VE をセットアップする
+  - id: 3
+    title: Debian 13 + PVE 9 再構築
+    status: done
+    owner: "session-rebuild-d13"
+    created: "2026-02-21T17:03:53Z"
+    updated: "2026-02-21T17:56:13Z"
+    blocked_by: ""
+    report: "report/2026-02-22_025453_debian13_pve9_rebuild.md"
+    labels:
+      - infra
+    description: Debian 13 (Trixie) + Proxmox VE 9 でサーバを再構築。SOL プライマリ化改善含む

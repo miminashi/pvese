@@ -1,0 +1,111 @@
+#!/bin/sh
+set -eu
+
+usage() {
+    echo "Usage: bmc-virtualmedia.sh <command> <args...>"
+    echo ""
+    echo "Commands:"
+    echo "  config <bmc_ip> <cookie_file> <csrf> <smb_host> <smb_path>"
+    echo "    Configure VirtualMedia ISO share (e.g. smb_path='\\public\\debian-preseed.iso')"
+    echo ""
+    echo "  mount  <bmc_ip> <cookie_file> <csrf>"
+    echo "    Mount the configured ISO"
+    echo ""
+    echo "  umount <bmc_ip> <cookie_file> <csrf>"
+    echo "    Unmount the ISO"
+    echo ""
+    echo "  status <bmc_ip> <cookie_file> <csrf>"
+    echo "    Show VirtualMedia status"
+    exit 1
+}
+
+cgi_post() {
+    bmc_ip="$1"
+    cookie_file="$2"
+    csrf="$3"
+    endpoint="$4"
+    data="$5"
+
+    result=$(curl -sk -w '\n%{http_code}' \
+        -X POST "https://${bmc_ip}/cgi/${endpoint}" \
+        -b "$cookie_file" \
+        -H "CSRF_TOKEN: ${csrf}" \
+        -d "$data")
+
+    body=$(echo "$result" | sed '$d')
+    http_code=$(echo "$result" | tail -1)
+
+    if echo "$body" | grep -q "Token Value is not matched"; then
+        echo "ERROR: CSRF token mismatch. Re-run bmc-session.sh login + csrf" >&2
+        exit 1
+    fi
+
+    echo "$body"
+}
+
+cmd_config() {
+    bmc_ip="$1"
+    cookie_file="$2"
+    csrf="$3"
+    smb_host="$4"
+    smb_path="$5"
+
+    data="op=config_iso&host=${smb_host}&path=${smb_path}&user=&pwd="
+    result=$(cgi_post "$bmc_ip" "$cookie_file" "$csrf" "op.cgi" "$data")
+    echo "Config result: $result"
+}
+
+cmd_mount() {
+    bmc_ip="$1"
+    cookie_file="$2"
+    csrf="$3"
+
+    result=$(cgi_post "$bmc_ip" "$cookie_file" "$csrf" "op.cgi" "op=mount_iso")
+    echo "Mount result: $result"
+}
+
+cmd_umount() {
+    bmc_ip="$1"
+    cookie_file="$2"
+    csrf="$3"
+
+    result=$(cgi_post "$bmc_ip" "$cookie_file" "$csrf" "op.cgi" "op=umount_iso")
+    echo "Umount result: $result"
+}
+
+cmd_status() {
+    bmc_ip="$1"
+    cookie_file="$2"
+    csrf="$3"
+
+    result=$(cgi_post "$bmc_ip" "$cookie_file" "$csrf" "op.cgi" "op=vm_status")
+    echo "$result"
+}
+
+if [ $# -lt 1 ]; then
+    usage
+fi
+
+command="$1"; shift
+
+case "$command" in
+    config)
+        if [ $# -lt 5 ]; then usage; fi
+        cmd_config "$1" "$2" "$3" "$4" "$5"
+        ;;
+    mount)
+        if [ $# -lt 3 ]; then usage; fi
+        cmd_mount "$1" "$2" "$3"
+        ;;
+    umount)
+        if [ $# -lt 3 ]; then usage; fi
+        cmd_umount "$1" "$2" "$3"
+        ;;
+    status)
+        if [ $# -lt 3 ]; then usage; fi
+        cmd_status "$1" "$2" "$3"
+        ;;
+    *)
+        usage
+        ;;
+esac

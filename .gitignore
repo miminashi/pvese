@@ -1,0 +1,8 @@
+.env
+issues/.issues.lock
+tools/target/
+log/
+bin/*
+!bin/.gitkeep
+state/
+upload/
