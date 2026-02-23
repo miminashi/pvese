@@ -53,6 +53,11 @@ SMB_SHARE=$("$YQ" '.smb_share_path' "$CONFIG")  # YAML "\\public" → \public
 既に初期化済みの場合は `status` で進行状況を確認し、完了済みフェーズはスキップする。
 `./scripts/os-setup-phase.sh next` で次の未完了フェーズを取得する。
 
+### 所要時間の記録
+
+各フェーズ開始時に `./scripts/os-setup-phase.sh start <phase>` を実行する。
+`mark` 時に終了タイムスタンプが自動記録される。
+
 ---
 
 ### Phase 1: iso-download
@@ -362,6 +367,7 @@ PVE のインストールを SSH 経由で実行。
 5. 完了: `./scripts/os-setup-phase.sh mark cleanup`
 
 6. **レポート作成**: `report/` ディレクトリに実行結果のレポートを作成（REPORT.md フォーマットに従う）
+   - `./scripts/os-setup-phase.sh times` の出力をレポートのフェーズ実行結果テーブルに転記する
 
 ---
 
