@@ -79,18 +79,20 @@ GRUBCONF
 phase_post_reboot() {
     echo "=== Phase: post-reboot ==="
 
+    echo "--- Fixing locale ---"
+    if ! locale -a 2>/dev/null | grep -q en_US.utf8; then
+        sed -i 's/^# *en_US.UTF-8/en_US.UTF-8/' /etc/locale.gen
+        locale-gen
+    fi
+    printf 'LANG=en_US.UTF-8\nLC_ALL=en_US.UTF-8\n' > /etc/default/locale
+    export LANG=en_US.UTF-8 LC_ALL=en_US.UTF-8
+
     echo "--- Installing proxmox-ve ---"
     DEBIAN_FRONTEND=noninteractive apt-get -y install proxmox-ve postfix open-iscsi chrony
 
     echo "--- Removing Debian kernel ---"
     DEBIAN_FRONTEND=noninteractive apt-get -y remove linux-image-amd64 'linux-image-6.*' 2>/dev/null || true
     update-grub
-
-    echo "--- Fixing locale ---"
-    if ! locale -a 2>/dev/null | grep -q en_US.utf8; then
-        sed -i 's/^# *en_US.UTF-8/en_US.UTF-8/' /etc/locale.gen
-        locale-gen
-    fi
 
     echo "=== post-reboot phase complete ==="
     echo "PVE version:"

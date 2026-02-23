@@ -8,6 +8,10 @@ ORIG_ISO="${1:-/var/samba/public/debian-13.3.0-amd64-netinst.iso}"
 PRESEED="${2:-${PROJECT_DIR}/preseed/preseed.cfg}"
 OUTPUT_ISO="${3:-/var/samba/public/debian-preseed.iso}"
 
+case "$ORIG_ISO" in /*) ;; *) ORIG_ISO="$(cd "$(dirname "$ORIG_ISO")" && pwd)/$(basename "$ORIG_ISO")" ;; esac
+case "$PRESEED" in /*) ;; *) PRESEED="$(cd "$(dirname "$PRESEED")" && pwd)/$(basename "$PRESEED")" ;; esac
+case "$OUTPUT_ISO" in /*) ;; *) OUTPUT_ISO="$(cd "$(dirname "$OUTPUT_ISO")" && pwd)/$(basename "$OUTPUT_ISO")" ;; esac
+
 if [ ! -f "$ORIG_ISO" ]; then
     echo "ERROR: Original ISO not found: $ORIG_ISO" >&2
     exit 1

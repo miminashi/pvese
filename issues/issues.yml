@@ -1,4 +1,4 @@
-next_id: 4
+next_id: 16
 issues:
   - id: 1
     title: Test issue
@@ -33,3 +33,136 @@ issues:
     labels:
       - infra
     description: Debian 13 (Trixie) + Proxmox VE 9 でサーバを再構築。SOL プライマリ化改善含む
+  - id: 4
+    title: 'remaster-debian-iso.sh: 相対パスを渡すと Docker エラー'
+    status: done
+    owner: ""
+    created: "2026-02-23T06:24:23Z"
+    updated: "2026-02-23T14:43:51Z"
+    blocked_by: ""
+    report: ""
+    labels:
+      - script
+    description: "相対パス (preseed/preseed-generated.cfg) を渡すと Docker が -v オプションをローカルボリューム名と解釈し 'includes invalid characters for a local volume name' エラーで失敗する。スクリプト内で realpath 等により絶対パスに変換すべき。"
+  - id: 5
+    title: oplog.sh のパス解決を統一する
+    status: done
+    owner: ""
+    created: "2026-02-23T06:24:24Z"
+    updated: "2026-02-23T14:43:52Z"
+    blocked_by: ""
+    report: ""
+    labels:
+      - script
+    description: "CLAUDE.md では oplog.sh と記載しているが PATH に含まれないため ./oplog.sh が必要。CLAUDE.md の記載と SKILL の呼び出しパスを統一する。"
+  - id: 6
+    title: pve-lock.sh を実装する
+    status: done
+    owner: ""
+    created: "2026-02-23T06:24:24Z"
+    updated: "2026-02-23T14:43:52Z"
+    blocked_by: ""
+    report: ""
+    labels:
+      - infra
+    description: "CLAUDE.md で pve-lock.sh による排他制御が規定されているが未実装。PVE クラスタ操作・IPMI 状態変更操作の競合を防ぐために実装が必要。"
+  - id: 7
+    title: Phase 7 (pve-install) のフェーズマーク漏れ対策
+    status: done
+    owner: ""
+    created: "2026-02-23T06:24:25Z"
+    updated: "2026-02-23T14:43:53Z"
+    blocked_by: ""
+    report: ""
+    labels:
+      - script
+    description: "テスト3回目で Phase 7 完了時に os-setup-phase.sh mark pve-install が実行されず pending のまま残った。SKILL.md の手順を明確化するか、Phase 8 開始時にフェーズマーク状態をチェックするガードを追加すべき。"
+  - id: 8
+    title: SOL バックグラウンド監視の代替方式を検討する
+    status: done
+    owner: ""
+    created: "2026-02-23T06:24:26Z"
+    updated: "2026-02-23T14:43:53Z"
+    blocked_by: ""
+    report: ""
+    labels:
+      - ipmi
+    description: "ipmitool sol activate はインタラクティブなため Bash ツールの run_in_background と非互換で即時終了する。SKILL.md で SOL バックグラウンド監視は推奨しない旨を記載し、PowerState ポーリング等の代替方式を明記すべき。"
+  - id: 9
+    title: SSH リブート後の接続待ち時間の目安を SKILL.md に記載する
+    status: done
+    owner: ""
+    created: "2026-02-23T06:25:48Z"
+    updated: "2026-02-23T14:43:54Z"
+    blocked_by: ""
+    report: ""
+    labels:
+      - doc
+    description: "リブート後 SSH 到達まで最大5回リトライ (約2.5分) かかった。現状のリトライで動作しているが、最大待機時間の目安を SKILL.md に記載すると次回セッションで迷わない。"
+  - id: 10
+    title: SSH 経由コマンドで Perl locale 警告が毎回出力される
+    status: done
+    owner: ""
+    created: "2026-02-23T06:25:49Z"
+    updated: "2026-02-23T14:43:54Z"
+    blocked_by: ""
+    report: ""
+    labels:
+      - infra
+    description: "SSH 経由で pveversion 等を実行すると perl: warning: Setting locale failed. が毎回出力される (通しテスト中94回検出)。動作影響なしだが出力が汚染される。pve-setup-remote.sh で locale 設定を追加するか SSH 接続時に LC_ALL=C を設定すべき。"
+  - id: 11
+    title: インストール最大待機時間の目安を SKILL.md に記載する
+    status: done
+    owner: ""
+    created: "2026-02-23T06:25:50Z"
+    updated: "2026-02-23T14:43:54Z"
+    blocked_by: ""
+    report: ""
+    labels:
+      - doc
+    description: "テスト3回目で Phase 5 のインストール完了まで通常より長くかかった (POST code 0x01 で10分以上待機)。インストール時間のばらつきは許容範囲だが、最大待機時間の目安を SKILL.md に記載すると安心。"
+  - id: 12
+    title: 'pve-setup-remote.sh: locale 設定をスクリプト冒頭に移動する'
+    status: done
+    owner: "4fbd93e9"
+    created: "2026-02-23T14:47:26Z"
+    updated: "2026-02-23T16:04:36Z"
+    blocked_by: ""
+    report: ""
+    labels:
+      - script
+    description: post-reboot フェーズ実行中、カーネル削除の dpkg postrm で locale 警告が出る。locale 設定がスクリプト末尾にあるため。apt 操作前に移動すれば解消する。影響は表面的（再起動後は解消）。
+  - id: 13
+    title: pve-lock.sh + SSH でパイプ出力が欠落する場合がある
+    status: plan
+    owner: ""
+    created: "2026-02-23T14:47:28Z"
+    updated: "2026-02-23T14:47:28Z"
+    blocked_by: ""
+    report: ""
+    labels:
+      - script
+    description: Run 1 で pve-lock.sh run ssh ... post-reboot の出力が空になった。SSH 直接実行では正常。flock の fd 管理と SSH の stdin/stdout の干渉が疑われる。Run 2, 3 では再発せず散発的。
+  - id: 14
+    title: SOL ログイン接続のタイミング改善
+    status: plan
+    owner: ""
+    created: "2026-02-23T14:47:30Z"
+    updated: "2026-02-23T14:47:30Z"
+    blocked_by: ""
+    report: ""
+    labels:
+      - ipmi
+    description: Run 1 Phase 6 で SOL 接続が GRUB メニュー表示中にあたり、コマンドが login ではなく GRUB に送られた。60秒追加待機で回復したが、login プロンプト出現を確認するロジックの追加が望ましい。
+  - id: 15
+    title: Phase 5 インストール監視で SOL ログを活用する
+    status: plan
+    owner: ""
+    created: "2026-02-23T14:51:14Z"
+    updated: "2026-02-23T14:51:14Z"
+    blocked_by: ""
+    report: ""
+    labels:
+      - script
+      - ipmi
+    description: '現在 Phase 5 のインストール監視は POST code + PowerState ポーリングのみで粗い粒度。SOL 経由でインストーラーの詳細ログ（パッケージ展開、ネットワーク設定等）が見えることはテスト #4 で確認済み。SOL 出力をパースして進捗を把握する仕組みを検討する。課題 #8 で SOL バックグラウンド監視を非推奨としたのはセッション管理の複雑さが理由であり、信頼性の高い方式（例: expect/Python subprocess でのフォアグラウンド監視、ログファイルへの記録）であれば活用可能。'
