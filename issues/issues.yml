@@ -145,12 +145,12 @@ issues:
     description: Run 1 で pve-lock.sh run ssh ... post-reboot の出力が空になった。SSH 直接実行では正常。flock の fd 管理と SSH の stdin/stdout の干渉が疑われる。Run 2, 3 では再発せず散発的。
   - id: 14
     title: SOL ログイン接続のタイミング改善
-    status: plan
-    owner: ""
+    status: done
+    owner: "a87c228d"
     created: "2026-02-23T14:47:30Z"
-    updated: "2026-02-23T14:47:30Z"
+    updated: "2026-02-23T16:34:29Z"
     blocked_by: ""
-    report: ""
+    report: "report/2026-02-24_013340_sol_login_boot_stage_detection.md"
     labels:
       - ipmi
     description: Run 1 Phase 6 で SOL 接続が GRUB メニュー表示中にあたり、コマンドが login ではなく GRUB に送られた。60秒追加待機で回復したが、login プロンプト出現を確認するロジックの追加が望ましい。

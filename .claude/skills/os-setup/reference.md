@@ -116,6 +116,21 @@ ipmitool -I lanplus -H <bmc_ip> -U <user> -P <pass> sol activate
 - ipmitool エスケープ: `~.`
 - deactivate コマンド: `ipmitool ... sol deactivate`
 
+### SOL ブートステージ検出
+
+| ステージ | 所要時間 | SOL パターン |
+|----------|---------|-------------|
+| POST/BIOS | 60-120秒 | バイナリデータ |
+| GRUB メニュー | 5秒 (timeout) | `GNU GRUB`, メニューエントリ |
+| カーネルブート | 10-30秒 | `Loading Linux`, `[  0.000000]` |
+| systemd 起動 | 20-60秒 | `systemd[1]:`, `Started` |
+| ログインプロンプト | 持続 | `<hostname> login:` |
+
+**重要**: GRUB メニュー表示中はキー入力禁止（メニュー選択やコマンドモードに入る危険）
+
+`scripts/sol-login.py` はこれらのステージを自動検出する状態機械を実装している。
+GRUB_MENU / KERNEL_BOOT 状態ではキー入力を一切送信しない。
+
 ### SOL 監視パターン
 
 バックグラウンドで SOL を起動し、出力をログファイルに記録:

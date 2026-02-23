@@ -226,18 +226,24 @@ Debian インストール後の初期設定。
    > **重要**: preseed の late_command は Debian 13 で動作しないことが多い。
    > SSH 公開鍵、PermitRootLogin、sudoers は SOL 経由で設定する必要がある。
 
-   python3 + subprocess で SOL に接続し、root/password でログイン後:
-   ```
-   sed -i "s/^#PermitRootLogin.*/PermitRootLogin yes/" /etc/ssh/sshd_config
-   systemctl restart sshd
-   echo "debian ALL=(ALL) NOPASSWD: ALL" > /etc/sudoers.d/debian
-   chmod 0440 /etc/sudoers.d/debian
-   mkdir -p /root/.ssh && chmod 700 /root/.ssh
-   echo "<SSH_PUBKEY>" > /root/.ssh/authorized_keys && chmod 600 /root/.ssh/authorized_keys
-   ```
-
-   `<SSH_PUBKEY>` はローカルの `~/.ssh/id_ed25519.pub` を Read ツールで読み取った内容を使用する。
-   ハードコードではなく、毎回ファイルから読み取ること。
+   a. SSH 公開鍵を Read ツールで `~/.ssh/id_ed25519.pub` から取得
+   b. コマンドファイルを `tmp/<session-id>/sol-commands.txt` に作成（各設定コマンドを1行1個）:
+      ```
+      sed -i "s/^#PermitRootLogin.*/PermitRootLogin yes/" /etc/ssh/sshd_config
+      systemctl restart sshd
+      echo "debian ALL=(ALL) NOPASSWD: ALL" > /etc/sudoers.d/debian
+      chmod 0440 /etc/sudoers.d/debian
+      mkdir -p /root/.ssh && chmod 700 /root/.ssh
+      echo "<SSH_PUBKEY>" > /root/.ssh/authorized_keys && chmod 600 /root/.ssh/authorized_keys
+      ip -brief addr
+      ```
+   c. `scripts/sol-login.py` で実行:
+      ```sh
+      scripts/sol-login.py --bmc-ip "$BMC_IP" --bmc-user "$BMC_USER" --bmc-pass "$BMC_PASS" \
+          --root-pass "$ROOT_PASS" --commands-file tmp/<session-id>/sol-commands.txt
+      ```
+      スクリプトはブートステージ（GRUB/カーネル/systemd）を自動検出し、
+      GRUB メニュー表示中はキー入力を送信しない。login プロンプトまで安全に待機する。
 
 4. **古いホスト鍵を削除**（OS 再インストールで鍵が変わるため）:
    ```sh
@@ -246,8 +252,9 @@ Debian インストール後の初期設定。
    ```
 
 5. **SSH 接続を待機**（通常 30-90 秒、最大 2.5 分）:
-   - DHCP IP は変わる可能性がある。SOL の `ip -brief addr` で現在の IP を確認
+   - DHCP IP は変わる可能性がある。ステップ 3 のコマンドファイルに `ip -brief addr` を含めて確認
    - SSH 接続確認: `ssh -o ConnectTimeout=5 -o StrictHostKeyChecking=no root@<ip> true`
+   - SSH が繋がらない場合、`scripts/sol-login.py --check-only` で SOL 経由のログイン可否を確認可能
 
 6. **静的 IP 設定**:
    設定ファイルの `static_ip`, `static_iface` が指定されている場合:
