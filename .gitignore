@@ -6,3 +6,4 @@ bin/*
 !bin/.gitkeep
 state/
 upload/
+tmp/

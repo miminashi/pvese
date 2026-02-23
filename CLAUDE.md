@@ -49,7 +49,8 @@ ipmitool -I lanplus -H 10.10.10.24 -U claude -P Claude123 chassis status
 - 設定値 (IPアドレス, ノード名等) はスクリプト先頭またはコンフィグファイルで定義する
 - **Bashコマンドに `#` コメント行を含めない**: コメント付きコマンドはパーミッション自動承認が効かないため、コメントは Bash ツールの description パラメータに記載すること
 - **マルチラインコマンドを避ける**: 改行区切りの複数コマンドはパーミッション自動承認が効かない。`&&` や `;` で1行にまとめるか、複数の Bash 呼び出しに分割すること。ただし `&&`/`;` チェインもビルトイン安全コマンド以外の異種コマンドの組み合わせでは自動承認されないため、複数 Bash 呼び出しへの分割が最も確実
-- **複雑なスクリプトはファイルに書いてから実行する**: 環境変数の設定、ヒアドキュメント、複数行ロジックを含むコマンドや、書き捨ての Python スクリプトは Bash ツールにインラインで渡さず、Write ツールで `/tmp/` にファイルとして保存してから `python3 /tmp/script.py` や `sh /tmp/script.sh` で実行すること。インラインの複雑なコマンドはパーミッション許可リストにマッチしない
+- **セッション用 tmp ディレクトリ**: セッション開始時に `mkdir -p tmp/<session-id>` でセッション固有の一時ディレクトリを作成する。`<session-id>` は Claude Code のセッション UUID の先頭8文字を使う（例: セッションの transcript パスが `.../<uuid>.jsonl` なら、その UUID の先頭8文字）。一時ファイル（スクリプト、コミットメッセージ等）はすべてここに書く。`/tmp/` への Write はプロジェクト外のため承認プロンプトが出る
+- **複雑なスクリプトはファイルに書いてから実行する**: 環境変数の設定、ヒアドキュメント、複数行ロジックを含むコマンドや、書き捨ての Python スクリプトは Bash ツールにインラインで渡さず、Write ツールで `tmp/<session-id>/` にファイルとして保存してから `python3 tmp/<session-id>/script.py` や `sh tmp/<session-id>/script.sh` で実行すること。インラインの複雑なコマンドはパーミッション許可リストにマッチしない
 - **ファイルへのリダイレクトを使わない**: `2>/tmp/file.log` や `>/tmp/file.log` 等のファイルリダイレクトはパーミッション自動承認が効かない（`2>/dev/null` と `2>&1` のみ許可）。stderr をファイルに保存したい場合は、Bash ツールの出力を直接利用すること
 - **パーミッション設定の優先順位**: プロジェクト `settings.local.json` に `permissions.allow` がある場合、グローバル `settings.local.json` の `permissions.allow` は置換される（マージされない）。プロジェクト設定には必要なグローバルパターンも含めること
 - **ツールのパスに `~` を使わない**: Read, Glob, Grep 等のツールは `~` をシェル展開しない。`~/projects/...` ではなく `/home/ubuntu/projects/...` のように絶対パスを使うこと
@@ -83,14 +84,14 @@ ipmitool -I lanplus -H 10.10.10.24 -U claude -P Claude123 chassis status
 
 ### 複雑なコマンドはファイルに書いて実行する
 
-環境変数の設定、パイプライン、`&&` チェイン、ヒアドキュメント等を含む複雑なコマンドは許可リストにマッチしないことが多い。Write ツールで `/tmp/` にファイルとして保存し、`sh /tmp/script.sh` や `python3 /tmp/script.py` で実行すること（`Bash(sh:*)` と `Bash(python3:*)` は許可リストに含まれている）。
+環境変数の設定、パイプライン、`&&` チェイン、ヒアドキュメント等を含む複雑なコマンドは許可リストにマッチしないことが多い。Write ツールで `tmp/<session-id>/` にファイルとして保存し、`sh tmp/<session-id>/script.sh` や `python3 tmp/<session-id>/script.py` で実行すること（`Bash(sh:*)` と `Bash(python3:*)` は許可リストに含まれている）。
 
 ```sh
 # NG: インラインの複雑なコマンド（自動承認されない）
 CSRF="xxx" && ./scripts/bmc-virtualmedia.sh mount ...
 
 # OK: ファイルに書いてから実行
-Write /tmp/mount.sh → sh /tmp/mount.sh
+Write tmp/<session-id>/mount.sh → sh tmp/<session-id>/mount.sh
 ```
 
 ### 自動承認されないコマンド（手動承認が必要）
@@ -100,8 +101,9 @@ Write /tmp/mount.sh → sh /tmp/mount.sh
 - 絶対パスのスクリプト (`/home/ubuntu/projects/pvese/scripts/xxx.sh`)
 - `&&` や `;` で繋いだ異種コマンドチェイン（安全コマンド以外の組み合わせでは自動承認されない場合がある）
 - `sudo` (iptables 以外)
-- `git -C <path>` (`git -C /path status` → `Bash(git -C` で始まり `Bash(git status:*)` にマッチしない。`cd /path && git status` をファイルに書いて `sh /tmp/script.sh` で実行するか、プロジェクトルートから直接実行すること)
-- `git commit -m "$(cat <<'EOF'...)"` (HEREDOC はマルチラインコマンドになり自動承認されない。代わりに Write ツールで `/tmp/commit-msg.txt` にメッセージを書き、`git commit -F /tmp/commit-msg.txt` で実行すること)
+- `git -C <path>` (`git -C /path status` → `Bash(git -C` で始まり `Bash(git status:*)` にマッチしない。`cd /path && git status` をファイルに書いて `sh tmp/<session-id>/script.sh` で実行するか、プロジェクトルートから直接実行すること)
+- `git commit -m "$(cat <<'EOF'...)"` (HEREDOC はマルチラインコマンドになり自動承認されない。代わりに Write ツールで `tmp/<session-id>/commit-msg.txt` にメッセージを書き、`git commit -F tmp/<session-id>/commit-msg.txt` で実行すること)
+- Write ツールでの `/tmp/` への書き込み (プロジェクト外パスは承認が必要。代わりに `tmp/<session-id>/` を使うこと)
 
 ### settings.local.json の管理
 
