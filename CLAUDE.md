@@ -40,7 +40,7 @@ ipmitool -I lanplus -H 10.10.10.24 -U claude -P Claude123 chassis status
 
 ## ルール
 
-- **全操作をログに記録する**: 状態変更操作は `oplog.sh` で記録すること（ラボ環境のためユーザ確認は不要）。ログは `log/oplog.log` に蓄積される
+- **全操作をログに記録する**: 状態変更操作は `./oplog.sh` で記録すること（ラボ環境のためユーザ確認は不要）。ログは `log/oplog.log` に蓄積される
 - IPMI パスワードや API トークンはスクリプトにハードコードしてよい（ラボ環境）
 - `.env` ファイルを使う場合は `.gitignore` に含め、コミットしない
 - PVE API 呼び出し時は自己署名証明書に対応するため `curl -k` または `--cacert` を使用する
@@ -49,6 +49,7 @@ ipmitool -I lanplus -H 10.10.10.24 -U claude -P Claude123 chassis status
 - 設定値 (IPアドレス, ノード名等) はスクリプト先頭またはコンフィグファイルで定義する
 - **Bashコマンドに `#` コメント行を含めない**: コメント付きコマンドはパーミッション自動承認が効かないため、コメントは Bash ツールの description パラメータに記載すること
 - **マルチラインコマンドを避ける**: 改行区切りの複数コマンドはパーミッション自動承認が効かない。`&&` や `;` で1行にまとめるか、複数の Bash 呼び出しに分割すること。ただし `&&`/`;` チェインもビルトイン安全コマンド以外の異種コマンドの組み合わせでは自動承認されないため、複数 Bash 呼び出しへの分割が最も確実
+- **複雑なスクリプトはファイルに書いてから実行する**: 環境変数の設定、ヒアドキュメント、複数行ロジックを含むコマンドや、書き捨ての Python スクリプトは Bash ツールにインラインで渡さず、Write ツールで `/tmp/` にファイルとして保存してから `python3 /tmp/script.py` や `sh /tmp/script.sh` で実行すること。インラインの複雑なコマンドはパーミッション許可リストにマッチしない
 - **ファイルへのリダイレクトを使わない**: `2>/tmp/file.log` や `>/tmp/file.log` 等のファイルリダイレクトはパーミッション自動承認が効かない（`2>/dev/null` と `2>&1` のみ許可）。stderr をファイルに保存したい場合は、Bash ツールの出力を直接利用すること
 - **パーミッション設定の優先順位**: プロジェクト `settings.local.json` に `permissions.allow` がある場合、グローバル `settings.local.json` の `permissions.allow` は置換される（マージされない）。プロジェクト設定には必要なグローバルパターンも含めること
 - **ツールのパスに `~` を使わない**: Read, Glob, Grep 等のツールは `~` をシェル展開しない。`~/projects/...` ではなく `/home/ubuntu/projects/...` のように絶対パスを使うこと
@@ -56,13 +57,56 @@ ipmitool -I lanplus -H 10.10.10.24 -U claude -P Claude123 chassis status
 - **ツールのインストール**: コマンドラインツールは sudo を使わずにプロジェクトローカル (`bin/`) にインストールしてよい（ユーザ確認不要）。スクリプトからの呼び出しは `${SCRIPT_DIR}/bin/yq` のようにフルパスで行う。apt でしかインストールできないパッケージは、ユーザにインストール手順を提示すること
 - **課題管理**: 作業は `issue.sh` で課題として追跡する。セッション開始時に `issue.sh list` で未完了課題を確認し、作業中の課題は `issue.sh start <id> --owner <session名>` で取得する。状態遷移ルールは [ISSUE.md](ISSUE.md) を参照
 - **BMC ファクトリーリセット禁止**: `ipmitool raw 0x3c 0x40` 等の BMC リセットコマンドは実行禁止。BMC 全ユーザ・ネットワーク設定が消失する。リセットが必要な場合はコマンドをユーザに提示し手動実行を依頼すること
+- **`git push` は自動許可しない**: パーミッション許可リストに `git push` は含めない。push が必要な場合はユーザに確認を求めること
+
+## パーミッション許可リストとコマンド実行
+
+`.claude/settings.local.json` の `permissions.allow` にはプレフィックスマッチングで自動承認されるコマンドパターンが定義されている。コマンドが自動承認されるためには、以下の規則に従うこと。
+
+### マッチングルール
+
+- `Bash(X:*)` はコマンド文字列が `X` で**始まる**場合にマッチする
+- 例: `Bash(git status:*)` は `git status`, `git status --short`, `git status -sb` すべてにマッチ
+- 例: `Bash(./scripts/:*)` は `./scripts/bmc-power.sh status`, `./scripts/generate-preseed.sh` 等すべてにマッチ
+
+### スクリプトのパス規則
+
+プロジェクトスクリプトは常に `./` 付きの相対パスで実行すること:
+
+| スクリプト | 実行例 |
+|-----------|--------|
+| ルートスクリプト | `./issue.sh list`, `./oplog.sh curl ...`, `./pve-lock.sh run ...` |
+| scripts/ 配下 | `./scripts/bmc-power.sh status`, `./scripts/generate-preseed.sh` |
+| bin/ 配下 | `./bin/yq .bmc_ip config.yml` |
+
+`scripts/xxx.sh`（`./` なし）や絶対パスは許可リストにないため自動承認されない。
+
+### 複雑なコマンドはファイルに書いて実行する
+
+環境変数の設定、パイプライン、`&&` チェイン、ヒアドキュメント等を含む複雑なコマンドは許可リストにマッチしないことが多い。Write ツールで `/tmp/` にファイルとして保存し、`sh /tmp/script.sh` や `python3 /tmp/script.py` で実行すること（`Bash(sh:*)` と `Bash(python3:*)` は許可リストに含まれている）。
+
+```sh
+# NG: インラインの複雑なコマンド（自動承認されない）
+CSRF="xxx" && ./scripts/bmc-virtualmedia.sh mount ...
+
+# OK: ファイルに書いてから実行
+Write /tmp/mount.sh → sh /tmp/mount.sh
+```
+
+### 自動承認されないコマンド（手動承認が必要）
+
+- `git push` (全サブコマンド)
+- `./` なしのスクリプトパス (`scripts/xxx.sh`, `bin/xxx`)
+- 絶対パスのスクリプト (`/home/ubuntu/projects/pvese/scripts/xxx.sh`)
+- `&&` や `;` で繋いだ異種コマンドチェイン（安全コマンド以外の組み合わせでは自動承認されない場合がある）
+- `sudo` (iptables 以外)
 
 ## 操作ログ
 
-状態変更操作は `oplog.sh` で記録する:
+状態変更操作は `./oplog.sh` で記録する:
 
 ```sh
-oplog.sh <command...>    # コマンド実行 + ログ記録
+./oplog.sh <command...>    # コマンド実行 + ログ記録
 ```
 
 記録フォーマット: `タイムスタンプ | rc=終了コード | 実行秒数 | コマンド`
@@ -71,7 +115,7 @@ oplog.sh <command...>    # コマンド実行 + ログ記録
 
 `pve-lock.sh` と組み合わせる場合:
 ```sh
-pve-lock.sh run oplog.sh pvesh create /nodes/pve1/qemu ...
+./pve-lock.sh run ./oplog.sh pvesh create /nodes/pve1/qemu ...
 ```
 
 ## Rust CLIツール
