@@ -100,6 +100,15 @@ Write /tmp/mount.sh → sh /tmp/mount.sh
 - 絶対パスのスクリプト (`/home/ubuntu/projects/pvese/scripts/xxx.sh`)
 - `&&` や `;` で繋いだ異種コマンドチェイン（安全コマンド以外の組み合わせでは自動承認されない場合がある）
 - `sudo` (iptables 以外)
+- `git -C <path>` (`git -C /path status` → `Bash(git -C` で始まり `Bash(git status:*)` にマッチしない。`cd /path && git status` をファイルに書いて `sh /tmp/script.sh` で実行するか、プロジェクトルートから直接実行すること)
+
+### settings.local.json の管理
+
+`.claude/settings.local.json` はグローバル gitignore で除外されているため git に含まれない。許可リストを更新した場合は、コピーをコミットして変更を追跡すること:
+
+1. `.claude/settings.local.json` を更新
+2. `settings.local.example.json` (プロジェクトルート) にコピー
+3. example ファイルをコミット
 
 ## 操作ログ
 
