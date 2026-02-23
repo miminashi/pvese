@@ -19,14 +19,16 @@ Debian + Proxmox VE のインストールを BMC VirtualMedia 経由で自動実
 
 | スクリプト | 用途 |
 |-----------|------|
-| `scripts/bmc-session.sh` | BMC 認証・CSRF トークン |
-| `scripts/bmc-virtualmedia.sh` | VirtualMedia 操作 |
-| `scripts/bmc-power.sh` | Redfish 電源制御 + POST code 取得 |
-| `scripts/bmc-screenshot.sh` | BMC スクリーンショット（DCMS 要） |
-| `scripts/os-setup-phase.sh` | フェーズ状態管理 |
-| `scripts/generate-preseed.sh` | preseed 生成 |
-| `scripts/remaster-debian-iso.sh` | ISO リマスター |
-| `scripts/pve-setup-remote.sh` | PVE インストール（リモート実行） |
+| `./scripts/bmc-session.sh` | BMC 認証・CSRF トークン |
+| `./scripts/bmc-virtualmedia.sh` | VirtualMedia 操作 |
+| `./scripts/bmc-power.sh` | Redfish 電源制御 + POST code 取得 |
+| `./scripts/bmc-screenshot.sh` | BMC スクリーンショット（DCMS 要） |
+| `./scripts/os-setup-phase.sh` | フェーズ状態管理 |
+| `./scripts/generate-preseed.sh` | preseed 生成 |
+| `./scripts/remaster-debian-iso.sh` | ISO リマスター |
+| `./scripts/pve-setup-remote.sh` | PVE インストール（リモート実行） |
+| `./scripts/sol-monitor.py` | SOL 経由インストール監視 |
+| `./scripts/sol-login.py` | SOL 経由ログイン・コマンド実行 |
 
 ## 設定値の読み取り
 
@@ -44,12 +46,12 @@ SMB_SHARE=$("$YQ" '.smb_share_path' "$CONFIG")  # YAML "\\public" → \public
 ### 初期化
 
 ```sh
-scripts/os-setup-phase.sh init
-scripts/os-setup-phase.sh status
+./scripts/os-setup-phase.sh init
+./scripts/os-setup-phase.sh status
 ```
 
 既に初期化済みの場合は `status` で進行状況を確認し、完了済みフェーズはスキップする。
-`scripts/os-setup-phase.sh next` で次の未完了フェーズを取得する。
+`./scripts/os-setup-phase.sh next` で次の未完了フェーズを取得する。
 
 ---
 
@@ -61,7 +63,7 @@ scripts/os-setup-phase.sh status
 2. ISO がダウンロード済みか確認（ファイル存在 + sha256 照合）
 3. 未ダウンロードなら `curl -L -o <path> <url>` でダウンロード
 4. sha256 検証: `sha256sum <file>` の出力と設定値を比較
-5. 完了: `scripts/os-setup-phase.sh mark iso-download`
+5. 完了: `./scripts/os-setup-phase.sh mark iso-download`
 
 **エラー時**: sha256 不一致 → ファイル削除して再ダウンロード
 
@@ -71,9 +73,9 @@ scripts/os-setup-phase.sh status
 
 **pve-lock**: 不要
 
-1. `scripts/generate-preseed.sh <config.yml> preseed/preseed-generated.cfg`
+1. `./scripts/generate-preseed.sh <config.yml> preseed/preseed-generated.cfg`
 2. 生成結果を確認（diff でテンプレートとの差分表示）
-3. 完了: `scripts/os-setup-phase.sh mark preseed-generate`
+3. 完了: `./scripts/os-setup-phase.sh mark preseed-generate`
 
 ---
 
@@ -82,31 +84,31 @@ scripts/os-setup-phase.sh status
 **pve-lock**: 不要
 
 1. ISO パスと生成した preseed のパスを確認
-2. `scripts/remaster-debian-iso.sh <元ISO> preseed/preseed-generated.cfg <出力ISO>`
+2. `./scripts/remaster-debian-iso.sh <元ISO> preseed/preseed-generated.cfg <出力ISO>`
    - デフォルト出力: `<iso_download_dir>/debian-preseed.iso`
 3. 出力 ISO の存在確認
-4. 完了: `scripts/os-setup-phase.sh mark iso-remaster`
+4. 完了: `./scripts/os-setup-phase.sh mark iso-remaster`
 
 ---
 
 ### Phase 4: bmc-mount-boot
 
-**pve-lock**: 必要（`pve-lock.sh run` で実行）
+**pve-lock**: 必要（`./pve-lock.sh run` で実行）
 
 このフェーズは以下をまとめて実行する:
 
 1. **BMC ログイン**:
    ```sh
    COOKIE_FILE="tmp/<session-id>/bmc-cookie"
-   scripts/bmc-session.sh login "$BMC_IP" "$BMC_USER" "$BMC_PASS" "$COOKIE_FILE"
-   CSRF=$(scripts/bmc-session.sh csrf "$BMC_IP" "$COOKIE_FILE")
+   ./scripts/bmc-session.sh login "$BMC_IP" "$BMC_USER" "$BMC_PASS" "$COOKIE_FILE"
+   CSRF=$(./scripts/bmc-session.sh csrf "$BMC_IP" "$COOKIE_FILE")
    ```
 
 2. **VirtualMedia 設定・マウント**:
    ```sh
-   scripts/bmc-virtualmedia.sh config "$BMC_IP" "$COOKIE_FILE" "$CSRF" "$SMB_HOST" "$SMB_SHARE"'\debian-preseed.iso'
-   scripts/bmc-virtualmedia.sh mount "$BMC_IP" "$COOKIE_FILE" "$CSRF"
-   scripts/bmc-virtualmedia.sh status "$BMC_IP" "$COOKIE_FILE" "$CSRF"
+   ./scripts/bmc-virtualmedia.sh config "$BMC_IP" "$COOKIE_FILE" "$CSRF" "$SMB_HOST" "$SMB_SHARE"'\debian-preseed.iso'
+   ./scripts/bmc-virtualmedia.sh mount "$BMC_IP" "$COOKIE_FILE" "$CSRF"
+   ./scripts/bmc-virtualmedia.sh status "$BMC_IP" "$COOKIE_FILE" "$CSRF"
    ```
 
 3. **サーバをパワーサイクルして BootOptions を列挙させる**:
@@ -116,14 +118,14 @@ scripts/os-setup-phase.sh status
 
    ```sh
    # VirtualMedia マウント後、パワーサイクルして POST を通過させる
-   scripts/bmc-power.sh cycle "$BMC_IP" "$BMC_USER" "$BMC_PASS" 20
+   ./scripts/bmc-power.sh cycle "$BMC_IP" "$BMC_USER" "$BMC_PASS" 20
    # POST + OS ブート完了を待つ（約3分）
    sleep 180
    ```
 
 4. **BootOptions から VirtualMedia CD の Boot ID を動的検索**:
    ```sh
-   BOOT_ID=$(scripts/bmc-power.sh find-boot-entry "$BMC_IP" "$BMC_USER" "$BMC_PASS" "ATEN Virtual CDROM")
+   BOOT_ID=$(./scripts/bmc-power.sh find-boot-entry "$BMC_IP" "$BMC_USER" "$BMC_PASS" "ATEN Virtual CDROM")
    ```
    - Boot ID は固定ではなく OS インストール後に変動する（例: Boot0011 → Boot0013）
    - `find-boot-entry` は最大3回リトライする（30秒間隔）。POST 直後は BootOptions が空の場合があるが、リトライで検出される
@@ -133,15 +135,15 @@ scripts/os-setup-phase.sh status
 
 5. **Boot Override 設定**（UefiBootNext で VirtualMedia CD を直接指定）:
    ```sh
-   scripts/bmc-power.sh boot-next "$BMC_IP" "$BMC_USER" "$BMC_PASS" "$BOOT_ID"
+   ./scripts/bmc-power.sh boot-next "$BMC_IP" "$BMC_USER" "$BMC_PASS" "$BOOT_ID"
    ```
 
 6. **電源サイクル**（CD ブート開始）:
    ```sh
-   scripts/bmc-power.sh cycle "$BMC_IP" "$BMC_USER" "$BMC_PASS" 20
+   ./scripts/bmc-power.sh cycle "$BMC_IP" "$BMC_USER" "$BMC_PASS" 20
    ```
 
-5. 完了: `scripts/os-setup-phase.sh mark bmc-mount-boot`
+7. 完了: `./scripts/os-setup-phase.sh mark bmc-mount-boot`
 
 **エラー時**:
 - CSRF エラー → `bmc-session.sh login` + `csrf` を再実行
@@ -159,10 +161,10 @@ Debian インストーラの進行を監視する。SOL 監視を主要手段と
 
 #### 1. SOL 監視（主要）
 
-`scripts/sol-monitor.py` でインストーラの進行をパッシブ監視する:
+`./scripts/sol-monitor.py` でインストーラの進行をパッシブ監視する:
 
 ```sh
-scripts/sol-monitor.py \
+./scripts/sol-monitor.py \
     --bmc-ip "$BMC_IP" --bmc-user "$BMC_USER" --bmc-pass "$BMC_PASS" \
     --log-file tmp/<session-id>/sol-install.log
 ```
@@ -178,14 +180,14 @@ scripts/sol-monitor.py \
 `sol-monitor.py` が接続エラー (exit 2) の場合に使用:
 
 ```sh
-scripts/bmc-power.sh postcode "$BMC_IP" "$BMC_USER" "$BMC_PASS"
-scripts/bmc-power.sh status "$BMC_IP" "$BMC_USER" "$BMC_PASS"
+./scripts/bmc-power.sh postcode "$BMC_IP" "$BMC_USER" "$BMC_PASS"
+./scripts/bmc-power.sh status "$BMC_IP" "$BMC_USER" "$BMC_PASS"
 ```
 
 - POST code を30秒間隔でポーリング
 - PowerState を5分間隔でポーリング
 - `Off` → インストール完了
-- `On` が45分超過 → `scripts/bmc-power.sh forceoff` で強制停止
+- `On` が45分超過 → `./scripts/bmc-power.sh forceoff` で強制停止
 
 #### 3. POST code 92 スタック検出
 
@@ -194,7 +196,7 @@ scripts/bmc-power.sh status "$BMC_IP" "$BMC_USER" "$BMC_PASS"
 #### 完了処理
 
 1. SOL を切断: `ipmitool ... sol deactivate`（sol-monitor.py が自動切断するが念のため）
-2. 完了: `scripts/os-setup-phase.sh mark install-monitor`
+2. 完了: `./scripts/os-setup-phase.sh mark install-monitor`
 
 ---
 
@@ -207,15 +209,15 @@ Debian インストール後の初期設定。
 1. **VirtualMedia アンマウント + Boot Override 解除**:
    ```sh
    # BMC セッション再確立（必要なら）
-   scripts/bmc-session.sh login "$BMC_IP" "$BMC_USER" "$BMC_PASS" "$COOKIE_FILE"
-   CSRF=$(scripts/bmc-session.sh csrf "$BMC_IP" "$COOKIE_FILE")
-   scripts/bmc-virtualmedia.sh umount "$BMC_IP" "$COOKIE_FILE" "$CSRF"
-   pve-lock.sh run scripts/bmc-power.sh boot-override-reset "$BMC_IP" "$BMC_USER" "$BMC_PASS"
+   ./scripts/bmc-session.sh login "$BMC_IP" "$BMC_USER" "$BMC_PASS" "$COOKIE_FILE"
+   CSRF=$(./scripts/bmc-session.sh csrf "$BMC_IP" "$COOKIE_FILE")
+   ./scripts/bmc-virtualmedia.sh umount "$BMC_IP" "$COOKIE_FILE" "$CSRF"
+   ./pve-lock.sh run ./scripts/bmc-power.sh boot-override-reset "$BMC_IP" "$BMC_USER" "$BMC_PASS"
    ```
 
 2. **ディスクからブート**:
    ```sh
-   pve-lock.sh run scripts/bmc-power.sh on "$BMC_IP" "$BMC_USER" "$BMC_PASS"
+   ./pve-lock.sh run ./scripts/bmc-power.sh on "$BMC_IP" "$BMC_USER" "$BMC_PASS"
    ```
 
 3. **SOL 経由でログイン確認・設定**:
@@ -231,11 +233,14 @@ Debian インストール後の初期設定。
       chmod 0440 /etc/sudoers.d/debian
       mkdir -p /root/.ssh && chmod 700 /root/.ssh
       echo "<SSH_PUBKEY>" > /root/.ssh/authorized_keys && chmod 600 /root/.ssh/authorized_keys
+      printf "\nauto <static_iface>\niface <static_iface> inet static\n    address <static_ip>/8\n" >> /etc/network/interfaces
+      ifup <static_iface>
       ip -brief addr
       ```
-   c. `scripts/sol-login.py` で実行:
+      > **重要**: 静的 IP 設定を SOL 経由で行うことで、DHCP IP への SSH 接続を不要にする。
+   c. `./scripts/sol-login.py` で実行:
       ```sh
-      scripts/sol-login.py --bmc-ip "$BMC_IP" --bmc-user "$BMC_USER" --bmc-pass "$BMC_PASS" \
+      ./scripts/sol-login.py --bmc-ip "$BMC_IP" --bmc-user "$BMC_USER" --bmc-pass "$BMC_PASS" \
           --root-pass "$ROOT_PASS" --commands-file tmp/<session-id>/sol-commands.txt
       ```
       スクリプトはブートステージ（GRUB/カーネル/systemd）を自動検出し、
@@ -243,23 +248,15 @@ Debian インストール後の初期設定。
 
 4. **古いホスト鍵を削除**（OS 再インストールで鍵が変わるため）:
    ```sh
-   ssh-keygen -R <dhcp_ip> 2>/dev/null || true
    ssh-keygen -R <static_ip> 2>/dev/null || true
    ```
 
-5. **SSH 接続を待機**（通常 30-90 秒、最大 2.5 分）:
-   - DHCP IP は変わる可能性がある。ステップ 3 のコマンドファイルに `ip -brief addr` を含めて確認
-   - SSH 接続確認: `ssh -o ConnectTimeout=5 -o StrictHostKeyChecking=no root@<ip> true`
-   - SSH が繋がらない場合、`scripts/sol-login.py --check-only` で SOL 経由のログイン可否を確認可能
+5. **静的 IP で SSH 接続確認**（通常 30-90 秒、最大 2.5 分）:
+   - ステップ 3 で SOL 経由の静的 IP 設定が完了しているため、静的 IP で接続する
+   - SSH 接続確認: `ssh -o ConnectTimeout=5 -o StrictHostKeyChecking=no root@<static_ip> true`
+   - SSH が繋がらない場合、`./scripts/sol-login.py --check-only` で SOL 経由のログイン可否を確認可能
 
-6. **静的 IP 設定**:
-   設定ファイルの `static_ip`, `static_iface` が指定されている場合:
-   ```sh
-   ssh root@<ip> 'printf "\nauto eno2np1\niface eno2np1 inet static\n    address 10.10.10.204/8\n" >> /etc/network/interfaces'
-   ssh root@<ip> 'ifup eno2np1'
-   ```
-
-7. 完了: `scripts/os-setup-phase.sh mark post-install-config`
+6. 完了: `./scripts/os-setup-phase.sh mark post-install-config`
 
 ---
 
@@ -271,21 +268,35 @@ PVE のインストールを SSH 経由で実行。
 
 1. **スクリプト転送**:
    ```sh
-   scp scripts/pve-setup-remote.sh root@<ip>:/tmp/
+   scp ./scripts/pve-setup-remote.sh root@<static_ip>:/tmp/
    ```
 
 2. **pre-reboot フェーズ**:
    ```sh
-   ssh root@<ip> '/tmp/pve-setup-remote.sh --phase pre-reboot --hostname <hostname> --ip <static_ip> --codename <codename>'
+   ssh root@<static_ip> '/tmp/pve-setup-remote.sh --phase pre-reboot --hostname <hostname> --ip <static_ip> --codename <codename>'
    ```
 
 3. **リブート**:
    ```sh
-   ssh root@<ip> 'reboot' || true
+   ssh root@<static_ip> 'reboot' || true
    ```
 
 4. **SSH 再接続待機**（通常 60-120 秒、最大 5 分、30秒間隔）:
    PVE カーネルでの起動を待つ。
+   - `ssh -o ConnectTimeout=5 root@<static_ip> true` を 30 秒間隔でリトライ
+   - **5 分超過でも SSH 不達の場合のリカバリ**:
+     1. POST code 確認: `./scripts/bmc-power.sh postcode "$BMC_IP" "$BMC_USER" "$BMC_PASS"`
+        - `0x92` (PCI bus init) で停滞 → POST スタックの可能性（`reference.md` 参照）
+     2. PowerState 確認: `./scripts/bmc-power.sh status "$BMC_IP" "$BMC_USER" "$BMC_PASS"`
+        - `On` の場合 → 自動パワーサイクル:
+          ```sh
+          ./scripts/bmc-power.sh forceoff "$BMC_IP" "$BMC_USER" "$BMC_PASS"
+          sleep 20
+          ./scripts/bmc-power.sh on "$BMC_IP" "$BMC_USER" "$BMC_PASS"
+          ```
+        - `Off` の場合 → `./scripts/bmc-power.sh on` で起動
+     3. パワーサイクル後 150 秒待機 → SSH リトライ（30 秒間隔、最大 3 分）
+     4. それでも SSH 不達 → SOL 経由で NIC 名・IP を確認（ステップ 5 へ）
 
 5. **NIC 名変更チェック**:
    SSH 接続できない場合、SOL 経由で NIC 名を確認（`reference.md` 参照）。
@@ -293,23 +304,23 @@ PVE のインストールを SSH 経由で実行。
 
 6. **post-reboot フェーズ**:
    ```sh
-   scp scripts/pve-setup-remote.sh root@<ip>:/tmp/
-   ssh root@<ip> '/tmp/pve-setup-remote.sh --phase post-reboot --hostname <hostname> --ip <static_ip> --codename <codename>'
+   scp ./scripts/pve-setup-remote.sh root@<static_ip>:/tmp/
+   ssh root@<static_ip> '/tmp/pve-setup-remote.sh --phase post-reboot --hostname <hostname> --ip <static_ip> --codename <codename>'
    ```
 
 7. **最終リブート**:
    ```sh
-   ssh root@<ip> 'reboot' || true
+   ssh root@<static_ip> 'reboot' || true
    ```
 
 8. **PVE 動作確認**:
    - SSH 再接続待機（通常 60-120 秒、最大 5 分、30秒間隔で ping）
-   - **注意**: リブート後5分以上ネットワーク到達不能な場合、BMC で ForceOff → On を試す
-     （VirtualMedia が中途半端にマウントされているとブートが遅延する場合がある）
-   - `ssh root@<ip> 'pveversion'` で PVE バージョン確認
+   - **注意**: リブート後5分以上ネットワーク到達不能な場合、ステップ 4 と同様のリカバリを実施
+     （ForceOff → 20秒待機 → On → 150秒待機 → SSH リトライ）
+   - `ssh root@<static_ip> 'pveversion'` で PVE バージョン確認
    - `curl -sk https://<static_ip>:8006` で Web UI アクセス確認
 
-9. **完了マーク（必須）**: `scripts/os-setup-phase.sh mark pve-install`
+9. **完了マーク（必須）**: `./scripts/os-setup-phase.sh mark pve-install`
    > **WARNING**: このマークを忘れると Phase 8 が開始できない。PVE 動作確認完了後、必ず実行すること。
 
 ---
@@ -318,7 +329,7 @@ PVE のインストールを SSH 経由で実行。
 
 **前提チェック**: Phase 8 開始前に pve-install フェーズの完了を確認する:
 ```sh
-scripts/os-setup-phase.sh check pve-install
+./scripts/os-setup-phase.sh check pve-install
 ```
 チェックが失敗した場合は Phase 7 に戻り、ステップ 9 の完了マークを実行する。
 
@@ -326,14 +337,14 @@ scripts/os-setup-phase.sh check pve-install
 
 1. **VirtualMedia クリーンアップ**（まだマウントされていれば）:
    ```sh
-   scripts/bmc-session.sh login "$BMC_IP" "$BMC_USER" "$BMC_PASS" "$COOKIE_FILE"
-   CSRF=$(scripts/bmc-session.sh csrf "$BMC_IP" "$COOKIE_FILE")
-   scripts/bmc-virtualmedia.sh umount "$BMC_IP" "$COOKIE_FILE" "$CSRF"
+   ./scripts/bmc-session.sh login "$BMC_IP" "$BMC_USER" "$BMC_PASS" "$COOKIE_FILE"
+   CSRF=$(./scripts/bmc-session.sh csrf "$BMC_IP" "$COOKIE_FILE")
+   ./scripts/bmc-virtualmedia.sh umount "$BMC_IP" "$COOKIE_FILE" "$CSRF"
    ```
 
 2. **Boot Override 確認・解除**:
    ```sh
-   pve-lock.sh run scripts/bmc-power.sh boot-override-reset "$BMC_IP" "$BMC_USER" "$BMC_PASS"
+   ./pve-lock.sh run ./scripts/bmc-power.sh boot-override-reset "$BMC_IP" "$BMC_USER" "$BMC_PASS"
    ```
 
 3. **cookie ファイル削除**:
@@ -342,13 +353,13 @@ scripts/os-setup-phase.sh check pve-install
    ```
 
 4. **最終検証サマリ**:
-   - OS: `ssh root@<ip> 'cat /etc/os-release | head -2'`
-   - PVE: `ssh root@<ip> 'pveversion'`
-   - カーネル: `ssh root@<ip> 'uname -r'`
-   - ネットワーク: `ssh root@<ip> 'ip -brief addr'`
+   - OS: `ssh root@<static_ip> 'cat /etc/os-release | head -2'`
+   - PVE: `ssh root@<static_ip> 'pveversion'`
+   - カーネル: `ssh root@<static_ip> 'uname -r'`
+   - ネットワーク: `ssh root@<static_ip> 'ip -brief addr'`
    - Web UI: `curl -sk -o /dev/null -w '%{http_code}' https://<static_ip>:8006`
 
-5. 完了: `scripts/os-setup-phase.sh mark cleanup`
+5. 完了: `./scripts/os-setup-phase.sh mark cleanup`
 
 6. **レポート作成**: `report/` ディレクトリに実行結果のレポートを作成（REPORT.md フォーマットに従う）
 
@@ -356,20 +367,20 @@ scripts/os-setup-phase.sh check pve-install
 
 ## Resume（中断からの再開）
 
-スキル呼び出し時に `scripts/os-setup-phase.sh status` で現在の状態を確認し、
+スキル呼び出し時に `./scripts/os-setup-phase.sh status` で現在の状態を確認し、
 完了済みフェーズをスキップして次のフェーズから再開する。
 
-`scripts/os-setup-phase.sh next` で次の未完了フェーズ名を取得できる。
+`./scripts/os-setup-phase.sh next` で次の未完了フェーズ名を取得できる。
 
-失敗したフェーズは `scripts/os-setup-phase.sh reset <phase>` でリセットして再実行可能。
+失敗したフェーズは `./scripts/os-setup-phase.sh reset <phase>` でリセットして再実行可能。
 
 ## pve-lock の使い方
 
-Phase 4〜8 では状態変更操作に `pve-lock.sh` を使用する:
+Phase 4〜8 では状態変更操作に `./pve-lock.sh` を使用する:
 
 ```sh
-pve-lock.sh run <command...>     # 即座に実行（ロック中ならエラー）
-pve-lock.sh wait <command...>    # ロック待ち→実行
+./pve-lock.sh run <command...>     # 即座に実行（ロック中ならエラー）
+./pve-lock.sh wait <command...>    # ロック待ち→実行
 ```
 
 ロック中の場合は別の課題に着手し、ロック解放後に再開する。
