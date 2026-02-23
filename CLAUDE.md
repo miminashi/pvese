@@ -54,6 +54,7 @@ ipmitool -I lanplus -H 10.10.10.24 -U claude -P Claude123 chassis status
 - **セッション用 tmp ディレクトリ**: セッション開始時に `mkdir -p tmp/<session-id>` でセッション固有の一時ディレクトリを作成する。`<session-id>` は Claude Code のセッション UUID の先頭8文字を使う（例: セッションの transcript パスが `.../<uuid>.jsonl` なら、その UUID の先頭8文字）。一時ファイル（スクリプト、コミットメッセージ等）はすべてここに書く。`/tmp/` への Write はプロジェクト外のため承認プロンプトが出る
 - **複雑なスクリプトはファイルに書いてから実行する**: 環境変数の設定、ヒアドキュメント、複数行ロジックを含むコマンドや、書き捨ての Python スクリプトは Bash ツールにインラインで渡さず、Write ツールで `tmp/<session-id>/` にファイルとして保存してから `python3 tmp/<session-id>/script.py` や `sh tmp/<session-id>/script.sh` で実行すること。インラインの複雑なコマンドはパーミッション許可リストにマッチしない
 - **ファイルへのリダイレクトを使わない**: `2>/tmp/file.log` や `>/tmp/file.log` 等のファイルリダイレクトはパーミッション自動承認が効かない（`2>/dev/null` と `2>&1` のみ許可）。stderr をファイルに保存したい場合は、Bash ツールの出力を直接利用すること
+- **ファイル内容の読み取りに Bash を使わない**: `cat`, `head`, `tail`, `for file in ... cat` 等でファイルを読むのは禁止。Read ツールや Glob ツールを使うこと。複数ファイルをまとめて読みたい場合は Glob で一覧を取得してから Read で各ファイルを読む
 - **パーミッション設定の優先順位**: プロジェクト `settings.local.json` に `permissions.allow` がある場合、グローバル `settings.local.json` の `permissions.allow` は置換される（マージされない）。プロジェクト設定には必要なグローバルパターンも含めること
 - **ツールのパスに `~` を使わない**: Read, Glob, Grep 等のツールは `~` をシェル展開しない。`~/projects/...` ではなく `/home/ubuntu/projects/...` のように絶対パスを使うこと
 - **レポート作成**: plan mode を使用してまとまった作業を行った場合は、完了時にレポートを作成すること。フォーマットは [REPORT.md](REPORT.md) に従う。レポートは常に `/home/ubuntu/projects/pvese/report/` に作成する
@@ -61,6 +62,7 @@ ipmitool -I lanplus -H 10.10.10.24 -U claude -P Claude123 chassis status
 - **課題管理**: 作業は `issue.sh` で課題として追跡する。セッション開始時に `issue.sh list` で未完了課題を確認し、作業中の課題は `issue.sh start <id> --owner <session名>` で取得する。状態遷移ルールは [ISSUE.md](ISSUE.md) を参照
 - **BMC ファクトリーリセット禁止**: `ipmitool raw 0x3c 0x40` 等の BMC リセットコマンドは実行禁止。BMC 全ユーザ・ネットワーク設定が消失する。リセットが必要な場合はコマンドをユーザに提示し手動実行を依頼すること
 - **`git push` は自動許可しない**: パーミッション許可リストに `git push` は含めない。push が必要な場合はユーザに確認を求めること
+- **通しテストはユーザの明確な指示で実行する**: `scripts/` 配下のセットアップスクリプトを修正した場合でも、通しテスト（`os-setup` スキル）は自動的に実行しない。ユーザが明確に通しテストを指示した場合のみ実行すること
 
 ## パーミッション許可リストとコマンド実行
 

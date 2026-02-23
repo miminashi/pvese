@@ -97,7 +97,7 @@ scripts/os-setup-phase.sh status
 
 1. **BMC ログイン**:
    ```sh
-   COOKIE_FILE="/tmp/bmc-cookie-$$"
+   COOKIE_FILE="tmp/<session-id>/bmc-cookie"
    scripts/bmc-session.sh login "$BMC_IP" "$BMC_USER" "$BMC_PASS" "$COOKIE_FILE"
    CSRF=$(scripts/bmc-session.sh csrf "$BMC_IP" "$COOKIE_FILE")
    ```
@@ -153,7 +153,9 @@ scripts/os-setup-phase.sh status
 
 **pve-lock**: 必要（Phase 4 から継続保持）
 
-Debian インストーラの進行を3層で監視する。
+> **所要時間目安**: Debian インストールは通常 10-12 分。全フェーズ (Phase 1-8) 合計は 35-50 分。
+
+Debian インストーラの進行を監視する（POST code + PowerState の2層）。
 
 #### 1. POST code ポーリング（30秒間隔）
 
@@ -168,20 +170,11 @@ scripts/bmc-power.sh postcode "$BMC_IP" "$BMC_USER" "$BMC_PASS"
 - POST code が安定（変化なし5分以上）→ OS/インストーラがカーネルに制御移行済み
 - POST code `0x00` → POST 完了 or 電源 Off
 
-#### 2. SOL 監視（バックグラウンド）
+#### 2. SOL 監視（非推奨）
 
-`ipmitool sol activate` を `Bash(run_in_background=true)` で起動し、出力を監視:
-
-```sh
-ipmitool -I lanplus -H "$BMC_IP" -U "$BMC_USER" -P "$BMC_PASS" sol activate
-```
-
-出力があればキーワード検出:
-- `Installation complete` → インストール完了
-- `login:` → OS 起動完了（poweroff せずリブートした場合）
-- `Power down` → シャットダウン中
-
-SOL に出力がない場合（efi.img のシリアル設定が効かなかった場合）は POST code + PowerState で監視を続ける。
+> **非推奨**: SOL バックグラウンド起動はセッション管理が複雑で信頼性が低い。
+> POST code ポーリング + PowerState ポーリングを主要な監視手段として使用すること。
+> SOL は Phase 6 のログイン操作など、対話が必要な場面でのみフォアグラウンドで使用する。
 
 #### 3. PowerState ポーリング（5分間隔）
 
@@ -197,7 +190,7 @@ scripts/bmc-power.sh status "$BMC_IP" "$BMC_USER" "$BMC_PASS"
 DCMS ライセンスがある場合のみ使用可能:
 
 ```sh
-scripts/bmc-screenshot.sh "$BMC_IP" "$COOKIE_FILE" "$CSRF" /tmp/installer-screenshot.bmp
+scripts/bmc-screenshot.sh "$BMC_IP" "$COOKIE_FILE" "$CSRF" tmp/<session-id>/installer-screenshot.bmp
 ```
 
 ライセンスエラーが返った場合はスキップ（POST code + PowerState で代替）。
@@ -252,7 +245,7 @@ Debian インストール後の初期設定。
    ssh-keygen -R <static_ip> 2>/dev/null || true
    ```
 
-5. **SSH 接続を待機**:
+5. **SSH 接続を待機**（通常 30-90 秒、最大 2.5 分）:
    - DHCP IP は変わる可能性がある。SOL の `ip -brief addr` で現在の IP を確認
    - SSH 接続確認: `ssh -o ConnectTimeout=5 -o StrictHostKeyChecking=no root@<ip> true`
 
@@ -288,7 +281,7 @@ PVE のインストールを SSH 経由で実行。
    ssh root@<ip> 'reboot' || true
    ```
 
-4. **SSH 再接続待機**（最大10分、30秒間隔）:
+4. **SSH 再接続待機**（通常 60-120 秒、最大 5 分、30秒間隔）:
    PVE カーネルでの起動を待つ。
 
 5. **NIC 名変更チェック**:
@@ -307,17 +300,24 @@ PVE のインストールを SSH 経由で実行。
    ```
 
 8. **PVE 動作確認**:
-   - SSH 再接続待機（最大5分、30秒間隔で ping）
+   - SSH 再接続待機（通常 60-120 秒、最大 5 分、30秒間隔で ping）
    - **注意**: リブート後5分以上ネットワーク到達不能な場合、BMC で ForceOff → On を試す
      （VirtualMedia が中途半端にマウントされているとブートが遅延する場合がある）
    - `ssh root@<ip> 'pveversion'` で PVE バージョン確認
    - `curl -sk https://<static_ip>:8006` で Web UI アクセス確認
 
-9. 完了: `scripts/os-setup-phase.sh mark pve-install`
+9. **完了マーク（必須）**: `scripts/os-setup-phase.sh mark pve-install`
+   > **WARNING**: このマークを忘れると Phase 8 が開始できない。PVE 動作確認完了後、必ず実行すること。
 
 ---
 
 ### Phase 8: cleanup
+
+**前提チェック**: Phase 8 開始前に pve-install フェーズの完了を確認する:
+```sh
+scripts/os-setup-phase.sh check pve-install
+```
+チェックが失敗した場合は Phase 7 に戻り、ステップ 9 の完了マークを実行する。
 
 **pve-lock**: 必要
 
