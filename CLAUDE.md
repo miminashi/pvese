@@ -41,6 +41,8 @@ ipmitool -I lanplus -H 10.10.10.24 -U claude -P Claude123 chassis status
 ## ルール
 
 - **全操作をログに記録する**: 状態変更操作は `./oplog.sh` で記録すること（ラボ環境のためユーザ確認は不要）。ログは `log/oplog.log` に蓄積される
+- **スクリプトは必ず `./` 付き相対パスで実行する**: 絶対パス (`/home/ubuntu/projects/pvese/scripts/xxx.sh`) や `./` なしのパス (`scripts/xxx.sh`) は許可リストにマッチしないため自動承認されない。必ず `./scripts/xxx.sh`, `./issue.sh`, `./oplog.sh` のように `./` を付けること
+- **一時ファイルは `tmp/<session-id>/` に書く。`/tmp/` は使用禁止**: `/tmp/` はプロジェクト外パスのため承認プロンプトが出る。cookie ファイル、一時スクリプト、ログ等すべて `tmp/<session-id>/` に書くこと
 - IPMI パスワードや API トークンはスクリプトにハードコードしてよい（ラボ環境）
 - `.env` ファイルを使う場合は `.gitignore` に含め、コミットしない
 - PVE API 呼び出し時は自己署名証明書に対応するため `curl -k` または `--cacert` を使用する
@@ -81,6 +83,19 @@ ipmitool -I lanplus -H 10.10.10.24 -U claude -P Claude123 chassis status
 | bin/ 配下 | `./bin/yq .bmc_ip config.yml` |
 
 `scripts/xxx.sh`（`./` なし）や絶対パスは許可リストにないため自動承認されない。
+
+> **注意**: 絶対パスは最もよくある間違い。特に引数に渡すファイルパスも `tmp/<session-id>/` を使うこと。
+
+```sh
+# NG: 絶対パスでスクリプトを実行（自動承認されない）
+/home/ubuntu/projects/pvese/scripts/bmc-virtualmedia.sh status 10.10.10.24 /tmp/bmc-cookie 'token'
+
+# NG: ./ なしで実行（自動承認されない）
+scripts/bmc-virtualmedia.sh status 10.10.10.24 /tmp/bmc-cookie 'token'
+
+# OK: ./ 付き相対パス + tmp/<session-id>/ を使用
+./scripts/bmc-virtualmedia.sh status 10.10.10.24 tmp/a1b2c3d4/bmc-cookie 'token'
+```
 
 ### 複雑なコマンドはファイルに書いて実行する
 
