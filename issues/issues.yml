@@ -156,12 +156,12 @@ issues:
     description: Run 1 Phase 6 で SOL 接続が GRUB メニュー表示中にあたり、コマンドが login ではなく GRUB に送られた。60秒追加待機で回復したが、login プロンプト出現を確認するロジックの追加が望ましい。
   - id: 15
     title: Phase 5 インストール監視で SOL ログを活用する
-    status: plan
-    owner: ""
+    status: done
+    owner: "17cc085d"
     created: "2026-02-23T14:51:14Z"
-    updated: "2026-02-23T14:51:14Z"
+    updated: "2026-02-23T16:50:51Z"
     blocked_by: ""
-    report: ""
+    report: "sol-monitor.py 作成、SKILL.md Phase 5 書き換え、reference.md 更新、オフラインテスト通過"
     labels:
       - script
       - ipmi

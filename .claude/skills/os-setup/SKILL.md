@@ -155,49 +155,45 @@ scripts/os-setup-phase.sh status
 
 > **所要時間目安**: Debian インストールは通常 10-12 分。全フェーズ (Phase 1-8) 合計は 35-50 分。
 
-Debian インストーラの進行を監視する（POST code + PowerState の2層）。
+Debian インストーラの進行を監視する。SOL 監視を主要手段とし、POST code ポーリングはフォールバック。
 
-#### 1. POST code ポーリング（30秒間隔）
+#### 1. SOL 監視（主要）
 
-`scripts/bmc-power.sh postcode` で BIOS/UEFI の進行を追跡する:
+`scripts/sol-monitor.py` でインストーラの進行をパッシブ監視する:
+
+```sh
+scripts/sol-monitor.py \
+    --bmc-ip "$BMC_IP" --bmc-user "$BMC_USER" --bmc-pass "$BMC_PASS" \
+    --log-file tmp/<session-id>/sol-install.log
+```
+
+- キー入力は一切送信しない（パッシブ監視のみ）
+- インストーラのステージ進行を stderr に表示（LOADING_COMPONENTS → ... → POWER_DOWN）
+- "Power down" 検出 → 30秒待機 → PowerState 確認 → exit 0
+- PowerState は60秒間隔でポーリング（"Off" なら exit 0）
+- 終了コード: 0=完了, 1=タイムアウト, 2=接続エラー, 3=異常終了
+
+#### 2. フォールバック: POST code ポーリング
+
+`sol-monitor.py` が接続エラー (exit 2) の場合に使用:
 
 ```sh
 scripts/bmc-power.sh postcode "$BMC_IP" "$BMC_USER" "$BMC_PASS"
-```
-
-- POST code が変化していれば POST 進行中
-- POST code `0x92` (PCI bus init) で10分以上停滞 → POST スタックの可能性（`reference.md` の回復手順参照）
-- POST code が安定（変化なし5分以上）→ OS/インストーラがカーネルに制御移行済み
-- POST code `0x00` → POST 完了 or 電源 Off
-
-#### 2. SOL 監視（非推奨）
-
-> **非推奨**: SOL バックグラウンド起動はセッション管理が複雑で信頼性が低い。
-> POST code ポーリング + PowerState ポーリングを主要な監視手段として使用すること。
-> SOL は Phase 6 のログイン操作など、対話が必要な場面でのみフォアグラウンドで使用する。
-
-#### 3. PowerState ポーリング（5分間隔）
-
-```sh
 scripts/bmc-power.sh status "$BMC_IP" "$BMC_USER" "$BMC_PASS"
 ```
 
-- `Off` → インストール完了（preseed の poweroff が成功）
+- POST code を30秒間隔でポーリング
+- PowerState を5分間隔でポーリング
+- `Off` → インストール完了
 - `On` が45分超過 → `scripts/bmc-power.sh forceoff` で強制停止
 
-#### 4. BMC スクリーンショット（オプション）
+#### 3. POST code 92 スタック検出
 
-DCMS ライセンスがある場合のみ使用可能:
-
-```sh
-scripts/bmc-screenshot.sh "$BMC_IP" "$COOKIE_FILE" "$CSRF" tmp/<session-id>/installer-screenshot.bmp
-```
-
-ライセンスエラーが返った場合はスキップ（POST code + PowerState で代替）。
+- POST code `0x92` (PCI bus init) で10分以上停滞 → POST スタックの可能性（`reference.md` の回復手順参照）
 
 #### 完了処理
 
-1. SOL を切断: `ipmitool ... sol deactivate`
+1. SOL を切断: `ipmitool ... sol deactivate`（sol-monitor.py が自動切断するが念のため）
 2. 完了: `scripts/os-setup-phase.sh mark install-monitor`
 
 ---

@@ -1,0 +1,229 @@
+#!/usr/bin/env python3
+"""Passive SOL monitor for Debian installer progress tracking.
+
+Connects to BMC via SOL and monitors installer output without sending
+any keystrokes. Detects installer stages and waits for power-off.
+
+Exit codes:
+  0 = completed (PowerState Off)
+  1 = timeout
+  2 = connection error
+  3 = abnormal termination
+"""
+import argparse
+import os
+import signal
+import subprocess
+import sys
+import time
+
+try:
+    import pexpect
+except ImportError:
+    print("ERROR: pexpect not installed. Run: pip3 install pexpect", file=sys.stderr)
+    sys.exit(2)
+
+
+# --- Installer stage definitions ---
+
+INSTALLER_STAGES = [
+    ("Loading additional components",   "LOADING_COMPONENTS"),
+    ("Detecting network hardware",      "DETECTING_NETWORK"),
+    ("Retrieving preseed file",         "RETRIEVING_PRESEED"),
+    ("Installing the base system",      "INSTALLING_BASE"),
+    ("Configuring apt",                 "CONFIGURING_APT"),
+    ("Select and install software",     "INSTALLING_SOFTWARE"),
+    ("Installing GRUB",                 "INSTALLING_GRUB"),
+    ("Installation complete",           "INSTALL_COMPLETE"),
+    ("Power down",                      "POWER_DOWN"),
+]
+
+
+def log(msg):
+    """Log to stderr with timestamp."""
+    ts = time.strftime("%H:%M:%S")
+    print(f"[{ts}] {msg}", file=sys.stderr, flush=True)
+
+
+def deactivate_sol(bmc_ip, bmc_user, bmc_pass):
+    """Deactivate any existing SOL session."""
+    cmd = [
+        "ipmitool", "-I", "lanplus",
+        "-H", bmc_ip, "-U", bmc_user, "-P", bmc_pass,
+        "sol", "deactivate",
+    ]
+    try:
+        subprocess.run(cmd, capture_output=True, timeout=10)
+    except Exception:
+        pass
+
+
+def sol_connect(bmc_ip, bmc_user, bmc_pass):
+    """Spawn ipmitool SOL connection."""
+    cmd = (
+        f"ipmitool -I lanplus -H {bmc_ip} -U {bmc_user} -P {bmc_pass} sol activate"
+    )
+    child = pexpect.spawn(cmd, timeout=30, encoding="latin-1")
+    return child
+
+
+def disconnect_sol(child):
+    """Cleanly disconnect SOL session (no login/logout needed)."""
+    try:
+        child.send("~.")
+        time.sleep(2)
+        child.close()
+    except Exception:
+        pass
+
+
+def check_powerstate(bmc_ip, bmc_user, bmc_pass):
+    """Check server PowerState via bmc-power.sh. Returns 'On', 'Off', or None."""
+    cmd = ["./scripts/bmc-power.sh", "status", bmc_ip, bmc_user, bmc_pass]
+    try:
+        result = subprocess.run(cmd, capture_output=True, text=True, timeout=30)
+        output = result.stdout.strip()
+        if "Off" in output:
+            return "Off"
+        if "On" in output:
+            return "On"
+        return output if output else None
+    except Exception as e:
+        log(f"PowerState check failed: {e}")
+        return None
+
+
+def monitor_loop(child, log_file, timeout, powerstate_interval, bmc_ip, bmc_user, bmc_pass):
+    """Main monitoring loop. Returns exit code."""
+    start = time.time()
+    last_powerstate_check = start
+    current_stage_idx = -1
+    power_down_detected = False
+
+    log(f"Monitoring started (timeout={timeout}s, powerstate_interval={powerstate_interval}s)")
+
+    while True:
+        elapsed = time.time() - start
+        if elapsed >= timeout:
+            log(f"Timeout reached ({timeout}s)")
+            return 1
+
+        try:
+            idx = child.expect([pexpect.TIMEOUT, pexpect.EOF], timeout=5)
+        except (pexpect.TIMEOUT, pexpect.EOF):
+            idx = 0
+
+        new_data = child.before or ""
+        if new_data and log_file:
+            try:
+                with open(log_file, "a", encoding="latin-1") as f:
+                    f.write(new_data)
+            except Exception as e:
+                log(f"Log write error: {e}")
+
+        if new_data:
+            for i, (keyword, stage_name) in enumerate(INSTALLER_STAGES):
+                if i > current_stage_idx and keyword in new_data:
+                    current_stage_idx = i
+                    elapsed_min = elapsed / 60
+                    log(f"Stage: {stage_name} ({elapsed_min:.1f}min)")
+
+            if not power_down_detected and "Power down" in new_data:
+                power_down_detected = True
+                log("Power down detected, waiting 30s for shutdown...")
+                time.sleep(30)
+                state = check_powerstate(bmc_ip, bmc_user, bmc_pass)
+                log(f"PowerState after shutdown wait: {state}")
+                if state == "Off":
+                    log("Installation completed successfully (PowerState Off)")
+                    return 0
+                log("PowerState not Off yet, continuing monitoring...")
+
+        if idx == 1:  # EOF
+            log("SOL connection lost (EOF)")
+            state = check_powerstate(bmc_ip, bmc_user, bmc_pass)
+            if state == "Off":
+                log("PowerState Off after SOL EOF - installation completed")
+                return 0
+            return 3
+
+        now = time.time()
+        if now - last_powerstate_check >= powerstate_interval:
+            last_powerstate_check = now
+            state = check_powerstate(bmc_ip, bmc_user, bmc_pass)
+            elapsed_min = (now - start) / 60
+            log(f"PowerState poll: {state} ({elapsed_min:.1f}min)")
+            if state == "Off":
+                log("Installation completed (PowerState Off)")
+                return 0
+
+
+def main():
+    parser = argparse.ArgumentParser(
+        description="Passive SOL monitor for Debian installer progress"
+    )
+    parser.add_argument("--bmc-ip", required=True, help="BMC IP address")
+    parser.add_argument("--bmc-user", required=True, help="BMC username")
+    parser.add_argument("--bmc-pass", required=True, help="BMC password")
+    parser.add_argument("--log-file", help="Path to save raw SOL output")
+    parser.add_argument("--timeout", type=int, default=2700,
+                        help="Max wait time in seconds (default: 2700 = 45min)")
+    parser.add_argument("--powerstate-interval", type=int, default=60,
+                        help="PowerState poll interval in seconds (default: 60)")
+    args = parser.parse_args()
+
+    child = None
+
+    def cleanup(signum=None, frame=None):
+        log("Signal received, cleaning up...")
+        if child:
+            disconnect_sol(child)
+        sys.exit(3)
+
+    signal.signal(signal.SIGTERM, cleanup)
+    signal.signal(signal.SIGINT, cleanup)
+
+    if args.log_file:
+        log_dir = os.path.dirname(args.log_file)
+        if log_dir:
+            os.makedirs(log_dir, exist_ok=True)
+        with open(args.log_file, "w") as f:
+            pass
+
+    log("Deactivating any existing SOL session")
+    deactivate_sol(args.bmc_ip, args.bmc_user, args.bmc_pass)
+    time.sleep(2)
+
+    log(f"Connecting SOL to {args.bmc_ip}")
+    try:
+        child = sol_connect(args.bmc_ip, args.bmc_user, args.bmc_pass)
+    except Exception as e:
+        log(f"SOL connection failed: {e}")
+        sys.exit(2)
+
+    try:
+        idx = child.expect(
+            [pexpect.TIMEOUT, pexpect.EOF, "SOL session", "\\[SOL"],
+            timeout=15,
+        )
+        if idx == 1:
+            log("SOL connection failed (EOF immediately)")
+            sys.exit(2)
+    except pexpect.TIMEOUT:
+        pass
+    except pexpect.EOF:
+        log("SOL connection failed (EOF)")
+        sys.exit(2)
+
+    log("SOL connected, starting installer monitoring")
+    rc = monitor_loop(
+        child, args.log_file, args.timeout, args.powerstate_interval,
+        args.bmc_ip, args.bmc_user, args.bmc_pass,
+    )
+
+    disconnect_sol(child)
+    sys.exit(rc)
+
+
+if __name__ == "__main__":
+    main()
