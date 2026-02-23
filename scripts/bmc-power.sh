@@ -13,6 +13,7 @@ usage() {
     echo "                   target: Cd, Pxe, Hdd, None"
     echo "                   mode: UEFI, Legacy"
     echo "  boot-next      <bmc_ip> <user> <pass> <boot_id>  Boot specific entry once (e.g. Boot0011)"
+    echo "  find-boot-entry <bmc_ip> <user> <pass> <pattern>  Find Boot ID by DisplayName pattern"
     echo "  boot-override-reset <bmc_ip> <user> <pass>           Disable boot override"
     echo "  postcode      <bmc_ip> <user> <pass>                Get POST code (Supermicro)"
     exit 1
@@ -137,7 +138,7 @@ cmd_boot_next() {
     pass="$3"
     boot_id="$4"
 
-    data="{\"Boot\":{\"BootSourceOverrideEnabled\":\"Once\",\"BootSourceOverrideTarget\":\"UefiBootNext\",\"BootNext\":\"${boot_id}\"}}"
+    data="{\"Boot\":{\"BootSourceOverrideEnabled\":\"Once\",\"BootSourceOverrideTarget\":\"UefiBootNext\",\"BootSourceOverrideMode\":\"UEFI\",\"BootNext\":\"${boot_id}\"}}"
 
     redfish_patch "$bmc_ip" "$user" "$pass" "/redfish/v1/Systems/1" "$data"
     echo ""
@@ -153,6 +154,55 @@ cmd_boot_override_reset() {
         '{"Boot":{"BootSourceOverrideEnabled":"Disabled"}}'
     echo ""
     echo "Boot override disabled"
+}
+
+cmd_find_boot_entry() {
+    bmc_ip="$1"
+    user="$2"
+    pass="$3"
+    pattern="$4"
+    max_retries=3
+    retry_wait=30
+    attempt=1
+
+    while [ "$attempt" -le "$max_retries" ]; do
+        members=$(redfish_get "$bmc_ip" "$user" "$pass" "/redfish/v1/Systems/1/BootOptions")
+
+        if command -v jq >/dev/null 2>&1; then
+            urls=$(echo "$members" | jq -r '.Members[]."@odata.id"' 2>/dev/null)
+        else
+            urls=$(echo "$members" | sed -n 's/.*"@odata.id"[[:space:]]*:[[:space:]]*"\([^"]*BootOptions\/[^"]*\)".*/\1/p')
+        fi
+
+        if [ -n "$urls" ]; then
+            for url in $urls; do
+                entry=$(redfish_get "$bmc_ip" "$user" "$pass" "$url")
+                if command -v jq >/dev/null 2>&1; then
+                    display_name=$(echo "$entry" | jq -r '.DisplayName // empty' 2>/dev/null)
+                    boot_id=$(echo "$entry" | jq -r '.Id // empty' 2>/dev/null)
+                else
+                    display_name=$(echo "$entry" | sed -n 's/.*"DisplayName"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p')
+                    boot_id=$(echo "$entry" | sed -n 's/.*"Id"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p')
+                fi
+
+                case "$display_name" in
+                    *"$pattern"*)
+                        echo "$boot_id"
+                        return 0
+                        ;;
+                esac
+            done
+        fi
+
+        if [ "$attempt" -lt "$max_retries" ]; then
+            echo "Boot entry '$pattern' not found, retry $attempt/$max_retries in ${retry_wait}s..." >&2
+            sleep "$retry_wait"
+        fi
+        attempt=$((attempt + 1))
+    done
+
+    echo "ERROR: No boot entry matching '$pattern' after $max_retries attempts" >&2
+    exit 1
 }
 
 postcode_desc() {
@@ -250,6 +300,10 @@ case "$command" in
     boot-next)
         if [ $# -lt 4 ]; then usage; fi
         cmd_boot_next "$1" "$2" "$3" "$4"
+        ;;
+    find-boot-entry)
+        if [ $# -lt 4 ]; then usage; fi
+        cmd_find_boot_entry "$1" "$2" "$3" "$4"
         ;;
     boot-override-reset)
         if [ $# -lt 3 ]; then usage; fi

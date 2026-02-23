@@ -34,6 +34,8 @@ Debian + Proxmox VE のインストールを BMC VirtualMedia 経由で自動実
 YQ="${PROJECT_DIR}/bin/yq"
 CONFIG="config/os-setup.yml"  # または引数で指定されたパス
 BMC_IP=$("$YQ" '.bmc_ip' "$CONFIG")
+SMB_HOST=$("$YQ" '.smb_host' "$CONFIG")
+SMB_SHARE=$("$YQ" '.smb_share_path' "$CONFIG")  # YAML "\\public" → \public
 # 以下同様に各値を読み取る
 ```
 
@@ -102,7 +104,7 @@ scripts/os-setup-phase.sh status
 
 2. **VirtualMedia 設定・マウント**:
    ```sh
-   scripts/bmc-virtualmedia.sh config "$BMC_IP" "$COOKIE_FILE" "$CSRF" "$SMB_HOST" "\\$SMB_SHARE\\debian-preseed.iso"
+   scripts/bmc-virtualmedia.sh config "$BMC_IP" "$COOKIE_FILE" "$CSRF" "$SMB_HOST" "$SMB_SHARE"'\debian-preseed.iso'
    scripts/bmc-virtualmedia.sh mount "$BMC_IP" "$COOKIE_FILE" "$CSRF"
    scripts/bmc-virtualmedia.sh status "$BMC_IP" "$COOKIE_FILE" "$CSRF"
    ```
@@ -119,19 +121,20 @@ scripts/os-setup-phase.sh status
    sleep 180
    ```
 
-4. **BootOptions で Boot0011 の存在を確認**:
+4. **BootOptions から VirtualMedia CD の Boot ID を動的検索**:
    ```sh
-   curl -sk -u "$BMC_USER:$BMC_PASS" "https://$BMC_IP/redfish/v1/Systems/1/BootOptions"
+   BOOT_ID=$(scripts/bmc-power.sh find-boot-entry "$BMC_IP" "$BMC_USER" "$BMC_PASS" "ATEN Virtual CDROM")
    ```
-   - `Boot0011` が一覧にない場合は VirtualMedia マウントを再確認
+   - Boot ID は固定ではなく OS インストール後に変動する（例: Boot0011 → Boot0013）
+   - `find-boot-entry` は最大3回リトライする（30秒間隔）。POST 直後は BootOptions が空の場合があるが、リトライで検出される
+   - 3回リトライしても見つからない場合は VirtualMedia マウントを再確認
    - **絶対に efibootmgr -c でブートエントリを手動作成しないこと**
      （無効なデバイスパスが UEFI BDS フェーズの POST code 92 スタックを引き起こす）
 
 5. **Boot Override 設定**（UefiBootNext で VirtualMedia CD を直接指定）:
    ```sh
-   scripts/bmc-power.sh boot-next "$BMC_IP" "$BMC_USER" "$BMC_PASS" Boot0011
+   scripts/bmc-power.sh boot-next "$BMC_IP" "$BMC_USER" "$BMC_PASS" "$BOOT_ID"
    ```
-   - `Boot0011` は "UEFI: ATEN Virtual CDROM YS0J" の ID
 
 6. **電源サイクル**（CD ブート開始）:
    ```sh
@@ -237,21 +240,30 @@ Debian インストール後の初期設定。
    echo "debian ALL=(ALL) NOPASSWD: ALL" > /etc/sudoers.d/debian
    chmod 0440 /etc/sudoers.d/debian
    mkdir -p /root/.ssh && chmod 700 /root/.ssh
-   echo "<公開鍵>" > /root/.ssh/authorized_keys && chmod 600 /root/.ssh/authorized_keys
+   echo "<SSH_PUBKEY>" > /root/.ssh/authorized_keys && chmod 600 /root/.ssh/authorized_keys
    ```
 
-4. **SSH 接続を待機**:
+   `<SSH_PUBKEY>` はローカルの `~/.ssh/id_ed25519.pub` を Read ツールで読み取った内容を使用する。
+   ハードコードではなく、毎回ファイルから読み取ること。
+
+4. **古いホスト鍵を削除**（OS 再インストールで鍵が変わるため）:
+   ```sh
+   ssh-keygen -R <dhcp_ip> 2>/dev/null || true
+   ssh-keygen -R <static_ip> 2>/dev/null || true
+   ```
+
+5. **SSH 接続を待機**:
    - DHCP IP は変わる可能性がある。SOL の `ip -brief addr` で現在の IP を確認
    - SSH 接続確認: `ssh -o ConnectTimeout=5 -o StrictHostKeyChecking=no root@<ip> true`
 
-5. **静的 IP 設定**:
+6. **静的 IP 設定**:
    設定ファイルの `static_ip`, `static_iface` が指定されている場合:
    ```sh
    ssh root@<ip> 'printf "\nauto eno2np1\niface eno2np1 inet static\n    address 10.10.10.204/8\n" >> /etc/network/interfaces'
    ssh root@<ip> 'ifup eno2np1'
    ```
 
-6. 完了: `scripts/os-setup-phase.sh mark post-install-config`
+7. 完了: `scripts/os-setup-phase.sh mark post-install-config`
 
 ---
 

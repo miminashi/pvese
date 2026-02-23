@@ -72,15 +72,18 @@ PATCH /redfish/v1/Systems/1
   "Boot": {
     "BootSourceOverrideEnabled": "Once",
     "BootSourceOverrideTarget": "UefiBootNext",
+    "BootSourceOverrideMode": "UEFI",
     "BootNext": "Boot0011"
   }
 }
 ```
-- `Boot0011` は "UEFI: ATEN Virtual CDROM YS0J" の ID（環境依存）
+- **`BootSourceOverrideMode: "UEFI"` は必須**。デフォルト "Legacy" では UefiBootNext が無視される
+- Boot ID は固定ではなく OS インストール後に変動する（例: Boot0011 → Boot0013）
+- `bmc-power.sh find-boot-entry` で DisplayName パターンから Boot ID を動的検索可能
 - BootOptions 一覧: `GET /redfish/v1/Systems/1/BootOptions`
 - 各エントリ詳細: `GET /redfish/v1/Systems/1/BootOptions/<id>` の `DisplayName` で確認
-- **重要**: `Boot0011` は UEFI POST で VirtualMedia を検出した後にのみ BootOptions に出現する。
-  サーバが Off の状態では VirtualMedia の BootOption が存在しないため boot-next が失敗する。
+- **重要**: VirtualMedia の BootOption は UEFI POST で VirtualMedia を検出した後にのみ出現する。
+  サーバが Off の状態では存在しないため boot-next が失敗する。
   手順: VirtualMedia マウント → サーバ On → POST 完了待ち(約2分) → boot-next 設定 → cycle
 
 **オーバーライド解除**:
@@ -302,3 +305,20 @@ ssh root@<ip> 'sed -i "s/^#PermitRootLogin.*/PermitRootLogin yes/" /etc/ssh/sshd
 
 引数: `<元ISO> <preseed.cfg> <出力ISO>`
 デフォルト出力: `/var/samba/public/debian-preseed.iso`
+
+### efi.img パッチ注意点
+
+ISO リマスター時に efi.img 内の GRUB を再構築してシリアルコンソール対応にする。
+`grub-mkstandalone` (Option B) のみが有効。以下の注意点がある:
+
+1. **`search` ターゲット**: `search --file /boot/grub/grub.cfg` は memdisk 内の grub.cfg を
+   再帰的に検出して無限ループを引き起こす。`search --file /install.amd/vmlinuz` のように
+   ISO 上にのみ存在するファイルを指定する
+2. **`set prefix` を変更しない**: prefix を書き換えると GRUB モジュールパスが壊れ、
+   モジュールの動的ロードが失敗する。menuentry は embed.cfg に直接記述して
+   外部 grub.cfg への依存を回避する
+3. **`--modules` で全必要モジュールを明示指定**: embed.cfg から使用する全モジュールを
+   `grub-mkstandalone --modules="..."` で静的リンクする。動的ロードに頼ると
+   prefix 問題でモジュールが見つからない場合がある
+4. **必要なモジュール例**: `part_gpt part_msdos fat iso9660 search serial
+   linux normal echo test gzio`
