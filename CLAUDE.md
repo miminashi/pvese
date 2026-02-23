@@ -101,6 +101,7 @@ Write /tmp/mount.sh → sh /tmp/mount.sh
 - `&&` や `;` で繋いだ異種コマンドチェイン（安全コマンド以外の組み合わせでは自動承認されない場合がある）
 - `sudo` (iptables 以外)
 - `git -C <path>` (`git -C /path status` → `Bash(git -C` で始まり `Bash(git status:*)` にマッチしない。`cd /path && git status` をファイルに書いて `sh /tmp/script.sh` で実行するか、プロジェクトルートから直接実行すること)
+- `git commit -m "$(cat <<'EOF'...)"` (HEREDOC はマルチラインコマンドになり自動承認されない。代わりに Write ツールで `/tmp/commit-msg.txt` にメッセージを書き、`git commit -F /tmp/commit-msg.txt` で実行すること)
 
 ### settings.local.json の管理
 
