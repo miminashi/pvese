@@ -16,6 +16,9 @@ usage() {
     echo ""
     echo "  status <bmc_ip> <cookie_file> <csrf>"
     echo "    Show VirtualMedia status"
+    echo ""
+    echo "  verify <bmc_ip> <bmc_user> <bmc_pass>"
+    echo "    Verify VirtualMedia mount via Redfish (exit 0=mounted, 1=not mounted)"
     exit 1
 }
 
@@ -82,6 +85,27 @@ cmd_status() {
     echo "$result"
 }
 
+cmd_verify() {
+    bmc_ip="$1"
+    bmc_user="$2"
+    bmc_pass="$3"
+
+    result=$(curl -sk -u "${bmc_user}:${bmc_pass}" \
+        "https://${bmc_ip}/redfish/v1/Managers/1/VirtualMedia/CD1")
+
+    inserted=$(echo "$result" | sed -n 's/.*"Inserted"[[:space:]]*:[[:space:]]*\([a-z]*\).*/\1/p')
+    connected=$(echo "$result" | sed -n 's/.*"ConnectedVia"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p')
+
+    echo "Inserted: $inserted, ConnectedVia: $connected"
+
+    if [ "$inserted" = "true" ]; then
+        return 0
+    else
+        echo "ERROR: VirtualMedia not inserted (CSRF token may have expired)" >&2
+        return 1
+    fi
+}
+
 if [ $# -lt 1 ]; then
     usage
 fi
@@ -104,6 +128,10 @@ case "$command" in
     status)
         if [ $# -lt 3 ]; then usage; fi
         cmd_status "$1" "$2" "$3"
+        ;;
+    verify)
+        if [ $# -lt 3 ]; then usage; fi
+        cmd_verify "$1" "$2" "$3"
         ;;
     *)
         usage
