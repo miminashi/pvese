@@ -117,7 +117,21 @@ SMB_SHARE=$("$YQ" '.smb_share_path' "$CONFIG")  # YAML "\\public" → \public
    ./scripts/bmc-virtualmedia.sh status "$BMC_IP" "$COOKIE_FILE" "$CSRF"
    ```
 
-3. **サーバをパワーサイクルして BootOptions を列挙させる**:
+3. **Redfish でマウント検証**:
+   ```sh
+   ./scripts/bmc-virtualmedia.sh verify "$BMC_IP" "$BMC_USER" "$BMC_PASS"
+   ```
+   - `Inserted: true` → 次のステップへ
+   - `Inserted: false` → CSRF トークンが失効している可能性。BMC 再ログイン + CSRF 再取得 + 再マウント + 再検証:
+     ```sh
+     ./scripts/bmc-session.sh login "$BMC_IP" "$BMC_USER" "$BMC_PASS" "$COOKIE_FILE"
+     CSRF=$(./scripts/bmc-session.sh csrf "$BMC_IP" "$COOKIE_FILE")
+     ./scripts/bmc-virtualmedia.sh config "$BMC_IP" "$COOKIE_FILE" "$CSRF" "$SMB_HOST" "$SMB_SHARE"'\debian-preseed.iso'
+     ./scripts/bmc-virtualmedia.sh mount "$BMC_IP" "$COOKIE_FILE" "$CSRF"
+     ./scripts/bmc-virtualmedia.sh verify "$BMC_IP" "$BMC_USER" "$BMC_PASS"
+     ```
+
+4. **サーバをパワーサイクルして BootOptions を列挙させる**:
    > **重要**: `Boot0011` (ATEN Virtual CDROM) は UEFI POST で VirtualMedia を
    > 検出した後にのみ BootOptions に出現する。VirtualMedia をマウントした後、
    > 最低1回はパワーサイクル（POST 通過）が必要。
@@ -129,7 +143,7 @@ SMB_SHARE=$("$YQ" '.smb_share_path' "$CONFIG")  # YAML "\\public" → \public
    sleep 180
    ```
 
-4. **BootOptions から VirtualMedia CD の Boot ID を動的検索**:
+5. **BootOptions から VirtualMedia CD の Boot ID を動的検索**:
    ```sh
    BOOT_ID=$(./scripts/bmc-power.sh find-boot-entry "$BMC_IP" "$BMC_USER" "$BMC_PASS" "ATEN Virtual CDROM")
    ```
@@ -139,17 +153,17 @@ SMB_SHARE=$("$YQ" '.smb_share_path' "$CONFIG")  # YAML "\\public" → \public
    - **絶対に efibootmgr -c でブートエントリを手動作成しないこと**
      （無効なデバイスパスが UEFI BDS フェーズの POST code 92 スタックを引き起こす）
 
-5. **Boot Override 設定**（UefiBootNext で VirtualMedia CD を直接指定）:
+6. **Boot Override 設定**（UefiBootNext で VirtualMedia CD を直接指定）:
    ```sh
    ./scripts/bmc-power.sh boot-next "$BMC_IP" "$BMC_USER" "$BMC_PASS" "$BOOT_ID"
    ```
 
-6. **電源サイクル**（CD ブート開始）:
+7. **電源サイクル**（CD ブート開始）:
    ```sh
    ./scripts/bmc-power.sh cycle "$BMC_IP" "$BMC_USER" "$BMC_PASS" 20
    ```
 
-7. 完了: `./scripts/os-setup-phase.sh mark bmc-mount-boot`
+8. 完了: `./scripts/os-setup-phase.sh mark bmc-mount-boot`
 
 **エラー時**:
 - CSRF エラー → `bmc-session.sh login` + `csrf` を再実行
