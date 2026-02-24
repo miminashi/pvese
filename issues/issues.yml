@@ -1,4 +1,4 @@
-next_id: 19
+next_id: 21
 issues:
   - id: 1
     title: Test issue
@@ -200,3 +200,26 @@ issues:
     labels:
       - script
     description: "Phase 4 で SMB パスをシェルリテラルでハードコードすると、シングルクォート内の \\\\public が二重バックスラッシュとしてCGI APIに送信され、CGIは成功(VMCOMCODE=001)を返すが実際にはマウントされないsilent failureが発生する。Issue #17のテストで発見。対策: (1) SKILL.md Phase 4 に警告コメントを追加（SMBパスは必ず yq で読み取り、シェルリテラルでバックスラッシュをハードコードしない旨） (2) bmc-virtualmedia.sh の cmd_config() にコメントで注意点を記載（パスに二重バックスラッシュが含まれるとsilent failureになる旨） (3) SKILL.md のコード例を yq による動的組み立てに修正"
+  - id: 19
+    title: Phase 6 post-install-config に POST 92 スタックのリカバリ手順を追加
+    status: plan
+    owner: ""
+    created: "2026-02-24T12:15:17Z"
+    updated: "2026-02-24T12:15:26Z"
+    blocked_by: ""
+    report: ""
+    labels:
+      - script
+    description: "Phase 6 (post-install-config) で Power On 後に POST code 92 (DXE--BIOS PCI Bus Enumeration) で散発的にスタックする。Phase 7 にはリカバリ手順が記載済みだが Phase 6 には未記載。Issue #17 テストで Phase 6 に約4分のスタックが発生し sol-login.py が 180秒タイムアウトで失敗した。ForceOff + 20秒待機 + Power On + 3分待機で回復。対策: (1) SKILL.md Phase 6 ステップ2 (Power On) の後に POST 92 スタック検出とリカバリ手順を追加 (2) sol-login.py のタイムアウト時に POST code を自動チェックするガイダンスを追記"
+  - id: 20
+    title: Redfish POST code API が stale 値を返す問題の調査と対策
+    status: plan
+    owner: ""
+    created: "2026-02-24T12:15:18Z"
+    updated: "2026-02-24T12:15:32Z"
+    blocked_by: ""
+    report: ""
+    labels:
+      - ipmi
+      - script
+    description: "Redfish POST code API (GET /redfish/v1/Systems/1) の CurrentBootProgress.OemPostCode が実際の POST 状態と乖離する場合がある。Issue #17 テストの Phase 6 で KVM スクリーンショットは POST code 92 (PCI Bus Enumeration) 画面を表示しているにもかかわらず、API は 0x00 (POST complete) を返した。POST code だけでスタック判定すると見逃す可能性がある。対策候補: (1) bmc-power.sh postcode にスクリーンショット併用の注意コメント追加 (2) POST code と PowerState の組み合わせ判定（On + 0x00 が長時間続く場合はスタック疑い） (3) KVM スクリーンショットによる視覚的確認をフォールバック手段として SKILL.md に記載"
