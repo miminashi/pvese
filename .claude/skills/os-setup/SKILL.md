@@ -248,6 +248,18 @@ Debian インストール後の初期設定。
    ```sh
    ./pve-lock.sh run ./scripts/bmc-power.sh on "$BMC_IP" "$BMC_USER" "$BMC_PASS"
    ```
+   - Power On 後 **60 秒待機**し POST code を確認:
+     ```sh
+     sleep 60
+     ./scripts/bmc-power.sh postcode "$BMC_IP" "$BMC_USER" "$BMC_PASS"
+     ```
+   - POST code が `0x92` (PCI bus init) で停滞 → POST スタックの可能性。自動リカバリ:
+     ```sh
+     ./pve-lock.sh run ./scripts/bmc-power.sh forceoff "$BMC_IP" "$BMC_USER" "$BMC_PASS"
+     sleep 20
+     ./pve-lock.sh run ./scripts/bmc-power.sh on "$BMC_IP" "$BMC_USER" "$BMC_PASS"
+     ```
+   - リカバリ後 **150 秒待機**してから次のステップへ進む
 
 3. **SOL 経由でログイン確認・設定**:
    > **重要**: preseed の late_command は Debian 13 で動作しないことが多い。
@@ -274,6 +286,17 @@ Debian インストール後の初期設定。
       ```
       スクリプトはブートステージ（GRUB/カーネル/systemd）を自動検出し、
       GRUB メニュー表示中はキー入力を送信しない。login プロンプトまで安全に待機する。
+   - **sol-login.py がタイムアウトした場合**: POST スタックの可能性がある。
+     POST code を確認し、`0x92` で停滞していればパワーサイクルでリカバリ:
+     ```sh
+     ./scripts/bmc-power.sh postcode "$BMC_IP" "$BMC_USER" "$BMC_PASS"
+     # 0x92 の場合:
+     ./pve-lock.sh run ./scripts/bmc-power.sh forceoff "$BMC_IP" "$BMC_USER" "$BMC_PASS"
+     sleep 20
+     ./pve-lock.sh run ./scripts/bmc-power.sh on "$BMC_IP" "$BMC_USER" "$BMC_PASS"
+     sleep 150
+     ```
+     リカバリ後、sol-login.py を再実行する。
 
 4. **古いホスト鍵を削除**（OS 再インストールで鍵が変わるため）:
    ```sh
