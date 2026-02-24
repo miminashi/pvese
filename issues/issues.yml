@@ -1,4 +1,4 @@
-next_id: 16
+next_id: 17
 issues:
   - id: 1
     title: Test issue
@@ -166,3 +166,14 @@ issues:
       - script
       - ipmi
     description: '現在 Phase 5 のインストール監視は POST code + PowerState ポーリングのみで粗い粒度。SOL 経由でインストーラーの詳細ログ（パッケージ展開、ネットワーク設定等）が見えることはテスト #4 で確認済み。SOL 出力をパースして進捗を把握する仕組みを検討する。課題 #8 で SOL バックグラウンド監視を非推奨としたのはセッション管理の複雑さが理由であり、信頼性の高い方式（例: expect/Python subprocess でのフォアグラウンド監視、ログファイルへの記録）であれば活用可能。'
+  - id: 16
+    title: 'sol-monitor.py: パワーサイクル直後の PowerState Off 誤検出'
+    status: done
+    owner: "65968776"
+    created: "2026-02-23T18:55:43Z"
+    updated: "2026-02-24T06:09:37Z"
+    blocked_by: ""
+    report: ""
+    labels:
+      - script
+    description: "scripts/sol-monitor.py が PowerState を60秒間隔でポーリングしているが、パワーサイクル（ForceOff→On）直後にポーリングが走ると、まだ電源が入っていない状態の Off を検出してインストール完了と誤判断し exit 0 で終了する。対策案: (1) 起動前に PowerState On を確認してからポーリングを開始 (2) 初回ポーリングの Off を無視するロジック追加 (3) Off 検出後に一定時間待機して再確認"
