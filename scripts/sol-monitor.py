@@ -93,6 +93,18 @@ def check_powerstate(bmc_ip, bmc_user, bmc_pass):
         return None
 
 
+def confirm_powerstate_off(bmc_ip, bmc_user, bmc_pass, context=""):
+    """Double-check PowerState Off to avoid false positives."""
+    log(f"PowerState Off detected ({context}), confirming in 10s...")
+    time.sleep(10)
+    state2 = check_powerstate(bmc_ip, bmc_user, bmc_pass)
+    log(f"PowerState re-check: {state2}")
+    if state2 == "Off":
+        return True
+    log(f"PowerState changed to {state2} - was transient Off, continuing")
+    return False
+
+
 def monitor_loop(child, log_file, timeout, powerstate_interval, bmc_ip, bmc_user, bmc_pass):
     """Main monitoring loop. Returns exit code."""
     start = time.time()
@@ -143,8 +155,10 @@ def monitor_loop(child, log_file, timeout, powerstate_interval, bmc_ip, bmc_user
             log("SOL connection lost (EOF)")
             state = check_powerstate(bmc_ip, bmc_user, bmc_pass)
             if state == "Off":
-                log("PowerState Off after SOL EOF - installation completed")
-                return 0
+                if confirm_powerstate_off(bmc_ip, bmc_user, bmc_pass, "SOL EOF"):
+                    log("Installation completed (PowerState Off confirmed after SOL EOF)")
+                    return 0
+                log("Transient Off after SOL EOF, treating as abnormal termination")
             return 3
 
         now = time.time()
@@ -154,8 +168,9 @@ def monitor_loop(child, log_file, timeout, powerstate_interval, bmc_ip, bmc_user
             elapsed_min = (now - start) / 60
             log(f"PowerState poll: {state} ({elapsed_min:.1f}min)")
             if state == "Off":
-                log("Installation completed (PowerState Off)")
-                return 0
+                if confirm_powerstate_off(bmc_ip, bmc_user, bmc_pass, "periodic poll"):
+                    log("Installation completed (PowerState Off confirmed)")
+                    return 0
 
 
 def main():
