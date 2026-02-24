@@ -27,6 +27,7 @@ bmc_pass: Claude123
 # SMB share for ISO hosting
 smb_host: 10.1.6.1
 smb_share_path: "\\public"
+iso_filename: debian-preseed.iso
 iso_download_dir: /var/samba/public
 
 # OS credentials (lab environment)

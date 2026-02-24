@@ -6,7 +6,7 @@ usage() {
     echo ""
     echo "Commands:"
     echo "  config <bmc_ip> <cookie_file> <csrf> <smb_host> <smb_path>"
-    echo "    Configure VirtualMedia ISO share (e.g. smb_path='\\public\\debian-preseed.iso')"
+    echo "    Configure VirtualMedia ISO share (smb_path uses single backslashes: \\public\\file.iso)"
     echo ""
     echo "  mount  <bmc_ip> <cookie_file> <csrf>"
     echo "    Mount the configured ISO"
@@ -47,6 +47,10 @@ cgi_post() {
 }
 
 cmd_config() {
+    # WARNING: smb_path must use single backslashes (e.g. \public\file.iso).
+    # Double backslashes (\\public\\file.iso) cause silent mount failure:
+    # CGI returns VMCOMCODE=001 (success) but VirtualMedia is NOT actually mounted.
+    # Always use yq to read the path from config YAML, never hardcode with shell literals.
     bmc_ip="$1"
     cookie_file="$2"
     csrf="$3"

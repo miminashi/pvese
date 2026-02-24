@@ -111,8 +111,17 @@ SMB_SHARE=$("$YQ" '.smb_share_path' "$CONFIG")  # YAML "\\public" → \public
    ```
 
 2. **VirtualMedia 設定・マウント**:
+
+   > **警告: SMB パスのバックスラッシュ**
+   > SMB パスは必ず yq で config から読み取った値を使うこと。シェルリテラルで
+   > バックスラッシュをハードコードすると二重バックスラッシュ (`\\\\public`) が
+   > CGI API に送信され、CGI は成功を返すが実際にはマウントされない silent failure が発生する。
+   > (Issue #17 で発見、Issue #18 で対策)
+
    ```sh
-   ./scripts/bmc-virtualmedia.sh config "$BMC_IP" "$COOKIE_FILE" "$CSRF" "$SMB_HOST" "$SMB_SHARE"'\debian-preseed.iso'
+   ISO_NAME=$("$YQ" '.iso_filename' "$CONFIG")
+   SMB_PATH="${SMB_SHARE}\\${ISO_NAME}"
+   ./scripts/bmc-virtualmedia.sh config "$BMC_IP" "$COOKIE_FILE" "$CSRF" "$SMB_HOST" "$SMB_PATH"
    ./scripts/bmc-virtualmedia.sh mount "$BMC_IP" "$COOKIE_FILE" "$CSRF"
    ./scripts/bmc-virtualmedia.sh status "$BMC_IP" "$COOKIE_FILE" "$CSRF"
    ```
@@ -126,7 +135,7 @@ SMB_SHARE=$("$YQ" '.smb_share_path' "$CONFIG")  # YAML "\\public" → \public
      ```sh
      ./scripts/bmc-session.sh login "$BMC_IP" "$BMC_USER" "$BMC_PASS" "$COOKIE_FILE"
      CSRF=$(./scripts/bmc-session.sh csrf "$BMC_IP" "$COOKIE_FILE")
-     ./scripts/bmc-virtualmedia.sh config "$BMC_IP" "$COOKIE_FILE" "$CSRF" "$SMB_HOST" "$SMB_SHARE"'\debian-preseed.iso'
+     ./scripts/bmc-virtualmedia.sh config "$BMC_IP" "$COOKIE_FILE" "$CSRF" "$SMB_HOST" "$SMB_PATH"
      ./scripts/bmc-virtualmedia.sh mount "$BMC_IP" "$COOKIE_FILE" "$CSRF"
      ./scripts/bmc-virtualmedia.sh verify "$BMC_IP" "$BMC_USER" "$BMC_PASS"
      ```
