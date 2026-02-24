@@ -19,7 +19,7 @@ USAGE
 
 cmd_status() {
     mkdir -p "$STATE_DIR"
-    if (exec 9>"$LOCK_FILE" && flock -n 9); then
+    if (flock -n 9) 9>"$LOCK_FILE"; then
         echo "unlocked"
     else
         echo "locked"
@@ -35,24 +35,24 @@ cmd_run() {
         exit 1
     fi
     mkdir -p "$STATE_DIR"
-    exec 9>"$LOCK_FILE"
-    if ! flock -n 9; then
-        echo "Error: Lock is held by another process" >&2
-        if [ -f "$INFO_FILE" ]; then
-            cat "$INFO_FILE" >&2
-        fi
-        exit 1
-    fi
-    printf "pid=%s cmd=%s time=%s\n" "$$" "$*" "$(date -u +%Y-%m-%dT%H:%M:%SZ)" > "$INFO_FILE"
-    "$@" 9>&-
-    rc=$?
-    rm -f "$INFO_FILE"
-    exec 9>&-
-    return $rc
+    (
+        flock -n 9 || {
+            echo "Error: Lock is held by another process" >&2
+            if [ -f "$INFO_FILE" ]; then
+                cat "$INFO_FILE" >&2
+            fi
+            exit 1
+        }
+        printf "pid=%s cmd=%s time=%s\n" "$$" "$*" "$(date -u +%Y-%m-%dT%H:%M:%SZ)" > "$INFO_FILE"
+        "$@" 9>&-
+        rc=$?
+        rm -f "$INFO_FILE"
+        exit "$rc"
+    ) 9>"$LOCK_FILE"
 }
 
 cmd_wait() {
-    local timeout=0
+    timeout=0
     if [ $# -ge 2 ] && [ "$1" = "--timeout" ]; then
         timeout="$2"
         shift 2
@@ -62,21 +62,21 @@ cmd_wait() {
         exit 1
     fi
     mkdir -p "$STATE_DIR"
-    exec 9>"$LOCK_FILE"
-    if [ "$timeout" -gt 0 ]; then
-        if ! flock -w "$timeout" 9; then
-            echo "Error: Timed out waiting for lock (${timeout}s)" >&2
-            exit 1
+    (
+        if [ "$timeout" -gt 0 ]; then
+            flock -w "$timeout" 9 || {
+                echo "Error: Timed out waiting for lock (${timeout}s)" >&2
+                exit 1
+            }
+        else
+            flock 9
         fi
-    else
-        flock 9
-    fi
-    printf "pid=%s cmd=%s time=%s\n" "$$" "$*" "$(date -u +%Y-%m-%dT%H:%M:%SZ)" > "$INFO_FILE"
-    "$@" 9>&-
-    rc=$?
-    rm -f "$INFO_FILE"
-    exec 9>&-
-    return $rc
+        printf "pid=%s cmd=%s time=%s\n" "$$" "$*" "$(date -u +%Y-%m-%dT%H:%M:%SZ)" > "$INFO_FILE"
+        "$@" 9>&-
+        rc=$?
+        rm -f "$INFO_FILE"
+        exit "$rc"
+    ) 9>"$LOCK_FILE"
 }
 
 if [ $# -lt 1 ]; then

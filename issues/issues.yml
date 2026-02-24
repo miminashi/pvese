@@ -134,10 +134,10 @@ issues:
     description: post-reboot フェーズ実行中、カーネル削除の dpkg postrm で locale 警告が出る。locale 設定がスクリプト末尾にあるため。apt 操作前に移動すれば解消する。影響は表面的（再起動後は解消）。
   - id: 13
     title: pve-lock.sh + SSH でパイプ出力が欠落する場合がある
-    status: plan
+    status: done
     owner: ""
     created: "2026-02-23T14:47:28Z"
-    updated: "2026-02-23T14:47:28Z"
+    updated: "2026-02-24T13:45:13Z"
     blocked_by: ""
     report: ""
     labels:
