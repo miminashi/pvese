@@ -8,3 +8,4 @@ state/
 upload/
 tmp/
 .venv/
+__pycache__/
