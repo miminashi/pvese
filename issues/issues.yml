@@ -213,10 +213,10 @@ issues:
     description: "Phase 6 (post-install-config) で Power On 後に POST code 92 (DXE--BIOS PCI Bus Enumeration) で散発的にスタックする。Phase 7 にはリカバリ手順が記載済みだが Phase 6 には未記載。Issue #17 テストで Phase 6 に約4分のスタックが発生し sol-login.py が 180秒タイムアウトで失敗した。ForceOff + 20秒待機 + Power On + 3分待機で回復。対策: (1) SKILL.md Phase 6 ステップ2 (Power On) の後に POST 92 スタック検出とリカバリ手順を追加 (2) sol-login.py のタイムアウト時に POST code を自動チェックするガイダンスを追記"
   - id: 20
     title: Redfish POST code API が stale 値を返す問題の調査と対策
-    status: plan
-    owner: ""
+    status: done
+    owner: "4e039071"
     created: "2026-02-24T12:15:18Z"
-    updated: "2026-02-24T12:15:32Z"
+    updated: "2026-02-24T13:35:53Z"
     blocked_by: ""
     report: ""
     labels:

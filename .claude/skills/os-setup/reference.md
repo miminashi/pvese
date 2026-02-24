@@ -244,6 +244,21 @@ IPMI raw コマンド: `ipmitool raw 0x30 0x70 0x02`
 | 0x00 | POST 完了 or 電源 Off |
 | 0xE0〜0xE4 | OS ブートフェーズ |
 
+### POST code の stale 値問題
+
+BMC ファームウェアの制限により、POST code レジスタが特定のスタック状態で更新されないことがある。実際に POST 0x92 (PCI Bus Enumeration) でスタックしているにもかかわらず、IPMI raw (`0x30 0x70 0x02`) が `0x00` (POST complete) を返すケースが確認されている (Issue #17 テスト時)。
+
+**POST code だけでスタック判定してはならない。** 以下の組み合わせで判定すること:
+
+| PowerState | POST code | SSH/ping | 判定 |
+|------------|-----------|----------|------|
+| On | 0x00 | 到達可能 | 正常起動完了 |
+| On | 0x00 | 不達 (5分以上) | **スタック疑い** — KVM スクリーンショットで視覚確認 |
+| On | 0x92 | 不達 | POST スタック確定 — パワーサイクルで回復 |
+| Off | 0x00 | 不達 | 電源 Off（正常） |
+
+**フォールバック確認手段**: `bmc-kvm.sh screenshot` で KVM スクリーンショットを取得し、実際の POST 画面を視覚的に確認する。POST code API の値が信頼できない場合の最終確認手段として使用する。
+
 ## エラーパターンと回復
 
 ### CSRF token 不一致

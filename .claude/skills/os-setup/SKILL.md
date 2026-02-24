@@ -259,6 +259,11 @@ Debian インストール後の初期設定。
      sleep 20
      ./pve-lock.sh run ./scripts/bmc-power.sh on "$BMC_IP" "$BMC_USER" "$BMC_PASS"
      ```
+   - POST code が `0x00` でも SSH 不達が **5 分以上**続く場合 → stale POST code の疑い。KVM スクリーンショットで視覚確認:
+     ```sh
+     ./scripts/bmc-kvm.sh screenshot "$BMC_IP" tmp/<session-id>/post-check.png
+     ```
+     スクリーンショットで POST 0x92 等のスタックが確認できたら、上記と同じ自動リカバリを実行する。
    - リカバリ後 **150 秒待機**してから次のステップへ進む
 
 3. **SOL 経由でログイン確認・設定**:
@@ -339,6 +344,11 @@ PVE のインストールを SSH 経由で実行。
    - **5 分超過でも SSH 不達の場合のリカバリ**:
      1. POST code 確認: `./scripts/bmc-power.sh postcode "$BMC_IP" "$BMC_USER" "$BMC_PASS"`
         - `0x92` (PCI bus init) で停滞 → POST スタックの可能性（`reference.md` 参照）
+        - `0x00` でも SSH 不達が続く場合 → stale POST code の疑い。KVM スクリーンショットで視覚確認:
+          ```sh
+          ./scripts/bmc-kvm.sh screenshot "$BMC_IP" tmp/<session-id>/post-check.png
+          ```
+          スクリーンショットで POST スタックが確認できたら、下記パワーサイクルを実行する。
      2. PowerState 確認: `./scripts/bmc-power.sh status "$BMC_IP" "$BMC_USER" "$BMC_PASS"`
         - `On` の場合 → 自動パワーサイクル:
           ```sh

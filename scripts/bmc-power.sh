@@ -248,6 +248,13 @@ postcode_desc() {
 }
 
 cmd_postcode() {
+    # NOTE: BMC may return stale POST code (e.g. 0x00 = "POST complete")
+    # even while the server is stuck at POST 0x92 (PCI Bus Enumeration).
+    # This is a BMC firmware limitation where the POST code register is
+    # not updated during certain stall conditions.
+    # Always combine with PowerState and SSH/ping reachability for
+    # accurate stall detection. For definitive visual confirmation,
+    # use KVM screenshot (bmc-kvm.sh screenshot).
     bmc_ip="$1"
     user="$2"
     pass="$3"
