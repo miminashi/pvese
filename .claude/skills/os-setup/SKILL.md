@@ -29,6 +29,7 @@ Debian + Proxmox VE のインストールを BMC VirtualMedia 経由で自動実
 | `./scripts/pve-setup-remote.sh` | PVE インストール（リモート実行） |
 | `./scripts/sol-monitor.py` | SOL 経由インストール監視 |
 | `./scripts/sol-login.py` | SOL 経由ログイン・コマンド実行 |
+| `./scripts/bmc-kvm-screenshot.py` | BMC KVM スクリーンショット |
 
 ## 設定値の読み取り
 
