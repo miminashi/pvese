@@ -179,12 +179,12 @@ issues:
     description: "scripts/sol-monitor.py が PowerState を60秒間隔でポーリングしているが、パワーサイクル（ForceOff→On）直後にポーリングが走ると、まだ電源が入っていない状態の Off を検出してインストール完了と誤判断し exit 0 で終了する。対策案: (1) 起動前に PowerState On を確認してからポーリングを開始 (2) 初回ポーリングの Off を無視するロジック追加 (3) Off 検出後に一定時間待機して再確認"
   - id: 17
     title: bmc-virtualmedia.sh mount 後に Redfish で Inserted 確認を追加
-    status: plan
-    owner: ""
+    status: done
+    owner: "07e102fa"
     created: "2026-02-24T09:17:50Z"
-    updated: "2026-02-24T09:18:13Z"
+    updated: "2026-02-24T10:29:18Z"
     blocked_by: ""
-    report: ""
+    report: "report/2026-02-24_192754_os_setup_virtualmedia_verify_test.md"
     labels:
       - script
       - ipmi
