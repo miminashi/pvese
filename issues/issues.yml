@@ -1,4 +1,4 @@
-next_id: 17
+next_id: 18
 issues:
   - id: 1
     title: Test issue
@@ -177,3 +177,15 @@ issues:
     labels:
       - script
     description: "scripts/sol-monitor.py が PowerState を60秒間隔でポーリングしているが、パワーサイクル（ForceOff→On）直後にポーリングが走ると、まだ電源が入っていない状態の Off を検出してインストール完了と誤判断し exit 0 で終了する。対策案: (1) 起動前に PowerState On を確認してからポーリングを開始 (2) 初回ポーリングの Off を無視するロジック追加 (3) Off 検出後に一定時間待機して再確認"
+  - id: 17
+    title: bmc-virtualmedia.sh mount 後に Redfish で Inserted 確認を追加
+    status: plan
+    owner: ""
+    created: "2026-02-24T09:17:50Z"
+    updated: "2026-02-24T09:18:13Z"
+    blocked_by: ""
+    report: ""
+    labels:
+      - script
+      - ipmi
+    description: "bmc-virtualmedia.sh の mount コマンドが CGI API から VMCOMCODE=001 (成功) を受け取っても、実際にはマウントされていないケースがある。原因は CGI セッション (CSRF トークン) の暗黙的な失効で、失効後も CGI API はエラーを返さず成功レスポンスを返す。対策: mount 後に Redfish API (GET /redfish/v1/Managers/1/VirtualMedia/CD1) で Inserted=true を確認するステップを追加し、false なら BMC 再ログイン→再マウント→再確認のリトライを行う。2026-02-24 の通しテスト Phase 4 で発見 (report/2026-02-24_150952_os_setup_issue16_fix_test.md 参照)。"
