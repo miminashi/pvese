@@ -2,7 +2,7 @@
 name: os-setup
 description: "Debian + Proxmox VE OS自動セットアップ。BMC VirtualMedia経由でpreseedインストール、PVEインストールまでを実行する。"
 disable-model-invocation: true
-argument-hint: "[config_file]"
+argument-hint: "<config_file>"
 ---
 
 # OS Setup スキル
@@ -11,8 +11,8 @@ Debian + Proxmox VE のインストールを BMC VirtualMedia 経由で自動実
 
 ## 事前準備
 
-1. 設定ファイルを準備（引数で指定、デフォルト: `config/os-setup.yml`）
-   - `config/os-setup.example.yml` をコピーして編集
+1. 設定ファイルを引数で指定する（例: `config/server4.yml`, `config/server5.yml`）
+   - 新規サーバの場合は `config/os-setup.example.yml` をコピーして `config/server<N>.yml` として編集
 2. 技術詳細は `reference.md` を参照
 
 ## スクリプト一覧
@@ -35,7 +35,7 @@ Debian + Proxmox VE のインストールを BMC VirtualMedia 経由で自動実
 
 ```sh
 YQ="${PROJECT_DIR}/bin/yq"
-CONFIG="config/os-setup.yml"  # または引数で指定されたパス
+CONFIG="config/server4.yml"  # 引数で指定されたパス (例: config/server4.yml, config/server5.yml)
 BMC_IP=$("$YQ" '.bmc_ip' "$CONFIG")
 SMB_HOST=$("$YQ" '.smb_host' "$CONFIG")
 SMB_SHARE=$("$YQ" '.smb_share_path' "$CONFIG")  # YAML "\\public" → \public

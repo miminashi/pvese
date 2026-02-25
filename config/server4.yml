@@ -1,6 +1,4 @@
-# os-setup configuration template
-# Copy to config/server<N>.yml and edit for your environment
-# Example: config/server4.yml, config/server5.yml
+# Server 4 (ayase-web-service-4) configuration
 
 hostname: ayase-web-service-4
 domain: local

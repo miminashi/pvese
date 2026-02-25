@@ -1,11 +1,10 @@
-# os-setup configuration example
-# Copy to config/os-setup.yml and edit for your environment
+# Server 5 (ayase-web-service-5) configuration
 
-hostname: ayase-web-service-4
+hostname: ayase-web-service-5
 domain: local
 
 # Network
-static_ip: 10.10.10.204
+static_ip: 10.10.10.205
 static_netmask: 8
 static_iface: eno2np1
 dhcp_iface: eno1np0
@@ -20,7 +19,7 @@ debian_iso_sha256: c9f09d24b7e834e6834f2ffa565b33d6f1f540d04bd25c79ad9953bc79a8a
 disk: /dev/nvme0n1
 
 # BMC
-bmc_ip: 10.10.10.24
+bmc_ip: 10.10.10.25
 bmc_user: claude
 bmc_pass: Claude123
 
