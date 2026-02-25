@@ -1,0 +1,182 @@
+# pvese — Proxmox VE Storage Evaluation
+
+Supermicro IPMI と Proxmox VE を操作して、分散ストレージ (Ceph, GlusterFS 等) の比較評価を行うツールキット。
+
+Claude Code (AI エージェント) がローカルマシンから SSH 経由で物理サーバを操作し、OS インストールからストレージベンチマークまでを自動化する。
+
+## 特徴
+
+- **BMC VirtualMedia による OS 自動インストール** — Redfish API / CGI API で ISO マウント、preseed による無人インストール
+- **多段フェーズのオーケストレーション** — ISO ダウンロード → preseed 生成 → ISO リマスタ → BMC マウント → インストール監視 → PVE セットアップまで状態追跡付きで実行
+- **排他ロック** — `pve-lock.sh` による flock ベースのロックで、複数の Claude Code セッションが同じクラスタを安全に操作
+- **課題管理・レポート追跡** — `issue.sh` による課題管理と、作業完了時のレポート自動生成
+- **InfiniBand (SX6036) ネットワーク評価** — シリアルコンソール経由での Mellanox スイッチ設定・ベンチマーク
+
+## 技術スタック
+
+| カテゴリ | 技術 |
+|---------|------|
+| メイン言語 | POSIX sh (`#!/bin/sh`, `set -eu`) |
+| CLI ツール | Rust (`tools/` ディレクトリ) |
+| 補助スクリプト | Python (SOL モニタ, KVM スクリーンショット等) |
+| サーバ管理 | Supermicro Redfish API / CGI API, ipmitool |
+| 仮想化基盤 | Proxmox VE REST API + CLI (pvesh, qm, pct, pveceph) |
+| OS インストール | Debian preseed, ISO リマスタ |
+| AI エージェント | Claude Code (`.claude/skills/` によるスキル定義) |
+
+## ディレクトリ構成
+
+```
+pvese/
+├── scripts/              # 主要スクリプト群
+│   ├── bmc-power.sh          # BMC 電源管理 (on/off/reset/status)
+│   ├── bmc-session.sh        # BMC CGI セッション管理
+│   ├── bmc-virtualmedia.sh   # BMC VirtualMedia マウント/アンマウント
+│   ├── bmc-screenshot.sh     # BMC KVM スクリーンショット取得
+│   ├── bmc-kvm-screenshot.py # BMC KVM スクリーンショット (Python版)
+│   ├── generate-preseed.sh   # preseed.cfg 生成
+│   ├── remaster-debian-iso.sh # Debian ISO リマスタ (preseed 埋め込み)
+│   ├── os-setup-phase.sh     # OS セットアップ フェーズ管理
+│   ├── pve-setup-remote.sh   # PVE リモートセットアップ
+│   ├── ib-setup-remote.sh    # InfiniBand リモートセットアップ
+│   ├── sol-login.py          # SOL (Serial Over LAN) 自動ログイン
+│   ├── sol-monitor.py        # SOL インストール進捗モニタ
+│   └── sx6036-console.py     # SX6036 IB スイッチ シリアルコンソール
+├── config/               # サーバ・スイッチ設定ファイル (YAML)
+│   ├── server4.yml
+│   ├── server5.yml
+│   └── switch-sx6036.yml
+├── preseed/              # Debian preseed テンプレート・生成ファイル
+├── state/                # フェーズ実行状態の永続化
+├── issues/               # 課題管理データ (issues.yml)
+├── report/               # 作業レポート (Markdown)
+├── log/                  # 操作ログ (oplog.log)
+├── tools/                # Rust CLI ツール (Cargo workspace)
+├── bin/                  # プロジェクトローカルのバイナリ (yq 等)
+├── tmp/                  # セッション別一時ファイル
+├── .claude/skills/       # Claude Code スキル定義
+├── issue.sh              # 課題管理 CLI
+├── oplog.sh              # 操作ログ記録
+├── pve-lock.sh           # PVE/IPMI 操作の排他ロック
+├── CLAUDE.md             # Claude Code へのルール・ガイダンス
+├── ISSUE.md              # 課題管理ルール
+└── REPORT.md             # レポート作成ルール
+```
+
+## 環境構成
+
+### サーバ一覧
+
+| サーバ | BMC IP | 静的 IP | ホスト名 |
+|--------|--------|---------|----------|
+| 4号機 | `10.10.10.24` | `10.10.10.204` | ayase-web-service-4 |
+| 5号機 | `10.10.10.25` | `10.10.10.205` | ayase-web-service-5 |
+
+- マザーボード: Supermicro X11DPU
+- OS: Debian 13 (Trixie) + Proxmox VE 9
+- NIC: eno1np0, eno2np1, eno3np2, eno4np3
+
+### ネットワーク構成
+
+```
+Claude Code (ローカル) --SSH--> PVE ノード (10.10.10.0/8)
+                      --IPMI-> BMC (10.10.10.24, .25)
+                      --SMB--> ISO ホスティング (10.1.6.1)
+
+PVE ノード間 --InfiniBand--> SX6036 スイッチ
+```
+
+## 主要スクリプト
+
+### BMC 操作
+
+| スクリプト | 用途 |
+|-----------|------|
+| `scripts/bmc-power.sh` | 電源管理 (on, off, reset, status, bios-setup) |
+| `scripts/bmc-session.sh` | BMC CGI API セッション取得・解放 |
+| `scripts/bmc-virtualmedia.sh` | VirtualMedia ISO マウント・アンマウント・状態確認 |
+| `scripts/bmc-screenshot.sh` | KVM コンソールのスクリーンショット取得 |
+
+### OS セットアップ
+
+| スクリプト | 用途 |
+|-----------|------|
+| `scripts/generate-preseed.sh` | config YAML から preseed.cfg を生成 |
+| `scripts/remaster-debian-iso.sh` | Debian ISO に preseed を埋め込んでリマスタ |
+| `scripts/os-setup-phase.sh` | セットアップフェーズの状態管理 (init/start/check/mark/fail/reset/status) |
+| `scripts/pve-setup-remote.sh` | SSH 経由で PVE リポジトリ追加・パッケージインストール |
+
+### モニタリング
+
+| スクリプト | 用途 |
+|-----------|------|
+| `scripts/sol-login.py` | SOL 経由の自動ログイン・ブートステージ検出 |
+| `scripts/sol-monitor.py` | SOL 経由のインストール進捗モニタリング |
+| `scripts/bmc-kvm-screenshot.py` | KVM スクリーンショット取得 (Python版、POST コード判定付き) |
+
+### InfiniBand
+
+| スクリプト | 用途 |
+|-----------|------|
+| `scripts/ib-setup-remote.sh` | InfiniBand ドライバ・ツールのリモートセットアップ |
+| `scripts/sx6036-console.py` | SX6036 スイッチのシリアルコンソール操作 |
+
+## ルートスクリプト
+
+### `issue.sh` — 課題管理
+
+```sh
+./issue.sh list                    # 未完了課題の一覧
+./issue.sh show <id>               # 課題の詳細表示
+./issue.sh add "タイトル" --label infra  # 新規課題作成
+./issue.sh start <id>              # 課題を active に遷移
+./issue.sh done <id>               # 課題を完了
+```
+
+### `oplog.sh` — 操作ログ
+
+状態変更を伴う操作をタイムスタンプ・終了コード・実行時間付きで記録する。
+
+```sh
+./oplog.sh <command...>            # コマンドを実行しログに記録
+```
+
+ログは `log/oplog.log` に蓄積される。
+
+### `pve-lock.sh` — 排他ロック
+
+PVE クラスタや IPMI の状態変更操作を排他制御する。
+
+```sh
+./pve-lock.sh status               # ロック状態を確認
+./pve-lock.sh run <command...>     # ロック取得して実行 (取得できなければエラー)
+./pve-lock.sh wait <command...>    # ロック待ちして実行
+```
+
+## OS セットアップフェーズ
+
+OS インストールは以下の 8 フェーズで段階的に実行される:
+
+1. **iso-download** — Debian ISO のダウンロード・SHA256 検証
+2. **preseed-generate** — config YAML から preseed.cfg を生成
+3. **iso-remaster** — preseed を埋め込んだカスタム ISO を作成
+4. **bmc-mount-boot** — BMC VirtualMedia で ISO をマウントし起動
+5. **install-monitor** — SOL モニタでインストール進捗を監視
+6. **post-install-config** — SSH 経由で初期設定 (ネットワーク, locale 等)
+7. **pve-install** — Proxmox VE リポジトリ追加・パッケージインストール
+8. **cleanup** — VirtualMedia アンマウント・一時ファイル削除
+
+各フェーズの状態は `state/os-setup/` に永続化され、失敗時の途中再開が可能。
+
+## Claude Code 連携
+
+このプロジェクトは Claude Code (AI エージェント) による操作を前提としている。
+
+- **`.claude/skills/`** — `os-setup` (OS セットアップ) や `ib-switch` (IB スイッチ操作) 等のスキルが定義されており、Claude Code が複雑な手順を自律的に実行できる
+- **`CLAUDE.md`** — スクリプト規約、パーミッション設定、操作ルール等を Claude Code に指示
+- **`ISSUE.md`** — 課題の状態遷移ルールを定義
+- **`REPORT.md`** — レポートのフォーマットを定義
+
+## ライセンス
+
+未定
