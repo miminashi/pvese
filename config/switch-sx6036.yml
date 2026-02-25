@@ -1,0 +1,11 @@
+hostname: switch-d2b2e2
+model: MSX6036F-1SFS
+serial_host: 10.10.10.204
+serial_host_user: root
+serial_device: /dev/ttyUSB0
+serial_baudrate: 9600
+switch_user: admin
+switch_pass: admin
+mgmt_ip: 10.125.13.104
+mgmt_netmask: 255.255.255.0
+ssh_port: 22
