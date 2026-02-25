@@ -1,4 +1,4 @@
-next_id: 21
+next_id: 22
 issues:
   - id: 1
     title: Test issue
@@ -223,3 +223,14 @@ issues:
       - ipmi
       - script
     description: "Redfish POST code API (GET /redfish/v1/Systems/1) の CurrentBootProgress.OemPostCode が実際の POST 状態と乖離する場合がある。Issue #17 テストの Phase 6 で KVM スクリーンショットは POST code 92 (PCI Bus Enumeration) 画面を表示しているにもかかわらず、API は 0x00 (POST complete) を返した。POST code だけでスタック判定すると見逃す可能性がある。対策候補: (1) bmc-power.sh postcode にスクリーンショット併用の注意コメント追加 (2) POST code と PowerState の組み合わせ判定（On + 0x00 が長時間続く場合はスタック疑い） (3) KVM スクリーンショットによる視覚的確認をフォールバック手段として SKILL.md に記載"
+  - id: 21
+    title: SX6036 内蔵 SM 不具合調査
+    status: done
+    owner: "f99d6c0b"
+    created: "2026-02-25T12:49:03Z"
+    updated: "2026-02-25T13:47:43Z"
+    blocked_by: ""
+    report: "report/2026-02-25_224551_sx6036_sm_investigation.md"
+    labels:
+      - infra
+    description: ""
