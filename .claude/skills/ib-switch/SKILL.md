@@ -15,11 +15,11 @@ Mellanox SX6036 InfiniBand スイッチを USB シリアルコンソール経由
 |------|-----|
 | モデル | MSX6036F-1SFS (36ポート FDR InfiniBand) |
 | ホスト名 | switch-d2b2e2 |
-| MLNX-OS | 3.6.8008 |
+| MLNX-OS | 3.6.8012 (最終版) |
 | シリアル接続先 | 4号機 (10.10.10.204) `/dev/ttyUSB0` |
 | シリアル設定 | 9600/8N1, フロー制御なし |
 | 認証 | admin / admin |
-| 管理 IP | 10.125.13.104/24 (mgmt0) |
+| 管理 IP | 10.10.10.100/24 (mgmt0, ラボから到達可) |
 
 接続構成: Claude Code → SSH → server 4 → USB serial → SX6036
 

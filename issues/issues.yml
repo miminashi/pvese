@@ -1,4 +1,4 @@
-next_id: 22
+next_id: 23
 issues:
   - id: 1
     title: Test issue
@@ -231,6 +231,17 @@ issues:
     updated: "2026-02-25T13:47:43Z"
     blocked_by: ""
     report: "report/2026-02-25_224551_sx6036_sm_investigation.md"
+    labels:
+      - infra
+    description: ""
+  - id: 22
+    title: SX6036 ファームウェア更新・フラッシュ修復
+    status: done
+    owner: "4856b189"
+    created: "2026-02-25T14:06:48Z"
+    updated: "2026-02-25T16:29:48Z"
+    blocked_by: ""
+    report: "report/2026-02-26_011138_sx6036_firmware_update.md"
     labels:
       - infra
     description: ""
