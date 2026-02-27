@@ -78,12 +78,26 @@ pvese/
 
 ### ネットワーク構成
 
-```
-Claude Code (ローカル) --SSH--> PVE ノード (10.10.10.0/8)
-                      --IPMI-> BMC (10.10.10.24, .25)
-                      --SMB--> ISO ホスティング (10.1.6.1)
+```mermaid
+graph LR
+    CC["Claude Code<br/>(ローカルマシン)"]
 
-PVE ノード間 --InfiniBand--> SX6036 スイッチ
+    subgraph mgmt["管理ネットワーク (10.10.10.0/8)"]
+        BMC4["BMC 4号機<br/>10.10.10.24"]
+        BMC5["BMC 5号機<br/>10.10.10.25"]
+        PVE4["PVE 4号機<br/>10.10.10.204"]
+        PVE5["PVE 5号機<br/>10.10.10.205"]
+        SMB["ISO ホスティング<br/>10.1.6.1"]
+        IB["SX6036 IB スイッチ<br/>10.10.10.100"]
+    end
+
+    CC -- "SSH" --> PVE4
+    CC -- "SSH" --> PVE5
+    CC -- "IPMI" --> BMC4
+    CC -- "IPMI" --> BMC5
+    CC -- "SMB" --> SMB
+    PVE4 -- "InfiniBand" --- IB
+    PVE5 -- "InfiniBand" --- IB
 ```
 
 ## 主要スクリプト
