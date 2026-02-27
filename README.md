@@ -177,6 +177,85 @@ OS インストールは以下の 8 フェーズで段階的に実行される:
 - **`ISSUE.md`** — 課題の状態遷移ルールを定義
 - **`REPORT.md`** — レポートのフォーマットを定義
 
+## Claude Code への指示例
+
+Claude Code セッションを開始した後、以下のように話しかけると各操作を実行できる。
+
+### OS セットアップ
+
+4号機に Debian + Proxmox VE を自動インストールする（8フェーズを順次実行）。
+
+```
+/os-setup config/server4.yml
+```
+
+自然言語での指示例:
+- 「4号機に OS をインストールして」
+- 「5号機の OS セットアップを Phase 5 から再開して」
+- 「4号機のインストール状態を確認して」
+
+### InfiniBand スイッチ操作
+
+Mellanox SX6036 スイッチの状態確認・設定変更を行う。
+
+| コマンド | 用途 |
+|---------|------|
+| `/ib-switch status` | バージョン・温度・ファン・ポート状態の一括表示 |
+| `/ib-switch ports` | 36 ポートの IB 接続状態を表示 |
+| `/ib-switch show <cmd>` | 任意の show コマンドを実行 (例: `show interfaces brief`) |
+| `/ib-switch enable-cmd <cmd>` | enable モードでコマンド実行 (例: `show running-config`) |
+| `/ib-switch configure <file>` | ファイルから設定を投入 |
+
+自然言語での指示例:
+- 「IB スイッチのポート状態を見せて」
+- 「IB スイッチの running-config を確認して」
+- 「IB スイッチの Subnet Manager の状態を確認して」
+
+### LINSTOR/DRBD ベンチマーク
+
+LINSTOR ストレージ上に VM を作成し、fio ベンチマーク（7テスト）を実行する。
+
+```
+/linstor-bench thin
+/linstor-bench thick-stripe
+```
+
+自然言語での指示例:
+- 「thin プロビジョニングでストレージベンチマークを実行して」
+- 「thick-stripe と thin の性能を比較したい」
+- 「前回のベンチマーク結果をレポートにまとめて」
+
+### LINSTOR ノード操作
+
+ノード障害シミュレーション・復旧・離脱・再参加の実験を行う。
+
+| コマンド | 用途 |
+|---------|------|
+| `/linstor-node-ops fail server4` | 4号機を強制電源断して障害をシミュレート |
+| `/linstor-node-ops recover server4` | 電源投入 + DRBD ビットマップ再同期 |
+| `/linstor-node-ops depart server4` | クラスタから正常離脱 (リソース・SP・ノード削除) |
+| `/linstor-node-ops rejoin server4` | 離脱ノードをクラスタに再参加 |
+
+自然言語での指示例:
+- 「4号機を落として障害時の挙動を確認して」
+- 「4号機を復旧して DRBD の再同期を待って」
+- 「5号機をクラスタから離脱させて」
+
+### 課題管理・日常操作
+
+```sh
+./issue.sh list                    # 未完了課題の一覧
+./issue.sh show <id>               # 課題の詳細表示
+```
+
+自然言語での指示例:
+- 「未完了の課題を一覧して」
+- 「課題 #18 の状態を確認して」
+- 「"BMC セッションタイムアウト対策" で課題を作成して」
+- 「4号機の電源状態を確認して」
+- 「PVE クラスタの状態を確認して」
+- 「ロックが取れないので別の課題に着手して」
+
 ## ライセンス
 
 未定
