@@ -83,10 +83,14 @@ graph LR
     CC["Claude Code<br/>(ローカルマシン)"]
 
     subgraph mgmt["管理ネットワーク (10.10.10.0/8)"]
-        BMC4["BMC 4号機<br/>10.10.10.24"]
-        BMC5["BMC 5号機<br/>10.10.10.25"]
-        PVE4["PVE 4号機<br/>10.10.10.204"]
-        PVE5["PVE 5号機<br/>10.10.10.205"]
+        subgraph srv4["4号機"]
+            BMC4["BMC<br/>10.10.10.24"]
+            PVE4["PVE<br/>10.10.10.204"]
+        end
+        subgraph srv5["5号機"]
+            BMC5["BMC<br/>10.10.10.25"]
+            PVE5["PVE<br/>10.10.10.205"]
+        end
         SMB["ISO ホスティング<br/>10.1.6.1"]
         IB["SX6036 IB スイッチ<br/>10.10.10.100"]
     end
