@@ -99,7 +99,8 @@ graph LR
     CC -- "SSH" --> PVE5
     CC -- "IPMI" --> BMC4
     CC -- "IPMI" --> BMC5
-    CC -- "SMB" --> SMB
+    BMC4 -- "SMB" --> SMB
+    BMC5 -- "SMB" --> SMB
     PVE4 -- "InfiniBand" --- IB
     PVE5 -- "InfiniBand" --- IB
 ```
