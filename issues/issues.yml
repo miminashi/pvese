@@ -1,4 +1,4 @@
-next_id: 23
+next_id: 26
 issues:
   - id: 1
     title: Test issue
@@ -244,4 +244,37 @@ issues:
     report: "report/2026-02-26_011138_sx6036_firmware_update.md"
     labels:
       - infra
+    description: ""
+  - id: 23
+    title: LINSTOR thin vs thick-stripe ベンチマーク実行と比較レポート作成
+    status: done
+    owner: "88d64294"
+    created: "2026-02-26T02:13:13Z"
+    updated: "2026-02-26T04:10:31Z"
+    blocked_by: ""
+    report: "report/2026-02-26_130844_linstor_thin_vs_thick_stripe_benchmark.md"
+    labels:
+      - bench
+    description: ""
+  - id: 24
+    title: LINSTOR/DRBD ノード離脱実験 — 5号機離脱後の4号機単独運用継続検証
+    status: done
+    owner: "fe65793d"
+    created: "2026-02-26T14:02:54Z"
+    updated: "2026-02-26T15:54:43Z"
+    blocked_by: ""
+    report: "report/2026-02-27_005307_linstor_node_departure_experiment.md"
+    labels:
+      - bench
+    description: ""
+  - id: 25
+    title: LINSTOR/DRBD ノード離脱・復帰実験 (完全サイクル)
+    status: done
+    owner: "4404adab"
+    created: "2026-02-26T21:02:46Z"
+    updated: "2026-02-27T02:13:58Z"
+    blocked_by: ""
+    report: "report/2026-02-27_111056_linstor_node_departure_rejoin_experiment.md"
+    labels:
+      - bench
     description: ""
