@@ -50,6 +50,7 @@ BMC_IP=$(./bin/yq '.bmc_ip' config/server5.yml)
 | N3 | リソース削除順序違反 | depart | ストレージプールやノードの削除でエラー | リソース → SP → ノード の順で削除 |
 | N4 | DRBD bitmap resync ポーリング見逃し | recover | 接続直後は `Inconsistent` だが数秒〜数十秒で完了 | 30秒間隔ポーリングで UpToDate を確認 |
 | N5 | stale DRBD メタデータ残存 | rejoin | `/etc/drbd.d/linstor-resources.res` が残る | LINSTOR が自動管理するため手動削除不要 |
+| N6 | minIoSize 不一致で rejoin 失敗 | rejoin | `incompatible minimum I/O size` エラー | VG 作成時に 512B PV を先頭に配置 |
 
 ### N1: Auto-eviction 干渉
 
@@ -79,6 +80,48 @@ ssh root@$CONTROLLER_IP "linstor resource-group modify $RG_NAME --place-count 1"
 障害回復後の DRBD resync はビットマップベースで高速 (障害中の変更ブロックのみ)。
 接続直後は `peer-disk:Inconsistent` だが、通常15秒程度で `UpToDate` になる。
 30秒ポーリング間隔で取りこぼさないよう注意。
+
+### N6: minIoSize 不一致
+
+LINSTOR は VG の最初の PV の physical block size を `StorDriver/internal/minIoSize` として使用する。
+ノード間で minIoSize が異なると、DRBD リソース作成時に `incompatible minimum I/O size` エラーが発生する。
+
+**原因**: 512e (512B) と 4Kn (4096B) のディスクが混在する環境で、VG 先頭の PV の block size がノード間で異なる。
+
+**確認手順**:
+```sh
+# 各ディスクの physical block size を確認
+ssh root@$TARGET_IP "blockdev --getpbsz /dev/sd{a,b,c,d}"
+
+# LINSTOR の minIoSize を確認
+ssh root@$CONTROLLER_IP "linstor storage-pool list-properties $TARGET_NODE striped-pool" | grep minIoSize
+```
+
+**回避策 1 (主)**: VG 作成時に 512B block size のディスクを先頭に配置する。
+
+```sh
+# 512B のディスクを特定 (例: sdb=512B)
+ssh root@$TARGET_IP "blockdev --getpbsz /dev/sdb"   # → 512
+
+# 512B ディスクを先頭にして VG を作成
+ssh root@$TARGET_IP "vgcreate linstor_vg /dev/sdb /dev/sda /dev/sdc /dev/sdd"
+```
+
+512B を先頭に置く理由: minIoSize=512 は他ノードの minIoSize=512 と一致する。
+4096B を先頭に置くと minIoSize=4096 になり、minIoSize=512 のノードとの互換性が失われる。
+
+**回避策 2 (セーフティネット)**: `Linstor/Drbd/auto-block-size 512` を resource-group に設定する (LINSTOR >= 1.33.0)。
+
+```sh
+linstor resource-group set-property $RG_NAME Linstor/Drbd/auto-block-size 512
+```
+
+効果:
+- DRBD リソース設定に `disk { block-size 512; }` が追加され、underlying device の physical block size を上書き
+- **手動 `resource create`** で minIoSize 不一致でもリソース作成可能
+- **auto-place** (`--place-count` 変更) は minIoSize 不一致ノードを除外するため、手動 `resource create` が必要
+
+現環境では pve-rg に `auto-block-size=512` を常時設定済み。
 
 ## サブコマンド: fail
 
@@ -228,13 +271,26 @@ IPMI 電源断で対象ノードの障害をシミュレーションする。
 
 ### 手順
 
-1. **5号機の LVM 状態確認** (stale LV がある場合はクリーンアップ):
+1. **LVM 状態確認 + minIoSize 対策** (★ N6 対策):
    ```sh
    ssh root@$TARGET_IP "vgs $VG_NAME"
    ssh root@$TARGET_IP "lvs $VG_NAME 2>/dev/null"
-   # stale LV がある場合のみ:
+   # 各ディスクの physical block size を確認
+   ssh root@$TARGET_IP "blockdev --getpbsz /dev/sd{a,b,c,d}"
+   ```
+
+   VG を再作成する場合は **512B block size のディスクを先頭に配置**すること:
+   ```sh
+   # stale LV がある場合や VG 再構成が必要な場合:
    # ssh root@$TARGET_IP "lvremove -f $VG_NAME; vgremove -f $VG_NAME; pvremove /dev/sd{a,b,c,d}"
-   # ssh root@$TARGET_IP "wipefs -af /dev/sd{a,b,c,d} && pvcreate /dev/sd{a,b,c,d} && vgcreate $VG_NAME /dev/sd{a,b,c,d}"
+   # ssh root@$TARGET_IP "wipefs -af /dev/sd{a,b,c,d} && pvcreate /dev/sd{a,b,c,d}"
+   # 512B ディスクを先頭にして VG 作成 (例: sdb=512B の場合):
+   # ssh root@$TARGET_IP "vgcreate $VG_NAME /dev/sdb /dev/sda /dev/sdc /dev/sdd"
+   ```
+
+   コントローラノードの minIoSize と一致していることを確認:
+   ```sh
+   ssh root@$CONTROLLER_IP "linstor storage-pool list-properties $CONTROLLER_NODE striped-pool" | grep minIoSize
    ```
 
 2. **LINSTOR ノード登録**:
@@ -260,9 +316,17 @@ IPMI 電源断で対象ノードの障害をシミュレーションする。
    ssh root@$CONTROLLER_IP "linstor node set-property $TARGET_NODE DrbdOptions/AutoEvictAllowEviction false"
    ```
 
-6. **place-count 復元** (→ DRBD フル同期トリガー):
+6. **place-count 復元 → リソース配置** (→ DRBD フル同期トリガー):
    ```sh
    ./pve-lock.sh run ./oplog.sh ssh root@$CONTROLLER_IP "linstor resource-group modify $RG_NAME --place-count $PLACE_COUNT"
+   ```
+
+   auto-place が「Not enough available nodes」で失敗した場合 (★ N6 minIoSize 不一致時):
+   手動でリソースを個別に作成する (`auto-block-size=512` が RG に設定済みであること):
+   ```sh
+   # リソース一覧を取得して各リソースを手動配置
+   ssh root@$CONTROLLER_IP "linstor -m resource list"
+   ./pve-lock.sh run ./oplog.sh ssh root@$CONTROLLER_IP "linstor resource create $TARGET_NODE <resource-name>"
    ```
 
 7. **DRBD フル同期待機** (60秒ポーリング):

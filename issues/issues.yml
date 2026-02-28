@@ -1,4 +1,4 @@
-next_id: 26
+next_id: 29
 issues:
   - id: 1
     title: Test issue
@@ -277,4 +277,37 @@ issues:
     report: "report/2026-02-27_111056_linstor_node_departure_rejoin_experiment.md"
     labels:
       - bench
+    description: ""
+  - id: 26
+    title: LINSTOR LVM RAID10 ディスク障害実験
+    status: done
+    owner: "e930c835"
+    created: "2026-02-27T05:31:50Z"
+    updated: "2026-02-27T11:33:48Z"
+    blocked_by: ""
+    report: "report/2026-02-27_203200_linstor_lvm_raid10_disk_failure_experiment.md"
+    labels:
+      - bench
+    description: LVM RAID10 (-i2 -m1) で1ノード内冗長化を構築し、ディスク障害をエミュレートして耐障害性を検証する
+  - id: 27
+    title: linstor-node-ops スキルに minIoSize 不一致の回避手順を追記
+    status: done
+    owner: "0892122b"
+    created: "2026-02-27T15:30:52Z"
+    updated: "2026-02-27T16:29:16Z"
+    blocked_by: ""
+    report: "report/2026-02-28_010338_linstor_lvm_raid_operational_concerns.md"
+    labels:
+      - script
+    description: 異なる physical block size のディスクが混在する環境で、LINSTOR の StorDriver/internal/minIoSize がノード間で不一致になり rejoin 時にリソース作成が失敗する。VG 作成時の PV 順序で minIoSize が決まるため、両ノードで同じ block size のディスクを先頭に配置する必要がある。linstor-node-ops スキルの rejoin 手順にこの回避策を追記する。
+  - id: 28
+    title: LINSTOR minIoSize 固定指定による不一致回避の調査・実験
+    status: done
+    owner: "f98e694b"
+    created: "2026-02-27T17:38:20Z"
+    updated: "2026-02-27T18:47:00Z"
+    blocked_by: ""
+    report: "report/2026-02-28_034507_linstor_miniosize_fixed_value_experiment.md"
+    labels:
+      - infra
     description: ""
