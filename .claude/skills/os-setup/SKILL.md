@@ -1,7 +1,6 @@
 ---
 name: os-setup
 description: "Debian + Proxmox VE OS自動セットアップ。BMC VirtualMedia経由でpreseedインストール、PVEインストールまでを実行する。"
-disable-model-invocation: true
 argument-hint: "<config_file>"
 ---
 

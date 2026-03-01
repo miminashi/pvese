@@ -1,7 +1,6 @@
 ---
 name: linstor-bench
 description: "LINSTOR/DRBD ストレージベンチマーク。VM上でfioを実行し、thin/thick-stripe構成の性能を計測する。"
-disable-model-invocation: true
 argument-hint: "<storage_type: thin|thick-stripe>"
 ---
 

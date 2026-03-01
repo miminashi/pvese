@@ -1,7 +1,6 @@
 ---
 name: ib-switch
 description: "Mellanox SX6036 InfiniBand スイッチのシリアルコンソール操作。ステータス確認、show コマンド、IB 設定、FW 管理を行う。"
-disable-model-invocation: true
 argument-hint: "<subcommand> [args]"
 ---
 

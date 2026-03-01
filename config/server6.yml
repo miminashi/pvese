@@ -1,0 +1,35 @@
+# Server 6 (ayase-web-service-6) configuration
+
+hostname: ayase-web-service-6
+domain: local
+
+# Network
+static_ip: 10.10.10.206
+static_netmask: 8
+static_iface: eno2np1
+dhcp_iface: eno1np0
+
+# Debian ISO
+debian_version: 13
+debian_codename: trixie
+debian_iso_url: https://cdimage.debian.org/debian-cd/current/amd64/iso-cd/debian-13.3.0-amd64-netinst.iso
+debian_iso_sha256: c9f09d24b7e834e6834f2ffa565b33d6f1f540d04bd25c79ad9953bc79a8ac02
+
+# Target disk
+disk: /dev/nvme0n1
+
+# BMC
+bmc_ip: 10.10.10.26
+bmc_user: claude
+bmc_pass: Claude123
+
+# SMB share for ISO hosting
+smb_host: 10.1.6.1
+smb_share_path: "\\public"
+iso_filename: debian-preseed.iso
+iso_download_dir: /var/samba/public
+
+# OS credentials (lab environment)
+root_password: password
+user_name: debian
+user_password: password

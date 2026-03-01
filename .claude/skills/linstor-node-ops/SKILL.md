@@ -1,7 +1,6 @@
 ---
 name: linstor-node-ops
 description: "LINSTOR/DRBD ノードの離脱・復帰操作。障害シミュレーション、回復、正常離脱、再参加を行う。"
-disable-model-invocation: true
 argument-hint: "<subcommand: fail|recover|depart|rejoin> <node: server4|server5>"
 ---
 
