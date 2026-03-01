@@ -11,29 +11,49 @@ usage() {
     echo "Usage: os-setup-phase.sh <command> [options]"
     echo ""
     echo "Commands:"
-    echo "  init   [--state-dir DIR]              Initialize phase tracking"
-    echo "  start  <phase> [--state-dir DIR]      Record phase start timestamp"
-    echo "  check  <phase> [--state-dir DIR]      Check if phase is completed (exit 0=done, 1=not)"
-    echo "  mark   <phase> [--state-dir DIR]      Mark phase as completed"
-    echo "  fail   <phase> [--state-dir DIR]      Mark phase as failed"
-    echo "  reset  <phase> [--state-dir DIR]      Reset phase to pending"
-    echo "  status [--state-dir DIR]              Show current phase status"
-    echo "  times  [--state-dir DIR]              Show elapsed time summary"
-    echo "  next   [--state-dir DIR]              Print next pending phase (exit 1 if all done)"
+    echo "  init   [--config FILE] [--state-dir DIR]   Initialize phase tracking"
+    echo "  start  <phase> [--config FILE] [--state-dir DIR]"
+    echo "  check  <phase> [--config FILE] [--state-dir DIR]"
+    echo "  mark   <phase> [--config FILE] [--state-dir DIR]"
+    echo "  fail   <phase> [--config FILE] [--state-dir DIR]"
+    echo "  reset  <phase> [--config FILE] [--state-dir DIR]"
+    echo "  status [--config FILE] [--state-dir DIR]   Show current phase status"
+    echo "  times  [--config FILE] [--state-dir DIR]   Show elapsed time summary"
+    echo "  next   [--config FILE] [--state-dir DIR]   Print next pending phase"
+    echo ""
+    echo "Options:"
+    echo "  --config FILE    Server config file (e.g. config/server6.yml)"
+    echo "                   Derives state dir: state/os-setup/server6/"
+    echo "  --state-dir DIR  Override state directory (takes precedence over --config)"
+    echo ""
+    echo "If neither --config nor --state-dir is given, uses: state/os-setup/"
     echo ""
     echo "Phases: ${PHASES}"
     exit 1
 }
 
 parse_state_dir() {
-    state_dir="${DEFAULT_STATE_DIR}"
+    state_dir=""
+    config_dir=""
     while [ $# -gt 0 ]; do
         case "$1" in
             --state-dir) state_dir="$2"; shift 2 ;;
+            --config)
+                config_file="$2"
+                server_name=$(basename "$config_file" .yml)
+                config_dir="${PROJECT_DIR}/state/os-setup/${server_name}"
+                shift 2
+                ;;
             *) shift ;;
         esac
     done
-    echo "$state_dir"
+    if [ -n "$state_dir" ]; then
+        echo "$state_dir"
+    elif [ -n "$config_dir" ]; then
+        echo "$config_dir"
+    else
+        echo "$DEFAULT_STATE_DIR"
+    fi
 }
 
 cmd_init() {

@@ -46,16 +46,18 @@ SMB_SHARE=$("$YQ" '.smb_share_path' "$CONFIG")  # YAML "\\public" → \public
 ### 初期化
 
 ```sh
-./scripts/os-setup-phase.sh init
-./scripts/os-setup-phase.sh status
+./scripts/os-setup-phase.sh init --config "$CONFIG"
+./scripts/os-setup-phase.sh status --config "$CONFIG"
 ```
 
+`--config` を指定すると、設定ファイル名からサーバ別の状態ディレクトリが自動導出される（例: `config/server6.yml` → `state/os-setup/server6/`）。これにより、異なるサーバの状態が互いに干渉しない。
+
 既に初期化済みの場合は `status` で進行状況を確認し、完了済みフェーズはスキップする。
-`./scripts/os-setup-phase.sh next` で次の未完了フェーズを取得する。
+`./scripts/os-setup-phase.sh next --config "$CONFIG"` で次の未完了フェーズを取得する。
 
 ### 所要時間の記録
 
-各フェーズ開始時に `./scripts/os-setup-phase.sh start <phase>` を実行する。
+各フェーズ開始時に `./scripts/os-setup-phase.sh start <phase> --config "$CONFIG"` を実行する。
 `mark` 時に終了タイムスタンプが自動記録される。
 
 ---
@@ -68,7 +70,7 @@ SMB_SHARE=$("$YQ" '.smb_share_path' "$CONFIG")  # YAML "\\public" → \public
 2. ISO がダウンロード済みか確認（ファイル存在 + sha256 照合）
 3. 未ダウンロードなら `curl -L -o <path> <url>` でダウンロード
 4. sha256 検証: `sha256sum <file>` の出力と設定値を比較
-5. 完了: `./scripts/os-setup-phase.sh mark iso-download`
+5. 完了: `./scripts/os-setup-phase.sh mark iso-download --config "$CONFIG"`
 
 **エラー時**: sha256 不一致 → ファイル削除して再ダウンロード
 
@@ -80,7 +82,7 @@ SMB_SHARE=$("$YQ" '.smb_share_path' "$CONFIG")  # YAML "\\public" → \public
 
 1. `./scripts/generate-preseed.sh <config.yml> preseed/preseed-generated.cfg`
 2. 生成結果を確認（diff でテンプレートとの差分表示）
-3. 完了: `./scripts/os-setup-phase.sh mark preseed-generate`
+3. 完了: `./scripts/os-setup-phase.sh mark preseed-generate --config "$CONFIG"`
 
 ---
 
@@ -92,7 +94,7 @@ SMB_SHARE=$("$YQ" '.smb_share_path' "$CONFIG")  # YAML "\\public" → \public
 2. `./scripts/remaster-debian-iso.sh <元ISO> preseed/preseed-generated.cfg <出力ISO>`
    - デフォルト出力: `<iso_download_dir>/debian-preseed.iso`
 3. 出力 ISO の存在確認
-4. 完了: `./scripts/os-setup-phase.sh mark iso-remaster`
+4. 完了: `./scripts/os-setup-phase.sh mark iso-remaster --config "$CONFIG"`
 
 ---
 
@@ -171,7 +173,7 @@ SMB_SHARE=$("$YQ" '.smb_share_path' "$CONFIG")  # YAML "\\public" → \public
    ./scripts/bmc-power.sh cycle "$BMC_IP" "$BMC_USER" "$BMC_PASS" 20
    ```
 
-8. 完了: `./scripts/os-setup-phase.sh mark bmc-mount-boot`
+8. 完了: `./scripts/os-setup-phase.sh mark bmc-mount-boot --config "$CONFIG"`
 
 **エラー時**:
 - CSRF エラー → `bmc-session.sh login` + `csrf` を再実行
@@ -224,7 +226,7 @@ Debian インストーラの進行を監視する。SOL 監視を主要手段と
 #### 完了処理
 
 1. SOL を切断: `ipmitool ... sol deactivate`（sol-monitor.py が自動切断するが念のため）
-2. 完了: `./scripts/os-setup-phase.sh mark install-monitor`
+2. 完了: `./scripts/os-setup-phase.sh mark install-monitor --config "$CONFIG"`
 
 ---
 
@@ -258,6 +260,7 @@ Debian インストール後の初期設定。
      sleep 20
      ./pve-lock.sh run ./scripts/bmc-power.sh on "$BMC_IP" "$BMC_USER" "$BMC_PASS"
      ```
+   - POST code が `0x01` (SEC) のまま **3 分以上**変化しない場合 → stale POST code の疑い。サーバは正常にブート済みの可能性がある。SSH/ping で到達確認し、到達可能なら stale 確定。不達の場合は KVM スクリーンショットで視覚確認。
    - POST code が `0x00` でも SSH 不達が **5 分以上**続く場合 → stale POST code の疑い。KVM スクリーンショットで視覚確認:
      ```sh
      ./scripts/bmc-kvm.sh screenshot "$BMC_IP" tmp/<session-id>/post-check.png
@@ -312,7 +315,7 @@ Debian インストール後の初期設定。
    - SSH 接続確認: `ssh -o ConnectTimeout=5 -o StrictHostKeyChecking=no root@<static_ip> true`
    - SSH が繋がらない場合、`./scripts/sol-login.py --check-only` で SOL 経由のログイン可否を確認可能
 
-6. 完了: `./scripts/os-setup-phase.sh mark post-install-config`
+6. 完了: `./scripts/os-setup-phase.sh mark post-install-config --config "$CONFIG"`
 
 ---
 
@@ -381,7 +384,7 @@ PVE のインストールを SSH 経由で実行。
    - `ssh root@<static_ip> 'pveversion'` で PVE バージョン確認
    - `curl -sk https://<static_ip>:8006` で Web UI アクセス確認
 
-9. **完了マーク（必須）**: `./scripts/os-setup-phase.sh mark pve-install`
+9. **完了マーク（必須）**: `./scripts/os-setup-phase.sh mark pve-install --config "$CONFIG"`
    > **WARNING**: このマークを忘れると Phase 8 が開始できない。PVE 動作確認完了後、必ず実行すること。
 
 ---
@@ -390,7 +393,7 @@ PVE のインストールを SSH 経由で実行。
 
 **前提チェック**: Phase 8 開始前に pve-install フェーズの完了を確認する:
 ```sh
-./scripts/os-setup-phase.sh check pve-install
+./scripts/os-setup-phase.sh check pve-install --config "$CONFIG"
 ```
 チェックが失敗した場合は Phase 7 に戻り、ステップ 9 の完了マークを実行する。
 
@@ -420,21 +423,21 @@ PVE のインストールを SSH 経由で実行。
    - ネットワーク: `ssh root@<static_ip> 'ip -brief addr'`
    - Web UI: `curl -sk -o /dev/null -w '%{http_code}' https://<static_ip>:8006`
 
-5. 完了: `./scripts/os-setup-phase.sh mark cleanup`
+5. 完了: `./scripts/os-setup-phase.sh mark cleanup --config "$CONFIG"`
 
 6. **レポート作成**: `report/` ディレクトリに実行結果のレポートを作成（REPORT.md フォーマットに従う）
-   - `./scripts/os-setup-phase.sh times` の出力をレポートのフェーズ実行結果テーブルに転記する
+   - `./scripts/os-setup-phase.sh times --config "$CONFIG"` の出力をレポートのフェーズ実行結果テーブルに転記する
 
 ---
 
 ## Resume（中断からの再開）
 
-スキル呼び出し時に `./scripts/os-setup-phase.sh status` で現在の状態を確認し、
+スキル呼び出し時に `./scripts/os-setup-phase.sh status --config "$CONFIG"` で現在の状態を確認し、
 完了済みフェーズをスキップして次のフェーズから再開する。
 
-`./scripts/os-setup-phase.sh next` で次の未完了フェーズ名を取得できる。
+`./scripts/os-setup-phase.sh next --config "$CONFIG"` で次の未完了フェーズ名を取得できる。
 
-失敗したフェーズは `./scripts/os-setup-phase.sh reset <phase>` でリセットして再実行可能。
+失敗したフェーズは `./scripts/os-setup-phase.sh reset <phase> --config "$CONFIG"` でリセットして再実行可能。
 
 ## pve-lock の使い方
 
