@@ -188,6 +188,56 @@ HddSeq: `RAID.Integrated.1-1` (PERC H310 仮想ディスク)
 - ACPI Error (AE_NOT_EXIST for IPMI handler) が起動時に出るが動作に影響なし
 - `cfgServerBootOnce`（旧構文）と `iDRAC.ServerBoot.BootOnce`（新構文）は同じ設定。新構文を推奨
 
+## SOL (Serial Over LAN)
+
+### 接続
+
+```sh
+ipmitool -I lanplus -H 10.10.10.120 -U claude -P Claude123 sol activate
+```
+
+切断: `~.` (チルダ + ドット) または `ipmitool ... sol deactivate`
+
+### 前提条件
+
+| 設定 | 必要値 | 確認コマンド |
+|------|--------|-------------|
+| IPMI SOL Enable | Enabled | `ssh idrac7 racadm get iDRAC.IPMISOL` |
+| SOL BaudRate | 115200 | (同上) |
+| BIOS RedirAfterBoot | **Enabled** | `ssh idrac7 racadm get BIOS.SerialCommSettings` |
+| BIOS SerialComm | OnConRedirCom2 | (同上) |
+| カーネル console | `console=ttyS0,115200n8` | `cat /proc/cmdline` |
+
+### 重要: COM ポートのマッピング
+
+R320 iDRAC7 では **BIOS の COM2 リダイレクトと SOL の COM ポートが異なる**:
+
+- **BIOS コンソールリダイレクト**: COM2 (0x2F8 = ttyS1) — POST 出力はこちら経由
+- **iDRAC7 SOL (Linux 用)**: **COM1 (0x3F8 = ttyS0)** — SPCR ACPI テーブルで指定
+
+BIOS POST 出力は INT10h リダイレクト経由で SOL に表示されるため、COM2 設定で問題ない。
+Linux カーネル以降の出力は直接 UART I/O を使うため、SPCR が指す COM1 (ttyS0) に出力する必要がある。
+
+### SOL で表示される内容
+
+| フェーズ | SOL 表示 | 仕組み |
+|---------|---------|--------|
+| BIOS POST | OK | BIOS INT10h → COM2 リダイレクト |
+| GRUB メニュー | OK (BIOS リダイレクト経由) | INT10h テキストモード |
+| Linux カーネル | OK (`console=ttyS0` 必須) | 直接 UART I/O |
+| ログインプロンプト | OK (serial-getty@ttyS0) | 直接 UART I/O |
+
+### RedirAfterBoot の重要性
+
+`RedirAfterBoot=Disabled` (デフォルト) では BIOS POST 後に SOL が途切れる。
+**必ず Enabled に設定**すること:
+
+```sh
+ssh idrac7 racadm set BIOS.SerialCommSettings.RedirAfterBoot Enabled
+ssh idrac7 racadm jobqueue create BIOS.Setup.1-1
+# パワーサイクルで適用
+```
+
 ## VNC
 
 ### 接続情報

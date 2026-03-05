@@ -5,10 +5,12 @@ SCRIPT_DIR=$(cd "$(dirname "$0")" && pwd)
 PROJECT_DIR=$(cd "$SCRIPT_DIR/.." && pwd)
 
 LEGACY_ONLY=false
+SERIAL_UNIT=1
 POSITIONAL=""
 for arg in "$@"; do
     case "$arg" in
         --legacy-only) LEGACY_ONLY=true ;;
+        --serial-unit=*) SERIAL_UNIT="${arg#--serial-unit=}" ;;
         *) POSITIONAL="${POSITIONAL:+$POSITIONAL }$arg" ;;
     esac
 done
@@ -42,6 +44,7 @@ fi
 
 docker run --rm --dns 8.8.8.8 \
     -e "LEGACY_ONLY=$LEGACY_ONLY" \
+    -e "SERIAL_UNIT=$SERIAL_UNIT" \
     -v "$ORIG_ISO:/input.iso:ro" \
     -v "$PRESEED:/preseed.cfg:ro" \
     -v "$(dirname "$OUTPUT_ISO"):/output" \
@@ -61,14 +64,14 @@ cat > "$WORK/mod/grub.cfg" << GRUBCFG
 set default=0
 set timeout=3
 
-serial --speed=115200 --unit=1 --word=8 --parity=no --stop=1
+serial --speed=115200 --unit=${SERIAL_UNIT} --word=8 --parity=no --stop=1
 terminal_input serial console
 terminal_output serial console
 
 search --file --set=root /install.amd/vmlinuz
 
 menuentry "Automated Install" {
-    linux /install.amd/vmlinuz vga=normal nomodeset auto=true priority=critical preseed/file=/cdrom/preseed.cfg locale=en_US.UTF-8 keymap=us console=tty0 --- quiet
+    linux /install.amd/vmlinuz vga=normal nomodeset auto=true priority=critical preseed/file=/cdrom/preseed.cfg locale=en_US.UTF-8 keymap=us console=tty0 console=ttyS${SERIAL_UNIT},115200n8 --- quiet
     initrd /install.amd/initrd.gz
 }
 GRUBCFG
@@ -78,7 +81,7 @@ default auto
 label auto
   menu label ^Automated Install
   kernel /install.amd/vmlinuz
-  append vga=normal nomodeset auto=true priority=critical preseed/file=/cdrom/preseed.cfg locale=en_US.UTF-8 keymap=us console=tty0 initrd=/install.amd/initrd.gz --- quiet
+  append vga=normal nomodeset auto=true priority=critical preseed/file=/cdrom/preseed.cfg locale=en_US.UTF-8 keymap=us console=tty0 console=ttyS${SERIAL_UNIT},115200n8 initrd=/install.amd/initrd.gz --- quiet
 label install
   menu label ^Install
   kernel /install.amd/vmlinuz
@@ -86,6 +89,7 @@ label install
 TXTCFG
 
 cat > "$WORK/mod/isolinux.cfg" << ISOCFG
+serial ${SERIAL_UNIT} 115200
 timeout 30
 default auto
 include txt.cfg
@@ -107,7 +111,7 @@ else
     mdir -i "$WORK/efi/efi.img" ::/EFI/boot/ 2>&1 || true
 
     cat > "$WORK/efi/serial-grub.cfg" << SERIALCFG
-serial --speed=115200 --unit=1 --word=8 --parity=no --stop=1
+serial --speed=115200 --unit=${SERIAL_UNIT} --word=8 --parity=no --stop=1
 terminal_input serial console
 terminal_output serial console
 SERIALCFG
@@ -130,7 +134,7 @@ SERIALCFG
         apt-get install -y -qq grub-efi-amd64-bin dosfstools > /dev/null 2>&1
 
         cat > "$WORK/efi/embed.cfg" << EMBEDCFG
-serial --speed=115200 --unit=1 --word=8 --parity=no --stop=1
+serial --speed=115200 --unit=${SERIAL_UNIT} --word=8 --parity=no --stop=1
 terminal_input serial console
 terminal_output serial console
 
@@ -140,7 +144,7 @@ set timeout=3
 search --file --set=root /install.amd/vmlinuz
 
 menuentry "Automated Install" {
-    linux /install.amd/vmlinuz auto=true priority=critical locale=en_US.UTF-8 keymap=us console=tty0 ---
+    linux /install.amd/vmlinuz auto=true priority=critical locale=en_US.UTF-8 keymap=us console=tty0 console=ttyS${SERIAL_UNIT},115200n8 ---
     initrd /install.amd/initrd.gz
 }
 EMBEDCFG

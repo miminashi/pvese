@@ -106,6 +106,7 @@ SMB_SHARE=$("$YQ" '.smb_share_path' "$CONFIG")  # YAML "\\public" → \public
 > "SYSTEM IDLE" でインストーラ TUI が表示されない。
 
 - `--legacy-only` フラグを使用（EFI パッチをスキップ）
+- `--serial-unit=0` フラグを使用（R320 の SOL は COM1/ttyS0）
 - `remaster-debian-iso.sh` のカーネルパラメータが `vga=normal nomodeset` であること確認
 - preseed は **initrd への注入禁止**（d-i TUI が壊れる）。`preseed/file=/cdrom/preseed.cfg` でISO ルート配置のみ使用
 - server7 用 preseed: `preseed/preseed-server7.cfg`（テンプレート生成ではなく手動管理）
@@ -203,10 +204,10 @@ SMB_SHARE=$("$YQ" '.smb_share_path' "$CONFIG")  # YAML "\\public" → \public
 
 Debian インストーラの進行を監視する。SOL 監視を主要手段とし、POST code ポーリングはフォールバック。
 
-> **iDRAC7 (7号機)**: R320 の SOL は Linux 出力を通さない (`console=tty0`)。
-> SOL 監視・POST code ポーリングは使えない。代わりに VNC スクリーンショットで進行を確認する:
-> `.venv/bin/python3 tmp/<session-id>/vnc-wake-screenshot.py --host 10.10.10.120 --port 5901 --password Claude1 --output <path>`
-> preseed 完了後 `SYSTEM POWER OFF` が表示される。`./scripts/bmc-power.sh status` で PowerState=Off を確認。
+> **iDRAC7 (7号機)**: R320 の SOL は COM1 (ttyS0) を使用。preseed-server7.cfg に
+> `console=ttyS0,115200n8` が設定されているため、SOL 監視で Debian インストーラの進行を確認可能。
+> ISO リマスター時に `--serial-unit=0` を指定すること。POST code ポーリングは使えない。
+> フォールバック: VNC スクリーンショット (`.venv/bin/python3 tmp/<session-id>/vnc-wake-screenshot.py`)。
 
 #### 1. SOL 監視（主要）
 
@@ -296,7 +297,7 @@ Debian インストール後の初期設定。
      スクリーンショットで POST 0x92 等のスタックが確認できたら、上記と同じ自動リカバリを実行する。
    - リカバリ後 **150 秒待機**してから次のステップへ進む
    - **iDRAC7 (7号機)**: `bmc-power.sh postcode` / `bmc-kvm.sh screenshot` は Supermicro 専用のため使えない。
-     VNC スクリーンショットまたは SSH リトライ (30秒間隔) で起動完了を監視する。
+     SOL 監視 (`console=ttyS0`)、VNC スクリーンショット、または SSH リトライ (30秒間隔) で起動完了を監視する。
      R320 の POST は 2-3 分 (Lifecycle Controller 初期化) かかるため、SSH 到達まで最大 3.5 分待つ。
 
 3. **SOL 経由でログイン確認・設定**:
@@ -336,12 +337,13 @@ Debian インストール後の初期設定。
      ```
      リカバリ後、sol-login.py を再実行する。
 
-   **iDRAC7 (7号機) — SOL が使えない場合**:
-   R320 の SOL は Linux シリアル出力を通さない (`console=tty0`)。
-   代わりに pexpect で debian ユーザにパスワード SSH → su root で設定する:
+   **iDRAC7 (7号機)**:
+   R320 の SOL は COM1 (ttyS0) を使用。`sol-login.py` で SOL 経由のログイン・設定が可能。
+   ただし preseed のデフォルトパスワードは `password` (preseed-server7.cfg 参照)。
+   フォールバック: pexpect で debian ユーザにパスワード SSH → su root で設定する:
    a. `tmp/<session-id>/ssh-setup.py` を作成 (pexpect ベース)
-      - `debian` ユーザにパスワード認証で SSH (`Claude123`)
-      - `su -` で root に切り替え (`Claude123`)
+      - `debian` ユーザにパスワード認証で SSH (`password`)
+      - `su -` で root に切り替え (`password`)
       - PermitRootLogin yes, sshd restart, sudoers, SSH 公開鍵を設定
       - 静的 IP 設定 (`/etc/network/interfaces` に追記 + `ifup`)
    b. `.venv/bin/python3 tmp/<session-id>/ssh-setup.py` で実行
@@ -419,7 +421,7 @@ PVE のインストールを SSH 経由で実行。
      3. パワーサイクル後 150 秒待機 → SSH リトライ（30 秒間隔、最大 3 分）
      4. それでも SSH 不達 → SOL 経由で NIC 名・IP を確認（ステップ 5 へ）
    - **iDRAC7 (7号機)**: `bmc-power.sh postcode` / `bmc-kvm.sh screenshot` は使えない。
-     VNC スクリーンショットまたは SSH リトライ (30秒間隔) で監視する。
+     SOL 監視 (`console=ttyS0`)、VNC スクリーンショット、または SSH リトライ (30秒間隔) で監視する。
      R320 の POST は 2-3 分 (Lifecycle Controller) かかるため、SSH 到達まで最大 3.5 分待つ。
 
 5. **NIC 名変更チェック**:

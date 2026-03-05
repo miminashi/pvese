@@ -68,7 +68,7 @@ GRUB_TERMINAL="console serial"
 GRUB_SERIAL_COMMAND="serial --unit=1 --speed=115200 --word=8 --parity=no --stop=1"
 GRUBCONF
     fi
-    if ! grep -q 'console=ttyS1' /etc/default/grub; then
+    if ! grep -q 'console=ttyS' /etc/default/grub; then
         sed -i 's/^GRUB_CMDLINE_LINUX=.*/GRUB_CMDLINE_LINUX="console=tty0 console=ttyS1,115200n8"/' /etc/default/grub
     fi
     update-grub
