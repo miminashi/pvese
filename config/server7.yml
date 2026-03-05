@@ -7,8 +7,8 @@ domain: local
 # Network
 static_ip: 10.10.10.207
 static_netmask: 8
-static_iface: TBD
-dhcp_iface: TBD
+static_iface: eno1
+dhcp_iface: eno2
 
 # Target disk (TBD: PERC H710 shows 0 pdisks via racadm/Redfish;
 # will be confirmed during installer. Expected /dev/sda if VD exists.)
