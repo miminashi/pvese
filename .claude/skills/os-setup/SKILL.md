@@ -84,6 +84,10 @@ SMB_SHARE=$("$YQ" '.smb_share_path' "$CONFIG")  # YAML "\\public" → \public
 2. 生成結果を確認（diff でテンプレートとの差分表示）
 3. 完了: `./scripts/os-setup-phase.sh mark preseed-generate --config "$CONFIG"`
 
+> **7号機 (R320)**: preseed は `preseed/preseed-server7.cfg` を手動管理しており、
+> `generate-preseed.sh` によるテンプレート生成は使用しない。
+> このフェーズでは preseed ファイルの内容を確認するだけでよい。
+
 ---
 
 ### Phase 3: iso-remaster
@@ -199,6 +203,11 @@ SMB_SHARE=$("$YQ" '.smb_share_path' "$CONFIG")  # YAML "\\public" → \public
 
 Debian インストーラの進行を監視する。SOL 監視を主要手段とし、POST code ポーリングはフォールバック。
 
+> **iDRAC7 (7号機)**: R320 の SOL は Linux 出力を通さない (`console=tty0`)。
+> SOL 監視・POST code ポーリングは使えない。代わりに VNC スクリーンショットで進行を確認する:
+> `.venv/bin/python3 tmp/<session-id>/vnc-wake-screenshot.py --host 10.10.10.120 --port 5901 --password Claude1 --output <path>`
+> preseed 完了後 `SYSTEM POWER OFF` が表示される。`./scripts/bmc-power.sh status` で PowerState=Off を確認。
+
 #### 1. SOL 監視（主要）
 
 `./scripts/sol-monitor.py` でインストーラの進行をパッシブ監視する:
@@ -286,6 +295,9 @@ Debian インストール後の初期設定。
      ```
      スクリーンショットで POST 0x92 等のスタックが確認できたら、上記と同じ自動リカバリを実行する。
    - リカバリ後 **150 秒待機**してから次のステップへ進む
+   - **iDRAC7 (7号機)**: `bmc-power.sh postcode` / `bmc-kvm.sh screenshot` は Supermicro 専用のため使えない。
+     VNC スクリーンショットまたは SSH リトライ (30秒間隔) で起動完了を監視する。
+     R320 の POST は 2-3 分 (Lifecycle Controller 初期化) かかるため、SSH 到達まで最大 3.5 分待つ。
 
 3. **SOL 経由でログイン確認・設定**:
    > **重要**: preseed の late_command は Debian 13 で動作しないことが多い。
@@ -324,6 +336,17 @@ Debian インストール後の初期設定。
      ```
      リカバリ後、sol-login.py を再実行する。
 
+   **iDRAC7 (7号機) — SOL が使えない場合**:
+   R320 の SOL は Linux シリアル出力を通さない (`console=tty0`)。
+   代わりに pexpect で debian ユーザにパスワード SSH → su root で設定する:
+   a. `tmp/<session-id>/ssh-setup.py` を作成 (pexpect ベース)
+      - `debian` ユーザにパスワード認証で SSH (`Claude123`)
+      - `su -` で root に切り替え (`Claude123`)
+      - PermitRootLogin yes, sshd restart, sudoers, SSH 公開鍵を設定
+      - 静的 IP 設定 (`/etc/network/interfaces` に追記 + `ifup`)
+   b. `.venv/bin/python3 tmp/<session-id>/ssh-setup.py` で実行
+   c. `ssh-keygen -R <static_ip>` → SSH 鍵認証確認
+
 4. **古いホスト鍵を削除**（OS 再インストールで鍵が変わるため）:
    ```sh
    ssh-keygen -R <static_ip> 2>/dev/null || true
@@ -343,6 +366,21 @@ Debian インストール後の初期設定。
 **pve-lock**: 必要
 
 PVE のインストールを SSH 経由で実行。
+
+0. **インターネット接続確保 (R320 / CD-only preseed の場合)**:
+   preseed が CD-only (`apt-setup/use_mirror boolean false`) の場合、以下が必要:
+
+   a. DHCP インターフェース有効化 + デフォルトルート修正:
+      - `/etc/network/interfaces` に eno2 DHCP 設定追加
+      - `ifup eno2` → DHCP IPv4 割当を待つ (5-10秒)
+      - `ip route del default via 10.10.10.1` (10.0.0.0/8 はインターネット不可)
+      - **注意**: リブートのたびにデフォルトルートが復活するため、毎回削除が必要
+
+   b. apt ソース + 必須パッケージ:
+      - `/etc/apt/sources.list` に Debian ミラーを追加 (trixie main non-free-firmware)
+      - `apt-get update && apt-get -y install wget ca-certificates`
+
+   これらを `tmp/<session-id>/pre-pve-setup.sh` にまとめて scp + ssh で実行する。
 
 1. **スクリプト転送**:
    ```sh
@@ -380,10 +418,17 @@ PVE のインストールを SSH 経由で実行。
         - `Off` の場合 → `./scripts/bmc-power.sh on` で起動
      3. パワーサイクル後 150 秒待機 → SSH リトライ（30 秒間隔、最大 3 分）
      4. それでも SSH 不達 → SOL 経由で NIC 名・IP を確認（ステップ 5 へ）
+   - **iDRAC7 (7号機)**: `bmc-power.sh postcode` / `bmc-kvm.sh screenshot` は使えない。
+     VNC スクリーンショットまたは SSH リトライ (30秒間隔) で監視する。
+     R320 の POST は 2-3 分 (Lifecycle Controller) かかるため、SSH 到達まで最大 3.5 分待つ。
 
 5. **NIC 名変更チェック**:
    SSH 接続できない場合、SOL 経由で NIC 名を確認（`reference.md` 参照）。
    Debian 13 + PVE 9 では変更なし（eno1np0 等）を確認済みだが、念のためチェック。
+
+   - **R320**: SSH 再接続後、post-reboot 前にデフォルトルートを修正する:
+     `ssh root@<static_ip> ip route del default via 10.10.10.1`
+     (10.0.0.0/8 はインターネット不可。リブートのたびに復活するため毎回必要)
 
 6. **post-reboot フェーズ**:
    ```sh
@@ -400,6 +445,7 @@ PVE のインストールを SSH 経由で実行。
    - SSH 再接続待機（通常 60-120 秒、最大 5 分、30秒間隔で ping）
    - **注意**: リブート後5分以上ネットワーク到達不能な場合、ステップ 4 と同様のリカバリを実施
      （ForceOff → 20秒待機 → On → 150秒待機 → SSH リトライ）
+   - **R320**: SSH 再接続後、`ssh root@<static_ip> ip route del default via 10.10.10.1` でデフォルトルート修正
    - `ssh root@<static_ip> 'pveversion'` で PVE バージョン確認
    - `curl -sk https://<static_ip>:8006` で Web UI アクセス確認
 
