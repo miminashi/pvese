@@ -125,6 +125,69 @@ ipmitool -I lanplus -H 10.10.10.120 -U claude -P Claude123 mc reset cold
 - IPMI LAN は FW アップグレード作業中に有効化済み (`cfgIpmiLanEnable=1`)
 - `mc reset cold`: スタックした FW アップデートの回復に使用
 
+## ブート制御
+
+### 概要
+
+R320 の BIOS ブート順序は iDRAC7 racadm 経由で制御可能:
+- **iDRAC.ServerBoot** — 次回ブートデバイスの一時設定（BootOnce/FirstBootDevice）
+- **BIOS.BiosBootSettings** — 永続的ブートシーケンス（BootSeq, BootMode）
+
+### スクリプトサブコマンド
+
+```sh
+./scripts/idrac-virtualmedia.sh boot-status 10.10.10.120   # 現在のブート設定表示
+./scripts/idrac-virtualmedia.sh boot-once 10.10.10.120 VCD-DVD  # 一時ブートデバイス設定
+./scripts/idrac-virtualmedia.sh boot-reset 10.10.10.120    # boot-once 解除（通常ブート復帰）
+```
+
+### FirstBootDevice の有効な値
+
+| 値 | 説明 |
+|----|------|
+| `Normal` | BIOS BootSeq に従う（デフォルト） |
+| `PXE` | ネットワークブート |
+| `BIOS` | BIOS セットアップに入る |
+| `VCD-DVD` | VirtualMedia CD/DVD |
+| `Floppy` | VirtualMedia フロッピー |
+| `HDD` | ハードディスク |
+
+### VirtualMedia ブート → HDD ブートの切り替え
+
+OS インストール後、VirtualMedia ブート設定をクリアしないと「No boot device available」が発生する:
+
+```sh
+# インストール前: VirtualMedia からブート
+./scripts/idrac-virtualmedia.sh boot-once 10.10.10.120 VCD-DVD
+
+# インストール完了後: boot-once を解除して HDD からブート
+./scripts/idrac-virtualmedia.sh umount 10.10.10.120
+./scripts/idrac-virtualmedia.sh boot-reset 10.10.10.120
+```
+
+### 永続的ブート順序
+
+BIOS BootSeq は racadm set + ジョブキューで変更可能（通常は変更不要）:
+
+```sh
+# 現在の BootSeq 確認
+ssh idrac7 racadm get BIOS.BiosBootSettings.BootSeq
+
+# 変更する場合（ジョブキュー + リブートが必要）
+ssh idrac7 racadm set BIOS.BiosBootSettings.BootSeq HardDisk.List.1-1,NIC.Embedded.1-1-1,...
+ssh idrac7 racadm jobqueue create BIOS.Setup.1-1 -r pwrcycle -s TIME_NOW
+```
+
+デフォルト BootSeq: `HardDisk.List.1-1,NIC.Embedded.1-1-1,Optical.SATAEmbedded.E-1,Unknown.Slot.1-1`
+HddSeq: `RAID.Integrated.1-1` (PERC H310 仮想ディスク)
+
+### R320 固有の注意事項
+
+- BootMode は `Bios`（レガシー）。UEFI ではない
+- POST は遅い（Lifecycle Controller: Collecting System Inventory... で 2-3 分）
+- ACPI Error (AE_NOT_EXIST for IPMI handler) が起動時に出るが動作に影響なし
+- `cfgServerBootOnce`（旧構文）と `iDRAC.ServerBoot.BootOnce`（新構文）は同じ設定。新構文を推奨
+
 ## VNC
 
 ### 接続情報

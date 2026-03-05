@@ -247,13 +247,22 @@ Debian インストーラの進行を監視する。SOL 監視を主要手段と
 Debian インストール後の初期設定。
 
 1. **VirtualMedia アンマウント + Boot Override 解除**:
+
+   **Supermicro (4-6号機)**:
    ```sh
-   # BMC セッション再確立（必要なら）
    ./scripts/bmc-session.sh login "$BMC_IP" "$BMC_USER" "$BMC_PASS" "$COOKIE_FILE"
    CSRF=$(./scripts/bmc-session.sh csrf "$BMC_IP" "$COOKIE_FILE")
    ./scripts/bmc-virtualmedia.sh umount "$BMC_IP" "$COOKIE_FILE" "$CSRF"
    ./pve-lock.sh run ./scripts/bmc-power.sh boot-override-reset "$BMC_IP" "$BMC_USER" "$BMC_PASS"
    ```
+
+   **iDRAC7 (7号機)**:
+   ```sh
+   ./scripts/idrac-virtualmedia.sh umount 10.10.10.120
+   ./scripts/idrac-virtualmedia.sh boot-reset 10.10.10.120
+   ```
+   > boot-reset は BootOnce=Disabled + FirstBootDevice=Normal に設定する。
+   > これを行わないと VCD-DVD の boot-once 設定が残り「No boot device available」が発生する。
 
 2. **ディスクからブート**:
    ```sh
