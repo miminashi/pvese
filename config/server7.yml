@@ -1,0 +1,43 @@
+# Server 7 (ayase-web-service-7) configuration
+# DELL PowerEdge R320 - iDRAC (not Supermicro BMC)
+
+hostname: ayase-web-service-7
+domain: local
+
+# Network
+static_ip: 10.10.10.207
+static_netmask: 8
+static_iface: TBD
+dhcp_iface: TBD
+
+# Target disk (TBD: PERC H710 shows 0 pdisks via racadm/Redfish;
+# will be confirmed during installer. Expected /dev/sda if VD exists.)
+disk: /dev/sda
+
+# Debian installer
+debian_version: 13
+debian_codename: trixie
+debian_iso_url: https://cdimage.debian.org/debian-cd/current/amd64/iso-cd/debian-13.3.0-amd64-netinst.iso
+debian_iso_sha256: c9f09d24b7e834e6834f2ffa565b33d6f1f540d04bd25c79ad9953bc79a8ac02
+
+# SMB / VirtualMedia
+smb_host: 10.1.6.1
+smb_share_path: "\\public"
+iso_filename: debian-preseed.iso
+iso_download_dir: /var/samba/public
+remoteimage_uri: "//10.1.6.1/public/debian-preseed.iso"
+
+# BMC (iDRAC)
+bmc_type: idrac
+bmc_ip: 10.10.10.120
+bmc_user: claude
+bmc_pass: Claude123
+bmc_ssh_key: ~/.ssh/idrac_rsa
+idrac_fw_version: "2.65.65.65"
+idrac_fw_build: "15"
+idrac_fw_updated: "2026-03-02"
+
+# OS credentials (lab environment)
+root_password: password
+user_name: debian
+user_password: password
