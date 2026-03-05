@@ -59,10 +59,16 @@ ssh root@$SERIAL_HOST 'python3 /tmp/sx6036-console.py status'
 
 ### show — 任意の show コマンド
 
+`show` サブコマンドは内部で `"show " + arg` を組み立てるため、引数に `show` を含めないこと:
+
 ```sh
+# OK: 引数に show を含めない
 ssh root@$SERIAL_HOST 'python3 /tmp/sx6036-console.py show version'
 ssh root@$SERIAL_HOST 'python3 /tmp/sx6036-console.py show interfaces brief'
 ssh root@$SERIAL_HOST 'python3 /tmp/sx6036-console.py show inventory'
+
+# NG: 引数に show を含めると二重になる
+# python3 /tmp/sx6036-console.py show "show interfaces ib status 1" → "show show interfaces ..."
 ```
 
 ### ports — IB ポート状態サマリ
@@ -223,6 +229,7 @@ operator (>)  →  enable (#)  →  configure terminal ((config) #)
 
 - **シリアルポート排他**: 同時に 1 セッションのみ接続可能。別のプロセスがシリアルポートを使用中だとエラーになる
 - **pyserial 必須**: server 4 に `pyserial` パッケージが必要。OS 再インストールで消失するため、接続失敗時は `pip3 install pyserial` を再実行
+- **OS 再インストール後の再セットアップ**: pyserial の再インストールに加え、`sx6036-console.py` の再転送 (`scp ./scripts/sx6036-console.py root@$SERIAL_HOST:/tmp/`) が必要。初回実行時のエラーを `2>/dev/null` で抑制しないこと（ファイル不在の検出が遅れる）
 - **低速通信**: 9600 baud (~960 bytes/sec)。36 ポート表示で 5-10 秒かかる。タイムアウトはデフォルト 30 秒
 - **enable パスワード**: 不要（パスワードプロンプトなしで enable モードに入れる）
 - **pve-lock**: 不要（IB スイッチは PVE クラスタとは独立）
@@ -234,6 +241,8 @@ operator (>)  →  enable (#)  →  configure terminal ((config) #)
 - **MLNX-OS の ping 構文**: `-c N` を使う (`count N` は不可)
 - **設定保存**: `write memory` を使う (`configuration write` は MLNX-OS 3.6 では不可)
 - **長時間操作と `sx6036-console.py`**: FW fetch (~5分), install (~15分), reload (~8分) はタイムアウトを超えるため、シリアルコンソール手動操作 (`screen /dev/ttyUSB0 9600`) を推奨
+- **QSFP+ トランシーバ電力制限**: SX6036 (SwitchX-2) はポートあたり最大 2W。CWDM4/LR4 等の高消費電力光モジュール (2.5-3.5W) は非対応。DAC ケーブルまたは Mellanox FDR AOC (<2W) を使用すること。スイッチ側で `Warning: High power transceiver is not supported` が表示されリンクが確立できない
+- **IB トランシーバ情報取得の制約**: MLNX-OS 3.6 の IB インターフェースでは `transceiver`, `module-info`, `pluggable`, `cables`, `running-config interface` サブコマンドが非対応。サーバ側の `ethtool -m` も IB インターフェースでは `Operation not supported`。トランシーバの詳細診断手段は限定的
 
 ## 参照
 

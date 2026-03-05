@@ -1,4 +1,4 @@
-next_id: 29
+next_id: 31
 issues:
   - id: 1
     title: Test issue
@@ -310,4 +310,27 @@ issues:
     report: "report/2026-02-28_034507_linstor_miniosize_fixed_value_experiment.md"
     labels:
       - infra
+    description: ""
+  - id: 29
+    title: DRBD/LINSTOR マルチリージョン per-connection protocol 実験
+    status: done
+    owner: "232ac286"
+    created: "2026-02-28T18:43:51Z"
+    updated: "2026-02-28T20:26:40Z"
+    blocked_by: ""
+    report: "report/2026-03-01_051957_linstor_multi_region_protocol_experiment.md"
+    labels:
+      - infra
+    description: ""
+  - id: 30
+    title: 3ノード LINSTOR クラスタ構築・ベンチマーク・離脱テスト
+    status: blocked
+    owner: "b38b3c37"
+    created: "2026-03-01T12:36:01Z"
+    updated: "2026-03-01T16:19:46Z"
+    blocked_by: "6号機 CWDM4 光モジュールが SX6036 の電力制限 (2W/port) を超過。DAC ケーブル交換が必要"
+    report: "report/2026-03-02_011809_3node_linstor_cluster_attempt.md"
+    labels:
+      - infra
+      - bench
     description: ""
