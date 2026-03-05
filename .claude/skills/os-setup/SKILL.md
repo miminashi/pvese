@@ -96,6 +96,16 @@ SMB_SHARE=$("$YQ" '.smb_share_path' "$CONFIG")  # YAML "\\public" → \public
 3. 出力 ISO の存在確認
 4. 完了: `./scripts/os-setup-phase.sh mark iso-remaster --config "$CONFIG"`
 
+#### 7号機 (iDRAC7 / Legacy BIOS) の注意事項
+
+> **重要**: iDRAC7 VNC ポート 5901 は `vga=788` (VESA フレームバッファ) と非互換。
+> "SYSTEM IDLE" でインストーラ TUI が表示されない。
+
+- `--legacy-only` フラグを使用（EFI パッチをスキップ）
+- `remaster-debian-iso.sh` のカーネルパラメータが `vga=normal nomodeset` であること確認
+- preseed は **initrd への注入禁止**（d-i TUI が壊れる）。`preseed/file=/cdrom/preseed.cfg` でISO ルート配置のみ使用
+- server7 用 preseed: `preseed/preseed-server7.cfg`（テンプレート生成ではなく手動管理）
+
 ---
 
 ### Phase 4: bmc-mount-boot

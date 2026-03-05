@@ -343,13 +343,23 @@ ssh root@<ip> 'sed -i "s/^#PermitRootLogin.*/PermitRootLogin yes/" /etc/ssh/sshd
 ## ISO リマスター
 
 `scripts/remaster-debian-iso.sh` が Docker 内で以下を実行:
-1. 元 ISO から initrd.gz を抽出
-2. preseed.cfg を initrd に注入
-3. GRUB/isolinux 設定をシリアルコンソール対応に書き換え
+1. GRUB/isolinux 設定をシリアルコンソール + 自動インストール用に書き換え
+2. preseed.cfg を ISO ルートに配置（`-map preseed.cfg /preseed.cfg`）
+3. カーネルパラメータに `preseed/file=/cdrom/preseed.cfg auto=true priority=critical` を設定
 4. `xorriso -boot_image any replay` で UEFI ブート構造を保持した ISO を再構築
+
+> **注意**: 以前は preseed を initrd に cpio 連結で注入していたが、
+> iDRAC7 VNC で d-i TUI が表示されない問題が発生したため廃止。
+> preseed/file= カーネルパラメータ方式に統一した。
 
 引数: `<元ISO> <preseed.cfg> <出力ISO>`
 デフォルト出力: `/var/samba/public/debian-preseed.iso`
+
+### 7号機 (Legacy BIOS / iDRAC7 VNC) 固有の設定
+
+- `--legacy-only` フラグで EFI パッチをスキップ
+- カーネルパラメータ: `vga=normal nomodeset`（`vga=788` は iDRAC7 VNC 非互換）
+- preseed: `preseed/preseed-server7.cfg`（ミラーなし、静的 IP、CD のみ）
 
 ### efi.img パッチ注意点
 

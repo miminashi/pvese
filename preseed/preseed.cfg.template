@@ -73,3 +73,8 @@ d-i debian-installer/exit/poweroff boolean true
 
 ### Late command - minimal (complex commands break finish-install on Debian 13)
 d-i preseed/late_command string true
+
+# Note: Server 7 (R320/iDRAC7) uses preseed/preseed-server7.cfg (手動管理)
+# - ミラーなし (apt-setup/use_mirror false, no_mirror true)
+# - apt-setup/cdrom/set-double boolean false が必須
+# - preseed/file=/cdrom/preseed.cfg (initrd 注入禁止)
