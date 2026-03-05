@@ -42,9 +42,11 @@ if [ "$LEGACY_ONLY" = true ]; then
     echo "Mode:       Legacy BIOS only (EFI patch skipped)"
 fi
 
+OUTPUT_BASENAME=$(basename "$OUTPUT_ISO")
 docker run --rm --dns 8.8.8.8 \
     -e "LEGACY_ONLY=$LEGACY_ONLY" \
     -e "SERIAL_UNIT=$SERIAL_UNIT" \
+    -e "OUTPUT_BASENAME=$OUTPUT_BASENAME" \
     -v "$ORIG_ISO:/input.iso:ro" \
     -v "$PRESEED:/preseed.cfg:ro" \
     -v "$(dirname "$OUTPUT_ISO"):/output" \
@@ -71,7 +73,7 @@ terminal_output serial console
 search --file --set=root /install.amd/vmlinuz
 
 menuentry "Automated Install" {
-    linux /install.amd/vmlinuz vga=normal nomodeset auto=true priority=critical preseed/file=/cdrom/preseed.cfg locale=en_US.UTF-8 keymap=us console=tty0 console=ttyS${SERIAL_UNIT},115200n8 --- quiet
+    linux /install.amd/vmlinuz vga=normal nomodeset auto=true priority=critical preseed/file=/cdrom/preseed.cfg locale=en_US.UTF-8 keymap=us netcfg/choose_interface=auto console=tty0 console=ttyS${SERIAL_UNIT},115200n8 --- quiet
     initrd /install.amd/initrd.gz
 }
 GRUBCFG
@@ -81,7 +83,7 @@ default auto
 label auto
   menu label ^Automated Install
   kernel /install.amd/vmlinuz
-  append vga=normal nomodeset auto=true priority=critical preseed/file=/cdrom/preseed.cfg locale=en_US.UTF-8 keymap=us console=tty0 console=ttyS${SERIAL_UNIT},115200n8 initrd=/install.amd/initrd.gz --- quiet
+  append vga=normal nomodeset auto=true priority=critical preseed/file=/cdrom/preseed.cfg locale=en_US.UTF-8 keymap=us netcfg/choose_interface=auto console=tty0 console=ttyS${SERIAL_UNIT},115200n8 initrd=/install.amd/initrd.gz --- quiet
 label install
   menu label ^Install
   kernel /install.amd/vmlinuz
@@ -144,7 +146,7 @@ set timeout=3
 search --file --set=root /install.amd/vmlinuz
 
 menuentry "Automated Install" {
-    linux /install.amd/vmlinuz auto=true priority=critical locale=en_US.UTF-8 keymap=us console=tty0 console=ttyS${SERIAL_UNIT},115200n8 ---
+    linux /install.amd/vmlinuz vga=normal nomodeset auto=true priority=critical preseed/file=/cdrom/preseed.cfg locale=en_US.UTF-8 keymap=us netcfg/choose_interface=auto console=tty0 console=ttyS${SERIAL_UNIT},115200n8 --- quiet
     initrd /install.amd/initrd.gz
 }
 EMBEDCFG
@@ -178,9 +180,9 @@ EMBEDCFG
 fi
 
 echo "--- Rebuilding ISO (preserving original boot structure) ---"
-rm -f "/output/debian-preseed.iso"
+rm -f "/output/$OUTPUT_BASENAME"
 xorriso -indev /input.iso \
-    -outdev "/output/debian-preseed.iso" \
+    -outdev "/output/$OUTPUT_BASENAME" \
     -boot_image any replay \
     -joliet on \
     -update "$WORK/mod/grub.cfg" /boot/grub/grub.cfg \
@@ -191,7 +193,7 @@ xorriso -indev /input.iso \
     2>&1
 
 echo "--- Done ---"
-ls -lh /output/debian-preseed.iso
+ls -lh "/output/$OUTPUT_BASENAME"
 '
 
 echo "=== Output: $OUTPUT_ISO ==="

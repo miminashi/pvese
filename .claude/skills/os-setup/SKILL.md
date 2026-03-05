@@ -100,16 +100,43 @@ SMB_SHARE=$("$YQ" '.smb_share_path' "$CONFIG")  # YAML "\\public" → \public
 3. 出力 ISO の存在確認
 4. 完了: `./scripts/os-setup-phase.sh mark iso-remaster --config "$CONFIG"`
 
-#### 7号機 (iDRAC7 / Legacy BIOS) の注意事項
+#### 7号機 (iDRAC7 / UEFI モード) の注意事項
+
+> **重要**: R320 は UEFI モードで運用する。Debian 13 は GPT パーティションテーブルをデフォルトで
+> 作成するため、Legacy BIOS では "No boot device available" が発生する。
+> UEFI モードへの切替手順は下記参照。
 
 > **重要**: iDRAC7 VNC ポート 5901 は `vga=788` (VESA フレームバッファ) と非互換。
 > "SYSTEM IDLE" でインストーラ TUI が表示されない。
 
-- `--legacy-only` フラグを使用（EFI パッチをスキップ）
+- `--legacy-only` を**付けない**（UEFI + Legacy dual boot ISO を生成）
 - `--serial-unit=0` フラグを使用（R320 の SOL は COM1/ttyS0）
 - `remaster-debian-iso.sh` のカーネルパラメータが `vga=normal nomodeset` であること確認
 - preseed は **initrd への注入禁止**（d-i TUI が壊れる）。`preseed/file=/cdrom/preseed.cfg` でISO ルート配置のみ使用
 - server7 用 preseed: `preseed/preseed-server7.cfg`（テンプレート生成ではなく手動管理）
+
+##### UEFI モードへの切替 (初回のみ)
+
+R320 が Legacy BIOS モードの場合、以下で UEFI に切り替える:
+```sh
+ssh -i ~/.ssh/idrac_rsa claude@10.10.10.120 racadm set BIOS.BiosBootSettings.BootMode Uefi
+ssh -i ~/.ssh/idrac_rsa claude@10.10.10.120 racadm jobqueue create BIOS.Setup.1-1 -r pwrcycle -s TIME_NOW -e TIME_NA
+# Power On して JOB 完了を待つ (約6分)
+ssh -i ~/.ssh/idrac_rsa claude@10.10.10.120 racadm jobqueue view
+# Status=Completed を確認
+```
+
+##### racadm コマンドの注意 (iDRAC7 FW 2.65.65.65)
+
+`racadm set iDRAC.ServerBoot.BootOnce` は iDRAC7 で**サイレントに失敗**する
+("Object value modified successfully" を返すが値は変わらない)。
+BootOnce の操作には legacy コマンドを使用すること:
+```sh
+racadm config -g cfgServerInfo -o cfgServerBootOnce 1   # 有効化
+racadm config -g cfgServerInfo -o cfgServerBootOnce 0   # 無効化
+```
+`FirstBootDevice` は `racadm set iDRAC.ServerBoot.FirstBootDevice` が正常に動作する。
+`idrac-virtualmedia.sh` は修正済み (legacy コマンドを使用)。
 
 ---
 
@@ -273,6 +300,7 @@ Debian インストール後の初期設定。
    ```
    > boot-reset は BootOnce=Disabled + FirstBootDevice=Normal に設定する。
    > これを行わないと VCD-DVD の boot-once 設定が残り「No boot device available」が発生する。
+   > 注意: BootOnce は legacy racadm コマンドを使用 (Phase 3 の racadm 注意事項参照)。
 
 2. **ディスクからブート**:
    ```sh

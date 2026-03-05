@@ -62,12 +62,12 @@ cmd_verify() {
 cmd_boot_once() {
     device="$1"
     ssh_idrac racadm set iDRAC.ServerBoot.FirstBootDevice "$device"
-    ssh_idrac racadm set iDRAC.ServerBoot.BootOnce Enabled
+    ssh_idrac racadm config -g cfgServerInfo -o cfgServerBootOnce 1
     echo "Boot-once set to: $device"
 }
 
 cmd_boot_reset() {
-    ssh_idrac racadm set iDRAC.ServerBoot.BootOnce Disabled
+    ssh_idrac racadm config -g cfgServerInfo -o cfgServerBootOnce 0
     ssh_idrac racadm set iDRAC.ServerBoot.FirstBootDevice Normal
     echo "Boot-once cleared. Normal boot sequence restored."
 }

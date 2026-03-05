@@ -1,4 +1,4 @@
-next_id: 31
+next_id: 33
 issues:
   - id: 1
     title: Test issue
@@ -333,4 +333,26 @@ issues:
     labels:
       - infra
       - bench
+    description: ""
+  - id: 31
+    title: R320 OS再インストール + PVE セットアップ通しテスト (SOL検証)
+    status: done
+    owner: "15e76796"
+    created: "2026-03-05T15:41:04Z"
+    updated: "2026-03-05T19:31:08Z"
+    blocked_by: ""
+    report: ""
+    labels:
+      - infra
+    description: ""
+  - id: 32
+    title: 4号機/5号機 同時 os-setup (R320 デグレ確認)
+    status: done
+    owner: "38ce6813"
+    created: "2026-03-05T18:22:25Z"
+    updated: "2026-03-05T22:07:47Z"
+    blocked_by: ""
+    report: "report/2026-03-06_070624_parallel_os_setup_regression_test.md"
+    labels:
+      - infra
     description: ""
