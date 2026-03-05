@@ -54,12 +54,28 @@ redfish_patch() {
         -d "$data"
 }
 
+get_system_path() {
+    bmc_ip="$1"
+    user="$2"
+    pass="$3"
+
+    members=$(redfish_get "$bmc_ip" "$user" "$pass" "/redfish/v1/Systems/")
+    path=$(echo "$members" | sed -n 's/.*"@odata.id"[[:space:]]*:[[:space:]]*"\(\/redfish\/v1\/Systems\/[^"]*\)".*/\1/p' | head -1)
+
+    if [ -z "$path" ]; then
+        echo "/redfish/v1/Systems/1"
+    else
+        echo "$path"
+    fi
+}
+
 cmd_status() {
     bmc_ip="$1"
     user="$2"
     pass="$3"
 
-    result=$(redfish_get "$bmc_ip" "$user" "$pass" "/redfish/v1/Systems/1")
+    sys_path=$(get_system_path "$bmc_ip" "$user" "$pass")
+    result=$(redfish_get "$bmc_ip" "$user" "$pass" "$sys_path")
     power_state=$(echo "$result" | sed -n 's/.*"PowerState"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p')
 
     if [ -z "$power_state" ]; then
@@ -76,8 +92,9 @@ cmd_on() {
     user="$2"
     pass="$3"
 
+    sys_path=$(get_system_path "$bmc_ip" "$user" "$pass")
     redfish_post "$bmc_ip" "$user" "$pass" \
-        "/redfish/v1/Systems/1/Actions/ComputerSystem.Reset" \
+        "${sys_path}/Actions/ComputerSystem.Reset" \
         '{"ResetType":"On"}'
     echo ""
     echo "Power On requested"
@@ -88,8 +105,9 @@ cmd_forceoff() {
     user="$2"
     pass="$3"
 
+    sys_path=$(get_system_path "$bmc_ip" "$user" "$pass")
     redfish_post "$bmc_ip" "$user" "$pass" \
-        "/redfish/v1/Systems/1/Actions/ComputerSystem.Reset" \
+        "${sys_path}/Actions/ComputerSystem.Reset" \
         '{"ResetType":"ForceOff"}'
     echo ""
     echo "ForceOff requested"
@@ -101,18 +119,20 @@ cmd_cycle() {
     pass="$3"
     wait_secs="${4:-15}"
 
+    sys_path=$(get_system_path "$bmc_ip" "$user" "$pass")
+
     echo "ForceOff..."
     redfish_post "$bmc_ip" "$user" "$pass" \
-        "/redfish/v1/Systems/1/Actions/ComputerSystem.Reset" \
+        "${sys_path}/Actions/ComputerSystem.Reset" \
         '{"ResetType":"ForceOff"}'
     echo ""
 
-    echo "Waiting ${wait_secs}s (POST code 92 prevention)..."
+    echo "Waiting ${wait_secs}s..."
     sleep "$wait_secs"
 
     echo "Power On..."
     redfish_post "$bmc_ip" "$user" "$pass" \
-        "/redfish/v1/Systems/1/Actions/ComputerSystem.Reset" \
+        "${sys_path}/Actions/ComputerSystem.Reset" \
         '{"ResetType":"On"}'
     echo ""
     echo "Power cycle complete"
@@ -125,9 +145,10 @@ cmd_boot_override() {
     target="$4"
     mode="$5"
 
+    sys_path=$(get_system_path "$bmc_ip" "$user" "$pass")
     data="{\"Boot\":{\"BootSourceOverrideEnabled\":\"Once\",\"BootSourceOverrideTarget\":\"${target}\",\"BootSourceOverrideMode\":\"${mode}\"}}"
 
-    redfish_patch "$bmc_ip" "$user" "$pass" "/redfish/v1/Systems/1" "$data"
+    redfish_patch "$bmc_ip" "$user" "$pass" "$sys_path" "$data"
     echo ""
     echo "Boot override set: target=$target mode=$mode (once)"
 }
@@ -138,9 +159,10 @@ cmd_boot_next() {
     pass="$3"
     boot_id="$4"
 
+    sys_path=$(get_system_path "$bmc_ip" "$user" "$pass")
     data="{\"Boot\":{\"BootSourceOverrideEnabled\":\"Once\",\"BootSourceOverrideTarget\":\"UefiBootNext\",\"BootSourceOverrideMode\":\"UEFI\",\"BootNext\":\"${boot_id}\"}}"
 
-    redfish_patch "$bmc_ip" "$user" "$pass" "/redfish/v1/Systems/1" "$data"
+    redfish_patch "$bmc_ip" "$user" "$pass" "$sys_path" "$data"
     echo ""
     echo "BootNext set: $boot_id (once)"
 }
@@ -150,7 +172,8 @@ cmd_boot_override_reset() {
     user="$2"
     pass="$3"
 
-    redfish_patch "$bmc_ip" "$user" "$pass" "/redfish/v1/Systems/1" \
+    sys_path=$(get_system_path "$bmc_ip" "$user" "$pass")
+    redfish_patch "$bmc_ip" "$user" "$pass" "$sys_path" \
         '{"Boot":{"BootSourceOverrideEnabled":"Disabled"}}'
     echo ""
     echo "Boot override disabled"
@@ -165,8 +188,10 @@ cmd_find_boot_entry() {
     retry_wait=30
     attempt=1
 
+    sys_path=$(get_system_path "$bmc_ip" "$user" "$pass")
+
     while [ "$attempt" -le "$max_retries" ]; do
-        members=$(redfish_get "$bmc_ip" "$user" "$pass" "/redfish/v1/Systems/1/BootOptions")
+        members=$(redfish_get "$bmc_ip" "$user" "$pass" "${sys_path}/BootOptions")
 
         if command -v jq >/dev/null 2>&1; then
             urls=$(echo "$members" | jq -r '.Members[]."@odata.id"' 2>/dev/null)
