@@ -25,6 +25,15 @@ nodes:
       - /dev/sdb
       - /dev/sdc
       - /dev/sdd
+  - name: ayase-web-service-6
+    ip: 10.10.10.206
+    ib_ip: 192.168.100.3
+    role: satellite
+    storage_disks:
+      - /dev/sda
+      - /dev/sdb
+      - /dev/sdc
+      - /dev/sdd
 
 # Storage pool
 vg_name: linstor_vg
