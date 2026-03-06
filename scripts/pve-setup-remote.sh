@@ -12,6 +12,7 @@ usage() {
     echo "  --hostname <name>       Hostname (required)"
     echo "  --ip <addr>             Static IP for /etc/hosts (required)"
     echo "  --codename <name>       Debian codename, e.g. trixie (required)"
+    echo "  --serial-unit <N>       Serial console unit number (default: 1)"
     exit 1
 }
 
@@ -19,19 +20,21 @@ phase=""
 hostname=""
 ip=""
 codename=""
+serial_unit=1
 
 while [ $# -gt 0 ]; do
     case "$1" in
-        --phase)    phase="$2";    shift 2 ;;
-        --hostname) hostname="$2"; shift 2 ;;
-        --ip)       ip="$2";      shift 2 ;;
-        --codename) codename="$2"; shift 2 ;;
-        *)          echo "Unknown option: $1" >&2; usage ;;
+        --phase)       phase="$2";       shift 2 ;;
+        --hostname)    hostname="$2";    shift 2 ;;
+        --ip)          ip="$2";          shift 2 ;;
+        --codename)    codename="$2";    shift 2 ;;
+        --serial-unit) serial_unit="$2"; shift 2 ;;
+        *)             echo "Unknown option: $1" >&2; usage ;;
     esac
 done
 
 if [ -z "$phase" ] || [ -z "$hostname" ] || [ -z "$ip" ] || [ -z "$codename" ]; then
-    echo "ERROR: All options are required" >&2
+    echo "ERROR: --phase, --hostname, --ip, --codename are required" >&2
     usage
 fi
 
@@ -61,15 +64,12 @@ phase_pre_reboot() {
     echo "--- Installing PVE kernel ---"
     DEBIAN_FRONTEND=noninteractive apt-get -y install proxmox-default-kernel
 
-    echo "--- Configuring GRUB for serial console ---"
+    echo "--- Configuring GRUB for serial console (unit=${serial_unit}) ---"
     if ! grep -q 'GRUB_TERMINAL=' /etc/default/grub; then
-        cat >> /etc/default/grub << 'GRUBCONF'
-GRUB_TERMINAL="console serial"
-GRUB_SERIAL_COMMAND="serial --unit=1 --speed=115200 --word=8 --parity=no --stop=1"
-GRUBCONF
+        printf '\nGRUB_TERMINAL="console serial"\nGRUB_SERIAL_COMMAND="serial --unit=%s --speed=115200 --word=8 --parity=no --stop=1"\n' "$serial_unit" >> /etc/default/grub
     fi
     if ! grep -q 'console=ttyS' /etc/default/grub; then
-        sed -i 's/^GRUB_CMDLINE_LINUX=.*/GRUB_CMDLINE_LINUX="console=tty0 console=ttyS1,115200n8"/' /etc/default/grub
+        sed -i "s/^GRUB_CMDLINE_LINUX=.*/GRUB_CMDLINE_LINUX=\"console=tty0 console=ttyS${serial_unit},115200n8\"/" /etc/default/grub
     fi
     update-grub
 

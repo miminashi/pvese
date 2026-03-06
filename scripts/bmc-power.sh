@@ -185,7 +185,7 @@ cmd_find_boot_entry() {
     pass="$3"
     pattern="$4"
     max_retries=3
-    retry_wait=30
+    retry_wait=15
     attempt=1
 
     sys_path=$(get_system_path "$bmc_ip" "$user" "$pass")

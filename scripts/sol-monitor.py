@@ -173,6 +173,31 @@ def monitor_loop(child, log_file, timeout, powerstate_interval, bmc_ip, bmc_user
                     return 0
 
 
+def sol_connect_with_handshake(bmc_ip, bmc_user, bmc_pass):
+    """Connect SOL and wait for initial handshake. Returns (child, True) or (None, False)."""
+    try:
+        child = sol_connect(bmc_ip, bmc_user, bmc_pass)
+    except Exception as e:
+        log(f"SOL connection failed: {e}")
+        return None, False
+
+    try:
+        idx = child.expect(
+            [pexpect.TIMEOUT, pexpect.EOF, "SOL session", "\\[SOL"],
+            timeout=15,
+        )
+        if idx == 1:
+            log("SOL connection failed (EOF immediately)")
+            return None, False
+    except pexpect.TIMEOUT:
+        pass
+    except pexpect.EOF:
+        log("SOL connection failed (EOF)")
+        return None, False
+
+    return child, True
+
+
 def main():
     parser = argparse.ArgumentParser(
         description="Passive SOL monitor for Debian installer progress"
@@ -183,8 +208,10 @@ def main():
     parser.add_argument("--log-file", help="Path to save raw SOL output")
     parser.add_argument("--timeout", type=int, default=2700,
                         help="Max wait time in seconds (default: 2700 = 45min)")
-    parser.add_argument("--powerstate-interval", type=int, default=60,
-                        help="PowerState poll interval in seconds (default: 60)")
+    parser.add_argument("--powerstate-interval", type=int, default=20,
+                        help="PowerState poll interval in seconds (default: 20)")
+    parser.add_argument("--max-reconnects", type=int, default=3,
+                        help="Max SOL reconnect attempts on EOF (default: 3)")
     args = parser.parse_args()
 
     child = None
@@ -209,35 +236,68 @@ def main():
     deactivate_sol(args.bmc_ip, args.bmc_user, args.bmc_pass)
     time.sleep(2)
 
-    log(f"Connecting SOL to {args.bmc_ip}")
-    try:
-        child = sol_connect(args.bmc_ip, args.bmc_user, args.bmc_pass)
-    except Exception as e:
-        log(f"SOL connection failed: {e}")
-        sys.exit(2)
+    global_start = time.time()
+    reconnects = 0
 
-    try:
-        idx = child.expect(
-            [pexpect.TIMEOUT, pexpect.EOF, "SOL session", "\\[SOL"],
-            timeout=15,
+    while reconnects <= args.max_reconnects:
+        remaining = args.timeout - (time.time() - global_start)
+        if remaining <= 0:
+            log("Global timeout reached")
+            sys.exit(1)
+
+        if reconnects == 0:
+            log(f"Connecting SOL to {args.bmc_ip}")
+        else:
+            log(f"Reconnecting SOL (attempt {reconnects}/{args.max_reconnects})")
+
+        child, ok = sol_connect_with_handshake(
+            args.bmc_ip, args.bmc_user, args.bmc_pass
         )
-        if idx == 1:
-            log("SOL connection failed (EOF immediately)")
-            sys.exit(2)
-    except pexpect.TIMEOUT:
-        pass
-    except pexpect.EOF:
-        log("SOL connection failed (EOF)")
-        sys.exit(2)
+        if not ok:
+            if reconnects == 0:
+                sys.exit(2)
+            reconnects += 1
+            if reconnects > args.max_reconnects:
+                break
+            time.sleep(5)
+            continue
 
-    log("SOL connected, starting installer monitoring")
-    rc = monitor_loop(
-        child, args.log_file, args.timeout, args.powerstate_interval,
-        args.bmc_ip, args.bmc_user, args.bmc_pass,
-    )
+        log("SOL connected, starting installer monitoring")
+        rc = monitor_loop(
+            child, args.log_file, remaining, args.powerstate_interval,
+            args.bmc_ip, args.bmc_user, args.bmc_pass,
+        )
 
-    disconnect_sol(child)
-    sys.exit(rc)
+        disconnect_sol(child)
+        child = None
+
+        if rc in (0, 1):
+            sys.exit(rc)
+
+        if rc == 3:  # EOF / abnormal
+            state = check_powerstate(args.bmc_ip, args.bmc_user, args.bmc_pass)
+            log(f"SOL lost, PowerState: {state}")
+            if state == "Off":
+                if confirm_powerstate_off(
+                    args.bmc_ip, args.bmc_user, args.bmc_pass, "reconnect check"
+                ):
+                    log("Installation completed (PowerState Off after SOL loss)")
+                    sys.exit(0)
+
+            reconnects += 1
+            if reconnects > args.max_reconnects:
+                break
+
+            log("Deactivating SOL before reconnect")
+            deactivate_sol(args.bmc_ip, args.bmc_user, args.bmc_pass)
+            time.sleep(5)
+            continue
+
+        # rc == 2 (connection error)
+        sys.exit(rc)
+
+    log(f"Max reconnects ({args.max_reconnects}) exceeded")
+    sys.exit(3)
 
 
 if __name__ == "__main__":

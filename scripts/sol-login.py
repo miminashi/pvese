@@ -292,7 +292,7 @@ def run_commands_file(child, commands_file):
             log(f"Command may have failed: {cmd}")
             # Continue executing remaining commands
             all_ok = False
-        time.sleep(0.5)
+        time.sleep(0.1)
 
     return all_ok
 
