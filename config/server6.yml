@@ -19,6 +19,7 @@ debian_iso_sha256: c9f09d24b7e834e6834f2ffa565b33d6f1f540d04bd25c79ad9953bc79a8a
 disk: /dev/nvme0n1
 
 # BMC
+bmc_type: supermicro
 bmc_ip: 10.10.10.26
 bmc_user: claude
 bmc_pass: Claude123
@@ -26,8 +27,11 @@ bmc_pass: Claude123
 # SMB share for ISO hosting
 smb_host: 10.1.6.1
 smb_share_path: "\\public"
-iso_filename: debian-preseed.iso
+iso_filename: debian-preseed-s6.iso
 iso_download_dir: /var/samba/public
+
+# Serial console
+serial_unit: 1
 
 # OS credentials (lab environment)
 root_password: password
