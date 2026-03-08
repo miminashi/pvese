@@ -1,4 +1,4 @@
-next_id: 33
+next_id: 34
 issues:
   - id: 1
     title: Test issue
@@ -355,4 +355,16 @@ issues:
     report: "report/2026-03-06_070624_parallel_os_setup_regression_test.md"
     labels:
       - infra
+    description: ""
+  - id: 33
+    title: 4ノード・マルチリージョン LINSTOR 構築・ベンチマーク
+    status: done
+    owner: "d075b1ee"
+    created: "2026-03-06T21:19:09Z"
+    updated: "2026-03-07T12:02:32Z"
+    blocked_by: ""
+    report: "report/2026-03-07_210011_linstor_4node_multiregion.md"
+    labels:
+      - infra
+      - bench
     description: ""
