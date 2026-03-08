@@ -1,7 +1,7 @@
 ---
 name: linstor-node-ops
 description: "LINSTOR/DRBD ノードの離脱・復帰操作。障害シミュレーション、回復、正常離脱、再参加を行う。"
-argument-hint: "<subcommand: fail|recover|depart|rejoin> <node: server4|server5>"
+argument-hint: "<subcommand: fail|recover|depart|rejoin> <node: server4|server5|server6|server7>"
 ---
 
 # LINSTOR ノード操作スキル
@@ -10,12 +10,19 @@ LINSTOR/DRBD クラスタのノード離脱・復帰操作を行う。
 
 | サブコマンド | 用途 |
 |-------------|------|
-| `fail <node>` | IPMI 電源断で障害シミュレーション |
+| `fail <node>` | IPMI/iDRAC 電源断で障害シミュレーション |
 | `recover <node>` | 障害ノードの電源オン + DRBD resync 待機 |
 | `depart <node>` | LINSTOR から正常離脱 (リソース削除 → SP削除 → ノード削除) |
-| `rejoin <node>` | 離脱済みノードのクラスタ再参加 (将来用プレースホルダー) |
+| `rejoin <node>` | 離脱済みノードのクラスタ再参加 |
 
-`<node>` は `server4` または `server5`。設定値は `config/linstor.yml` から読み取る。
+`<node>` は `server4`, `server5`, `server6`, `server7` のいずれか。設定値は `config/linstor.yml` と各サーバの `config/server<N>.yml` から読み取る。
+
+## プラットフォーム分岐
+
+| ノード | BMC タイプ | 電源操作 |
+|--------|----------|---------|
+| server4, server5, server6 | Supermicro IPMI | `ipmitool -I lanplus -H $BMC_IP -U claude -P Claude123 chassis power ...` |
+| server7 | iDRAC7 | `ipmitool -I lanplus -H $BMC_IP -U claude -P Claude123 chassis power ...` (IPMI over LAN) |
 
 ## 設定値の読み取り
 
@@ -23,21 +30,28 @@ LINSTOR/DRBD クラスタのノード離脱・復帰操作を行う。
 YQ="${PROJECT_DIR}/bin/yq"
 CONFIG="config/linstor.yml"
 
-NODE1=$("$YQ" '.nodes[0].name' "$CONFIG")
-NODE1_IP=$("$YQ" '.nodes[0].ip' "$CONFIG")
-NODE1_BMC=$("$YQ" '.nodes[0].bmc_ip' "$CONFIG")  # server4.yml の bmc_ip
-NODE2=$("$YQ" '.nodes[1].name' "$CONFIG")
-NODE2_IP=$("$YQ" '.nodes[1].ip' "$CONFIG")
-NODE2_BMC=$("$YQ" '.nodes[1].bmc_ip' "$CONFIG")  # server5.yml の bmc_ip
+# コントローラ情報
+CONTROLLER_NODE=$("$YQ" '.controller_node' "$CONFIG")
+CONTROLLER_IP=$("$YQ" '.controller_ip' "$CONFIG")
+
+# ノード番号からサーバ設定ファイルを特定
+# server4 → config/server4.yml, server7 → config/server7.yml
+SERVER_CONFIG="config/server${NODE_NUM}.yml"
+TARGET_NODE=$("$YQ" '.hostname' "$SERVER_CONFIG")
+TARGET_IP=$("$YQ" '.static_ip' "$SERVER_CONFIG")
+TARGET_BMC=$("$YQ" '.bmc_ip' "$SERVER_CONFIG")
+BMC_USER=$("$YQ" '.bmc_user' "$SERVER_CONFIG")
+BMC_PASS=$("$YQ" '.bmc_pass' "$SERVER_CONFIG")
 
 VG_NAME=$("$YQ" '.vg_name' "$CONFIG")
 RG_NAME=$("$YQ" '.resource_group' "$CONFIG")
 PLACE_COUNT=$("$YQ" '.place_count' "$CONFIG")
 ```
 
-BMC IP はノードの設定ファイルからも取得可能:
+全ノードの BMC IP は各サーバの設定ファイルから取得する:
 ```sh
-BMC_IP=$(./bin/yq '.bmc_ip' config/server5.yml)
+BMC_IP=$(./bin/yq '.bmc_ip' config/server5.yml)  # → 10.10.10.25
+BMC_IP=$(./bin/yq '.bmc_ip' config/server7.yml)  # → 10.10.10.120 (iDRAC)
 ```
 
 ## 既知の失敗と対策
@@ -50,6 +64,9 @@ BMC_IP=$(./bin/yq '.bmc_ip' config/server5.yml)
 | N4 | DRBD bitmap resync ポーリング見逃し | recover | 接続直後は `Inconsistent` だが数秒〜数十秒で完了 | 30秒間隔ポーリングで UpToDate を確認 |
 | N5 | stale DRBD メタデータ残存 | rejoin | `/etc/drbd.d/linstor-resources.res` が残る | LINSTOR が自動管理するため手動削除不要 |
 | N6 | minIoSize 不一致で rejoin 失敗 | rejoin | `incompatible minimum I/O size` エラー | VG 作成時に 512B PV を先頭に配置 |
+| N7 | IPoIB インターフェースがリブート後に DOWN 状態 | recover | `ip link show <ib_iface>` で DOWN | 手動で `ip link set up` + `ip addr add` |
+| N8 | SSH ホスト鍵がノードリブート後に変化 | recover | `REMOTE HOST IDENTIFICATION HAS CHANGED` | `ssh-keygen -R <target_ip>` + `StrictHostKeyChecking=no` |
+| N9 | DRBD 9 status に `/proc/drbd` (DRBD 8形式) を使用 | recover | 空出力またはタイムアウト | `drbdsetup status` または `drbdadm status` を使用 |
 
 ### N1: Auto-eviction 干渉
 
@@ -122,6 +139,47 @@ linstor resource-group set-property $RG_NAME Linstor/Drbd/auto-block-size 512
 
 現環境では pve-rg に `auto-block-size=512` を常時設定済み。
 
+### N7: IPoIB リブート後 DOWN
+
+IPoIB は `/etc/network/interfaces` に設定がない場合、リブート後に DOWN のまま。
+recover 後に IB を使うリージョン (Region A: 4+5号機) では手動復旧が必要:
+
+```sh
+# IB インターフェース名を確認 (例: ibp134s0)
+ssh root@$TARGET_IP "ip link show type ipoib"
+# 手動起動
+ssh root@$TARGET_IP "ip link set ibp134s0 up"
+ssh root@$TARGET_IP "ip addr add 192.168.100.x/24 dev ibp134s0"
+```
+
+永続化するには `/etc/network/interfaces` に以下を追記:
+```
+auto ibp134s0
+iface ibp134s0 inet static
+    address 192.168.100.x/24
+```
+
+### N8: SSH ホスト鍵変更
+
+PVE ノードのリブートでは通常ホスト鍵は変わらない。
+ただし OS 再インストールや初回接続時はホスト鍵が変わるため:
+```sh
+ssh-keygen -R $TARGET_IP
+ssh -o StrictHostKeyChecking=no root@$TARGET_IP hostname
+```
+
+### N9: DRBD 9 ステータスコマンド
+
+DRBD 9 では `/proc/drbd` は空または形式が異なる。以下を使用:
+```sh
+# 全リソースのステータス
+ssh root@$CONTROLLER_IP "drbdsetup status --verbose"
+# 特定リソース
+ssh root@$CONTROLLER_IP "drbdsetup status <resource> --verbose"
+# drbdadm status も可 (ANSI カラーコード付き)
+# ANSI カラーを除去する場合は TERM=dumb を設定
+```
+
 ## サブコマンド: fail
 
 IPMI 電源断で対象ノードの障害をシミュレーションする。
@@ -173,22 +231,32 @@ IPMI 電源断で対象ノードの障害をシミュレーションする。
    ./pve-lock.sh run ./oplog.sh ipmitool -I lanplus -H $TARGET_BMC -U claude -P Claude123 chassis power on
    ```
 
-2. SSH 復帰待機 (30秒間隔ポーリング、最大5分):
+2. SSH 復帰待機 (★ N8: ホスト鍵クリア + 30秒間隔ポーリング、最大5分):
    ```sh
-   ssh -o ConnectTimeout=5 root@$TARGET_IP 'hostname'
+   ssh-keygen -R $TARGET_IP
+   ssh -o StrictHostKeyChecking=no -o ConnectTimeout=5 root@$TARGET_IP hostname
    ```
 
-3. DRBD resync 待機 (30秒間隔ポーリング):
+3. DRBD resync 待機 (★ N9: drbdsetup を使用、30秒間隔ポーリング):
    ```sh
-   ssh root@$CONTROLLER_IP "drbdadm status"
+   ssh root@$CONTROLLER_IP "drbdsetup status --verbose"
    # peer-disk:Inconsistent → peer-disk:UpToDate を待機
    ```
 
-4. 完了確認:
+4. IPoIB 復旧確認 (★ N7: Region A のノードのみ):
    ```sh
-   ssh root@$CONTROLLER_IP "drbdadm status"            # UpToDate/UpToDate
-   ssh root@$CONTROLLER_IP "linstor node list"          # 両ノード Online
-   ssh root@$CONTROLLER_IP "linstor resource list"      # 両ノードにリソースあり
+   # IB インターフェースが UP か確認
+   ssh root@$TARGET_IP "ip link show type ipoib"
+   # DOWN の場合は手動起動
+   ssh root@$TARGET_IP "ip link set ibp134s0 up"
+   ssh root@$TARGET_IP "ip addr add 192.168.100.x/24 dev ibp134s0"
+   ```
+
+5. 完了確認:
+   ```sh
+   ssh root@$CONTROLLER_IP "drbdsetup status --verbose"  # UpToDate/UpToDate
+   ssh root@$CONTROLLER_IP "linstor node list"            # 両ノード Online
+   ssh root@$CONTROLLER_IP "linstor resource list"        # 両ノードにリソースあり
    ```
 
 ### 回復タイムライン (実測値)
