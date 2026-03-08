@@ -81,6 +81,9 @@ benchmark:
   vm_memory: 4096
   vm_disk_size: 32G
   vm_bridge: vmbr1
+  vm_mgmt_bridge: vmbr0
+  vm_mgmt_ip: 10.10.10.210
+  vm_mgmt_prefix: 8
   vm_user: debian
   vm_password: password
   cloud_image: /var/lib/vz/template/debian-cloud.qcow2

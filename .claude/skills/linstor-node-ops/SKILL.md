@@ -43,6 +43,8 @@ TARGET_BMC=$("$YQ" '.bmc_ip' "$SERVER_CONFIG")
 BMC_USER=$("$YQ" '.bmc_user' "$SERVER_CONFIG")
 BMC_PASS=$("$YQ" '.bmc_pass' "$SERVER_CONFIG")
 
+TARGET_IB_IP=$("$YQ" ".nodes[] | select(.name == \"$TARGET_NODE\") | .ib_ip" "$CONFIG")
+
 VG_NAME=$("$YQ" '.vg_name' "$CONFIG")
 RG_NAME=$("$YQ" '.resource_group' "$CONFIG")
 PLACE_COUNT=$("$YQ" '.place_count' "$CONFIG")
@@ -149,14 +151,14 @@ recover 後に IB を使うリージョン (Region A: 4+5号機) では手動復
 ssh root@$TARGET_IP "ip link show type ipoib"
 # 手動起動
 ssh root@$TARGET_IP "ip link set ibp134s0 up"
-ssh root@$TARGET_IP "ip addr add 192.168.100.x/24 dev ibp134s0"
+ssh root@$TARGET_IP "ip addr add $TARGET_IB_IP/24 dev ibp134s0"
 ```
 
-永続化するには `/etc/network/interfaces` に以下を追記:
+永続化するには `/etc/network/interfaces` に以下を追記 (`config/linstor.yml` の `ib_ip` を参照):
 ```
 auto ibp134s0
 iface ibp134s0 inet static
-    address 192.168.100.x/24
+    address <IB_IP>/24
 ```
 
 ### N8: SSH ホスト鍵変更
@@ -213,9 +215,10 @@ IPMI 電源断で対象ノードの障害をシミュレーションする。
    ssh root@$CONTROLLER_IP "linstor node set-property $TARGET_NODE DrbdOptions/AutoEvictAllowEviction false"
    ```
 
-5. データ整合性検証 (VM 内):
+5. データ整合性検証 (VM 内、10.x 管理用 IP に直接 SSH):
    ```sh
-   sshpass -p "$VM_PASS" ssh $VM_USER@$VM_IP 'md5sum -c checksums.txt'
+   VM_MGMT_IP=$("$YQ" '.benchmark.vm_mgmt_ip' "$CONFIG")
+   ssh ${VM_USER}@${VM_MGMT_IP} 'md5sum -c checksums.txt'
    ```
 
 ## サブコマンド: recover
@@ -249,7 +252,7 @@ IPMI 電源断で対象ノードの障害をシミュレーションする。
    ssh root@$TARGET_IP "ip link show type ipoib"
    # DOWN の場合は手動起動
    ssh root@$TARGET_IP "ip link set ibp134s0 up"
-   ssh root@$TARGET_IP "ip addr add 192.168.100.x/24 dev ibp134s0"
+   ssh root@$TARGET_IP "ip addr add $TARGET_IB_IP/24 dev ibp134s0"
    ```
 
 5. 完了確認:

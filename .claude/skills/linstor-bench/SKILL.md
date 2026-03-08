@@ -73,6 +73,9 @@ VM_CORES=$("$YQ" '.benchmark.vm_cores' "$CONFIG")
 VM_MEMORY=$("$YQ" '.benchmark.vm_memory' "$CONFIG")
 VM_DISK_SIZE=$("$YQ" '.benchmark.vm_disk_size' "$CONFIG")
 VM_BRIDGE=$("$YQ" '.benchmark.vm_bridge' "$CONFIG")
+VM_MGMT_BRIDGE=$("$YQ" '.benchmark.vm_mgmt_bridge' "$CONFIG")
+VM_MGMT_IP=$("$YQ" '.benchmark.vm_mgmt_ip' "$CONFIG")
+VM_MGMT_PREFIX=$("$YQ" '.benchmark.vm_mgmt_prefix' "$CONFIG")
 VM_USER=$("$YQ" '.benchmark.vm_user' "$CONFIG")
 VM_PASS=$("$YQ" '.benchmark.vm_password' "$CONFIG")
 CLOUD_IMAGE=$("$YQ" '.benchmark.cloud_image' "$CONFIG")
@@ -90,7 +93,7 @@ FIO_SEQ_SIZE=$("$YQ" '.benchmark.fio_seq_size' "$CONFIG")
 | F1 | ディスク不良セクタ | Phase 0 | SMART Current_Pending_Sector > 0 | ゼロ書きで強制再割り当て |
 | F2 | LINSTOR リソース名が `vm-100-disk-0` ではなく `pm-XXXX` | Phase 3 | `qm importdisk` 出力に `pm-XXXX` と表示 | importdisk 出力をパースしてリソース名を取得 |
 | F3 | cloud-init SSH パスワード認証無効 | Phase 3 | `Permission denied (publickey)` | vendor snippet `ssh_pwauth: true` + `--cicustom` |
-| F4 | VM MAC アドレス不一致で IP 検出失敗 | Phase 4 | IP 検出タイムアウト | `qm config` から MAC を動的取得 |
+| F4 | VM MAC アドレス不一致で IP 検出失敗 | Phase 4 | IP 検出タイムアウト | 管理用 IP (10.x) が config で設定済みのため不要。DHCP のみの場合は `qm config` から MAC を動的取得 |
 | F5 | Thick LVM で DRBD 全領域同期 | Phase 4 | `peer-disk:Inconsistent` が長時間 | ポーリングで待機 (thin は ~30秒) |
 | F6 | `linstor --output-format json` 不存在 | Phase 4 | `unrecognized arguments` エラー | `linstor -m resource list` を使う |
 | F7 | citype デフォルト (configdrive2) が Debian に非対応 | Phase 3 | cloud-init 設定が VM に反映されない | `--citype nocloud` を初回起動前に設定 |
@@ -98,10 +101,10 @@ FIO_SEQ_SIZE=$("$YQ" '.benchmark.fio_seq_size' "$CONFIG")
 | F9 | fio JSON 出力ディレクトリが未作成 | Phase 5 | `No such file or directory` | ローカルの `mkdir -p` を先頭に追加 |
 | F10 | `--boot order=scsi0` をディスクインポート前に設定 | Phase 3 | `device 'scsi0' does not exist` | importdisk → scsi0 接続の**後**に boot order を設定 |
 | F11 | DRBD 9 の同期確認に `/proc/drbd` (DRBD 8形式) を使用 | Phase 4 | タイムアウトまたは空出力 | `drbdsetup status <res> --verbose` を使用 |
-| F12 | sshpass が非コントローラ PVE ホストに未インストール | Phase 4 | `sshpass: command not found` | Region B 実行前に `apt-get install -y sshpass` を確認 |
+| F12 | sshpass が非コントローラ PVE ホストに未インストール | Phase 4 | `sshpass: command not found` | 公開鍵認証 + 10.x 直接 SSH を使用するため sshpass 不要 |
 | F13 | VM 再作成後に SSH known_hosts のホスト鍵が不一致 | Phase 4 | `REMOTE HOST IDENTIFICATION HAS CHANGED` | `ssh-keygen -R <vm_ip>` で事前クリア |
 | F14 | Satellite ノードで `linstor` コマンドが localhost controller に接続不可 | Phase 4 | `Connection refused` | 全 linstor コマンドは Controller ノード (4号機) で実行 |
-| F15 | cloud-init DHCP でアドレス取得失敗 → SSH 不能 | Phase 3 | IP 検出タイムアウト | static IP フォールバック: `--ipconfig0 ip=<ip>/24,gw=<gw>` |
+| F15 | cloud-init DHCP でアドレス取得失敗 → SSH 不能 | Phase 3 | IP 検出タイムアウト | DHCP 取得を最大5分待機。管理用 SSH は ipconfig1 の static 10.x で行うため DHCP 完了前でもアクセス可能 |
 | F16 | vendor snippet ssh_pwauth=true でもパスワード認証不可 | Phase 3-4 | `Permission denied (publickey)` | SSH 公開鍵認証を優先: `qm set --sshkeys <pubkey_file>` |
 | F17 | Debian 13 (OpenSSH 10.0) で RSA 鍵が無効化 | Phase 3-4 | `Permission denied (publickey)` | **Ed25519 鍵** (`id_ed25519.pub`) を使用すること |
 | F18 | DRBD non-UpToDate 中に `qm resize` が失敗 | Phase 3 | LINSTOR API 500 エラー | DRBD 同期完了後に resize する。resize 後に VM 内で `growpart` + `resize2fs` も必要 |
@@ -149,13 +152,13 @@ ssh root@$NODE1_IP "qm set $VM_ID --cicustom 'vendor=local:snippets/ssh-pwauth.y
 
 ### F4: VM MAC アドレスの動的取得
 
-VM の MAC アドレスはハードコードせず、`qm config` から動的に取得する。
+> **注**: 管理用 IP (10.x) が config で設定済み (`vm_mgmt_ip`) の場合、MAC アドレス検出・nmap スキャン・ARP 参照は不要。
+> `VM_IP=$VM_MGMT_IP` で直接 SSH 接続できる。
 
+以下は DHCP のみの構成で IP 検出が必要な場合の参考手順:
 ```sh
-# qm config から MAC を取得
 MAC=$(ssh root@$NODE1_IP "qm config $VM_ID" | grep '^net0' | grep -o 'virtio=[0-9A-Fa-f:]*' | cut -d= -f2)
-# PVE ホストで ARP テーブルから IP を検出
-ssh root@$NODE1_IP "nmap -sn 192.168.39.0/24 >/dev/null 2>&1; ip neigh | grep -i '$MAC' | awk '{print \$1}'"
+ssh root@$NODE1_IP "ip neigh | grep -i '$MAC' | awk '{print \$1}'"
 ```
 
 ### F7: citype nocloud
@@ -216,9 +219,8 @@ ssh root@$CONTROLLER_IP "drbdsetup status <resource> --verbose"
 
 ### F12: sshpass 未インストール
 
-Region B の PVE ホスト (6号機/7号機) には sshpass がインストールされていない場合がある。
-VM へのパスワード認証 SSH に sshpass を使う場合は事前確認が必要。
-ただし F16 の SSH 公開鍵認証を採用すれば sshpass は不要。
+公開鍵認証 + 10.x 管理用 IP への直接 SSH を使用するため、sshpass は不要。
+VM への SSH は `ssh ${VM_USER}@${VM_MGMT_IP}` で直接接続する。
 
 ### F13: SSH known_hosts ホスト鍵不一致
 
@@ -236,27 +238,27 @@ Satellite ノードには linstor-controller が動いていないため、`lins
 
 ### F15-F16: SSH 接続の推奨方法
 
-cloud-init VM への SSH は**Ed25519 公開鍵認証を優先**する:
+VM にはデュアル NIC を構成し、SSH は **10.x 管理用 IP に直接接続**する:
+- `net0`: vmbr1 (192.168.39.0/24, DHCP, インターネット用)
+- `net1`: vmbr0 (10.0.0.0/8, static, SSH 管理用)
 
 > **注意 (F17)**: Debian 13 cloud image (OpenSSH 10.0) は **RSA 鍵が無効化**されている。
 > `/root/.ssh/id_rsa.pub` ではなく **Ed25519 鍵** (`/root/.ssh/id_ed25519.pub`) を使うこと。
-> PVE ホストに Ed25519 鍵がない場合は `ssh-keygen -t ed25519 -f /root/.ssh/id_ed25519 -N ''` で生成する。
 
-1. PVE ホストの Ed25519 公開鍵を `qm set --sshkeys` で設定:
+1. **ローカルマシン** (Claude Code ホスト) の Ed25519 公開鍵を `qm set --sshkeys` で設定:
    ```sh
-   # Ed25519 鍵がない場合は生成
-   ssh root@$NODE1_IP "test -f /root/.ssh/id_ed25519.pub || ssh-keygen -t ed25519 -f /root/.ssh/id_ed25519 -N ''"
-   ssh root@$NODE1_IP "qm set $VM_ID --sshkeys /root/.ssh/id_ed25519.pub"
+   scp ~/.ssh/id_ed25519.pub root@$NODE1_IP:/tmp/local_ed25519.pub
+   ssh root@$NODE1_IP "qm set $VM_ID --sshkeys /tmp/local_ed25519.pub"
    ```
-2. `ssh -o StrictHostKeyChecking=no debian@<vm_ip>` で PVE ホストから接続 (sshpass 不要)
-3. DHCP が失敗する場合は static IP で `--ipconfig0` を設定:
+   - **注意**: PVE ホストの鍵ではなくローカルの鍵を使うこと (SSH はローカルから直接 10.x に接続)
+2. `ssh -o StrictHostKeyChecking=no debian@$VM_MGMT_IP` で**ローカルから直接接続** (10.x 経由、sshpass 不要)
+3. DHCP は最大5分かかることがあるが、SSH は static 10.x なので DHCP 完了を待つ必要はない
+4. fio インストール (apt) にはインターネットが必要なので、cloud-init 完了を待つ:
    ```sh
-   ssh root@$NODE1_IP "qm set $VM_ID --ipconfig0 ip=192.168.39.251/24,gw=192.168.39.1"
+   ssh ${VM_USER}@${VM_MGMT_IP} 'cloud-init status --wait'
    ```
-4. cloud-init の完了を待ってから fio インストールすること:
-   ```sh
-   ssh root@$NODE1_IP "ssh debian@<vm_ip> 'cloud-init status --wait'"
-   ```
+
+> **注意**: 192.168.39.0/24 に静的 IP を割り当てないこと (DHCP 衝突の危険)。
 
 ## fio テスト定義
 
@@ -431,19 +433,28 @@ ssh root@$NODE1_IP "pvesm status"
 
 **pve-lock**: 必須
 
-> **注意**: cloud-init は初回起動時のみ実行される。すべての設定 (cicustom, citype, ciuser, cipassword, ipconfig0) を `qm start` 前に完了すること。
+> **注意**: cloud-init は初回起動時のみ実行される。すべての設定 (cicustom, citype, ciuser, cipassword, ipconfig0, ipconfig1) を `qm start` 前に完了すること。
 
-1. **VM 作成**:
+0. **ブリッジ検証** (★ 7号機 NIC 逆順対策):
    ```sh
-   ssh root@$NODE1_IP "qm create $VM_ID --name $VM_NAME --memory $VM_MEMORY --cores $VM_CORES --cpu host --net0 virtio,bridge=$VM_BRIDGE --ostype l26 --scsihw virtio-scsi-single"
+   # vmbr0 が 10.x (管理)、vmbr1 が 192.168.39.x (DHCP) であることを確認
+   ssh root@$NODE1_IP "ip -4 addr show vmbr0"   # → 10.10.10.x が表示されるべき
+   ssh root@$NODE1_IP "ip -4 addr show vmbr1"   # → 192.168.39.x が表示されるべき
+   # 逆の場合は VM_BRIDGE と VM_MGMT_BRIDGE を入れ替える
+   ```
+
+1. **VM 作成** (★ デュアル NIC: net0=インターネット用, net1=管理用):
+   ```sh
+   ssh root@$NODE1_IP "qm create $VM_ID --name $VM_NAME --memory $VM_MEMORY --cores $VM_CORES --cpu host --net0 virtio,bridge=$VM_BRIDGE --net1 virtio,bridge=$VM_MGMT_BRIDGE --ostype l26 --scsihw virtio-scsi-single"
    ```
 
 2. **ディスクインポート** (★ F2 対策: リソース名をパース):
    ```sh
    IMPORT_OUTPUT=$(ssh root@$NODE1_IP "qm importdisk $VM_ID $CLOUD_IMAGE linstor-storage" 2>&1)
-   RESOURCE_NAME=$(echo "$IMPORT_OUTPUT" | grep -o 'pm-[0-9]*')
+   RESOURCE_NAME=$(echo "$IMPORT_OUTPUT" | grep "successfully imported" | grep -o 'pm-[a-z0-9_]*')
    ```
    - `RESOURCE_NAME` が空の場合は出力全体を確認しエラー対処
+   - **注意**: grep は `successfully imported` 行のみ対象にすること。`pm-<hex>` と `pm-<hex>_<vmid>` の両方にマッチするため、正しい行から抽出しないと誤ったリソース名になる
 
 3. **ディスク接続** (パースしたリソース名を使用):
    ```sh
@@ -470,23 +481,20 @@ ssh root@$NODE1_IP "pvesm status"
 
 7. **SSH 公開鍵設定** (★ F16/F17 対策: Ed25519 公開鍵認証を使用):
    ```sh
-   ssh root@$NODE1_IP "test -f /root/.ssh/id_ed25519.pub || ssh-keygen -t ed25519 -f /root/.ssh/id_ed25519 -N ''"
-   ssh root@$NODE1_IP "qm set $VM_ID --sshkeys /root/.ssh/id_ed25519.pub"
+   # ローカルマシン (Claude Code ホスト) の Ed25519 公開鍵を PVE ホストにコピー
+   scp ~/.ssh/id_ed25519.pub root@$NODE1_IP:/tmp/local_ed25519.pub
+   ssh root@$NODE1_IP "qm set $VM_ID --sshkeys /tmp/local_ed25519.pub"
    ```
+   - **注意**: PVE ホストの鍵ではなく、ローカルマシンの公開鍵を設定すること。SSH はローカルから 10.x 経由で直接接続するため
 
-8. **cloud-init ユーザ・ネットワーク設定** (★ F15: DHCP 失敗時は static IP にフォールバック):
+8. **cloud-init ユーザ・ネットワーク設定** (★ デュアル NIC: DHCP + 管理用 static):
    ```sh
-   ssh root@$NODE1_IP "qm set $VM_ID --ciuser $VM_USER --cipassword $VM_PASS --ipconfig0 ip=dhcp"
-   # DHCP 失敗時のフォールバック:
-   # ssh root@$NODE1_IP "qm set $VM_ID --ipconfig0 ip=192.168.39.251/24,gw=192.168.39.1"
+   ssh root@$NODE1_IP "qm set $VM_ID --ciuser $VM_USER --cipassword $VM_PASS --ipconfig0 ip=dhcp --ipconfig1 ip=$VM_MGMT_IP/$VM_MGMT_PREFIX"
    ```
+   - `ipconfig0`: vmbr1 (DHCP, インターネット用)
+   - `ipconfig1`: vmbr0 (static 10.x, SSH 管理用, ゲートウェイ不要)
 
-9. **ディスクリサイズ**:
-   ```sh
-   ssh root@$NODE1_IP "qm resize $VM_ID scsi0 $VM_DISK_SIZE"
-   ```
-
-10. **VM 起動** (★ すべて設定完了後):
+9. **VM 起動** (★ resize は DRBD 同期完了後に行うため先に起動):
     ```sh
     ssh root@$NODE1_IP "qm start $VM_ID"
     ```
@@ -520,39 +528,44 @@ ssh root@$CONTROLLER_IP "drbdsetup status --verbose"
 
 UpToDate/UpToDate になるまでポーリングで待機する。
 
-#### VM IP 検出 (★ F4)
+#### ディスクリサイズ (★ F18: DRBD 同期完了後に実行)
 
-1. `qm config` から MAC アドレスを動的取得:
-   ```sh
-   MAC=$(ssh root@$NODE1_IP "qm config $VM_ID" | grep '^net0' | grep -o 'virtio=[0-9A-Fa-f:]*' | cut -d= -f2)
-   ```
+```sh
+ssh root@$NODE1_IP "qm resize $VM_ID scsi0 $VM_DISK_SIZE"
+# VM 内でパーティション + ファイルシステム拡張
+ssh ${VM_USER}@${VM_MGMT_IP} "sudo growpart /dev/sda 1"
+ssh ${VM_USER}@${VM_MGMT_IP} "sudo resize2fs /dev/sda1"
+```
 
-2. PVE ホストで nmap + ARP テーブルから MAC→IP 変換:
-   ```sh
-   ssh root@$NODE1_IP "nmap -sn 192.168.39.0/24 >/dev/null 2>&1"
-   VM_IP=$(ssh root@$NODE1_IP "ip neigh | grep -i '$MAC' | awk '{print \$1}'")
-   ```
+#### VM 管理 IP
 
-3. IP が取得できない場合は 30 秒待機して再試行 (最大 5 分)
+VM の管理用 IP は config から既知 (10.x static)。MAC アドレス検出・nmap スキャン・ARP テーブル参照は不要。
 
-#### SSH 接続テスト (★ F13, F16)
+```sh
+VM_IP=$VM_MGMT_IP
+```
+
+> **注**: F4 (MAC アドレス不一致) は管理用 IP が config で設定済みのため不要。
+> DHCP の 192.168.39.x IP はインターネット通信専用で、SSH 接続には使用しない。
+
+#### SSH 接続テスト (★ F13)
 
 ```sh
 # ★ F13: VM 再作成時はホスト鍵をクリア
 ssh-keygen -R $VM_IP
-ssh root@$NODE1_IP "ssh-keygen -R $VM_IP"
 
-# ★ F16: 公開鍵認証を優先 (Phase 3 で --sshkeys 設定済み)
+# 10.x 管理用 IP に直接 SSH (公開鍵認証、Phase 3 で --sshkeys 設定済み)
 ssh -o StrictHostKeyChecking=no -o ConnectTimeout=10 ${VM_USER}@${VM_IP} 'uname -a'
-# パスワード認証のフォールバック:
-# sshpass -p "$VM_PASS" ssh -o StrictHostKeyChecking=no -o ConnectTimeout=10 ${VM_USER}@${VM_IP} 'uname -a'
 ```
 
-#### fio インストール
+#### cloud-init 完了待ち + fio インストール
+
+DHCP (vmbr1) は最大5分かかる場合がある。SSH は 10.x (static) 経由なので DHCP 完了前でもアクセス可能。
+ただし fio インストール (apt) にはインターネットが必要なので、cloud-init 完了を待つ。
 
 ```sh
+ssh ${VM_USER}@${VM_IP} 'cloud-init status --wait'
 ssh ${VM_USER}@${VM_IP} 'sudo apt-get update && sudo apt-get install -y fio'
-# パスワード認証の場合: sshpass -p "$VM_PASS" ssh ${VM_USER}@${VM_IP} '...'
 ```
 
 > **注意 (F6)**: LINSTOR の JSON 出力は `linstor --output-format json` ではなく `linstor -m` (machine-readable) を使う。
@@ -571,7 +584,7 @@ ssh ${VM_USER}@${VM_IP} 'sudo apt-get update && sudo apt-get install -y fio'
 mkdir -p tmp/<session-id>/fio-results
 ```
 
-各テストの実行 (★ F16: 公開鍵認証で SSH 接続):
+各テストの実行 (10.x 管理 IP に公開鍵認証で SSH 接続):
 ```sh
 ssh ${VM_USER}@${VM_IP} "sudo fio \
   --name=<test-name> \
@@ -582,7 +595,6 @@ ssh ${VM_USER}@${VM_IP} "sudo fio \
   --runtime=$FIO_RUNTIME --time_based \
   --group_reporting --output-format=json" \
   > tmp/<session-id>/fio-results/<test-name>.json
-# パスワード認証の場合: sshpass -p "$VM_PASS" ssh ${VM_USER}@${VM_IP} "sudo fio ..."
 ```
 
 テスト一覧 (fio テスト定義セクション参照):
