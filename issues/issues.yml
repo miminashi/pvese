@@ -1,4 +1,4 @@
-next_id: 34
+next_id: 35
 issues:
   - id: 1
     title: Test issue
@@ -364,6 +364,18 @@ issues:
     updated: "2026-03-07T12:02:32Z"
     blocked_by: ""
     report: "report/2026-03-07_210011_linstor_4node_multiregion.md"
+    labels:
+      - infra
+      - bench
+    description: ""
+  - id: 34
+    title: LINSTOR マルチリージョン実運用テスト (2+1, ライブ/コールドマイグレーション)
+    status: done
+    owner: "26107bcc"
+    created: "2026-03-08T14:13:13Z"
+    updated: "2026-03-08T16:10:21Z"
+    blocked_by: ""
+    report: ""
     labels:
       - infra
       - bench
