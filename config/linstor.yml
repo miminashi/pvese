@@ -73,6 +73,14 @@ drbd_protocol: C
 drbd_transport: tcp
 drbd_interface: ib0
 
+# Migration
+migration:
+  topology: "2+1"          # primary 2 replicas + 1 DR replica
+  dr_protocol: A           # inter-region protocol
+  intra_protocol: C        # intra-region protocol
+  cpu_type: kvm64           # required for heterogeneous hardware live migration
+  cross_region_interface: default  # node-connection path interface (bypass PrefNic=ib0)
+
 # Benchmark
 benchmark:
   vm_id: 100

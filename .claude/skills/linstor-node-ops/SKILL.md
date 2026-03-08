@@ -69,6 +69,7 @@ BMC_IP=$(./bin/yq '.bmc_ip' config/server7.yml)  # → 10.10.10.120 (iDRAC)
 | N7 | IPoIB インターフェースがリブート後に DOWN 状態 | recover | `ip link show <ib_iface>` で DOWN | 手動で `ip link set up` + `ip addr add` |
 | N8 | SSH ホスト鍵がノードリブート後に変化 | recover | `REMOTE HOST IDENTIFICATION HAS CHANGED` | `ssh-keygen -R <target_ip>` + `StrictHostKeyChecking=no` |
 | N9 | DRBD 9 status に `/proc/drbd` (DRBD 8形式) を使用 | recover | 空出力またはタイムアウト | `drbdsetup status` または `drbdadm status` を使用 |
+| N10 | node remove/re-add 後に cross-region パスが stale | rejoin | `Network interface 'default' does not exist` | パスを delete + recreate (詳細は linstor-migration スキル C3) |
 
 ### N1: Auto-eviction 干渉
 
@@ -406,7 +407,21 @@ IPMI 電源断で対象ノードの障害をシミュレーションする。
    # peer-disk:Inconsistent → peer-disk:UpToDate を待機
    ```
 
-8. **完了確認**:
+8. **cross-region パスの再作成** (マルチリージョン構成の場合のみ):
+
+   node delete → node create でノード UUID が変わるため、既存の cross-region パスが stale になる。
+   `Network interface 'default' of node 'X' does not exist!` エラーが出た場合はパスを再作成する:
+   ```sh
+   # 対向リージョンの各ノードとのパスを delete + recreate
+   ssh root@$CONTROLLER_IP "linstor node-connection path delete $TARGET_NODE $REMOTE_NODE cross-region"
+   ssh root@$CONTROLLER_IP "linstor node-connection path create $TARGET_NODE $REMOTE_NODE cross-region default default"
+   # Protocol A 再適用
+   ./scripts/linstor-multiregion-setup.sh setup config/linstor.yml
+   ```
+
+   詳細は `linstor-migration` スキル (C3: stale パス) を参照。
+
+9. **完了確認**:
    ```sh
    ssh root@$CONTROLLER_IP "drbdadm status"            # UpToDate/UpToDate
    ssh root@$CONTROLLER_IP "linstor node list"          # 両ノード Online
