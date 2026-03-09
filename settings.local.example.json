@@ -145,7 +145,25 @@
       "Bash(.venv/bin/playwright:*)",
       "Bash(.venv/bin/python:*)",
       "Bash(bash:*)",
-      "Bash(sudo apt:*)"
+      "Bash(sudo apt:*)",
+      "Bash(/home/ubuntu/projects/pvese/.venv/bin/python:*)",
+      "Bash(./scripts/idrac-virtualmedia.sh status:*)",
+      "Bash(./scripts/idrac-virtualmedia.sh verify:*)",
+      "Bash(.venv/bin/pip list:*)",
+      "Bash(/home/ubuntu/projects/pvese/.venv/bin/pip list:*)",
+      "Bash(./scripts/bmc-power.sh on:*)",
+      "Bash(./scripts/bmc-power.sh forceoff:*)",
+      "Bash(./scripts/syslog-receiver.sh 5514:*)",
+      "Bash(.venv/bin/python3:*)",
+      "Bash(apt-cache search:*)",
+      "Bash(vncsnapshot:*)",
+      "Bash(.venv/bin/pip install:*)",
+      "Bash(./scripts/idrac-virtualmedia.sh boot-status:*)",
+      "Bash(./scripts/idrac-virtualmedia.sh boot-reset:*)",
+      "Bash(./scripts/idrac-virtualmedia.sh umount:*)",
+      "Bash(./scripts/idrac-virtualmedia.sh mount:*)",
+      "Bash(./scripts/linstor-multiregion-setup.sh setup:*)",
+      "Write(.claude/skills/**)"
     ]
   }
 }
