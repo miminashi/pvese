@@ -251,6 +251,7 @@ LINSTOR にリージョンを追加し、DR レプリカを設定する。
 | C5 | cloudinit ディスクのアタッチ不要 | cold-migrate | - | 初回起動済みのため cloudinit スキップ可 |
 | C6 | DRBD フルシンクがネットワーク帯域を飽和 | cold-migrate | SSH 遅延 | `c-max-rate` で帯域制限 |
 | C7 | パス作成時の PeerClosingConnectionException | add-region | exit code 10 + エラー出力 | パスを delete + recreate (2回目の create で安定) |
+| C8 | ストライプ/非ストライプ間の LV サイズ不一致 | add-region, cold-migrate | `The peer's disk size is too small!` + StandAlone | リソース削除 → 手動 LV 作成 (正しい PE 数) → 再作成 |
 
 ### C2: PrefNic=ib0 と cross-region パス
 
@@ -292,6 +293,28 @@ ssh root@$CONTROLLER_IP "linstor node-connection path create nodeA nodeB cross-r
 ssh root@$CONTROLLER_IP "linstor node-connection path delete nodeA nodeB cross-region"
 # 3. path create で再作成 (今度は成功)
 ssh root@$CONTROLLER_IP "linstor node-connection path create nodeA nodeB cross-region default default"
+```
+
+### C8: ストライプ/非ストライプ間の LV サイズ不一致
+
+ストライプ構成のノードから非ストライプ構成のノードにリソースを作成すると、LVM PE アライメントの違いにより LV サイズが数 MB 異なり、DRBD が接続を拒否して StandAlone 状態に入る。
+
+```
+drbd pm-39c4600d: The peer's disk size is too small! (67110832 < 67127216 sectors)
+```
+
+StandAlone に入ると `drbdadm adjust` では復旧不可。
+
+**対策**:
+```sh
+# 1. リソースを削除
+linstor resource delete <node> <resource>
+# 2. ソースノードの PE 数を確認
+ssh root@<source_ip> "lvs --noheadings -o seg_pe_ranges linstor_vg/<resource>_00000"
+# 3. 正しい PE 数で LV を手動作成
+ssh root@<target_ip> "lvcreate -n <resource>_00000 -l <pe_count> linstor_vg"
+# 4. リソースを再作成 (既存 LV を検出して使用)
+linstor resource create <node> <resource>
 ```
 
 ## oplog

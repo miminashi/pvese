@@ -58,6 +58,10 @@ get_all_nodes() {
     done
 }
 
+node_exists_in_linstor() {
+    run_linstor "node list -n $1" 2>/dev/null | grep -q "$1"
+}
+
 is_cross_region() {
     region_a=$(get_node_region "$1")
     region_b=$(get_node_region "$2")
@@ -78,8 +82,12 @@ do_setup() {
     echo "=== Setting Aux/site properties ==="
     for region in $(get_region_names); do
         for node in $(get_region_nodes "$region"); do
-            echo "  $node -> Aux/site=$region"
-            run_linstor "node set-property $node Aux/site $region"
+            if node_exists_in_linstor "$node"; then
+                echo "  $node -> Aux/site=$region"
+                run_linstor "node set-property $node Aux/site $region"
+            else
+                echo "  $node -> SKIP (not in LINSTOR)"
+            fi
         done
     done
 
