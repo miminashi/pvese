@@ -9,14 +9,14 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## プロジェクト概要
 
-pvese (Proxmox VE Storage Evaluation) — Supermicro IPMI と Proxmox VE を操作して、分散ストレージ (Ceph, GlusterFS 等) の比較評価を行うプロジェクト。
+pvese (Proxmox VE Storage Evaluation) — Supermicro IPMI と Proxmox VE を操作して、分散ストレージの比較評価およびマルチリージョン VM 運用基盤の構築を行うプロジェクト。
 
 ## 技術スタック
 
 - **言語**: POSIX sh (メイン), Rust (CLIツール)
 - **IPMI操作**: ipmitool による Supermicro サーバの電源管理・センサー監視
 - **PVE操作**: Proxmox REST API (curl) と CLI (pvesh, qm, pct, pveceph 等) を併用
-- **評価対象ストレージ**: Ceph, GlusterFS 等の複数比較
+- **評価対象ストレージ**: Ceph, GlusterFS 等の複数比較、LINSTOR/DRBD マルチリージョン運用
 
 ## 環境構成
 
@@ -254,6 +254,21 @@ tools/
 1. `cargo new --name <name> tools/<name>`
 2. `tools/Cargo.toml` の `members` に追加
 3. `cargo build --release` で確認
+
+## LINSTOR マルチリージョン運用
+
+LINSTOR/DRBD の 2+1 トポロジーで、リージョン内ゼロダウンタイム・リージョン間 DR を実現する宣言的マルチリージョン VM 運用基盤。
+
+- **リージョン構成**: `config/linstor.yml` の `regions` セクションで定義 (Region A: 4+5号機 IPoIB / Region B: 6+7号機 Ethernet)
+- **主要スクリプト**:
+  - `scripts/linstor-migrate-live.sh` — リージョン内ライブマイグレーション
+  - `scripts/linstor-migrate-cold.sh` — リージョン間コールドマイグレーション
+  - `scripts/linstor-drbd-sync-wait.sh` — DRBD 同期完了待機
+  - `scripts/linstor-multiregion-setup.sh` — マルチリージョンセットアップ
+  - `scripts/linstor-multiregion-node.sh` — ノード操作
+  - `scripts/linstor-multiregion-status.sh` — 状態確認
+- **運用ドキュメント**: [docs/linstor-multiregion-ops.md](docs/linstor-multiregion-ops.md), [docs/linstor-multiregion-tutorial.md](docs/linstor-multiregion-tutorial.md)
+- **スキル**: `linstor-migration` (ライブ/コールドマイグレーション、リージョン追加・廃止)
 
 ## PVE/IPMI ロック
 

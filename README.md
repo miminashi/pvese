@@ -1,8 +1,8 @@
 # pvese — Proxmox VE Storage Evaluation
 
-Supermicro IPMI と Proxmox VE を操作して、分散ストレージ (Ceph, GlusterFS 等) の比較評価を行うツールキット。
+Supermicro IPMI と Proxmox VE を操作して、分散ストレージの比較評価およびマルチリージョン VM 運用基盤の構築を行うツールキット。
 
-Claude Code (AI エージェント) がローカルマシンから SSH 経由で物理サーバを操作し、OS インストールからストレージベンチマークまでを自動化する。
+Claude Code (AI エージェント) がローカルマシンから SSH 経由で物理サーバを操作し、OS インストールからストレージベンチマーク、LINSTOR/DRBD によるマルチリージョン VM マイグレーションまでを自動化する。
 
 ## 特徴
 
@@ -12,6 +12,7 @@ Claude Code (AI エージェント) がローカルマシンから SSH 経由で
 - **排他ロック** — `pve-lock.sh` による flock ベースのロックで、複数の Claude Code セッションが同じクラスタを安全に操作
 - **課題管理・レポート追跡** — `issue.sh` による課題管理と、作業完了時のレポート自動生成
 - **LINSTOR/DRBD ストレージベンチマーク** — fio による性能計測、ノード障害シミュレーション・復旧
+- **LINSTOR/DRBD マルチリージョン VM 運用** — 2+1 トポロジー (リージョン内同期 + リージョン間非同期 DR)、ライブ/コールドマイグレーション、リージョンライフサイクル管理
 - **InfiniBand (SX6036) ネットワーク評価** — シリアルコンソール経由での Mellanox スイッチ設定・ベンチマーク
 
 ## 技術スタック
@@ -52,7 +53,10 @@ pvese/
 │   ├── linstor-bench-preflight.sh    # ベンチマーク前チェック (SMART 等)
 │   ├── linstor-multiregion-setup.sh  # LINSTOR マルチリージョンセットアップ
 │   ├── linstor-multiregion-node.sh   # LINSTOR マルチリージョンノード操作
-│   └── linstor-multiregion-status.sh # LINSTOR マルチリージョン状態確認
+│   ├── linstor-multiregion-status.sh # LINSTOR マルチリージョン状態確認
+│   ├── linstor-migrate-live.sh       # リージョン内ライブマイグレーション
+│   ├── linstor-migrate-cold.sh       # リージョン間コールドマイグレーション
+│   └── linstor-drbd-sync-wait.sh     # DRBD 同期完了待機
 ├── config/               # サーバ・スイッチ設定ファイル (YAML)
 │   ├── server4.yml
 │   ├── server5.yml
@@ -61,6 +65,8 @@ pvese/
 │   ├── linstor.yml
 │   └── switch-sx6036.yml
 ├── docs/                 # 運用ドキュメント
+│   ├── linstor-multiregion-ops.md       # マルチリージョン運用マニュアル
+│   └── linstor-multiregion-tutorial.md  # マルチリージョンチュートリアル
 ├── preseed/              # Debian preseed テンプレート・生成ファイル
 ├── state/                # フェーズ実行状態の永続化
 ├── issues/               # 課題管理データ (issues.yml)
@@ -235,6 +241,54 @@ graph LR
 | `scripts/linstor-multiregion-setup.sh` | マルチリージョンセットアップ |
 | `scripts/linstor-multiregion-node.sh` | マルチリージョンノード操作 |
 | `scripts/linstor-multiregion-status.sh` | マルチリージョン状態確認 |
+| `scripts/linstor-migrate-live.sh` | リージョン内ライブマイグレーション |
+| `scripts/linstor-migrate-cold.sh` | リージョン間コールドマイグレーション |
+| `scripts/linstor-drbd-sync-wait.sh` | DRBD 同期完了待機 |
+
+### LINSTOR マルチリージョン運用
+
+LINSTOR/DRBD の **2+1 トポロジー**で、リージョン内はゼロダウンタイムのライブマイグレーション、リージョン間は構造化されたコールドマイグレーションと DR を実現する、宣言的マルチリージョン VM 運用基盤。
+
+**2+1 トポロジー概要:**
+
+```
+Region A (IPoIB)              Region B (Ethernet)
+┌─────────┐  ┌─────────┐     ┌─────────┐  ┌─────────┐
+│ 4号機   │←→│ 5号機   │     │ 6号機   │←→│ 7号機   │
+│ Primary │  │ Primary │     │ Primary │  │ Primary │
+│ Replica │  │ Replica │     │ Replica │  │ Replica │
+└────┬────┘  └────┬────┘     └────┬────┘  └────┬────┘
+     │  Protocol C │              │  Protocol C │
+     │  (同期)     │              │  (同期)     │
+     └──────┬──────┘              └──────┬──────┘
+            │       Protocol A           │
+            └────── (非同期DR) ──────────┘
+```
+
+| 項目 | リージョン内 | リージョン間 |
+|------|-------------|-------------|
+| DRBD プロトコル | C (同期) | A (非同期) |
+| マイグレーション | ライブ (ゼロダウンタイム) | コールド (VM 停止→転送→起動) |
+| ネットワーク | Region A: IPoIB / Region B: Ethernet | Ethernet (10GbE) |
+
+**リージョン構成** (`config/linstor.yml`):
+
+| リージョン | ノード | 接続 |
+|-----------|--------|------|
+| Region A | 4号機 + 5号機 | InfiniBand (IPoIB) |
+| Region B | 6号機 + 7号機 | Ethernet (10GbE) |
+
+**運用シナリオ:**
+
+- **ライブマイグレーション** — リージョン内のノード間で VM をゼロダウンタイム移動 (DRBD Protocol C 同期済み)
+- **コールドマイグレーション** — リージョン間で VM を停止→DRBD 同期待ち→起動で移動
+- **リージョン追加** — 新ノードペアを LINSTOR に登録し、DR レプリカを配置
+- **リージョン廃止** — VM をコールドマイグレーションで退避後、ノード・リソースを削除
+- **DR フェイルオーバー** — リージョン障害時に DR レプリカから VM を起動
+
+**詳細ドキュメント:**
+- [マルチリージョン運用マニュアル](docs/linstor-multiregion-ops.md)
+- [マルチリージョンチュートリアル](docs/linstor-multiregion-tutorial.md)
 
 ## ルートスクリプト
 
@@ -292,6 +346,7 @@ OS インストールは以下の 8 フェーズで段階的に実行される:
   - `ib-switch` — IB スイッチ操作 (SX6036 シリアルコンソール)
   - `linstor-bench` — LINSTOR/DRBD ストレージベンチマーク
   - `linstor-node-ops` — LINSTOR ノード障害シミュレーション・復旧
+  - `linstor-migration` — LINSTOR マルチリージョン VM マイグレーション
   - `idrac7` — iDRAC7 基本操作 (racadm SSH)
   - `idrac7-fw-update` — iDRAC7 ファームウェアアップデート
   - `dell-fw-download` — Dell ファームウェアダウンロード (Playwright)
@@ -379,6 +434,22 @@ LINSTOR ストレージ上に VM を作成し、fio ベンチマーク（7テス
 - 「4号機を落として障害時の挙動を確認して」
 - 「4号機を復旧して DRBD の再同期を待って」
 - 「5号機をクラスタから離脱させて」
+
+### LINSTOR マルチリージョンマイグレーション
+
+VM のリージョン内ライブマイグレーション、リージョン間コールドマイグレーション、リージョンの追加・廃止を行う。
+
+| コマンド | 用途 |
+|---------|------|
+| `/linstor-migration live-migrate vm200 server5` | VM をリージョン内の別ノードへライブマイグレーション |
+| `/linstor-migration cold-migrate vm200 region-b` | VM をリージョン間でコールドマイグレーション |
+| `/linstor-migration decommission-region region-a` | リージョンの全 VM を退避して廃止 |
+| `/linstor-migration add-region region-a` | リージョンを再構築して追加 |
+
+自然言語での指示例:
+- 「vm200 を 5号機にライブマイグレーションして」
+- 「vm200 を region-b にコールドマイグレーションして」
+- 「region-a を廃止して全 VM を退避して」
 
 ### 課題管理・日常操作
 
