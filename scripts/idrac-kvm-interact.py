@@ -229,19 +229,32 @@ class VNCSession:
         self.sock.settimeout(self.timeout)
 
     def wake(self):
-        """Send a harmless key to wake VNC from SYSTEM IDLE.
+        """Force BMC video capture to refresh.
 
-        iDRAC7 VNC stops video capture when idle. After wake, the server
-        needs 2-3 seconds to restart video capture and produce a fresh frame.
+        iDRAC7 VNC stops video capture when idle or between connections.
+        Sending keys that cause visible screen changes forces the BMC to
+        recapture the current video output. Ctrl alone is insufficient;
+        we send ArrowDown+ArrowUp to trigger a cursor movement (visible
+        change) that the BMC will detect.
         """
-        self.send_key(0xFFE3, True)
-        self.send_key(0xFFE3, False)
+        # ArrowDown + ArrowUp = cursor moves and returns (harmless)
+        self.press_key(0xFF54)  # ArrowDown
+        time.sleep(0.1)
+        self.press_key(0xFF52)  # ArrowUp
         time.sleep(3)
 
     def _capture_framebuffer(self, output):
-        """Capture framebuffer once (internal, no wake)."""
+        """Capture framebuffer (internal, no wake).
 
-        # Request full framebuffer update
+        Requests an incremental update first to flush stale content,
+        then a full non-incremental update for the actual capture.
+        """
+        # First: request incremental update to flush stale framebuffer
+        self.sock.sendall(struct.pack("!BBHHHH", 3, 1, 0, 0,
+                                       self.width, self.height))
+        self._drain_messages(0.5)
+
+        # Second: request full non-incremental update
         self.sock.sendall(struct.pack("!BBHHHH", 3, 0, 0, 0,
                                        self.width, self.height))
 
@@ -400,7 +413,7 @@ def main():
 
             if getattr(args, "pre_screenshot", False) and args.screenshot_prefix:
                 fn = f"{args.screenshot_prefix}_000.png"
-                session._capture_framebuffer(fn)
+                session.screenshot(fn)
                 log(f"Pre-screenshot: {fn}")
 
             for idx, key in enumerate(keys, 1):
@@ -410,11 +423,11 @@ def main():
                 if args.screenshot_prefix:
                     fn = f"{args.screenshot_prefix}_{idx:03d}.png"
                     time.sleep(args.post_wait / 1000.0)
-                    session._capture_framebuffer(fn)
+                    session.screenshot(fn)
 
             if args.screenshot_file and not args.screenshot_prefix:
                 time.sleep(args.post_wait / 1000.0)
-                if session._capture_framebuffer(args.screenshot_file):
+                if session.screenshot(args.screenshot_file):
                     log(f"Saved {args.screenshot_file}")
 
         elif args.command == "type":

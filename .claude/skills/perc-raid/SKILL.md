@@ -182,13 +182,22 @@ RAID Level 選択後、ArrowDown で PD リストに移動し、Space で各 PD 
 - PD 選択は **Space** でトグル (選択時 `[X]`、未選択時 `[ ]`)
 - 選択済み PD の `#` 列に数字が表示される
 
-**操作シーケンス**:
+**操作シーケンス (検証済み)**:
 ```
 1. ルート行で F2 → Enter (Create New VD)
 2. RAID Level: Enter → ArrowDown x N → Enter (RAID レベル選択)
-3. PD 選択: ArrowDown → Space (各 PD を選択)
-4. Tab → OK: Tab x N → Enter (フィールド数に依存)
+   - RAID-0: デフォルト (変更不要)
+   - RAID-1: ArrowDown x1
+   - RAID-5: ArrowDown x2
+   - RAID-6: ArrowDown x3
+   - RAID-10: ArrowDown x4
+3. PD 選択: ArrowDown → Space (1本目), ArrowDown → Space (2本目), ...
+4. Tab x5 → Enter (OK)
+   Tab 順序: VD Size → VD Name → Advanced Settings → Secure VD → OK
+5. 初期化スキップ確認: Tab → Enter (OK を選択)
 ```
+
+**注意**: 初期化確認ダイアログが表示される。初期フォーカスは Cancel。Tab で OK に移動して Enter。
 
 ### サポートされる RAID レベル
 
@@ -200,11 +209,17 @@ RAID Level 選択後、ArrowDown で PD リストに移動し、Space で各 PD 
 | RAID-6 | 4 | (N-2)/N |
 | RAID-10 | 4 | 50% |
 
-## VD 削除手順
+## VD 削除手順 (検証済み)
 
-1. VD Mgmt タブで対象 VD の ID 行にカーソル移動
-2. F2 → ArrowDown → Enter (Delete VD)
+1. VD Mgmt タブで対象 VD の ID 行 ("ID: N, ...") にカーソル移動
+2. F2 → **ArrowDown x1** → Enter (Delete VD)
+   - F2 メニューの初期カーソルは **Consistency Check** (2番目)
+   - Delete VD は 3 番目 → ArrowDown **x1** で到達
 3. 確認ダイアログ: Tab (YES に移動) → Enter
+   - 初期フォーカスは NO。Tab で YES に移動
+
+**注意**: F2 メニューの初期位置は Consistency Check であり Initialization ではない。
+ArrowDown x2 だと Properties が開くので注意。
 
 ## PERC BIOS 終了
 
@@ -226,13 +241,62 @@ Escape → "Are you sure you want to exit?" → OK (Enter)
 
 ## 既知の制約
 
-### VNC SYSTEM IDLE
+### VNC ビデオキャプチャの停止と stale framebuffer
 
-iDRAC7 VNC は一度アイドルになると復帰しない。`VNCServer.Enable` の Disable/Enable では復旧せず、**racadm racreset が必要**。racreset は 90-120 秒かかる。
+iDRAC7 VNC は**一度ビデオキャプチャが停止すると、同一セッション外からは回復不可能**。
+停止後の VNC 接続は最後にキャプチャされたフレーム（stale）を返し続ける。
+
+- `VNCServer.Enable` の Disable/Enable → **効果なし**
+- Ctrl キー (wake) → **効果なし**
+- ArrowDown+ArrowUp → **効果なし**
+- F5 (Refresh) → PERC BIOS は再描画するが BMC がキャプチャしない
+- **racadm racreset → 唯一の回復手段** (90-120 秒)
+
+### VNC 操作の鉄則
+
+1. **racreset 後の最初の VNC セッション**でのみスクリーンショットが信頼できる
+2. **同一セッション内**のスクリーンショットは常に正しい（BMC がアクティブにキャプチャ中）
+3. **セッション切断→再接続**後のスクリーンショットは stale になる可能性が高い
+4. **複数ステップの PERC BIOS 操作は 1 つの VNC セッション内で完結**させること
+5. 操作結果の最終確認は **racadm** (PERC BIOS 終了後) で行う
+
+### 推奨ワークフロー
+
+```
+1. racadm racreset → 120秒待機
+2. power cycle → sleep 25
+3. 単一 VNC セッションで: Ctrl+R → PERC BIOS 操作 → Escape で終了
+4. POST 完了後に racadm raid get vdisks で結果確認
+```
 
 ### VNC 解像度変更
 
-POST (800x600) → PERC BIOS (738x414) の遷移で VNC 接続が切れることがある。Ctrl+R 送信中は `--screenshot-each` をつけず、PERC BIOS 進入後に新しい VNC 接続でスクリーンショットを取る。
+POST (800x600) → PERC BIOS (738x414) の遷移で VNC 接続が切れることがある。
+Ctrl+R 送信中は `--screenshot-each` をつけず、PERC BIOS 進入後に新しい接続でスクリーンショットを取る。
+
+### Create New VD フォームの Tab 順序 (検証済み)
+
+PD 選択後の Tab 順序:
+```
+PD リスト → (Tab1) VD Size → (Tab2) VD Name → (Tab3) Advanced Settings
+→ (Tab4) Secure VD → (Tab5) OK → (Tab6) CANCEL → (Tab7, wraps) RAID Level
+```
+
+**OK は PD リストから Tab x5**。
+初期化確認ダイアログ: 初期フォーカスは Cancel → **Tab → Enter** で OK。
+
+### VD Mgmt ツリーのラッピング
+
+ArrowUp/Down はツリーの先頭/末尾で**循環する**（ラップ）。
+ルートからさらに ArrowUp すると最後のアイテムに移動する。
+正確なアイテム数に依存するため、ArrowUp x N の N は慎重に選ぶこと。
+
+### F2 メニューの初期カーソル位置
+
+| F2 の対象 | メニュー | 初期カーソル |
+|-----------|---------|-------------|
+| ルート行 | Create New VD, Clear Config, ... | **Create New VD** (1番目) |
+| VD ID 行 | Initialization, Consistency Check, Delete VD, ... | **Consistency Check** (2番目) |
 
 ### PERC BIOS と Lifecycle Controller
 
