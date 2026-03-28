@@ -155,13 +155,15 @@ python3 ./scripts/idrac-kvm-interact.py \
 
 ### F2 Operations メニュー
 
-**コントローラ行 (ルート) で F2**:
+**コントローラ行 (ルート) で F2** (初期カーソル = Create New VD):
 1. **Create New VD** — VD 新規作成
-2. Clear Config — 全 VD 一括削除
+2. **Clear Config** — 全 VD 一括削除 (**VD0 含む全 VD が消える！**)
 3. Foreign Config →
 4. Manage Preserved Cache
 5. Security Key Management →
 6. Create CacheCade Virtual Disk
+
+**Clear Config**: F2 → ArrowDown → Enter → Tab (YES) → Enter。VD0 (OS) も削除されるため、再構築が必要。
 
 **VD 行で F2**:
 1. Initialization →
