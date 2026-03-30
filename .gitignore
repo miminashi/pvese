@@ -9,3 +9,9 @@ upload/
 tmp/
 .venv/
 __pycache__/
+ssh/known_hosts
+ssh/known_hosts.old
+ssh/idrac_rsa
+ssh/idrac_rsa.pub
+ssh/id_ed25519
+ssh/id_ed25519.pub

@@ -1,5 +1,5 @@
 # LINSTOR / DRBD configuration for pvese project
-# 4-node multi-region setup
+# 6-node multi-region setup
 
 # LINSTOR controller
 controller_node: ayase-web-service-4
@@ -30,6 +30,7 @@ nodes:
     lvcreate_options: "-i4 -I64"
   - name: ayase-web-service-6
     ip: 10.10.10.206
+    ib_ip: 192.168.100.3
     role: satellite
     storage_disks:
       - /dev/sda
@@ -39,30 +40,60 @@ nodes:
     lvcreate_options: "-i4 -I64"
   - name: ayase-web-service-7
     ip: 10.10.10.207
+    ib_ip: 192.168.101.7
     role: satellite
     storage_disks:
       - /dev/sdb
       - /dev/sdc
       - /dev/sdd
       - /dev/sde
-      - /dev/sdf
-      - /dev/sdg
-    lvcreate_options: "-i6 -I64"
+    lvcreate_options: "-i4 -I64"
+  - name: ayase-web-service-8
+    ip: 10.10.10.208
+    ib_ip: 192.168.101.8
+    role: satellite
+    storage_disks:
+      - /dev/sdb
+      - /dev/sdc
+      - /dev/sdd
+    lvcreate_options: "-i3 -I64"
+  - name: ayase-web-service-9
+    ip: 10.10.10.209
+    ib_ip: 192.168.101.9
+    role: satellite
+    storage_disks:
+      - /dev/sdb
+      - /dev/sdc
+      - /dev/sdd
+    lvcreate_options: "-i3 -I64"
 
 # Regions (multi-region DR)
+# IB subnets are separated per region for traffic isolation
 regions:
   region-a:
-    - ayase-web-service-4
-    - ayase-web-service-5
+    ib_subnet: 192.168.100.0/24
+    pve_storage: linstor-storage
+    storage_pool_name: zfs-pool
+    nodes:
+      - ayase-web-service-4
+      - ayase-web-service-5
+      - ayase-web-service-6
   region-b:
-    - ayase-web-service-6
-    - ayase-web-service-7
+    ib_subnet: 192.168.101.0/24
+    pve_storage: linstor-storage-b
+    storage_pool_name: zfs-pool
+    nodes:
+      - ayase-web-service-7
+      - ayase-web-service-8
+      - ayase-web-service-9
 
 # Storage pool
-vg_name: linstor_vg
-storage_pool_name: striped-pool
-storage_pool_type: lvm
-lvcreate_options: "-i4 -I64"
+zpool_name: linstor_zpool
+storage_pool_name: zfs-pool
+storage_pool_type: zfs
+# Legacy LVM settings (kept for reference)
+# vg_name: linstor_vg
+# lvcreate_options: "-i4 -I64"
 
 # Resource group
 resource_group: pve-rg

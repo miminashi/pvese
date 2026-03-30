@@ -1,17 +1,16 @@
-# Server 7 (ayase-web-service-7) configuration
+# Server 8 (ayase-web-service-8) configuration
 # DELL PowerEdge R320 - iDRAC (not Supermicro BMC)
 
-hostname: ayase-web-service-7
+hostname: ayase-web-service-8
 domain: local
 
 # Network
-static_ip: 10.10.10.207
+static_ip: 10.10.10.208
 static_netmask: 8
 static_iface: eno1
 dhcp_iface: eno2
 
-# Target disk (TBD: PERC H710 shows 0 pdisks via racadm/Redfish;
-# will be confirmed during installer. Expected /dev/sda if VD exists.)
+# Target disk (PERC H710 Mini RAID, /dev/sda = VD0)
 disk: /dev/sda
 
 # Debian installer
@@ -23,19 +22,16 @@ debian_iso_sha256: c9f09d24b7e834e6834f2ffa565b33d6f1f540d04bd25c79ad9953bc79a8a
 # SMB / VirtualMedia
 smb_host: 10.1.6.1
 smb_share_path: "\\public"
-iso_filename: debian-preseed-s7.iso
+iso_filename: debian-preseed-s8.iso
 iso_download_dir: /var/samba/public
-remoteimage_uri: "//10.1.6.1/public/debian-preseed-s7.iso"
+remoteimage_uri: "//10.1.6.1/public/debian-preseed-s8.iso"
 
 # BMC (iDRAC)
 bmc_type: idrac
-bmc_ip: 10.10.10.27
+bmc_ip: 10.10.10.28
 bmc_user: claude
 bmc_pass: Claude123
 bmc_ssh_key: ssh/idrac_rsa
-idrac_fw_version: "2.65.65.65"
-idrac_fw_build: "15"
-idrac_fw_updated: "2026-03-02"
 
 # Serial console
 serial_unit: 0

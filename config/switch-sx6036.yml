@@ -9,3 +9,18 @@ switch_pass: admin
 mgmt_ip: 10.10.10.100
 mgmt_netmask: 255.255.255.0
 ssh_port: 22
+
+# IB subnet isolation (MLNX-OS 3.6 does not support ib partition command)
+# Region separation is done at IP level with different subnets
+ib_subnets:
+  region-a: 192.168.100.0/24   # servers 4, 5, 6
+  region-b: 192.168.101.0/24   # servers 7, 8, 9
+
+# Port assignments
+port_map:
+  IB1/7:  ayase-web-service-7
+  IB1/9:  ayase-web-service-9
+  IB1/11: ayase-web-service-8
+  IB1/19: ayase-web-service-6
+  IB1/21: ayase-web-service-5
+  IB1/23: ayase-web-service-4

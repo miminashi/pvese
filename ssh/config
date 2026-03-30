@@ -1,0 +1,62 @@
+# pvese project SSH config
+# Usage: ssh -F ssh/config <host>
+
+UserKnownHostsFile /home/ubuntu/projects/pvese/ssh/known_hosts
+StrictHostKeyChecking accept-new
+
+# --- iDRAC (7-9号機) ---
+Host idrac7
+  HostName 10.10.10.27
+  User claude
+  IdentityFile /home/ubuntu/projects/pvese/ssh/idrac_rsa
+  IdentitiesOnly yes
+  KexAlgorithms +diffie-hellman-group14-sha1,diffie-hellman-group1-sha1
+  HostKeyAlgorithms +ssh-rsa,ssh-dss
+  PubkeyAcceptedAlgorithms +ssh-rsa
+
+Host idrac8
+  HostName 10.10.10.28
+  User claude
+  IdentityFile /home/ubuntu/projects/pvese/ssh/idrac_rsa
+  IdentitiesOnly yes
+  KexAlgorithms +diffie-hellman-group14-sha1,diffie-hellman-group1-sha1
+  HostKeyAlgorithms +ssh-rsa,ssh-dss
+  PubkeyAcceptedAlgorithms +ssh-rsa
+
+Host idrac9
+  HostName 10.10.10.29
+  User claude
+  IdentityFile /home/ubuntu/projects/pvese/ssh/idrac_rsa
+  IdentitiesOnly yes
+  KexAlgorithms +diffie-hellman-group14-sha1,diffie-hellman-group1-sha1
+  HostKeyAlgorithms +ssh-rsa,ssh-dss
+  PubkeyAcceptedAlgorithms +ssh-rsa
+
+# --- PVE ノード (4-9号機) ---
+Host pve4
+  HostName 10.10.10.204
+  User root
+
+Host pve5
+  HostName 10.10.10.205
+  User root
+
+Host pve6
+  HostName 10.10.10.206
+  User root
+
+Host pve7
+  HostName 10.10.10.207
+  User root
+
+Host pve8
+  HostName 10.10.10.208
+  User root
+
+Host pve9
+  HostName 10.10.10.209
+  User root
+
+# --- 全ホスト共通 ---
+Host *
+  ConnectTimeout 10
