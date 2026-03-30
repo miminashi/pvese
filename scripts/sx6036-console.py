@@ -300,6 +300,9 @@ def main():
     log("Disabling pager")
     run_cmd(ser, "no cli session paging enable", timeout=5)
     time.sleep(0.5)
+    log("Setting terminal width")
+    run_cmd(ser, "terminal width 256", timeout=5)
+    time.sleep(0.5)
 
     try:
         if args.subcommand == "status":

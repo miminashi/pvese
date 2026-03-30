@@ -3,6 +3,7 @@ set -eu
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 YQ="${SCRIPT_DIR}/../bin/yq"
+SSH_CONFIG="${SCRIPT_DIR}/../ssh/config"
 
 usage() {
     echo "Usage: linstor-migrate-live.sh <vmid> <target_node> [<config>]"
@@ -43,7 +44,7 @@ fi
 CONTROLLER_IP=$("$YQ" '.controller_ip' "$CONFIG")
 
 run_linstor() {
-    ssh "root@${CONTROLLER_IP}" "linstor $*"
+    ssh -F "$SSH_CONFIG" "root@${CONTROLLER_IP}" "linstor $*"
 }
 
 get_node_ip() {
@@ -53,7 +54,7 @@ get_node_ip() {
 get_node_site() {
     node="$1"
     for region in $("$YQ" '.regions | keys | .[]' "$CONFIG"); do
-        for n in $("$YQ" ".regions.\"$region\"[]" "$CONFIG"); do
+        for n in $("$YQ" ".regions.\"$region\".nodes[]" "$CONFIG"); do
             if [ "$n" = "$node" ]; then
                 echo "$region"
                 return
@@ -76,15 +77,15 @@ if [ -z "$source_node" ]; then
 fi
 SOURCE_IP=$(get_node_ip "$source_node")
 
-scsi0_line=$(ssh "root@${SOURCE_IP}" "qm config $VMID" | grep '^scsi0:')
+scsi0_line=$(ssh -F "$SSH_CONFIG" "root@${SOURCE_IP}" "qm config $VMID" | grep '^scsi0:')
 if [ -z "$scsi0_line" ]; then
     echo "Error: VM $VMID has no scsi0 disk on $source_node"
     exit 1
 fi
 
 pve_vol=$(echo "$scsi0_line" | sed 's/^scsi0: *//' | sed 's/,.*//')
-base_resource=$(echo "$pve_vol" | sed "s/^linstor-storage://" | sed "s/_${VMID}$//")
-resource_name="${pve_vol#linstor-storage:}"
+resource_name=$(echo "$pve_vol" | sed 's/^[^:]*://')
+base_resource=$(echo "$resource_name" | sed "s/_${VMID}$//")
 echo "  Resource: $resource_name (base: $base_resource)"
 echo "  Source: $source_node ($SOURCE_IP)"
 
@@ -110,7 +111,7 @@ if [ "$target_state" != "UpToDate" ]; then
 fi
 echo "  Target resource state: $target_state (OK)"
 
-vm_status=$(ssh "root@${SOURCE_IP}" "qm status $VMID")
+vm_status=$(ssh -F "$SSH_CONFIG" "root@${SOURCE_IP}" "qm status $VMID")
 echo "  VM status: $vm_status"
 
 case "$vm_status" in
@@ -126,13 +127,13 @@ echo ""
 echo "--- Executing live migration ---"
 echo "  qm migrate $VMID $TARGET_NODE --online"
 
-ssh "root@${SOURCE_IP}" "qm migrate $VMID $TARGET_NODE --online"
+ssh -F "$SSH_CONFIG" "root@${SOURCE_IP}" "qm migrate $VMID $TARGET_NODE --online"
 
 echo ""
 echo "--- Post-migration verification ---"
 
 TARGET_IP=$(get_node_ip "$TARGET_NODE")
-vm_status_after=$(ssh "root@${TARGET_IP}" "qm status $VMID")
+vm_status_after=$(ssh -F "$SSH_CONFIG" "root@${TARGET_IP}" "qm status $VMID")
 echo "  VM status on $TARGET_NODE: $vm_status_after"
 
 resource_json_after=$(run_linstor "-m resource list -r $base_resource")

@@ -1,6 +1,9 @@
 #!/bin/sh
 set -eu
 
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+SSH_CONFIG="${SCRIPT_DIR}/../ssh/config"
+
 usage() {
     echo "Usage: ssh-wait.sh <host> [--timeout 300] [--interval 10] [--user root]"
     echo ""
@@ -42,7 +45,7 @@ attempt=0
 
 while [ "$elapsed" -lt "$timeout" ]; do
     attempt=$((attempt + 1))
-    if ssh -o ConnectTimeout=5 -o BatchMode=yes -o StrictHostKeyChecking=no "${user}@${host}" true 2>/dev/null; then
+    if ssh -F "$SSH_CONFIG" -o ConnectTimeout=5 -o BatchMode=yes -o StrictHostKeyChecking=no "${user}@${host}" true 2>/dev/null; then
         echo "SSH connected to ${user}@${host} (attempt ${attempt}, ${elapsed}s elapsed)"
         exit 0
     fi

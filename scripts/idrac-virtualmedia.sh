@@ -1,6 +1,9 @@
 #!/bin/sh
 set -eu
 
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+SSH_CONFIG="${SCRIPT_DIR}/../ssh/config"
+
 usage() {
     echo "Usage: idrac-virtualmedia.sh <command> <bmc_ip> [args...]"
     echo ""
@@ -17,13 +20,21 @@ usage() {
     echo ""
     echo "Boot Devices: Normal, PXE, BIOS, VCD-DVD, Floppy, HDD"
     echo ""
-    echo "Requires SSH host 'idrac7' configured in ~/.ssh/config"
-    echo "(User claude, IdentityFile ~/.ssh/idrac_rsa, legacy KexAlgorithms)"
+    echo "Requires SSH config at ssh/config (project-local)"
     exit 1
 }
 
+resolve_idrac_host() {
+    case "$1" in
+        10.10.10.27) echo "idrac7" ;;
+        10.10.10.28) echo "idrac8" ;;
+        10.10.10.29) echo "idrac9" ;;
+        *) echo "idrac7" ;;
+    esac
+}
+
 ssh_idrac() {
-    ssh -o ConnectTimeout=10 idrac7 "$@"
+    ssh -F "$SSH_CONFIG" "$IDRAC_HOST" "$@"
 }
 
 cmd_mount() {
@@ -91,6 +102,8 @@ if [ $# -lt 2 ]; then
 fi
 
 command="$1"; shift
+bmc_ip="$1"
+IDRAC_HOST=$(resolve_idrac_host "$bmc_ip")
 
 case "$command" in
     mount)

@@ -3,6 +3,7 @@ set -eu
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 YQ="${SCRIPT_DIR}/../bin/yq"
+SSH_CONFIG="${SCRIPT_DIR}/../ssh/config"
 
 usage() {
     echo "Usage: linstor-drbd-sync-wait.sh <resource_name> [<config>] [--timeout <seconds>]"
@@ -64,7 +65,7 @@ fi
 CONTROLLER_IP=$("$YQ" '.controller_ip' "$CONFIG")
 
 run_linstor() {
-    ssh "root@${CONTROLLER_IP}" "linstor $*"
+    ssh -F "$SSH_CONFIG" "root@${CONTROLLER_IP}" "linstor $*"
 }
 
 elapsed=0

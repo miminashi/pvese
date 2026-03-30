@@ -52,6 +52,10 @@ echo "IP: $ip_addr"
 echo "Mode: $ib_mode"
 echo "MTU: $mtu"
 
+echo "--- Loading ib_ipoib module ---"
+modprobe ib_ipoib
+sleep 2
+
 echo "--- Detecting IPoIB interface ---"
 iface=""
 for dev in /sys/class/net/*; do
@@ -78,9 +82,6 @@ if [ -z "$iface" ]; then
     echo "ERROR: No IPoIB interface found" >&2
     exit 1
 fi
-
-echo "--- Loading ib_ipoib module ---"
-modprobe ib_ipoib
 
 echo "--- Bringing up interface ---"
 ip link set "$iface" up

@@ -3,6 +3,7 @@ set -eu
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 YQ="${SCRIPT_DIR}/../bin/yq"
+SSH_CONFIG="${SCRIPT_DIR}/../ssh/config"
 
 usage() {
     echo "Usage: linstor-multiregion-setup.sh <setup|teardown> <config>"
@@ -29,7 +30,7 @@ fi
 CONTROLLER_IP=$("$YQ" '.controller_ip' "$CONFIG")
 
 run_linstor() {
-    ssh "root@${CONTROLLER_IP}" "linstor $*"
+    ssh -F "$SSH_CONFIG" "root@${CONTROLLER_IP}" "linstor $*"
 }
 
 get_region_names() {
@@ -37,7 +38,7 @@ get_region_names() {
 }
 
 get_region_nodes() {
-    "$YQ" ".regions.\"$1\"[]" "$CONFIG"
+    "$YQ" ".regions.\"$1\".nodes[]" "$CONFIG"
 }
 
 get_node_region() {

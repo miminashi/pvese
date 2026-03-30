@@ -3,6 +3,7 @@ set -eu
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 YQ="${SCRIPT_DIR}/../bin/yq"
+SSH_CONFIG="${SCRIPT_DIR}/../ssh/config"
 
 usage() {
     echo "Usage: linstor-multiregion-node.sh <add|remove> <node> <region|config> [<config>]"
@@ -55,7 +56,7 @@ CONTROLLER_IP=$("$YQ" '.controller_ip' "$CONFIG")
 STORAGE_POOL=$("$YQ" '.storage_pool_name' "$CONFIG")
 
 run_linstor() {
-    ssh "root@${CONTROLLER_IP}" "linstor $*"
+    ssh -F "$SSH_CONFIG" "root@${CONTROLLER_IP}" "linstor $*"
 }
 
 get_region_names() {
@@ -63,7 +64,7 @@ get_region_names() {
 }
 
 get_region_nodes() {
-    "$YQ" ".regions.\"$1\"[]" "$CONFIG"
+    "$YQ" ".regions.\"$1\".nodes[]" "$CONFIG"
 }
 
 get_node_region() {
@@ -183,8 +184,12 @@ do_remove() {
         echo ""
     fi
 
-    echo "  Deleting storage pool $STORAGE_POOL from $NODE"
-    run_linstor "storage-pool delete $NODE $STORAGE_POOL" 2>/dev/null || echo "    (pool not found or already deleted)"
+    region_pool="$STORAGE_POOL"
+    if [ -n "$node_region" ]; then
+        region_pool=$("$YQ" ".regions.\"$node_region\".storage_pool_name // .storage_pool_name" "$CONFIG")
+    fi
+    echo "  Deleting storage pool $region_pool from $NODE"
+    run_linstor "storage-pool delete $NODE $region_pool" || echo "    (pool not found or already deleted)"
 
     echo "  Removing Aux/site property from $NODE"
     run_linstor "node set-property $NODE Aux/site" 2>/dev/null || true

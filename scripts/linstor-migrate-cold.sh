@@ -3,6 +3,7 @@ set -eu
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 YQ="${SCRIPT_DIR}/../bin/yq"
+SSH_CONFIG="${SCRIPT_DIR}/../ssh/config"
 
 usage() {
     echo "Usage: linstor-migrate-cold.sh <vmid> <source_region> <target_region> [<config>]"
@@ -44,9 +45,11 @@ fi
 
 CONTROLLER_IP=$("$YQ" '.controller_ip' "$CONFIG")
 CROSS_REGION_IF=$("$YQ" '.migration.cross_region_interface // "default"' "$CONFIG")
+SOURCE_POOL=$("$YQ" ".regions.\"$SOURCE_REGION\".storage_pool_name // .storage_pool_name" "$CONFIG")
+TARGET_POOL=$("$YQ" ".regions.\"$TARGET_REGION\".storage_pool_name // .storage_pool_name" "$CONFIG")
 
 run_linstor() {
-    ssh "root@${CONTROLLER_IP}" "linstor $*"
+    ssh -F "$SSH_CONFIG" "root@${CONTROLLER_IP}" "linstor $*"
 }
 
 get_node_ip() {
@@ -54,7 +57,7 @@ get_node_ip() {
 }
 
 get_region_nodes() {
-    "$YQ" ".regions.\"$1\"[]" "$CONFIG"
+    "$YQ" ".regions.\"$1\".nodes[]" "$CONFIG"
 }
 
 node_exists_in_linstor() {
@@ -115,19 +118,21 @@ fi
 SOURCE_IP=$(get_node_ip "$source_node_primary")
 echo "  Source primary node: $source_node_primary ($SOURCE_IP)"
 
-scsi0_line=$(ssh "root@${SOURCE_IP}" "qm config $VMID" | grep '^scsi0:')
+scsi0_line=$(ssh -F "$SSH_CONFIG" "root@${SOURCE_IP}" "qm config $VMID" | grep '^scsi0:')
 if [ -z "$scsi0_line" ]; then
     echo "Error: VM $VMID has no scsi0 disk on $source_node_primary"
     exit 1
 fi
 pve_vol=$(echo "$scsi0_line" | sed 's/^scsi0: *//' | sed 's/,.*//')
-base_resource=$(echo "$pve_vol" | sed "s/^linstor-storage://" | sed "s/_${VMID}$//")
-resource_name="${pve_vol#linstor-storage:}"
+source_storage=$(echo "$pve_vol" | sed 's/:.*//')
+resource_name=$(echo "$pve_vol" | sed 's/^[^:]*://')
+base_resource=$(echo "$resource_name" | sed "s/_${VMID}$//")
+target_storage=$("$YQ" ".regions.\"$TARGET_REGION\".pve_storage // \"$source_storage\"" "$CONFIG")
 echo "  Resource: $resource_name (base: $base_resource)"
 
 echo ""
 echo "--- Capturing VM config ---"
-vm_config=$(ssh "root@${SOURCE_IP}" "qm config $VMID")
+vm_config=$(ssh -F "$SSH_CONFIG" "root@${SOURCE_IP}" "qm config $VMID")
 echo "$vm_config"
 
 vm_name=$(echo "$vm_config" | grep '^name:' | sed 's/^name: *//')
@@ -149,10 +154,40 @@ if [ -n "$net1_line" ]; then
     vm_net1=$(echo "$net1_line" | sed 's/^net1: *//')
 fi
 
+vm_ipconfig0=""
+ipconfig0_line=$(echo "$vm_config" | grep '^ipconfig0:' || true)
+if [ -n "$ipconfig0_line" ]; then
+    vm_ipconfig0=$(echo "$ipconfig0_line" | sed 's/^ipconfig0: *//')
+fi
+
 vm_ipconfig1=""
 ipconfig1_line=$(echo "$vm_config" | grep '^ipconfig1:' || true)
 if [ -n "$ipconfig1_line" ]; then
     vm_ipconfig1=$(echo "$ipconfig1_line" | sed 's/^ipconfig1: *//')
+fi
+
+vm_ciuser=""
+ciuser_line=$(echo "$vm_config" | grep '^ciuser:' || true)
+if [ -n "$ciuser_line" ]; then
+    vm_ciuser=$(echo "$ciuser_line" | sed 's/^ciuser: *//')
+fi
+
+vm_serial0=""
+serial0_line=$(echo "$vm_config" | grep '^serial0:' || true)
+if [ -n "$serial0_line" ]; then
+    vm_serial0=$(echo "$serial0_line" | sed 's/^serial0: *//')
+fi
+
+vm_vga=""
+vga_line=$(echo "$vm_config" | grep '^vga:' || true)
+if [ -n "$vga_line" ]; then
+    vm_vga=$(echo "$vga_line" | sed 's/^vga: *//')
+fi
+
+has_cloudinit=""
+ide2_line=$(echo "$vm_config" | grep '^ide2:.*cloudinit' || true)
+if [ -n "$ide2_line" ]; then
+    has_cloudinit="yes"
 fi
 
 scsi0_line=$(echo "$vm_config" | grep '^scsi0:' || true)
@@ -201,8 +236,8 @@ if [ "$target_replica_count" -lt 2 ]; then
         if [ "$needed" -le 0 ]; then
             break
         fi
-        echo "  Creating resource $base_resource on $node"
-        run_linstor "resource create $node $base_resource"
+        echo "  Creating resource $base_resource on $node (pool: $TARGET_POOL)"
+        run_linstor "resource create $node $base_resource --storage-pool $TARGET_POOL" || echo "  WARNING: resource create returned non-zero (may include non-fatal errors)"
         needed=$((needed - 1))
 
         echo "  Ensuring cross-region paths for $node"
@@ -234,7 +269,7 @@ echo "=========================================="
 echo ""
 
 echo "  Stopping VM $VMID on $source_node_primary..."
-ssh "root@${SOURCE_IP}" "qm stop $VMID"
+ssh -F "$SSH_CONFIG" "root@${SOURCE_IP}" "qm stop $VMID"
 echo "  VM stopped."
 
 echo ""
@@ -249,7 +284,7 @@ done
 
 echo ""
 echo "  Removing VM config from source..."
-ssh "root@${SOURCE_IP}" "rm -f /etc/pve/qemu-server/${VMID}.conf"
+ssh -F "$SSH_CONFIG" "root@${SOURCE_IP}" "rm -f /etc/pve/qemu-server/${VMID}.conf"
 
 target_primary=""
 for node in $target_nodes; do
@@ -278,25 +313,47 @@ if [ -n "$vm_net1" ]; then
     create_args="$create_args --net1 $vm_net1"
 fi
 
-ssh "root@${TARGET_IP}" "qm create $create_args"
+ssh -F "$SSH_CONFIG" "root@${TARGET_IP}" "qm create $create_args"
 
 echo "  Attaching LINSTOR disk..."
-scsi0_attach="linstor-storage:${resource_name}"
+scsi0_attach="${target_storage}:${resource_name}"
 if [ -n "$disk_opts" ]; then
     scsi0_attach="${scsi0_attach},${disk_opts}"
 elif [ -n "$disk_size" ]; then
     scsi0_attach="${scsi0_attach},size=${disk_size}"
 fi
-ssh "root@${TARGET_IP}" "qm set $VMID --scsi0 $scsi0_attach"
-ssh "root@${TARGET_IP}" "qm set $VMID --boot order=scsi0"
+ssh -F "$SSH_CONFIG" "root@${TARGET_IP}" "qm set $VMID --scsi0 $scsi0_attach"
+ssh -F "$SSH_CONFIG" "root@${TARGET_IP}" "qm set $VMID --boot order=scsi0"
 
-if [ -n "$vm_ipconfig1" ]; then
-    ssh "root@${TARGET_IP}" "qm set $VMID --ipconfig1 $vm_ipconfig1"
+if [ -n "$vm_serial0" ]; then
+    ssh -F "$SSH_CONFIG" "root@${TARGET_IP}" "qm set $VMID --serial0 $vm_serial0"
+fi
+if [ -n "$vm_vga" ]; then
+    ssh -F "$SSH_CONFIG" "root@${TARGET_IP}" "qm set $VMID --vga $vm_vga"
+fi
+
+if [ -n "$has_cloudinit" ]; then
+    echo "  Re-creating cloud-init drive..."
+    ssh -F "$SSH_CONFIG" "root@${TARGET_IP}" "rm -f /var/lib/vz/images/${VMID}/vm-${VMID}-cloudinit.qcow2"
+    ssh -F "$SSH_CONFIG" "root@${TARGET_IP}" "qm set $VMID --ide2 local:cloudinit"
+    if [ -n "$vm_ciuser" ]; then
+        ssh -F "$SSH_CONFIG" "root@${TARGET_IP}" "qm set $VMID --ciuser $vm_ciuser --cipassword password"
+    fi
+    if [ -n "$vm_ipconfig0" ]; then
+        ssh -F "$SSH_CONFIG" "root@${TARGET_IP}" "qm set $VMID --ipconfig0 $vm_ipconfig0"
+    fi
+    if [ -n "$vm_ipconfig1" ]; then
+        ssh -F "$SSH_CONFIG" "root@${TARGET_IP}" "qm set $VMID --ipconfig1 $vm_ipconfig1"
+    fi
+    source_sshkeys=$(ssh -F "$SSH_CONFIG" "root@${SOURCE_IP}" "cat /root/.ssh/authorized_keys" 2>/dev/null || true)
+    if [ -n "$source_sshkeys" ]; then
+        ssh -F "$SSH_CONFIG" "root@${TARGET_IP}" "qm set $VMID --sshkeys /root/.ssh/authorized_keys"
+    fi
 fi
 
 echo ""
 echo "  Starting VM $VMID on $target_primary..."
-ssh "root@${TARGET_IP}" "qm start $VMID"
+ssh -F "$SSH_CONFIG" "root@${TARGET_IP}" "qm start $VMID"
 echo "  VM started."
 
 echo ""
@@ -316,7 +373,7 @@ if [ -n "$dr_node" ]; then
 
     has_dr=$(run_linstor "-m resource list -r $base_resource" | "$YQ" -r ".[0][] | select(.node_name == \"$dr_node\") | .name" | head -1)
     if [ -z "$has_dr" ]; then
-        run_linstor "resource create $dr_node $base_resource"
+        run_linstor "resource create $dr_node $base_resource --storage-pool $SOURCE_POOL" || echo "  WARNING: resource create returned non-zero (may include non-fatal errors)"
     else
         echo "    Resource already exists on $dr_node"
     fi

@@ -3,6 +3,7 @@ set -eu
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 YQ="${SCRIPT_DIR}/../bin/yq"
+SSH_CONFIG="${SCRIPT_DIR}/../ssh/config"
 
 usage() {
     echo "Usage: linstor-multiregion-status.sh [<config>]"
@@ -26,7 +27,7 @@ fi
 CONTROLLER_IP=$("$YQ" '.controller_ip' "$CONFIG")
 
 run_linstor() {
-    ssh "root@${CONTROLLER_IP}" "linstor $*"
+    ssh -F "$SSH_CONFIG" "root@${CONTROLLER_IP}" "linstor $*"
 }
 
 get_region_names() {
@@ -34,7 +35,7 @@ get_region_names() {
 }
 
 get_region_nodes() {
-    "$YQ" ".regions.\"$1\"[]" "$CONFIG"
+    "$YQ" ".regions.\"$1\".nodes[]" "$CONFIG"
 }
 
 get_node_region() {
@@ -126,6 +127,6 @@ echo ""
 for node in $all_nodes; do
     node_ip=$("$YQ" ".nodes[] | select(.name == \"$node\") | .ip" "$CONFIG")
     echo "--- $node ---"
-    ssh "root@${node_ip}" "drbdsetup status --verbose --statistics" 2>/dev/null | grep -E '(^\S|connection|peer-disk|out-of-sync|protocol)' || echo "  (no DRBD resources)"
+    ssh -F "$SSH_CONFIG" "root@${node_ip}" "drbdsetup status --verbose --statistics" 2>/dev/null | grep -E '(^\S|connection|peer-disk|out-of-sync|protocol)' || echo "  (no DRBD resources)"
     echo ""
 done
