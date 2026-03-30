@@ -90,7 +90,9 @@ graph LR
     subgraph RegionA["Region A（本番）"]
         A1["Node A1<br/>レプリカ 1"]
         A2["Node A2<br/>レプリカ 2"]
+        A3["Node A3<br/>レプリカ 3"]
         A1 ---|"Protocol C<br/>(同期)"| A2
+        A2 ---|"Protocol C<br/>(同期)"| A3
     end
 
     subgraph RegionB["Region B（DR）"]
@@ -99,11 +101,13 @@ graph LR
 
     A1 -.-|"Protocol A<br/>(非同期)"| B1
     A2 -.-|"Protocol A<br/>(非同期)"| B1
+    A3 -.-|"Protocol A<br/>(非同期)"| B1
 
     style RegionA fill:#e8f5e9,stroke:#4caf50
     style RegionB fill:#fff3e0,stroke:#ff9800
     style A1 fill:#4caf50,color:#fff
     style A2 fill:#4caf50,color:#fff
+    style A3 fill:#4caf50,color:#fff
     style B1 fill:#ff9800,color:#fff
 ```
 
@@ -133,7 +137,7 @@ graph LR
 
 ### 必要環境
 
-- 4 ノード LINSTOR クラスタ (2 リージョン × 2 ノード)
+- 6 ノード LINSTOR クラスタ (2 リージョン × 3 ノード)
 - `config/linstor.yml` に regions 定義済み
 - マルチリージョンスクリプト群が利用可能:
   - `scripts/linstor-multiregion-setup.sh`
@@ -160,6 +164,8 @@ ssh root@<CONTROLLER_IP> "linstor node list"
 | ayase-web-service-5   | SATELLITE  | 10.10.10.205(PLAIN)   |
 | ayase-web-service-6   | SATELLITE  | 10.10.10.206(PLAIN)   |
 | ayase-web-service-7   | SATELLITE  | 10.10.10.207(PLAIN)   |
+| ayase-web-service-8   | SATELLITE  | 10.10.10.208(PLAIN)   |
+| ayase-web-service-9   | SATELLITE  | 10.10.10.209(PLAIN)   |
 +------------------------------------------------------------+
 ```
 
@@ -194,10 +200,16 @@ cross-region パス作成 (PrefNic=ib0 環境の場合):
 
 ```sh
 # Region A ↔ Region B の全ノードペアにパスを作成
+# Region A (3ノード) × Region B (3ノード) = 9ペア
 ssh root@<CONTROLLER_IP> "linstor node-connection path create <NODE_A1> <NODE_B1> cross-region default default"
 ssh root@<CONTROLLER_IP> "linstor node-connection path create <NODE_A1> <NODE_B2> cross-region default default"
+ssh root@<CONTROLLER_IP> "linstor node-connection path create <NODE_A1> <NODE_B3> cross-region default default"
 ssh root@<CONTROLLER_IP> "linstor node-connection path create <NODE_A2> <NODE_B1> cross-region default default"
 ssh root@<CONTROLLER_IP> "linstor node-connection path create <NODE_A2> <NODE_B2> cross-region default default"
+ssh root@<CONTROLLER_IP> "linstor node-connection path create <NODE_A2> <NODE_B3> cross-region default default"
+ssh root@<CONTROLLER_IP> "linstor node-connection path create <NODE_A3> <NODE_B1> cross-region default default"
+ssh root@<CONTROLLER_IP> "linstor node-connection path create <NODE_A3> <NODE_B2> cross-region default default"
+ssh root@<CONTROLLER_IP> "linstor node-connection path create <NODE_A3> <NODE_B3> cross-region default default"
 ```
 
 DR レプリカ追加:
@@ -413,11 +425,11 @@ ssh root@<CONTROLLER_IP> "linstor resource list -r <RESOURCE>"
 
 期待出力例:
 ```
-[0s/600s] ayase-web-service-4:UpToDate ayase-web-service-5:SyncTarget ayase-web-service-6:UpToDate ayase-web-service-7:UpToDate
-[10s/600s] ayase-web-service-4:UpToDate ayase-web-service-5:SyncTarget ayase-web-service-6:UpToDate ayase-web-service-7:UpToDate
+[0s/600s] ayase-web-service-4:UpToDate ayase-web-service-5:SyncTarget ayase-web-service-6:UpToDate ayase-web-service-7:UpToDate ayase-web-service-8:UpToDate ayase-web-service-9:UpToDate
+[10s/600s] ayase-web-service-4:UpToDate ayase-web-service-5:SyncTarget ayase-web-service-6:UpToDate ayase-web-service-7:UpToDate ayase-web-service-8:UpToDate ayase-web-service-9:UpToDate
 ...
-[150s/600s] ayase-web-service-4:UpToDate ayase-web-service-5:UpToDate ayase-web-service-6:UpToDate ayase-web-service-7:UpToDate
-All 4 replicas UpToDate.
+[150s/600s] ayase-web-service-4:UpToDate ayase-web-service-5:UpToDate ayase-web-service-6:UpToDate ayase-web-service-7:UpToDate ayase-web-service-8:UpToDate ayase-web-service-9:UpToDate
+All 6 replicas UpToDate.
 ```
 
 #### Step 3: VM 設定をキャプチャ
@@ -584,9 +596,12 @@ ssh root@<CONTROLLER_IP> "linstor resource list"
    ssh root@<CONTROLLER_IP> "linstor node set-property <NODE> DrbdOptions/AutoEvictAllowEviction false"
    ```
 
-4. **LvcreateOptions 設定**:
+4. **LvcreateOptions 設定** (ダッシュ引数が承認プロンプトに引っかかるため scp + ssh パターン):
    ```sh
-   ssh root@<CONTROLLER_IP> "linstor storage-pool set-property <NODE> striped-pool StorDriver/LvcreateOptions -- '-i4 -I64'"
+   # tmp/<session-id>/lvcreate-opts.sh に以下を Write:
+   #   linstor storage-pool set-property <NODE> striped-pool StorDriver/LvcreateOptions -- '-i4 -I64'
+   scp -F ssh/config tmp/<session-id>/lvcreate-opts.sh root@<CONTROLLER_IP>:/tmp/lvcreate-opts.sh
+   ssh root@<CONTROLLER_IP> sh /tmp/lvcreate-opts.sh
    ```
 
 5. **cross-region パス作成** (create-delete-recreate パターン):
@@ -743,6 +758,8 @@ graph TD
 | **平均** | **54ms** | **735 MiB** | **15秒** |
 
 環境: VM 200 (4GiB RAM, 32GiB disk, kvm64), SATA HDD, 1GbE
+
+**注記**: 旧リージョン構成 (Region B: 6+7号機) 時の実測値。
 
 ### DRBD 同期
 

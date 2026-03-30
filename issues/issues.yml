@@ -324,11 +324,11 @@ issues:
     description: ""
   - id: 30
     title: 3ノード LINSTOR クラスタ構築・ベンチマーク・離脱テスト
-    status: blocked
-    owner: "b38b3c37"
+    status: done
+    owner: "18c7ddd0"
     created: "2026-03-01T12:36:01Z"
-    updated: "2026-03-01T16:19:46Z"
-    blocked_by: "6号機 CWDM4 光モジュールが SX6036 の電力制限 (2W/port) を超過。DAC ケーブル交換が必要"
+    updated: "2026-03-19T09:27:50Z"
+    blocked_by: ""
     report: "report/2026-03-02_011809_3node_linstor_cluster_attempt.md"
     labels:
       - infra

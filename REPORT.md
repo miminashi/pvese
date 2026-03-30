@@ -12,12 +12,32 @@
 - 実験の再現方法（手順・コマンド等）を記載する
 - 実験に際して参照した過去のレポートがある場合は、そのレポートへのリンクを記載する
 - 実験レポートにはサーバ構成・ストレージ構成等の環境情報を記載する
+- レポートに添付ファイル（プランファイル、ログ、スクリーンショット等）がある場合は `report/attachment/<レポートファイル名>/` ディレクトリに格納し、レポート本文から相対パスでリンクすること
+  - `<レポートファイル名>` は `.md` を除いたファイル名（例: `2026-02-21_143052_ceph_cluster_setup`）
+  - リンク例: `[実装プラン](attachment/2026-02-21_143052_ceph_cluster_setup/plan.md)`
+- **プランファイルの添付（必須）**: プランモードで作業を行った場合、レポート作成時に必ず以下の手順でプランファイルを添付すること:
+  1. 添付ディレクトリを作成: `mkdir -p report/attachment/<レポートファイル名>/`
+  2. プランファイルをコピー: `cp /home/ubuntu/.claude/plans/<plan-name>.md report/attachment/<レポートファイル名>/plan.md`
+     - `<plan-name>` はプランモード開始時に指定されたファイル名（例: `groovy-humming-candy`）
+  3. レポート本文に `## 添付ファイル` セクションを設け、リンクを記載:
+     ```markdown
+     ## 添付ファイル
+
+     - [実装プラン](attachment/<レポートファイル名>/plan.md)
+     ```
+
+### Discord 通知
+
+レポート作成時（Write ツールで `report/` 直下に `.md` を書き込んだ時）、PostToolUse hook により Discord webhook で自動通知される。Webhook URL は `.env` の `DISCORD_WEBHOOK_URL` で設定する。
 
 ### 例
 
 ```
 report/
   2026-02-21_143052_ceph_cluster_setup.md
+  attachment/
+    2026-02-21_143052_ceph_cluster_setup/
+      plan.md
 ```
 
 ファイル内の例:
@@ -25,6 +45,10 @@ report/
 # Ceph クラスタ構築レポート
 
 - **実施日時**: 2026年2月21日 14:30
+
+## 添付ファイル
+
+- [実装プラン](attachment/2026-02-21_143052_ceph_cluster_setup/plan.md)
 
 ## 前提・目的
 

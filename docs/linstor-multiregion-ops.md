@@ -8,9 +8,9 @@
 Region A                              Region B
 ┌───────────────────────┐             ┌───────────────────────┐
 │ PVE Cluster           │             │ PVE Cluster           │
-│ ┌─────────┐ ┌───────┐ │ Protocol A  │ ┌───────┐ ┌─────────┐ │
-│ │ Node A1 │─│Node A2│─│─────────────│─│Node B1│─│ Node B2 │ │
-│ └─────────┘ └───────┘ │  (async)    │ └───────┘ └─────────┘ │
+│ ┌────┐┌────┐┌────┐ │ Protocol A  │ ┌────┐┌────┐┌────┐ │
+│ │ A1 ││ A2 ││ A3 │─│─────────────│─│ B1 ││ B2 ││ B3 │ │
+│ └────┘└────┘└────┘ │  (async)    │ └────┘└────┘└────┘ │
 │   Protocol C (sync)   │  no 2pri    │   Protocol C (sync)   │
 │   allow-2pri: yes     │             │   allow-2pri: yes     │
 │   Aux/site=region-a   │             │   Aux/site=region-b   │
@@ -206,6 +206,7 @@ qm migrate <vmid> <target-node> --online
 - テスト環境: VM 200 (4GiB RAM, 32GiB DRBD disk, kvm64 CPU)
 - ダウンタイムは方向・VM のメモリ dirty pages により変動。平均値は同等レンジ
 - 転送量は 349-911 MiB の範囲で変動
+- **注記**: 上記は旧リージョン構成 (Region B: 6+7号機) 時の実測値
 
 ## 5. リージョン間フェイルオーバー
 
@@ -412,8 +413,8 @@ drbdsetup status --statistics | grep -E '(out-of-sync|send)'
 
 ### 7.5 C2: PrefNic=ib0 と cross-region パス
 
-Region A (4+5号機) は PrefNic=ib0 が設定されており、DRBD はデフォルトで IB アドレス (192.168.100.x) にバインドする。
-Region B (6+7号機) は IB を持たないため、cross-region 接続は到達不能になる。
+Region A (4+5+6号機) は PrefNic=ib0 が設定されており、DRBD はデフォルトで IB アドレス (192.168.100.x) にバインドする。
+Region B (7+8+9号機) も IB を持つが、cross-region 接続はデフォルトインターフェース経由で行う。
 
 **解決策**: `node-connection path create` で cross-region ペアに `default` インターフェースを指定:
 ```sh
@@ -695,6 +696,8 @@ linstor resource-connection drbd-peer-options <nodeA> <nodeB> <resource> --c-max
 | 7→6 | 2回目 | 74ms | 844 MiB | 15秒 |
 
 環境: VM 200 (4GiB RAM, 32GiB DRBD disk, kvm64 CPU), 1GbE
+
+**注記**: 旧リージョン構成 (Region B: 6+7号機) 時の実測値。
 
 ### 12.2 DRBD 同期時間
 

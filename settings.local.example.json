@@ -146,14 +146,13 @@
       "Bash(.venv/bin/python:*)",
       "Bash(bash:*)",
       "Bash(sudo apt:*)",
-      "Bash(/home/ubuntu/projects/pvese/.venv/bin/python:*)",
+      "Bash(jq:*)",
       "Bash(./scripts/idrac-virtualmedia.sh status:*)",
       "Bash(./scripts/idrac-virtualmedia.sh verify:*)",
       "Bash(.venv/bin/pip list:*)",
-      "Bash(/home/ubuntu/projects/pvese/.venv/bin/pip list:*)",
       "Bash(./scripts/bmc-power.sh on:*)",
       "Bash(./scripts/bmc-power.sh forceoff:*)",
-      "Bash(./scripts/syslog-receiver.sh 5514:*)",
+      "Bash(./scripts/syslog-receiver.sh:*)",
       "Bash(.venv/bin/python3:*)",
       "Bash(apt-cache search:*)",
       "Bash(vncsnapshot:*)",
@@ -163,7 +162,27 @@
       "Bash(./scripts/idrac-virtualmedia.sh umount:*)",
       "Bash(./scripts/idrac-virtualmedia.sh mount:*)",
       "Bash(./scripts/linstor-multiregion-setup.sh setup:*)",
-      "Write(.claude/skills/**)"
+      "Write(.claude/skills/**)",
+      "Bash(./scripts/linstor-drbd-sync-wait.sh:*)",
+      "Bash(./scripts/idrac-virtualmedia.sh boot-once:*)",
+      "Bash(./scripts/ssh-wait.sh:*)",
+      "Write(.claude/settings.local.json)",
+      "Bash(./scripts/bmc-power.sh reset:*)",
+      "Bash(./scripts/bmc-power.sh boot-override:*)",
+      "Bash(./scripts/bmc-power.sh cycle:*)"
+    ]
+  },
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "./scripts/discord-notify-report.sh"
+          }
+        ]
+      }
     ]
   }
 }
