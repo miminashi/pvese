@@ -1,0 +1,29 @@
+ARC Summary after IPoIB benchmark (server 7)
+==============================================
+Captured: 2026-03-30 05:09 JST
+
+ARC status:
+  Max target size: 4.0 GiB (zfs_arc_max set to 64 MiB but ARC grew beyond)
+  Current size: 4.0 GiB
+
+ARC hit rates:
+  Total hits: 79.5% (79.8M hits)
+  Total I/O hits: 6.5% (6.6M)
+  Total misses: 14.0% (14.1M)
+
+  Demand data hits: 81.1% (26.1M)
+  Demand data I/O hits: 17.1% (5.5M)
+  Demand data misses: 1.8% (595.0k)
+
+  Demand metadata hits: 99.7% (50.3M)
+  Demand metadata misses: <0.1% (10.5k)
+
+  Prefetch data hits: 19.2% (3.4M)
+  Prefetch data misses: 75.5% (13.5M)
+
+Notes:
+- zfs_arc_max was set to 67108864 (64 MiB) but ARC grew to 4.0 GiB
+- ZFS on Linux enforces a minimum ARC size (~1.5 GiB on this system)
+- The 64 GiB test file is 16x larger than ARC, so ARC caching is minimal
+- Demand data hit rate of 81.1% reflects metadata + recently accessed blocks only
+- Prefetch data miss rate of 75.5% confirms sequential I/O mostly misses ARC
