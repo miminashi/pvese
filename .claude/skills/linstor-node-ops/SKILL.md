@@ -1,7 +1,7 @@
 ---
 name: linstor-node-ops
 description: "LINSTOR/DRBD ノードの離脱・復帰操作。障害シミュレーション、回復、正常離脱、再参加を行う。"
-argument-hint: "<subcommand: fail|recover|depart|rejoin> <node: server4|server5|server6|server7>"
+argument-hint: "<subcommand: fail|recover|depart|rejoin> <node: server4|server5|server6|server7|server8|server9>"
 ---
 
 # LINSTOR ノード操作スキル
@@ -22,7 +22,7 @@ LINSTOR/DRBD クラスタのノード離脱・復帰操作を行う。
 | ノード | BMC タイプ | 電源操作 |
 |--------|----------|---------|
 | server4, server5, server6 | Supermicro IPMI | `ipmitool -I lanplus -H $BMC_IP -U claude -P Claude123 chassis power ...` |
-| server7 | iDRAC7 | `ipmitool -I lanplus -H $BMC_IP -U claude -P Claude123 chassis power ...` (IPMI over LAN) |
+| server7, server8, server9 | iDRAC7 | `ipmitool -I lanplus -H $BMC_IP -U claude -P Claude123 chassis power ...` (IPMI over LAN) |
 
 ## 設定値の読み取り
 
@@ -53,7 +53,9 @@ PLACE_COUNT=$("$YQ" '.place_count' "$CONFIG")
 全ノードの BMC IP は各サーバの設定ファイルから取得する:
 ```sh
 BMC_IP=$(./bin/yq '.bmc_ip' config/server5.yml)  # → 10.10.10.25
-BMC_IP=$(./bin/yq '.bmc_ip' config/server7.yml)  # → 10.10.10.120 (iDRAC)
+BMC_IP=$(./bin/yq '.bmc_ip' config/server7.yml)  # → 10.10.10.27 (iDRAC)
+BMC_IP=$(./bin/yq '.bmc_ip' config/server8.yml)  # → 10.10.10.28 (iDRAC)
+BMC_IP=$(./bin/yq '.bmc_ip' config/server9.yml)  # → 10.10.10.29 (iDRAC)
 ```
 
 ## 既知の失敗と対策
@@ -67,7 +69,7 @@ BMC_IP=$(./bin/yq '.bmc_ip' config/server7.yml)  # → 10.10.10.120 (iDRAC)
 | N5 | stale DRBD メタデータ残存 | rejoin | `/etc/drbd.d/linstor-resources.res` が残る | LINSTOR が自動管理するため手動削除不要 |
 | N6 | minIoSize 不一致で rejoin 失敗 | rejoin | `incompatible minimum I/O size` エラー | VG 作成時に 512B PV を先頭に配置 |
 | N7 | IPoIB インターフェースがリブート後に DOWN 状態 | recover | `ip link show <ib_iface>` で DOWN | 手動で `ip link set up` + `ip addr add` |
-| N8 | SSH ホスト鍵がノードリブート後に変化 | recover | `REMOTE HOST IDENTIFICATION HAS CHANGED` | `ssh-keygen -R <target_ip>` + `StrictHostKeyChecking=no` |
+| N8 | SSH ホスト鍵がノードリブート後に変化 | recover | `REMOTE HOST IDENTIFICATION HAS CHANGED` | `ssh-keygen -R <target_ip> -f ssh/known_hosts` + `StrictHostKeyChecking=no` |
 | N9 | DRBD 9 status に `/proc/drbd` (DRBD 8形式) を使用 | recover | 空出力またはタイムアウト | `drbdsetup status` または `drbdadm status` を使用 |
 | N10 | node remove/re-add 後に cross-region パスが stale | rejoin | `Network interface 'default' does not exist` | パスを delete + recreate (詳細は linstor-migration スキル C3) |
 
@@ -144,22 +146,29 @@ linstor resource-group set-property $RG_NAME Linstor/Drbd/auto-block-size 512
 
 ### N7: IPoIB リブート後 DOWN
 
-IPoIB は `/etc/network/interfaces` に設定がない場合、リブート後に DOWN のまま。
-recover 後に IB を使うリージョン (Region A: 4+5号機) では手動復旧が必要:
+IPoIB は永続設定がない場合、リブート後に DOWN のまま（`ib_ipoib` モジュール未ロード）。
+`ib-setup-remote.sh --persist` で設定と永続化を一括実行する:
 
 ```sh
-# IB インターフェース名を確認 (例: ibp134s0)
-ssh root@$TARGET_IP "ip link show type ipoib"
-# 手動起動
-ssh root@$TARGET_IP "ip link set ibp134s0 up"
-ssh root@$TARGET_IP "ip addr add $TARGET_IB_IP/24 dev ibp134s0"
+# スクリプトを転送して実行 (connected mode, MTU 65520 推奨)
+scp -F ssh/config scripts/ib-setup-remote.sh pve$N:/tmp/ib-setup-remote.sh
+ssh -F ssh/config pve$N "sh /tmp/ib-setup-remote.sh --ip $TARGET_IB_IP/24 --mode connected --mtu 65520 --persist"
 ```
 
-永続化するには `/etc/network/interfaces` に以下を追記 (`config/linstor.yml` の `ib_ip` を参照):
+IB IP は `config/linstor.yml` の `ib_ip` を参照:
+- Region A (4+5+6号機): 192.168.100.{1,2,3}/24, インターフェース ibp134s0
+- Region B (7+8+9号機): 192.168.101.{7,8,9}/24, インターフェース ibp10s0
+
+> **注**: 初回 `modprobe ib_ipoib` 時に udev リネームのタイミングで `ib0` として検出されることがある。失敗した場合は再実行すれば `ibp*` 名で検出される。
+
+永続設定は `/etc/network/interfaces.d/ib0` に書き込まれる:
 ```
-auto ibp134s0
-iface ibp134s0 inet static
+auto ibp10s0
+iface ibp10s0 inet static
     address <IB_IP>/24
+    mtu 65520
+    pre-up modprobe ib_ipoib
+    pre-up echo connected > /sys/class/net/ibp10s0/mode || true
 ```
 
 ### N8: SSH ホスト鍵変更
@@ -167,7 +176,7 @@ iface ibp134s0 inet static
 PVE ノードのリブートでは通常ホスト鍵は変わらない。
 ただし OS 再インストールや初回接続時はホスト鍵が変わるため:
 ```sh
-ssh-keygen -R $TARGET_IP
+ssh-keygen -R $TARGET_IP -f ssh/known_hosts
 ssh -o StrictHostKeyChecking=no root@$TARGET_IP hostname
 ```
 
@@ -237,7 +246,7 @@ IPMI 電源断で対象ノードの障害をシミュレーションする。
 
 2. SSH 復帰待機 (★ N8: ホスト鍵クリア + 30秒間隔ポーリング、最大5分):
    ```sh
-   ssh-keygen -R $TARGET_IP
+   ssh-keygen -R $TARGET_IP -f ssh/known_hosts
    ssh -o StrictHostKeyChecking=no -o ConnectTimeout=5 root@$TARGET_IP hostname
    ```
 
@@ -247,13 +256,14 @@ IPMI 電源断で対象ノードの障害をシミュレーションする。
    # peer-disk:Inconsistent → peer-disk:UpToDate を待機
    ```
 
-4. IPoIB 復旧確認 (★ N7: Region A のノードのみ):
+4. IPoIB 復旧確認 (★ N7: 全ノード IB 搭載):
    ```sh
    # IB インターフェースが UP か確認
    ssh root@$TARGET_IP "ip link show type ipoib"
-   # DOWN の場合は手動起動
-   ssh root@$TARGET_IP "ip link set ibp134s0 up"
-   ssh root@$TARGET_IP "ip addr add $TARGET_IB_IP/24 dev ibp134s0"
+   # DOWN の場合は手動起動 (インターフェース名はリージョンにより異なる)
+   # Region A: ibp134s0, Region B: ibp10s0
+   ssh root@$TARGET_IP "ip link set $IB_IFACE up"
+   ssh root@$TARGET_IP "ip addr add $TARGET_IB_IP/24 dev $IB_IFACE"
    ```
 
 5. 完了確認:
@@ -371,14 +381,20 @@ IPMI 電源断で対象ノードの障害をシミュレーションする。
 
 3. **IB インターフェース + PrefNic 設定**:
    ```sh
-   ./pve-lock.sh run ./oplog.sh ssh root@$CONTROLLER_IP "linstor node interface create $TARGET_NODE ib0 $TARGET_IB_IP"
-   ./pve-lock.sh run ./oplog.sh ssh root@$CONTROLLER_IP "linstor node set-property $TARGET_NODE PrefNic ib0"
+   # IB_IFACE は OS のデバイス名を使う (`ip link show type ipoib` で確認)
+   # Region A (4+5+6号機): ibp134s0, Region B (7+8+9号機): ibp10s0
+   ./pve-lock.sh run ./oplog.sh ssh root@$CONTROLLER_IP "linstor node interface create $TARGET_NODE $IB_IFACE $TARGET_IB_IP"
+   ./pve-lock.sh run ./oplog.sh ssh root@$CONTROLLER_IP "linstor node set-property $TARGET_NODE PrefNic $IB_IFACE"
    ```
 
 4. **ストレージプール作成 + ストライプオプション**:
    ```sh
    ./pve-lock.sh run ./oplog.sh ssh root@$CONTROLLER_IP "linstor storage-pool create lvm $TARGET_NODE striped-pool $VG_NAME"
-   ./pve-lock.sh run ./oplog.sh ssh root@$CONTROLLER_IP "linstor storage-pool set-property $TARGET_NODE striped-pool StorDriver/LvcreateOptions -- '-i4 -I64'"
+   # LvcreateOptions: ダッシュ引数が承認プロンプトに引っかかるため scp + ssh パターンで実行
+   # tmp/<session-id>/lvcreate-opts.sh に以下を Write:
+   #   linstor storage-pool set-property $TARGET_NODE striped-pool StorDriver/LvcreateOptions -- '-i4 -I64'
+   scp -F ssh/config tmp/<session-id>/lvcreate-opts.sh root@$CONTROLLER_IP:/tmp/lvcreate-opts.sh
+   ./pve-lock.sh run ./oplog.sh ssh root@$CONTROLLER_IP sh /tmp/lvcreate-opts.sh
    ```
 
 5. **Auto-eviction 無効化** (★ N1 対策):

@@ -118,6 +118,51 @@ ipmitool -I lanplus -H $BMC_IP -U claude -P Claude123 mc reset cold
 - IPMI LAN は FW アップグレード作業中に有効化済み (`cfgIpmiLanEnable=1`)
 - `mc reset cold`: スタックした FW アップデートの回復に使用
 
+## RAID 管理 (racadm raid)
+
+PERC H710 Mini の RAID 構成を racadm 経由で管理する。PERC H710 は RealtimeConfigurationCapability = Incapable のため、**全ての設定変更にジョブ作成 + 再起動が必要**。
+
+### 状態確認 (読み取り専用)
+
+```sh
+ssh -F ssh/config idrac8 racadm raid get vdisks -o -p Layout,Size,Name,State
+ssh -F ssh/config idrac8 racadm raid get pdisks -o -p Size,State,MediaType
+ssh -F ssh/config idrac8 racadm raid get controllers -o
+```
+
+### VD 作成
+
+```sh
+# 1. createvd (受理のみ)
+ssh -F ssh/config idrac8 racadm raid createvd:RAID.Integrated.1-1 -rl r0 \
+    -pdkey:Disk.Bay.6:Enclosure.Internal.0-1:RAID.Integrated.1-1
+
+# 2. ジョブ作成 + 再起動
+ssh -F ssh/config idrac8 racadm jobqueue create RAID.Integrated.1-1 -s TIME_NOW -r pwrcycle
+
+# 3. 待機後にジョブ結果確認
+ssh -F ssh/config idrac8 racadm jobqueue view -i JID_xxxxx
+```
+
+RAID レベル: `-rl r0` (RAID-0), `-rl r1` (RAID-1), `-rl r5` (RAID-5), `-rl r6` (RAID-6), `-rl r10` (RAID-10)
+
+### VD 削除
+
+```sh
+ssh -F ssh/config idrac8 racadm raid deletevd:Disk.Virtual.4:RAID.Integrated.1-1
+ssh -F ssh/config idrac8 racadm jobqueue create RAID.Integrated.1-1 -s TIME_NOW -r pwrcycle
+```
+
+### STOR023 エラー
+
+`jobqueue delete --all` でジョブを削除しても pending 設定が "committed" 状態で残り、次の RAID 操作が `STOR023: Configuration already committed` で拒否されることがある。
+
+**解決**: `racadm serveraction powercycle` で再起動すると pending 設定がクリアされる。
+
+### 詳細
+
+VD 作成・削除の詳細手順は [perc-raid スキル](../perc-raid/SKILL.md) を参照。
+
 ## ブート制御
 
 ### 概要

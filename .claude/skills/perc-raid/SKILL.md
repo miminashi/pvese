@@ -233,15 +233,85 @@ Escape → "Are you sure you want to exit?" → OK (Enter)
 
 ## 8号機の物理ディスク構成
 
-| Bay | Disk ID | Size | Vendor | 用途 |
-|-----|---------|------|--------|------|
-| 0 | 00:01:00 | 558.37 GB | HP | VD0 (system, RAID-1) |
-| 1 | 00:01:01 | 558.37 GB | HGST | VD0 (system, RAID-1) |
-| 2 | 00:01:02 | 837.75 GB | HITACHI | Unconfigured |
-| 3 | 00:01:03 | 837.75 GB | NETAPP | Blocked |
-| 4 | 00:01:04 | 837.75 GB | SEAGATE | Unconfigured |
-| 5 | 00:01:05 | 837.75 GB | HITACHI | Unconfigured |
-| 6 | 00:01:06 | 837.75 GB | SEAGATE | Unconfigured |
+| Bay | Disk ID | Size | Vendor / Model | 用途 |
+|-----|---------|------|----------------|------|
+| 0 | 00:01:00 | 558.37 GB | HP EG0600JETKA | VD0 (system, RAID-1) |
+| 1 | 00:01:01 | 558.37 GB | HGST HUC101860CSS204 | VD0 (system, RAID-1) |
+| 2 | 00:01:02 | 837.75 GB | HITACHI HUC109090CSS600 | VD1 (RAID-0) |
+| 3 | 00:01:03 | 837.75 GB | NETAPP X423 TAL13900A10 | **Blocked (使用不可)** |
+| 4 | 00:01:04 | 837.75 GB | SEAGATE ST900MM0168 | VD2 (RAID-0) |
+| 5 | 00:01:05 | 837.75 GB | HITACHI HUC109090CSS600 | VD3 (RAID-0) |
+| 6 | 00:01:06 | 837.75 GB | SEAGATE ST900MM0168 | VD4 (RAID-0) |
+
+**Bay 3 注意**: NETAPP X423 TAL13900A10 は PERC H710 と互換性がなく、Blocked 状態から変更不可。racadm createvd は受理されるがジョブ実行時に PR21 で失敗する。Instant Secure Erase もグレーアウトで使用不可。別のコントローラに接続してフォーマットするか、ディスクを交換する必要がある。
+
+## racadm 経由の VD 作成 (推奨)
+
+VNC PERC BIOS 操作よりも **racadm コマンドラインの方が確実**。ただし PERC H710 は RealtimeConfigurationCapability = Incapable のため、設定適用に再起動が必要。
+
+### VD 作成手順
+
+```sh
+# 1. VD 作成コマンド (受理のみ、まだ適用されない)
+ssh -F ssh/config idrac8 racadm raid createvd:RAID.Integrated.1-1 -rl r0 \
+    -pdkey:Disk.Bay.6:Enclosure.Internal.0-1:RAID.Integrated.1-1
+
+# 2. ジョブ作成 + 再起動で適用
+ssh -F ssh/config idrac8 racadm jobqueue create RAID.Integrated.1-1 -s TIME_NOW -r pwrcycle
+
+# 3. 3-5分待機 (LC 初期化 + ジョブ実行)
+sleep 300
+
+# 4. ジョブ結果確認
+ssh -F ssh/config idrac8 racadm jobqueue view -i JID_xxxxx
+# Status=Completed なら成功、Status=Failed なら失敗
+
+# 5. VD 状態確認
+ssh -F ssh/config idrac8 racadm raid get vdisks -o -p Layout,Size,Name,State
+```
+
+複数の `createvd` を続けて実行し、1回の `jobqueue create` + 再起動でまとめて適用できる。
+
+### VD 削除
+
+```sh
+ssh -F ssh/config idrac8 racadm raid deletevd:Disk.Virtual.4:RAID.Integrated.1-1
+ssh -F ssh/config idrac8 racadm jobqueue create RAID.Integrated.1-1 -s TIME_NOW -r pwrcycle
+```
+
+### STOR023 エラー (committed config が残る問題)
+
+`racadm jobqueue delete --all` でジョブを削除しても、pending 設定が "committed" 状態で残り、次の `createvd` が `STOR023: Configuration already committed` エラーになることがある。
+
+**解決方法**: `racadm serveraction powercycle` で再起動すると pending 設定がクリアされ、新規 `createvd` が可能になる。
+
+## PD Mgmt タブの F2 メニュー
+
+PD Mgmt タブで物理ディスクを選択して F2 を押すと操作メニューが開く。**メニュー項目はディスクの State によって異なる**。グレーアウト項目は ArrowDown でスキップされる。
+
+### Online ディスク (VD 所属)
+
+| ArrowDown | 項目 |
+|-----------|------|
+| 初期 | Rebuild → |
+| Down 1 | Replace Member → |
+| Down 2 | Force Online |
+| Down 3 | Force Offline |
+
+### Blocked ディスク
+
+| ArrowDown | 項目 | 備考 |
+|-----------|------|------|
+| 初期 | Rebuild → | |
+| Down 1 | Replace Member → | |
+| Down 2 | Force Online | |
+| Down 3 | Force Offline | ここで止まる |
+| — | LED Blinking | **グレーアウト** |
+| — | Make Global HS | **グレーアウト** |
+| — | Remove Hot Spare | **グレーアウト** |
+| — | Instant Secure Erase | **グレーアウト** |
+
+**注意**: Blocked ディスクでは Instant Secure Erase が使用不可。ローレベルフォーマットは別のコントローラに接続して行う必要がある。
 
 ## 既知の制約
 
@@ -313,7 +383,20 @@ ArrowUp/Down はツリーの先頭/末尾で**循環する**（ラップ）。
 
 ### PD の Blocked 状態
 
-Bay 3 (00:01:03) は "Blocked" 状態で Create VD の PD リストに表示されない。物理的な問題または Foreign Config の可能性。
+Bay 3 (00:01:03, NETAPP X423 TAL13900A10) は "Blocked" 状態。PERC H710 との互換性問題でありForeign Config ではない (ForeignKeyIdentifier = null)。
+
+- Create VD の PD リストに表示されない
+- racadm createvd は受理されるがジョブ実行時に PR21 (Job failed) で失敗
+- racadm converttoraid → STOR013 エラー
+- racadm converttononraid → STOR058 (非サポート)
+- PERC BIOS PD Mgmt の Instant Secure Erase → グレーアウト (使用不可)
+- **対処**: 別のコントローラに接続してフォーマットするか、ディスクを交換する
+
+### VNC Create VD フォームの PD 選択
+
+VNC の個別接続 (`idrac-kvm-interact.py`) で Create VD フォームを操作すると、ArrowDown → Space での PD 選択が不安定になる場合がある（接続間でフォーカス位置が保持されない）。
+
+**推奨**: VD 作成は **racadm コマンドライン**を使用する。VNC PERC BIOS は状態確認やスクリーンショット取得に限定し、VD 作成・削除は racadm 経由で行うこと。
 
 ## 参照
 

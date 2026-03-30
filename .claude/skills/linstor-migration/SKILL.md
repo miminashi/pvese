@@ -35,9 +35,9 @@ CONTROLLER_IP=$("$YQ" '.controller_ip' "$CONFIG")
 ## トポロジー: 2+1 構成
 
 ```
-Region A (Protocol C)          Region B (Protocol C)
-  [Node 4] ←────────────→ [Node 6] ← Primary
-  (DR)     Protocol A      [Node 7]
+Region A (Protocol C)                Region B (Protocol C)
+  [Node 4] ←→ [Node 5] ←→ [Node 6]   [Node 7] ←→ [Node 8] ←→ [Node 9]
+  ←──── Protocol A (DR) ────→
 ```
 
 - リージョン内: 2レプリカ (Protocol C, allow-two-primaries=yes) → ライブマイグレーション可能
@@ -83,6 +83,8 @@ Region A (Protocol C)          Region B (Protocol C)
 |------|-------------------|-------------------|------|
 | 6号機 → 7号機 | 73ms / 911 MiB / 18秒 | 37ms / 834 MiB / 17秒 | 平均 55ms |
 | 7号機 → 6号機 | 33ms / 349 MiB / 11秒 | 74ms / 844 MiB / 15秒 | 平均 53.5ms |
+
+**注記**: 旧リージョン構成 (Region B: 6+7号機) 時の実測値。
 
 ## サブコマンド: cold-migrate
 
@@ -176,20 +178,16 @@ LINSTOR にリージョンを追加し、DR レプリカを設定する。
    sleep 10  # satellite 接続待ち
    ```
 
-2. ストレージプール作成:
+2. ストレージプール作成 (ZFS):
    ```sh
-   ssh root@$CONTROLLER_IP "linstor storage-pool create lvm $NODE striped-pool linstor_vg"
+   ssh root@$CONTROLLER_IP "linstor storage-pool create zfs $NODE zfs-pool linstor_zpool"
    ```
+   注: satellite 再起動直後は ZFS プロバイダが検出されないことがある。数秒待ってリトライ。
 
 3. リージョンプロパティ + auto-eviction 無効化:
    ```sh
    ssh root@$CONTROLLER_IP "linstor node set-property $NODE Aux/site $REGION"
    ssh root@$CONTROLLER_IP "linstor node set-property $NODE DrbdOptions/AutoEvictAllowEviction false"
-   ```
-
-4. LvcreateOptions 設定:
-   ```sh
-   ssh root@$CONTROLLER_IP "linstor storage-pool set-property $NODE striped-pool StorDriver/LvcreateOptions -- '-i4 -I64'"
    ```
 
 5. cross-region パス作成:
@@ -253,10 +251,13 @@ LINSTOR にリージョンを追加し、DR レプリカを設定する。
 | C7 | パス作成時の PeerClosingConnectionException | add-region | exit code 10 + エラー出力 | パスを delete + recreate (2回目の create で安定) |
 | C8 | ストライプ/非ストライプ間の LV サイズ不一致 | add-region, cold-migrate | `The peer's disk size is too small!` + StandAlone | リソース削除 → 手動 LV 作成 (正しい PE 数) → 再作成 |
 
-### C2: PrefNic=ib0 と cross-region パス
+### C2: PrefNic と cross-region パス
 
-Region A (4+5号機) は PrefNic=ib0 が設定されており、DRBD はデフォルトで IB アドレス (192.168.100.x) にバインドする。
-Region B (6+7号機) は IB を持たないため、cross-region 接続は到達不能になる。
+両リージョンとも PrefNic が IB インターフェースに設定済み (Region A: ibp134s0, Region B: ibp10s0)。
+DRBD はデフォルトで IB アドレス (192.168.100.x) にバインドする。
+cross-region 接続は IB ではなくデフォルトインターフェース (10.x Ethernet) 経由で行う。
+
+> **注**: LINSTOR に登録するインターフェース名は OS のデバイス名を使う (`ip link show type ipoib` で確認)。`ib0` ではない。
 
 **解決策**: `node-connection path create` で cross-region ペアに `default` インターフェースを指定:
 ```sh
@@ -297,25 +298,13 @@ ssh root@$CONTROLLER_IP "linstor node-connection path create nodeA nodeB cross-r
 
 ### C8: ストライプ/非ストライプ間の LV サイズ不一致
 
-ストライプ構成のノードから非ストライプ構成のノードにリソースを作成すると、LVM PE アライメントの違いにより LV サイズが数 MB 異なり、DRBD が接続を拒否して StandAlone 状態に入る。
+(注: 2026-03-30 に全ノード ZFS raidz1 に統一したため、LVM ストライプ/非ストライプ間のサイズ不一致問題は解消。ZFS 統一構成では `--storage-pool zfs-pool` を指定すれば正常にリソース作成可能。)
 
-```
-drbd pm-39c4600d: The peer's disk size is too small! (67110832 < 67127216 sectors)
-```
+### C9: ZFS zvol ライブリサイズの不安定性
 
-StandAlone に入ると `drbdadm adjust` では復旧不可。
+`qm resize` で DRBD 上の ZFS zvol をリサイズすると、一部ノードで DRBD adjust が失敗し Resizing 状態でスタックすることがある。
 
-**対策**:
-```sh
-# 1. リソースを削除
-linstor resource delete <node> <resource>
-# 2. ソースノードの PE 数を確認
-ssh root@<source_ip> "lvs --noheadings -o seg_pe_ranges linstor_vg/<resource>_00000"
-# 3. 正しい PE 数で LV を手動作成
-ssh root@<target_ip> "lvcreate -n <resource>_00000 -l <pe_count> linstor_vg"
-# 4. リソースを再作成 (既存 LV を検出して使用)
-linstor resource create <node> <resource>
-```
+**対策**: VM ディスクサイズは作成時に確定する。ライブリサイズが必要な場合は新しいディスクを追加してデータ移行する。
 
 ## oplog
 

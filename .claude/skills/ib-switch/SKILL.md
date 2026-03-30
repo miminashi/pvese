@@ -244,6 +244,55 @@ operator (>)  →  enable (#)  →  configure terminal ((config) #)
 - **QSFP+ トランシーバ電力制限**: SX6036 (SwitchX-2) はポートあたり最大 2W。CWDM4/LR4 等の高消費電力光モジュール (2.5-3.5W) は非対応。DAC ケーブルまたは Mellanox FDR AOC (<2W) を使用すること。スイッチ側で `Warning: High power transceiver is not supported` が表示されリンクが確立できない
 - **IB トランシーバ情報取得の制約**: MLNX-OS 3.6 の IB インターフェースでは `transceiver`, `module-info`, `pluggable`, `cables`, `running-config interface` サブコマンドが非対応。サーバ側の `ethtool -m` も IB インターフェースでは `Operation not supported`。トランシーバの詳細診断手段は限定的
 
+## IB パーティション / トラフィック分離
+
+### パーティションコマンドの対応状況
+
+MLNX-OS 3.6.8012 は `ib partition` コマンドを **部分的にサポート**:
+- `show ib partition` (enable mode) — **動作する**。Default パーティション (PKey 0x7FFF, ALL members) が表示される
+- `ib partition <name> pkey 0x<id>` (configure mode) — **動作する**。パーティション作成可能
+- `ib partition <name> ipoib` (configure mode) — **動作する**
+- `ib partition <name> member ALL type full` (configure mode) — **動作する**
+- `ib partition <name> member <GUID> type full` (configure mode) — **動作しない**。`% Invalid port GUID` エラー。`e41d:2d03:00b4:db21` / `e41d2d0300b4db21` / `0xe41d2d0300b4db21` いずれのフォーマットも不可
+
+**結論**: パーティション作成自体は可能だが、個別 GUID によるメンバー制限は MLNX-OS 3.6 では非サポート。`ALL` のみ指定可能なため、リージョン間のハードウェアレベル Pkey 分離は不可。
+
+### 採用手段: サブネット分離
+
+リージョンごとに異なる IPoIB サブネットを割り当てて IP レベルで分離:
+
+| リージョン | サブネット | ノード |
+|-----------|-----------|--------|
+| Region A | 192.168.100.0/24 | 4号機 (.1), 5号機 (.2), 6号機 (.3) |
+| Region B | 192.168.101.0/24 | 7号機 (.7), 8号機 (.8), 9号機 (.9) |
+
+- DRBD はリージョン内で IPoIB、リージョン間で Ethernet (10.x) を使用
+- 異なるサブネット間はルーティングなしのため IP レベルで到達不可
+- LINSTOR PrefNic は変更不要 (同じ物理インターフェース、IP のみ変更)
+- 検証済み: Region A↔B 間は ping 100% packet loss (2026-03-19)
+
+### ポートマップ
+
+| ポート | サーバ | 状態 |
+|--------|--------|------|
+| IB1/7  | 7号機 | Active 40 Gbps QDR |
+| IB1/9  | 9号機 | Active 40 Gbps QDR |
+| IB1/11 | 8号機 | Active 40 Gbps QDR |
+| IB1/19 | 6号機 | Active 40 Gbps QDR |
+| IB1/21 | 5号機 | Active 40 Gbps QDR |
+| IB1/23 | 4号機 | Active 40 Gbps QDR |
+
+### HCA GUID
+
+| サーバ | IB デバイス | Node GUID | Port GUID (port 1) |
+|--------|-----------|-----------|---------------------|
+| 4号機 | ibp134s0 | e41d:2d03:00b4:db20 | e41d:2d03:00b4:db21 |
+| 5号機 | ibp134s0 | e41d:2d03:007a:5c60 | e41d:2d03:007a:5c61 |
+| 6号機 | ibp134s0 (mlx4_0) | e41d:2d03:00b4:ded0 | e41d:2d03:00b4:ded1 |
+| 7号機 | ibp10s0 (mlx4_0) | ec0d:9a03:00e6:cc10 | ec0d:9a03:00e6:cc11 |
+| 8号機 | ibp10s0 (mlx4_0) | ec0d:9a03:00de:bb40 | ec0d:9a03:00de:bb41 |
+| 9号機 | ibp10s0 (mlx4_0) | f452:1403:006b:7530 | f452:1403:006b:7531 |
+
 ## 参照
 
 - [FW 更新レポート](../../../report/2026-02-26_011138_sx6036_firmware_update.md)

@@ -454,6 +454,8 @@ ssh-keygen -R <static_ip> -f ssh/known_hosts
 
 PVE のインストールを SSH 経由で実行。
 
+> **ネットワーク制約**: `10.0.0.0/8` はインターネット到達不可。preseed で設定された `default via 10.10.10.1` を削除し、`192.168.39.1` 経由に切り替えないと apt/wget が失敗する。
+
 #### ステップ 0: インターネット接続確保 (iDRAC / CD-only preseed の場合)
 
 preseed が CD-only (`apt-setup/use_mirror boolean false`) の場合:
@@ -580,9 +582,17 @@ ssh -F ssh/config root@<static_ip> reboot || true
    - ネットワーク: `ssh -F ssh/config root@<static_ip> ip -brief addr`
    - Web UI: `curl -sk https://<static_ip>:8006`
 
-5. 完了: `./scripts/os-setup-phase.sh mark cleanup --config "$CONFIG"`
+5. **IB セットアップ** (IB 搭載サーバのみ):
+   OS セットアップ完了後、IPoIB を設定して永続化する。IB IP は `config/linstor.yml` の `ib_ip` を参照。
+   ```sh
+   scp -F ssh/config scripts/ib-setup-remote.sh pve$N:/tmp/ib-setup-remote.sh
+   ssh -F ssh/config pve$N "sh /tmp/ib-setup-remote.sh --ip <IB_IP>/24 --mode connected --mtu 65520 --persist"
+   ```
+   初回実行時は udev リネーム前に検出され失敗することがある。再実行すれば解決する。
 
-6. **レポート作成**: `report/` ディレクトリに実行結果のレポートを作成
+6. 完了: `./scripts/os-setup-phase.sh mark cleanup --config "$CONFIG"`
+
+7. **レポート作成**: `report/` ディレクトリに実行結果のレポートを作成
    - `./scripts/os-setup-phase.sh times --config "$CONFIG"` の出力をレポートに転記
 
 ---
