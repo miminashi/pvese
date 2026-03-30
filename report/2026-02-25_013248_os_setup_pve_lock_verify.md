@@ -149,35 +149,35 @@ Run 1 で PVE 9.1.5 がインストールされたが、Run 2/3 では PVE 9.1.6
 
 | タイミング | ファイル |
 |-----------|---------|
-| Phase 4: VirtualMedia verify 後 | ![](../tmp/2c27638b/screenshots/run1-phase4-verify.png) |
-| Phase 5: インストール完了 | ![](../tmp/2c27638b/screenshots/run1-phase5-complete.png) |
-| Phase 6: ディスクブート後 | ![](../tmp/2c27638b/screenshots/run1-phase6-boot.png) |
-| Phase 6: SOL ログイン後 | ![](../tmp/2c27638b/screenshots/run1-phase6-login.png) |
-| Phase 7: PVE 稼働確認 | ![](../tmp/2c27638b/screenshots/run1-phase7-pve.png) |
-| Phase 8: 最終状態 | ![](../tmp/2c27638b/screenshots/run1-phase8-final.png) |
+| Phase 4: VirtualMedia verify 後 | ![](attachment/2026-02-25_013248_os_setup_pve_lock_verify/run1-phase4-verify.png) |
+| Phase 5: インストール完了 | ![](attachment/2026-02-25_013248_os_setup_pve_lock_verify/run1-phase5-complete.png) |
+| Phase 6: ディスクブート後 | ![](attachment/2026-02-25_013248_os_setup_pve_lock_verify/run1-phase6-boot.png) |
+| Phase 6: SOL ログイン後 | ![](attachment/2026-02-25_013248_os_setup_pve_lock_verify/run1-phase6-login.png) |
+| Phase 7: PVE 稼働確認 | ![](attachment/2026-02-25_013248_os_setup_pve_lock_verify/run1-phase7-pve.png) |
+| Phase 8: 最終状態 | ![](attachment/2026-02-25_013248_os_setup_pve_lock_verify/run1-phase8-final.png) |
 
 ### Run 2
 
 | タイミング | ファイル |
 |-----------|---------|
-| Phase 4: VirtualMedia verify 後 | ![](../tmp/2c27638b/screenshots/run2-phase4-verify.png) |
-| Phase 5: インストール完了 | ![](../tmp/2c27638b/screenshots/run2-phase5-complete.png) |
-| Phase 6: ディスクブート後 | ![](../tmp/2c27638b/screenshots/run2-phase6-boot.png) |
-| Phase 6: POST 92 リカバリ後 | ![](../tmp/2c27638b/screenshots/run2-phase6-post92.png) |
-| Phase 6: SOL ログイン後 | ![](../tmp/2c27638b/screenshots/run2-phase6-login.png) |
-| Phase 7: PVE 稼働確認 | ![](../tmp/2c27638b/screenshots/run2-phase7-pve.png) |
-| Phase 8: 最終状態 | ![](../tmp/2c27638b/screenshots/run2-phase8-final.png) |
+| Phase 4: VirtualMedia verify 後 | ![](attachment/2026-02-25_013248_os_setup_pve_lock_verify/run2-phase4-verify.png) |
+| Phase 5: インストール完了 | ![](attachment/2026-02-25_013248_os_setup_pve_lock_verify/run2-phase5-complete.png) |
+| Phase 6: ディスクブート後 | ![](attachment/2026-02-25_013248_os_setup_pve_lock_verify/run2-phase6-boot.png) |
+| Phase 6: POST 92 リカバリ後 | ![](attachment/2026-02-25_013248_os_setup_pve_lock_verify/run2-phase6-post92.png) |
+| Phase 6: SOL ログイン後 | ![](attachment/2026-02-25_013248_os_setup_pve_lock_verify/run2-phase6-login.png) |
+| Phase 7: PVE 稼働確認 | ![](attachment/2026-02-25_013248_os_setup_pve_lock_verify/run2-phase7-pve.png) |
+| Phase 8: 最終状態 | ![](attachment/2026-02-25_013248_os_setup_pve_lock_verify/run2-phase8-final.png) |
 
 ### Run 3
 
 | タイミング | ファイル |
 |-----------|---------|
-| Phase 4: VirtualMedia verify 後 | ![](../tmp/2c27638b/screenshots/run3-phase4-verify.png) |
-| Phase 5: インストール完了 | ![](../tmp/2c27638b/screenshots/run3-phase5-complete.png) |
-| Phase 6: ディスクブート後 | ![](../tmp/2c27638b/screenshots/run3-phase6-boot.png) |
-| Phase 6: SOL ログイン後 | ![](../tmp/2c27638b/screenshots/run3-phase6-login.png) |
-| Phase 7: PVE 稼働確認 | ![](../tmp/2c27638b/screenshots/run3-phase7-pve.png) |
-| Phase 8: 最終状態 | ![](../tmp/2c27638b/screenshots/run3-phase8-final.png) |
+| Phase 4: VirtualMedia verify 後 | ![](attachment/2026-02-25_013248_os_setup_pve_lock_verify/run3-phase4-verify.png) |
+| Phase 5: インストール完了 | ![](attachment/2026-02-25_013248_os_setup_pve_lock_verify/run3-phase5-complete.png) |
+| Phase 6: ディスクブート後 | ![](attachment/2026-02-25_013248_os_setup_pve_lock_verify/run3-phase6-boot.png) |
+| Phase 6: SOL ログイン後 | ![](attachment/2026-02-25_013248_os_setup_pve_lock_verify/run3-phase6-login.png) |
+| Phase 7: PVE 稼働確認 | ![](attachment/2026-02-25_013248_os_setup_pve_lock_verify/run3-phase7-pve.png) |
+| Phase 8: 最終状態 | ![](attachment/2026-02-25_013248_os_setup_pve_lock_verify/run3-phase8-final.png) |
 
 ## 最終検証サマリ (Run 3 最終状態)
 

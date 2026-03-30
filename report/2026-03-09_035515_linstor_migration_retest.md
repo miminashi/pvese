@@ -161,4 +161,4 @@ Region A (DR):
 
 ### 添付
 
-- [テスト計画書](attachments/2026-03-09_035515_linstor_migration_retest_plan.md)
+- [テスト計画書](attachment/2026-03-09_035515_linstor_migration_retest/plan.md)
