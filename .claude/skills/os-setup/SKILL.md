@@ -582,7 +582,21 @@ ssh -F ssh/config root@<static_ip> reboot || true
    - ネットワーク: `ssh -F ssh/config root@<static_ip> ip -brief addr`
    - Web UI: `curl -sk https://<static_ip>:8006`
 
-5. **IB セットアップ** (IB 搭載サーバのみ):
+5. **ブリッジ設定** (vmbr0/vmbr1):
+   PVE で VM を利用するにはブリッジが必要。config YAML から NIC 名・IP を読み取り設定する。
+   冪等: ブリッジが既に設定済みならスキップされる。
+   ```sh
+   STATIC_IFACE=$("$YQ" '.static_iface' "$CONFIG")
+   STATIC_IP=$("$YQ" '.static_ip' "$CONFIG")
+   STATIC_NETMASK=$("$YQ" '.static_netmask' "$CONFIG")
+   DHCP_IFACE=$("$YQ" '.dhcp_iface' "$CONFIG")
+   scp -F ssh/config scripts/pve-bridge-setup.sh root@<static_ip>:/tmp/
+   ssh -F ssh/config root@<static_ip> sh /tmp/pve-bridge-setup.sh \
+       --static-iface "$STATIC_IFACE" --static-ip "${STATIC_IP}/${STATIC_NETMASK}" --dhcp-iface "$DHCP_IFACE"
+   ```
+   検証: `ip -brief link show type bridge` で vmbr0/vmbr1 が UP、`ip -brief addr show vmbr0` で正しい IP。
+
+6. **IB セットアップ** (IB 搭載サーバのみ):
    OS セットアップ完了後、IPoIB を設定して永続化する。IB IP は `config/linstor.yml` の `ib_ip` を参照。
    ```sh
    scp -F ssh/config scripts/ib-setup-remote.sh pve$N:/tmp/ib-setup-remote.sh
@@ -590,9 +604,9 @@ ssh -F ssh/config root@<static_ip> reboot || true
    ```
    初回実行時は udev リネーム前に検出され失敗することがある。再実行すれば解決する。
 
-6. 完了: `./scripts/os-setup-phase.sh mark cleanup --config "$CONFIG"`
+7. 完了: `./scripts/os-setup-phase.sh mark cleanup --config "$CONFIG"`
 
-7. **レポート作成**: `report/` ディレクトリに実行結果のレポートを作成
+8. **レポート作成**: `report/` ディレクトリに実行結果のレポートを作成
    - `./scripts/os-setup-phase.sh times --config "$CONFIG"` の出力をレポートに転記
 
 ---

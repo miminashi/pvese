@@ -10,8 +10,7 @@ static_netmask: 8
 static_iface: eno1
 dhcp_iface: eno2
 
-# Target disk (TBD: PERC H710 shows 0 pdisks via racadm/Redfish;
-# will be confirmed during installer. Expected /dev/sda if VD exists.)
+# Target disk (PERC H710 Mini RAID, /dev/sda = VD0 RAID-1 system)
 disk: /dev/sda
 
 # Debian installer

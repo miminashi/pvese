@@ -47,7 +47,9 @@ nodes:
       - /dev/sdc
       - /dev/sdd
       - /dev/sde
-    lvcreate_options: "-i4 -I64"
+      - /dev/sdf
+      - /dev/sdg
+    lvcreate_options: "-i6 -I64"
   - name: ayase-web-service-8
     ip: 10.10.10.208
     ib_ip: 192.168.101.8
@@ -56,7 +58,8 @@ nodes:
       - /dev/sdb
       - /dev/sdc
       - /dev/sdd
-    lvcreate_options: "-i3 -I64"
+      - /dev/sde
+    lvcreate_options: "-i4 -I64"
   - name: ayase-web-service-9
     ip: 10.10.10.209
     ib_ip: 192.168.101.9
@@ -65,7 +68,8 @@ nodes:
       - /dev/sdb
       - /dev/sdc
       - /dev/sdd
-    lvcreate_options: "-i3 -I64"
+      - /dev/sde
+    lvcreate_options: "-i4 -I64"
 
 # Regions (multi-region DR)
 # IB subnets are separated per region for traffic isolation

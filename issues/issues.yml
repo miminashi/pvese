@@ -437,10 +437,10 @@ issues:
     description: ""
   - id: 40
     title: 'Region B: vmbr0/vmbr1 ブリッジ未作成 — PVEクラスタ作成後にネットワーク設定が必要'
-    status: plan
-    owner: ""
+    status: done
+    owner: "2ebb320a"
     created: "2026-03-31T17:41:21Z"
-    updated: "2026-03-31T17:41:21Z"
+    updated: "2026-03-31T19:49:40Z"
     blocked_by: ""
     report: ""
     labels:
