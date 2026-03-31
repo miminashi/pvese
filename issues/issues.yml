@@ -1,4 +1,4 @@
-next_id: 40
+next_id: 41
 issues:
   - id: 1
     title: Test issue
@@ -434,4 +434,15 @@ issues:
     report: ""
     labels:
       - script
+    description: ""
+  - id: 40
+    title: 'Region B: vmbr0/vmbr1 ブリッジ未作成 — PVEクラスタ作成後にネットワーク設定が必要'
+    status: plan
+    owner: ""
+    created: "2026-03-31T17:41:21Z"
+    updated: "2026-03-31T17:41:21Z"
+    blocked_by: ""
+    report: ""
+    labels:
+      - infra
     description: ""
