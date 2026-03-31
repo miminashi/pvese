@@ -1,4 +1,4 @@
-next_id: 38
+next_id: 39
 issues:
   - id: 1
     title: Test issue
@@ -412,4 +412,15 @@ issues:
     report: ""
     labels:
       - script
+    description: ""
+  - id: 38
+    title: 'IPoIB: リブート後に ibp134s0 が自動起動しない (auto 設定あるが DOWN) — rdma-core モジュールロード順序の問題'
+    status: plan
+    owner: ""
+    created: "2026-03-31T16:47:12Z"
+    updated: "2026-03-31T16:47:12Z"
+    blocked_by: ""
+    report: ""
+    labels:
+      - infra
     description: ""
