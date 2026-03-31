@@ -57,6 +57,8 @@ with sync_playwright() as p:
     )
     context = browser.new_context(
         accept_downloads=True,
+        locale="en-US",
+        extra_http_headers={"Accept-Language": "en-US,en;q=0.9"},
         user_agent="Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 "
                    "(KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36",
     )
@@ -66,9 +68,26 @@ with sync_playwright() as p:
     )
 
     # Dell ドライバページを訪問してセッション確立
+    # 注意: GEO IP により日本語ページにリダイレクトされることがある
+    # en-us URL を強制し、cookie 同意バナーがあれば閉じる
     print(f"Visiting driver page: {DRIVER_URL}", file=sys.stderr)
     page.goto(DRIVER_URL, wait_until="domcontentloaded", timeout=60000)
     time.sleep(3)
+
+    # Cookie 同意バナーを閉じる (表示されている場合)
+    try:
+        reject_btn = page.locator('button:has-text("Reject"), button:has-text("すべて拒否")')
+        if reject_btn.count() > 0:
+            reject_btn.first.click()
+            time.sleep(1)
+    except Exception:
+        pass
+
+    # GEO リダイレクトで日本語ページになった場合、en-us URL に再アクセス
+    if "/en-us/" not in page.url:
+        print(f"Redirected to {page.url}, forcing en-us URL", file=sys.stderr)
+        page.goto(DRIVER_URL, wait_until="domcontentloaded", timeout=60000)
+        time.sleep(3)
 
     # ダウンロードボタンをクリック
     dl_btn = page.locator('a:has-text("Download")')
@@ -174,6 +193,7 @@ fw-extracted/
 ## 注意事項
 
 - **curl は使用不可**: Akamai CDN がボット検知で 403 を返す。Playwright 必須
+- **GEO IP リダイレクト**: 日本の IP からアクセスすると日本語ページ (`/ja-jp/`) にリダイレクトされ「ドライバーはご利用いただけません」と表示されることがある。`locale="en-US"` + `Accept-Language` ヘッダ + cookie 同意バナー閉じ + en-us URL 強制で対処する
 - **BIN ファイルサイズ**: 数十 MB 〜 100 MB 程度。ダウンロードに数分かかる場合がある
 - **マーカーの位置**: `#####Startofarchive#####` はファイルによって位置が異なる。バイナリ検索で動的に検出する
 - **firmimg.d7 の配置**: TFTP サーバで配信する際は `chmod 644` を忘れないこと (tftp-server スキル参照)

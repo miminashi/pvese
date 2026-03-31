@@ -1,4 +1,4 @@
-next_id: 35
+next_id: 38
 issues:
   - id: 1
     title: Test issue
@@ -379,4 +379,37 @@ issues:
     labels:
       - infra
       - bench
+    description: ""
+  - id: 35
+    title: Region B (7-9号機) LINSTOR/DRBD 未セットアップ — OS再インストール後の再構成が必要
+    status: plan
+    owner: ""
+    created: "2026-03-31T16:16:36Z"
+    updated: "2026-03-31T16:16:36Z"
+    blocked_by: ""
+    report: ""
+    labels:
+      - infra
+    description: ""
+  - id: 36
+    title: 'tftp-server: Docker TFTP コンテナがローカルホストからの UDP テストに応答しない'
+    status: plan
+    owner: ""
+    created: "2026-03-31T16:24:51Z"
+    updated: "2026-03-31T16:24:51Z"
+    blocked_by: ""
+    report: ""
+    labels:
+      - infra
+    description: ""
+  - id: 37
+    title: 'dell-fw-download: GEO IPで日本語ページにリダイレクトされダウンロード不可。cookie同意+URL強制が必要'
+    status: plan
+    owner: ""
+    created: "2026-03-31T16:25:14Z"
+    updated: "2026-03-31T16:25:14Z"
+    blocked_by: ""
+    report: ""
+    labels:
+      - script
     description: ""
