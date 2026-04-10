@@ -13,6 +13,7 @@ usage() {
     echo "  --ip <addr>             Static IP for /etc/hosts (required)"
     echo "  --codename <name>       Debian codename, e.g. trixie (required)"
     echo "  --serial-unit <N>       Serial console unit number (default: 1)"
+    echo "  --linstor               Install LINBIT repo + DRBD/LINSTOR packages"
     exit 1
 }
 
@@ -21,6 +22,7 @@ hostname=""
 ip=""
 codename=""
 serial_unit=1
+linstor=0
 
 while [ $# -gt 0 ]; do
     case "$1" in
@@ -29,6 +31,7 @@ while [ $# -gt 0 ]; do
         --ip)          ip="$2";          shift 2 ;;
         --codename)    codename="$2";    shift 2 ;;
         --serial-unit) serial_unit="$2"; shift 2 ;;
+        --linstor)     linstor=1;        shift ;;
         *)             echo "Unknown option: $1" >&2; usage ;;
     esac
 done
@@ -87,12 +90,60 @@ phase_post_reboot() {
     printf 'LANG=en_US.UTF-8\nLC_ALL=en_US.UTF-8\n' > /etc/default/locale
     export LANG=en_US.UTF-8 LC_ALL=en_US.UTF-8
 
+    echo "--- Removing enterprise repositories ---"
+    rm -f /etc/apt/sources.list.d/pve-enterprise.list
+    rm -f /etc/apt/sources.list.d/pve-enterprise.sources
+
+    echo "--- Updating package lists ---"
+    apt-get update
+
     echo "--- Installing proxmox-ve ---"
     DEBIAN_FRONTEND=noninteractive apt-get -y install proxmox-ve postfix open-iscsi chrony
 
     echo "--- Removing Debian kernel ---"
     DEBIAN_FRONTEND=noninteractive apt-get -y remove linux-image-amd64 'linux-image-6.*' 2>/dev/null || true
     update-grub
+
+    echo "--- Installing durable default-route fix hook ---"
+    mkdir -p /etc/network/if-up.d
+    cat > /etc/network/if-up.d/z-fix-default-route << 'HOOK_EOF'
+#!/bin/sh
+# Persistent default route fix for lab environment.
+# Management network 10.0.0.0/8 has no internet; 192.168.39.0/24 (DHCP)
+# is the only internet-capable path. ifupdown2 sometimes sets default via
+# 10.10.10.1 during re-evaluation; this hook reverts on every interface up.
+ip route del default via 10.10.10.1 2>/dev/null || true
+if ! ip route show default | grep -q 'default'; then
+    ip route add default via 192.168.39.1 2>/dev/null || true
+fi
+HOOK_EOF
+    chmod 0755 /etc/network/if-up.d/z-fix-default-route
+    /etc/network/if-up.d/z-fix-default-route || true
+    echo "Default-route fix hook installed at /etc/network/if-up.d/z-fix-default-route"
+
+    if [ "$linstor" = "1" ]; then
+        echo "--- Setting up LINBIT repository ---"
+        echo "deb [signed-by=/usr/share/keyrings/linbit-keyring.gpg] http://packages.linbit.com/public/ proxmox-9 drbd-9" > /etc/apt/sources.list.d/linbit.list
+        if [ ! -f /usr/share/keyrings/linbit-keyring.gpg ]; then
+            echo "Fetching LINBIT GPG key..."
+            if ! wget -qO /usr/share/keyrings/linbit-keyring.gpg https://packages.linbit.com/package-signing-pubkey.gpg || [ ! -s /usr/share/keyrings/linbit-keyring.gpg ]; then
+                echo "Direct URL failed, trying keyserver..."
+                rm -f /usr/share/keyrings/linbit-keyring.gpg
+                DEBIAN_FRONTEND=noninteractive apt-get -y install gnupg dirmngr
+                gpg --batch --no-default-keyring --keyring /tmp/linbit-tmp.gpg --keyserver keyserver.ubuntu.com --recv-keys 4E5385546726D13CB649872CFC05A31DB826FE48
+                gpg --batch --no-default-keyring --keyring /tmp/linbit-tmp.gpg --export 4E5385546726D13CB649872CFC05A31DB826FE48 > /usr/share/keyrings/linbit-keyring.gpg
+                rm -f /tmp/linbit-tmp.gpg /tmp/linbit-tmp.gpg~
+            fi
+            chmod a+r /usr/share/keyrings/linbit-keyring.gpg
+        fi
+        rm -f /etc/apt/sources.list.d/pve-enterprise.sources
+        apt-get update
+        pve_kernel=$(uname -r)
+        DEBIAN_FRONTEND=noninteractive apt-get -y install gcc "proxmox-headers-${pve_kernel}" drbd-dkms drbd-utils linstor-satellite linstor-client linstor-proxmox
+        dkms autoinstall || true
+        systemctl enable linstor-satellite
+        echo "LINSTOR/DRBD setup complete"
+    fi
 
     echo "=== post-reboot phase complete ==="
     echo "PVE version:"
