@@ -161,12 +161,30 @@ SERVER_SUFFIX = hostname の末尾数字 (例: ayase-web-service-4 → "4")
 
 **iDRAC の場合**:
 ```sh
-./scripts/remaster-debian-iso.sh <元ISO> preseed/preseed-server7.cfg <iso_download_dir>/${ISO_FILENAME} --serial-unit=0
+./scripts/remaster-debian-iso.sh <元ISO> preseed/preseed-server<N>.cfg <iso_download_dir>/${ISO_FILENAME} --serial-unit=<UNIT>
 ```
+
+**`--serial-unit` の決定**: 事前に BIOS `SerialPortAddress` を確認して決める:
+
+```sh
+ssh -F ssh/config idrac<N> racadm get BIOS.SerialCommSettings.SerialPortAddress
+```
+
+| SerialPortAddress | iDRAC SOL → 物理 COM | kernel `console=` | `--serial-unit=` |
+|-------------------|--------------------|-------------------|-----------------|
+| `Serial1Com2Serial2Com1` | Serial2 → Com1 (0x3F8) | `ttyS0` | **`0`** |
+| `Serial1Com1Serial2Com2` | Serial2 → Com2 (0x2F8) | `ttyS1` | **`1`** |
+
+> **注意**: この値は個体ごとに異なる (Serial1Com2Serial2Com1 が推奨設定だが、
+> F3 Load Defaults や過去の BIOS 操作で Serial1Com1Serial2Com2 に戻っている
+> 個体もある)。SOL に BIOS POST は出るが installer 出力が出ない場合はこの
+> mismatch を疑うこと (`report/2026-04-10_172807_server8_vmedia_recovery_test.md`
+> 関連調査で発見)。
+
 - `--legacy-only` を**付けない**（UEFI + Legacy dual boot ISO を生成）
-- `--serial-unit=0` を指定（R320 の SOL は COM1/ttyS0）
 - `remaster-debian-iso.sh` のカーネルパラメータが `vga=normal nomodeset` であること確認
-- preseed は **initrd への注入禁止**（d-i TUI が壊れる）。`preseed/file=/cdrom/preseed.cfg` でISO ルート配置のみ使用
+- preseed は **initrd への注入禁止**（iDRAC VirtualMedia では d-i TUI が壊れる）。`preseed/file=/cdrom/preseed.cfg` でISO ルート配置のみ使用
+- **例外: Supermicro VirtualMedia では initrd 注入が必要**。UEFI GRUB から `preseed/file=/cdrom/preseed.cfg` が読めない環境があるため、`remaster-debian-iso.sh` が preseed を initrd に注入する (ホスト側で 7z + cpio)。Supermicro の場合はこの動作がデフォルト
 
 4. リマスター成功後、preseed ハッシュを保存:
    ```
@@ -175,20 +193,38 @@ SERVER_SUFFIX = hostname の末尾数字 (例: ayase-web-service-4 → "4")
 5. 出力 ISO の存在確認
 4. 完了: `./scripts/os-setup-phase.sh mark iso-remaster --config "$CONFIG"`
 
-#### iDRAC: UEFI モードの確認 (初回のみ)
+#### iDRAC: UEFI モードの確認 (BIOSリセット後および初回)
 
 R320 は **UEFI モード**で運用する。preseed から `partman-efi/non_efi_system` を削除済みで、
 UEFI モードでは partman が自動的に ESP を作成し grub-efi-amd64 が正常にインストールされる。
 Legacy BIOS モードでは GPT パーティションテーブルからブートできない問題が発生する。
 
-R320 が Legacy BIOS モードの場合、以下で UEFI に切り替える:
+> **重要 (反復5で発見)**: BIOS F3 (Load Default Settings) を実行すると Boot Mode が **UEFI → BIOS (Legacy)** に変わる。
+> BIOSリセット後は必ず BootMode を確認し、BIOS (Legacy) になっていたら以下の手順で UEFI に戻すこと。
+
+> ⚠️ **絶対禁止 (反復7-9で発見、8号機で永続的故障)**: `racadm set BIOS.BiosBootSettings.BootMode Uefi` を**使用してはならない**。
+> R320 / iDRAC7 FW 2.65.65.65 では racadm 経由の BootMode 変更が UefiBootSeq から `Optical.iDRACVirtual.1-1` を削除し、**VirtualMedia ブートが永続的に不能**になる。
+> 一度削除されると racadm では復元できない (BOOT018 read-only エラー)。BIOS Load Defaults + VNC BIOS UI での手動修正が必要になる ([idrac7 スキルの「VirtualMedia ブート復旧手順」](../idrac7/SKILL.md#virtualmedia-ブート復旧手順-bootmode-破壊からの回復) を参照)。
+
+R320 が Legacy BIOS モードの場合、**VNC 経由で BIOS Setup から手動で UEFI に切り替える**:
+
 ```sh
-ssh -F ssh/config idrac7 racadm set BIOS.BiosBootSettings.BootMode Uefi
-ssh -F ssh/config idrac7 racadm jobqueue create BIOS.Setup.1-1 -r pwrcycle -s TIME_NOW -e TIME_NA
-# Power On して JOB 完了を待つ (約6分)
-ssh -F ssh/config idrac7 racadm jobqueue view
-# Status=Completed を確認
+# まず現在のモードを確認
+ssh -F ssh/config idrac7 "racadm get BIOS.BiosBootSettings.BootMode"
+
+# BootMode=Bios が返ってきたら、VNC BIOS UI で手動変更:
+# 1. 電源サイクル後 POST 開始まで 45 秒待機
+# 2. F2 連打で BIOS Setup 入場
+python3 ./scripts/idrac-kvm-interact.py --bmc-ip $BMC_IP sendkeys F2 x30 --wait 2000 \
+    --screenshot-each tmp/<sid>/bm-f2 --pre-screenshot
+
+# 3. "System Setup" で Enter (System BIOS 選択)
+# 4. "Boot Settings" に移動 → "Boot Mode" → UEFI 選択
+# 5. Escape → Finish → 確認 Enter
+# (具体的なキー操作はスクリーンショットを見ながら適宜)
 ```
+
+**重要**: BootMode 変更には racadm を使わず、必ず VNC BIOS UI を使うこと。racadm の `set BIOS.BiosBootSettings.BootMode` は VirtualMedia デバイスの BIOS NVStore 登録を破壊する。
 
 #### iDRAC: racadm コマンドの注意 (iDRAC7 FW 2.65.65.65)
 
@@ -268,6 +304,16 @@ PowerState=$(./scripts/bmc-power.sh status "$BMC_IP" "$BMC_USER" "$BMC_PASS")
    - `find-boot-entry` は最大3回リトライ（15秒間隔）
    - **絶対に efibootmgr -c でブートエントリを手動作成しないこと**
 
+   **6号機: Redfish BootOptions API が空の場合のフォールバック**:
+   6号機など一部のサーバでは Redfish BootOptions API が空配列を返し、`find-boot-entry` / `boot-next` (UefiBootNext) が使えない。
+   この場合、`bios-setup` スキルの `--no-click` を使って BIOS Boot タブから Boot Option #1 を設定する:
+   1. `--no-click` で Boot タブに移動 (ArrowRight x5)
+   2. ArrowDown x2 で Boot Option #1 へ
+   3. Enter → PageUp (先頭 CD/DVD) → ArrowDown x11 → Enter で "UEFI CD/DVD" (index 11) を選択
+   4. F4 → Enter で Save & Exit → UEFI CD からブート
+   - **Legacy ISOLINUX ブートだと MBR パーティションが作成され ESP が作成されない。NVMe は Legacy ブート不可なので、必ず UEFI モードでインストールすること**
+   - **PXE 無限ループが発生する場合**: `bios-setup` スキルで全 PXE Boot Option を Disabled に設定 (`Enter → PageDown → Enter` を Boot Option ごとに繰り返す。17 個分)
+
 6. **Boot Override 設定** + **電源サイクル**:
    ```sh
    ./pve-lock.sh wait ./scripts/bmc-power.sh boot-next "$BMC_IP" "$BMC_USER" "$BMC_PASS" "$BOOT_ID"
@@ -281,7 +327,27 @@ PowerState=$(./scripts/bmc-power.sh status "$BMC_IP" "$BMC_USER" "$BMC_PASS")
 
 #### iDRAC の場合
 
-1. **VirtualMedia マウント**:
+1. **事前検証: BIOS SerialCommSettings** (R320 固有、install-monitor 成立の必須条件):
+
+   iDRAC SOL で Debian インストーラの進行を監視するためには、BIOS のシリアルコンソールリダイレクトが有効でなければならない。`BIOS.SerialCommSettings.SerialComm` が **`OnConRedirCom1`** でない場合、BIOS POST 以降の出力 (カーネルログ、インストーラテキスト) が iDRAC SOL に流れず、`sol-monitor.py` は永久に進行を検知できない (install-monitor フェーズがハング)。
+
+   > ⚠️ **既知の原因**: `BIOS.BiosBootSettings.BootMode` 破壊からの VirtualMedia 復旧手順 ([idrac7 スキルの「VirtualMedia ブート復旧手順」](../idrac7/SKILL.md#virtualmedia-ブート復旧手順-bootmode-破壊からの回復)) で **BIOS Load Defaults (F3) を実行すると `SerialCommSettings` もデフォルト (`OnNoConRedir`) にリセットされる**。復旧手順で `SerialCommSettings` の復元を行っていないと、次回 install-monitor が無言でハングする。
+
+   ```sh
+   SERIAL_CURRENT=$(ssh -F ssh/config "$IDRAC_HOST" racadm get BIOS.SerialCommSettings.SerialComm | grep '^SerialComm=' | cut -d= -f2 | tr -d '\r\n')
+   REDIR_CURRENT=$(ssh -F ssh/config "$IDRAC_HOST" racadm get BIOS.SerialCommSettings.RedirAfterBoot | grep '^RedirAfterBoot=' | cut -d= -f2 | tr -d '\r\n')
+   if [ "$SERIAL_CURRENT" != "OnConRedirCom1" ] || [ "$REDIR_CURRENT" != "Enabled" ]; then
+       echo "FIX: SerialComm=$SERIAL_CURRENT RedirAfterBoot=$REDIR_CURRENT → restoring"
+       ./pve-lock.sh wait ./oplog.sh ssh -F ssh/config "$IDRAC_HOST" racadm set BIOS.SerialCommSettings.SerialComm OnConRedirCom1
+       ./pve-lock.sh wait ./oplog.sh ssh -F ssh/config "$IDRAC_HOST" racadm set BIOS.SerialCommSettings.RedirAfterBoot Enabled
+       ./pve-lock.sh wait ./oplog.sh ssh -F ssh/config "$IDRAC_HOST" racadm jobqueue create BIOS.Setup.1-1 -s TIME_NOW -r pwrcycle
+       # BIOS ジョブ完了を待つ (5-6 分)。jobqueue view でポーリング。
+   fi
+   ```
+
+   `BIOS.SerialCommSettings` は `BIOS.BiosBootSettings.BootMode` と異なり、racadm 経由の変更で UefiBootSeq の VirtualMedia エントリを破壊しない。安全に racadm で変更可能。
+
+2. **VirtualMedia マウント**:
    ```sh
    REMOTE_URI=$("$YQ" '.remoteimage_uri' "$CONFIG")
    ./scripts/idrac-virtualmedia.sh mount "$BMC_IP" "$REMOTE_URI"
@@ -289,7 +355,7 @@ PowerState=$(./scripts/bmc-power.sh status "$BMC_IP" "$BMC_USER" "$BMC_PASS")
    ./scripts/idrac-virtualmedia.sh verify "$BMC_IP"
    ```
 
-2. **Boot Once 設定 + 電源サイクル**:
+3. **Boot Once 設定 + 電源サイクル**:
    ```sh
    ./scripts/idrac-virtualmedia.sh boot-once "$BMC_IP" VCD-DVD
    ./pve-lock.sh wait ./scripts/bmc-power.sh cycle "$BMC_IP" "$BMC_USER" "$BMC_PASS" 20
@@ -313,6 +379,34 @@ PowerState=$(./scripts/bmc-power.sh status "$BMC_IP" "$BMC_USER" "$BMC_PASS")
 
 Debian インストーラの進行を監視する。SOL 監視を主要手段とし、フォールバックはプラットフォーム別。
 
+#### 0. Installer syslog receiver の起動（推奨、iDRAC 環境で特に重要）
+
+preseed `early_command` は `syslogd -R 10.1.6.1:5514 -L` で installer syslog を UDP でフォワードする。
+`./scripts/syslog-receiver.sh` を起動しておかないと、`grub-install` / `efibootmgr` の生エラー文字列が永久に失われる (SOL には TUI ダイアログのピクセルしか残らない)。
+
+**単独実行時**:
+```sh
+mkdir -p tmp/<session-id>
+if ss -uln 2>/dev/null | grep -q ':5514 '; then
+    echo "WARN: UDP 5514 already in use; skipping syslog receiver"
+    SYSLOG_RCV_PID=""
+else
+    ./scripts/syslog-receiver.sh 5514 tmp/<session-id>/installer-syslog-s${SUFFIX}.log &
+    SYSLOG_RCV_PID=$!
+    echo "Started syslog receiver (pid=$SYSLOG_RCV_PID)"
+fi
+```
+
+**並列実行時 (7/8/9 同時)**: 3 台が同じ UDP 5514 に書くため、**親セッションで 1 本だけ** リスナーを立てる。子エージェントは立てない。
+```sh
+./scripts/syslog-receiver.sh 5514 tmp/<parent-sid>/installer-syslog-all.log &
+```
+受信後は送信元 IP (`10.10.10.207/208/209`) で grep して台ごとに切り分ける。
+
+前提: `socat` が必要。未インストールなら `sudo apt install -y socat` (許可リスト内)。
+
+ログは検証 3.5 で attachment へ永続化する (tmp 掃除前に必ず退避)。
+
 #### 1. SOL 監視（主要、共通）
 
 `./scripts/sol-monitor.py` でインストーラの進行をパッシブ監視する:
@@ -327,19 +421,31 @@ Debian インストーラの進行を監視する。SOL 監視を主要手段と
 - キー入力は一切送信しない（パッシブ監視のみ）
 - インストーラのステージ進行を stderr に表示
 - EOF 時: PowerState 確認 → On なら自動で SOL deactivate + 5秒待機 + 再接続 (最大3回)
-- EOF 時: PowerState=Off → exit 0 (インストール完了)
-- "Power down" 検出 → 30秒待機 → PowerState 確認 → exit 0
+- EOF 時: PowerState=Off かつ **最低 1 ステージ観測済み** → exit 0 (インストール完了)
+- "Power down" 検出 → 30秒待機 → PowerState 確認 → (stage 観測あり) exit 0
 - PowerState は20秒間隔でポーリング
-- 終了コード: 0=完了, 1=タイムアウト, 2=接続エラー, 3=異常終了(再接続上限超過含む)
+- 終了コード: 0=完了, 1=タイムアウト, 2=接続エラー, 3=異常終了(再接続上限超過含む), **4=False positive (PowerState=Off だが installer stage 未観測)**
+
+> **注意**: SOL は **OS レベルの `/dev/ttyS*` 書き込みを捕捉しない** (Dell R320 + iDRAC7 共通)。
+> SOL に流れる出力は BIOS の INT10h リダイレクションまたは installer 特有の UEFI ConsoleOut 経由のみ。
+> インストール後の OS 状態を SOL 経由で確認することは基本的にできないため、post-install-config は
+> SSH + `/etc/machine-id` 検証で行うこと (Phase 6 ステップ 5 参照)。
 
 #### 2. SOL exit code 別の対処
 
 | exit code | 状態 | 対処 |
 |-----------|------|------|
-| 0 | 完了 | 次の Phase へ |
-| 1 | タイムアウト | PowerState 確認。Off→完了扱い。On→forceoff |
+| 0 | 完了 (stage 観測 ≥ 1 & PowerState=Off) | 次の Phase へ |
+| 1 | タイムアウト | PowerState 確認。Off かつ stage 観測あり→完了扱い。それ以外→forceoff |
 | 2 | 接続エラー | フォールバックへ |
-| 3 | 異常終了 | PowerState 確認。Off→完了扱い。On→フォールバックへ |
+| 3 | 異常終了 | PowerState 確認。Off かつ stage 観測あり→完了扱い。それ以外→フォールバックへ |
+| **4** | **False positive (stage 0 件 + Off)** | **強制 Off → bmc-mount-boot から再実行。install-monitor を done にしない。BIOS SerialComm/VirtualMedia の状態を再確認** |
+
+> **重要**: `PowerState=Off` 単独での成功判定は False positive の原因となる
+> (`report/2026-04-10_172807_server8_vmedia_recovery_test.md`)。
+> `sol-monitor.py` は内部で **最低 1 ステージの観測** を必須化している。
+> さらに install-monitor 完了を判断する前に、Phase 6 の `/etc/machine-id` タイムスタンプ検証を必ず通すこと。
+> exit 4 を受け取った場合は、install-monitor を done にせず bmc-mount-boot からやり直す。
 
 #### 3. フォールバック
 
@@ -361,7 +467,21 @@ python3 ./scripts/idrac-kvm-screenshot.py --bmc-ip "$BMC_IP" --bmc-user "$BMC_US
 #### 完了処理
 
 1. SOL を切断: `ipmitool ... sol deactivate`（sol-monitor.py が自動切断するが念のため）
-2. 完了: `./scripts/os-setup-phase.sh mark install-monitor --config "$CONFIG"`
+2. **Syslog receiver 停止** (単独実行時、ステップ 0 で起動した場合):
+   ```sh
+   if [ -n "$SYSLOG_RCV_PID" ]; then
+       kill "$SYSLOG_RCV_PID" 2>/dev/null || true
+       wait "$SYSLOG_RCV_PID" 2>/dev/null || true
+       SYSLOG_LOG="tmp/<session-id>/installer-syslog-s${SUFFIX}.log"
+       if [ -s "$SYSLOG_LOG" ]; then
+           echo "Installer syslog: $(wc -l < "$SYSLOG_LOG") lines saved to $SYSLOG_LOG"
+       else
+           echo "WARN: Installer syslog empty — check network path to 10.1.6.1:5514"
+       fi
+   fi
+   ```
+   (並列実行時は親セッションで一括停止するため子エージェントはスキップ)
+3. 完了: `./scripts/os-setup-phase.sh mark install-monitor --config "$CONFIG"`
 
 ---
 
@@ -405,20 +525,33 @@ CSRF=$(./scripts/bmc-session.sh csrf "$BMC_IP" "$COOKIE_FILE")
 - `./scripts/ssh-wait.sh <static_ip> --timeout 210 --interval 10` で SSH 到達を待つ
 - POST code 監視/KVM は使えない。SOL または VNC で代替
 
-#### ステップ 3: SOL 経由でログイン確認・設定
+#### ステップ 3: SOL 経由でログイン確認・SSH 鍵配置
 
 > **重要**: preseed の late_command は Debian 13 で動作しないことが多い。
 > SSH 公開鍵、PermitRootLogin、sudoers は SOL 経由で設定する必要がある。
+> **両プラットフォーム共通**: このステップは Supermicro / iDRAC 両方で必須。
+> Supermicro の場合も SOL (`sol-login.py`) で SSH 鍵を配置する。
+> SSH 鍵が未配置のままだと、後続の Phase 7 (pve-install) で SSH 接続できない。
 
-a. SSH 公開鍵を Read ツールで `~/.ssh/id_ed25519.pub` から取得
+a. SSH 公開鍵を Read ツールで `ssh/id_ed25519.pub` から取得（**注意**: `~/.ssh/id_ed25519.pub` ではなく `ssh/id_ed25519.pub` を使うこと。`ssh/config` の pve7-9 エントリは `ssh/id_ed25519` を IdentityFile として使用するため、これが正しいプロジェクト鍵）
 b. コマンドファイルを `tmp/<session-id>/sol-commands-s${SUFFIX}.txt` に作成:
    ```
    sed -i "s/^#PermitRootLogin.*/PermitRootLogin yes/" /etc/ssh/sshd_config
    systemctl restart sshd
    echo "debian ALL=(ALL) NOPASSWD: ALL" > /etc/sudoers.d/debian
    chmod 0440 /etc/sudoers.d/debian
-   mkdir -p /root/.ssh && chmod 700 /root/.ssh
-   echo "<SSH_PUBKEY>" > /root/.ssh/authorized_keys && chmod 600 /root/.ssh/authorized_keys
+   mkdir -p /root/.ssh
+   chmod 700 /root/.ssh
+   echo "<BASE64_ENCODED_PUBKEY>" | base64 -d > /root/.ssh/authorized_keys
+   chmod 600 /root/.ssh/authorized_keys
+   ```
+   > **注意**: `echo "ssh-ed25519 ..." > /root/.ssh/authorized_keys` は SOL 経由で `>` リダイレクトと長い引数が正しく扱われないことがある。
+   > 公開鍵は必ず base64 エンコードして書き込むこと:
+   > ```sh
+   > python3 -c "import base64; k=open('ssh/id_ed25519.pub').read().strip(); print(base64.b64encode(k.encode()).decode())"
+   > ```
+   > これで得た BASE64 文字列を `<BASE64_ENCODED_PUBKEY>` に置換する。
+   ```
    printf "\nauto <static_iface>\niface <static_iface> inet static\n    address <static_ip>/8\n" >> /etc/network/interfaces
    ifup <static_iface>
    ip -brief addr
@@ -443,6 +576,36 @@ SOL が使えない場合は pexpect で debian ユーザにパスワード SSH 
 ssh-keygen -R <static_ip> -f ssh/known_hosts
 ./scripts/ssh-wait.sh <static_ip> --timeout 150 --interval 10
 ```
+
+#### ステップ 5: 実インストール検証 (False positive 防止)
+
+> **背景**: `sol-monitor.py` の PowerState=Off 判定は stage 観測ガードで補強されているが、
+> それでも「古い OS がそのまま起動し SSH 応答を返した」ケースは検出できない。
+> install-monitor 開始時刻より **新しい** `/etc/machine-id` が生成されていることを SSH 経由で
+> 実測検証する。古ければリインストール未実行と判断し、install-monitor と bmc-mount-boot を
+> reset してフェーズをやり直す
+> (`report/2026-04-10_172807_server8_vmedia_recovery_test.md` 参照)。
+
+```sh
+SERVER_NAME=$(basename "$CONFIG" .yml)
+STATE_DIR="state/os-setup/${SERVER_NAME}"
+INSTALL_START=$(cat "${STATE_DIR}/install-monitor.start")
+REMOTE_MACHINE_ID_MTIME=$(ssh -F ssh/config "pve${NUM}" stat -c %Y /etc/machine-id)
+REMOTE_HOSTNAME_MTIME=$(ssh -F ssh/config "pve${NUM}" stat -c %Y /etc/hostname)
+echo "install-monitor.start = ${INSTALL_START} ($(date -d @${INSTALL_START}))"
+echo "remote /etc/machine-id mtime = ${REMOTE_MACHINE_ID_MTIME} ($(date -d @${REMOTE_MACHINE_ID_MTIME}))"
+echo "remote /etc/hostname  mtime = ${REMOTE_HOSTNAME_MTIME} ($(date -d @${REMOTE_HOSTNAME_MTIME}))"
+
+if [ "${REMOTE_MACHINE_ID_MTIME}" -lt "${INSTALL_START}" ]; then
+    echo "ERROR: /etc/machine-id predates install-monitor start — FALSE POSITIVE"
+    ./scripts/os-setup-phase.sh fail post-install-config --config "$CONFIG"
+    ./scripts/os-setup-phase.sh reset install-monitor --config "$CONFIG"
+    ./scripts/os-setup-phase.sh reset bmc-mount-boot --config "$CONFIG"
+    exit 1
+fi
+```
+
+両方のタイムスタンプが install-monitor 開始より新しいことを確認できたら正規のリインストールが行われたと判断する。
 
 完了: `./scripts/os-setup-phase.sh mark post-install-config --config "$CONFIG"`
 
@@ -517,8 +680,20 @@ ssh -F ssh/config root@<static_ip> ping -c1 -W3 deb.debian.org || echo "WARN: no
 
 ```sh
 scp -F ssh/config ./scripts/pve-setup-remote.sh root@<static_ip>:/tmp/
-ssh -F ssh/config root@<static_ip> /tmp/pve-setup-remote.sh --phase post-reboot --hostname <hostname> --ip <static_ip> --codename <codename> --serial-unit ${SERIAL_UNIT}
+ssh -F ssh/config root@<static_ip> /tmp/pve-setup-remote.sh --phase post-reboot --hostname <hostname> --ip <static_ip> --codename <codename> --serial-unit ${SERIAL_UNIT} --linstor
 ```
+
+> **`--linstor` フラグ**: LINBIT リポジトリの GPG 鍵追加 + DRBD/LINSTOR パッケージインストールを行う。LINSTOR クラスタに参加するサーバでは必ず指定すること。省略すると LINSTOR 関連のセットアップはスキップされる。
+> enterprise リポジトリ (`.list` + `.sources`) の除去は `--linstor` の有無にかかわらず常に実行される。
+
+> **LINBIT GPG キーが 404 になる場合の対処**: `pve-setup-remote.sh` は `https://packages.linbit.com/package-signing-pubkey.gpg` から GPG キーを取得するが、URL が変更されて 404 になることがある。この場合はローカルマシンで Ubuntu キーサーバから取得してサーバに配置する:
+> ```sh
+> curl "https://keyserver.ubuntu.com/pks/lookup?op=get&search=0x4E5385546726D13CB649872CFC05A31DB826FE48" -o tmp/<sid>/linbit-key.asc
+> gpg --batch --yes --dearmor -o tmp/<sid>/linbit-keyring.gpg tmp/<sid>/linbit-key.asc
+> scp -F ssh/config tmp/<sid>/linbit-keyring.gpg root@<static_ip>:/usr/share/keyrings/linbit-keyring.gpg
+> ssh -F ssh/config root@<static_ip> chmod a+r /usr/share/keyrings/linbit-keyring.gpg
+> ```
+> その後、`pve-setup-remote.sh --phase post-reboot --linstor` を再実行する（GPG キーが存在する場合は再取得をスキップする）。
 
 #### ステップ 5: 最終リブート + PVE 動作確認
 
@@ -603,6 +778,7 @@ ssh -F ssh/config root@<static_ip> reboot || true
    ssh -F ssh/config pve$N "sh /tmp/ib-setup-remote.sh --ip <IB_IP>/24 --mode connected --mtu 65520 --persist"
    ```
    初回実行時は udev リネーム前に検出され失敗することがある。再実行すれば解決する。
+   `--persist` は `/etc/network/interfaces.d/ib0` に加えて `/etc/modules-load.d/ib_ipoib.conf` も書き込む。これにより `systemd-modules-load.service` が networking.service より前に `ib_ipoib` モジュールをロードし、リブート後の自動起動が確実になる。
 
 7. 完了: `./scripts/os-setup-phase.sh mark cleanup --config "$CONFIG"`
 

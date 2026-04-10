@@ -12,7 +12,7 @@ echo "Listening for installer syslog on UDP port $PORT..."
 echo "Press Ctrl+C to stop."
 
 if [ -n "$LOG_FILE" ]; then
-    socat UDP-LISTEN:"$PORT",fork,reuseaddr - | tee "$LOG_FILE"
+    socat -u UDP4-RECVFROM:"$PORT",fork,reuseaddr - | tee "$LOG_FILE"
 else
-    socat UDP-LISTEN:"$PORT",fork,reuseaddr -
+    socat -u UDP4-RECVFROM:"$PORT",fork,reuseaddr -
 fi
