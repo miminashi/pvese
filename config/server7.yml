@@ -37,7 +37,11 @@ idrac_fw_build: "15"
 idrac_fw_updated: "2026-03-02"
 
 # Serial console
-serial_unit: 0
+# Server 7: BIOS SerialPortAddress=Serial1Com1Serial2Com2 → iDRAC SOL maps to COM2 (ttyS1)
+# Other R320s (server 8, 9) use Serial1Com2Serial2Com1 → ttyS0 (serial_unit: 0)
+# This individual difference was first documented in the 2026-04-11 sol-monitor
+# false positive investigation (see report/2026-04-11_031406_sol_monitor_false_positive_fix.md).
+serial_unit: 1
 
 # OS credentials (lab environment)
 root_password: password
