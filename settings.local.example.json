@@ -169,7 +169,12 @@
       "Write(.claude/settings.local.json)",
       "Bash(./scripts/bmc-power.sh reset:*)",
       "Bash(./scripts/bmc-power.sh boot-override:*)",
-      "Bash(./scripts/bmc-power.sh cycle:*)"
+      "Bash(./scripts/bmc-power.sh cycle:*)",
+      "Bash(./scripts/bmc-kvm.sh screenshot:*)",
+      "Bash(./scripts/bmc-power.sh list-boot-entries:*)",
+      "Bash(sudo chmod:*)",
+      "Bash(sudo ./scripts/:*)",
+      "Bash(systemctl status:*)"
     ]
   },
   "hooks": {
