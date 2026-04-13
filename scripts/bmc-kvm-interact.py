@@ -241,13 +241,31 @@ def capture_canvas(page, output):
     return 0
 
 
-def focus_canvas(page, safe_click=False):
+def focus_canvas(page, safe_click=False, no_click=False):
     """Focus the noVNC canvas for keyboard input.
 
+    If no_click is True, uses JavaScript focus() instead of clicking.
     If safe_click is True, clicks bottom-right corner to avoid menu items.
     Otherwise clicks center (default, proven to work for BIOS entry).
     """
-    if safe_click:
+    if no_click:
+        page.evaluate(
+            """() => {
+                const c = document.getElementById('noVNC_canvas');
+                if (c) {
+                    c.setAttribute('tabindex', '0');
+                    c.focus();
+                    c.dispatchEvent(new Event('focus', {bubbles: true}));
+                }
+            }"""
+        )
+        # Also use Playwright's focus method as backup
+        try:
+            page.focus("#noVNC_canvas")
+        except Exception:
+            pass
+        log("Canvas focused (no click, JS focus + tabindex)")
+    elif safe_click:
         dims = page.evaluate(
             """() => {
                 const c = document.getElementById('noVNC_canvas');
@@ -279,6 +297,10 @@ def detect_rfb_client(page):
             // Try to find it in window
             if (window.rfb && typeof window.rfb.sendKey === 'function') {
                 return 'window.rfb';
+            }
+            // Supermicro iKVM: UI.rfb holds the RFB instance
+            if (typeof UI !== 'undefined' && UI.rfb && typeof UI.rfb.sendKey === 'function') {
+                return 'UI.rfb';
             }
             // Search for VNC display object
             var scripts = document.getElementsByTagName('script');
@@ -323,19 +345,20 @@ def send_key_rfb(page, key, rfb_obj_name):
 
 
 def send_keys(page, keys, wait_ms, rfb_obj_name=None,
-              screenshot_each_prefix=None, post_wait_ms=500):
+              screenshot_each_prefix=None, post_wait_ms=500,
+              safe_click=False, no_click=False):
     """Send a sequence of keys with delay between each.
 
     If screenshot_each_prefix is set, capture a screenshot after each key
     as PREFIX_001.png, PREFIX_002.png, etc.
     """
-    focus_canvas(page)
+    focus_canvas(page, safe_click=safe_click, no_click=no_click)
 
     for i, key in enumerate(keys, 1):
         log(f"Sending key [{i}/{len(keys)}]: {key}")
 
         sent = False
-        if rfb_obj_name and rfb_obj_name in ("rfb", "window.rfb"):
+        if rfb_obj_name and rfb_obj_name in ("rfb", "window.rfb", "UI.rfb"):
             sent = send_key_rfb(page, key, rfb_obj_name)
             if sent:
                 log(f"  -> sent via RFB ({rfb_obj_name})")
@@ -360,7 +383,7 @@ def send_text(page, text, wait_ms, rfb_obj_name=None):
         log(f"Typing: '{ch}'")
 
         sent = False
-        if rfb_obj_name and rfb_obj_name in ("rfb", "window.rfb"):
+        if rfb_obj_name and rfb_obj_name in ("rfb", "window.rfb", "UI.rfb"):
             keysym = ord(ch)
             js_code = f"""() => {{
                 var obj = {rfb_obj_name};
@@ -427,7 +450,9 @@ def cmd_sendkeys(args):
 
         send_keys(page, args.keys, args.wait, rfb_obj,
                   screenshot_each_prefix=screenshot_each,
-                  post_wait_ms=args.post_wait)
+                  post_wait_ms=args.post_wait,
+                  safe_click=getattr(args, "safe_click", False),
+                  no_click=getattr(args, "no_click", False))
 
         rc = 0
         if args.screenshot:
@@ -507,6 +532,14 @@ def main():
     p_sendkeys.add_argument(
         "--pre-screenshot", action="store_true",
         help="Capture initial state as PREFIX_000.png (requires --screenshot-each)",
+    )
+    p_sendkeys.add_argument(
+        "--safe-click", action="store_true",
+        help="Click bottom-right corner instead of center to avoid moving BIOS cursor",
+    )
+    p_sendkeys.add_argument(
+        "--no-click", action="store_true",
+        help="Use JS focus() instead of clicking canvas (no mouse event sent to remote)",
     )
 
     # type command
