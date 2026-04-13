@@ -1,4 +1,4 @@
-next_id: 41
+next_id: 50
 issues:
   - id: 1
     title: Test issue
@@ -415,10 +415,10 @@ issues:
     description: ""
   - id: 38
     title: 'IPoIB: リブート後に ibp134s0 が自動起動しない (auto 設定あるが DOWN) — rdma-core モジュールロード順序の問題'
-    status: plan
+    status: done
     owner: ""
     created: "2026-03-31T16:47:12Z"
-    updated: "2026-03-31T16:47:12Z"
+    updated: "2026-03-31T23:16:26Z"
     blocked_by: ""
     report: ""
     labels:
@@ -426,10 +426,10 @@ issues:
     description: ""
   - id: 39
     title: 'os-setup: Region B 再構成時に LINBIT リポジトリの GPG 鍵と enterprise.sources 除去が必要'
-    status: plan
+    status: done
     owner: ""
     created: "2026-03-31T17:12:12Z"
-    updated: "2026-03-31T17:12:12Z"
+    updated: "2026-03-31T23:16:26Z"
     blocked_by: ""
     report: ""
     labels:
@@ -445,4 +445,98 @@ issues:
     report: ""
     labels:
       - infra
+    description: ""
+  - id: 41
+    title: '6号機: DIMM P2-DIMMA1 Uncorrectable memory エラー + BootOrder 破損でブート不能'
+    status: done
+    owner: "db5fe630"
+    created: "2026-04-01T07:29:40Z"
+    updated: "2026-04-07T06:43:40Z"
+    blocked_by: ""
+    report: "report/2026-04-07_154248_server6_ppr_os_install.md"
+    labels:
+      - infra
+    description: ""
+  - id: 42
+    title: 8号機 BIOS リセット + OS セットアップ 10回通しテスト
+    status: active
+    owner: "db5fe630"
+    created: "2026-04-05T20:19:17Z"
+    updated: "2026-04-05T20:19:20Z"
+    blocked_by: ""
+    report: ""
+    labels:
+      - infra
+    description: ""
+  - id: 43
+    title: 9号機 BIOS リセット + OS セットアップ 10回通しテスト
+    status: active
+    owner: "db5fe630"
+    created: "2026-04-05T20:19:28Z"
+    updated: "2026-04-05T20:19:30Z"
+    blocked_by: ""
+    report: ""
+    labels:
+      - infra
+    description: ""
+  - id: 44
+    title: 5号機 BIOS リセット + OS セットアップ 10回通しテスト (反復8-10)
+    status: active
+    owner: "db5fe630"
+    created: "2026-04-06T19:39:54Z"
+    updated: "2026-04-06T19:39:56Z"
+    blocked_by: ""
+    report: ""
+    labels:
+      - infra
+    description: ""
+  - id: 45
+    title: sol-monitor.py false positive 修正 + 7/8/9 並列回帰テスト
+    status: done
+    owner: "da4c169f"
+    created: "2026-04-10T09:05:29Z"
+    updated: "2026-04-10T18:16:23Z"
+    blocked_by: ""
+    report: "report/2026-04-11_031406_sol_monitor_false_positive_fix.md"
+    labels: []
+    description: ""
+  - id: 46
+    title: 'iDRAC7 R320 grub-install 間欠失敗: 非累積破損仮説の潰し込み + 残存課題 2/3 修正'
+    status: done
+    owner: "f36c0c9d-grub-noncorrupt"
+    created: "2026-04-10T19:18:08Z"
+    updated: "2026-04-11T03:34:44Z"
+    blocked_by: ""
+    report: "report/2026-04-11_123226_grub_install_nvram_exhaustion_confirmed.md"
+    labels: []
+    description: ""
+  - id: 47
+    title: 'server 7 NVRAM 枯渇 (preseed cleanup では救済不能): BIOS Delete Boot Options or racadm systemerase nvramclr 検討'
+    status: plan
+    owner: ""
+    created: "2026-04-11T03:34:56Z"
+    updated: "2026-04-11T03:34:56Z"
+    blocked_by: ""
+    report: ""
+    labels: []
+    description: ""
+  - id: 48
+    title: 'preseed 診断 visibility: logger / /dev/kmsg が d-i 経由の UDP syslog に届かない。nc で直接 UDP 送信に書き換える'
+    status: plan
+    owner: ""
+    created: "2026-04-11T03:35:00Z"
+    updated: "2026-04-11T03:35:00Z"
+    blocked_by: ""
+    report: ""
+    labels: []
+    description: ""
+  - id: 49
+    title: 'sol-monitor: grub-install modal dialog を検出して early exit する機構追加 (timeout 待ちを避ける)'
+    status: plan
+    owner: ""
+    created: "2026-04-11T03:35:04Z"
+    updated: "2026-04-11T03:35:04Z"
+    blocked_by: ""
+    report: ""
+    labels: []
     description: ""
