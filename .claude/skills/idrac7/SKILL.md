@@ -221,10 +221,137 @@ HddSeq: `RAID.Integrated.1-1` (PERC H310 仮想ディスク)
 
 ### R320 固有の注意事項
 
-- BootMode は `Bios`（レガシー）。UEFI ではない
+- BootMode は **UEFI** で運用する（`os-setup` スキル参照）。BIOS F3 (Load Defaults) で Legacy にリセットされる
 - POST は遅い（Lifecycle Controller: Collecting System Inventory... で 2-3 分）
 - ACPI Error (AE_NOT_EXIST for IPMI handler) が起動時に出るが動作に影響なし
 - `cfgServerBootOnce`（旧構文）と `iDRAC.ServerBoot.BootOnce`（新構文）は同じ設定。新構文を推奨
+
+### ⚠️ 重大な禁止事項: racadm による BootMode 変更
+
+**`racadm set BIOS.BiosBootSettings.BootMode` を絶対に使ってはならない**。
+
+R320 / iDRAC7 FW 2.65.65.65 / BIOS 2.3.3 では、racadm 経由で BootMode を `Uefi` ↔ `Bios` で切り替えると **VirtualMedia EFI ブートデバイスエントリ (`Optical.iDRACVirtual.1-1`) が UefiBootSeq から `enumeration 不在` の状態になる**。このとき `set BIOS.BiosBootSettings.UefiBootSeq` で手動追加しようとしても `BOOT018: Specified boot control list is read-only` で拒否される（BIOS が登録していないデバイス名を受け付けない）。
+
+> **訂正 (2026-04-10)**: 以前は「永続的に削除」と記載していたが、これは不正確だった。
+> 実際には **VirtualMedia が mount されていない状態で列挙されない** だけで、
+> ISO を mount して POST を通すと BIOS が再列挙し、UefiBootSeq にエントリが復活する
+> (`report/2026-04-10_172807_server8_vmedia_recovery_test.md` 反復 1 参照)。
+> それでも racadm BootMode 変更は依然として **禁止**。理由は以下の副次効果:
+>   - この後の復旧手順で Phase A (F3 Load Defaults) を踏まざるを得ず、その副作用で
+>     `BIOS.SerialCommSettings.SerialComm` 等が壊れる (Phase B-2 で復元必要)
+>   - BIOS NVRAM に累積破損が残る懸念 (同レポート反復 3 でハング報告)
+>   - BIOS ジョブ適用が stale ジョブのせいで失敗する事象が観測されている
+
+**症状**: VirtualMedia をマウント+`boot-once VCD-DVD`しても以下のいずれかが発生する:
+- EFI ドライバ初期化ループ（暗い画面が継続）
+- Lifecycle Controller "Collecting System Inventory" で永続停止
+- boot-once が無視されて通常ブート（HDD）にフォールスルー
+
+**回避策**: BootMode を変更する必要がある場合は **VNC 経由で BIOS Setup (F2) から手動変更すること** ([`bios-setup` スキル](../bios-setup/SKILL.md) は 4-6号機専用なので、idrac-kvm-interact.py で操作)。
+
+### VirtualMedia ブート復旧手順 (BootMode 破壊からの回復)
+
+`racadm set BIOS.BiosBootSettings.BootMode` 等で UefiBootSeq から VirtualMedia エントリが消失した場合の復旧手順:
+
+```sh
+# 1. VirtualMedia をアンマウントしてクリーン状態に
+./scripts/idrac-virtualmedia.sh umount $BMC_IP
+./scripts/idrac-virtualmedia.sh boot-reset $BMC_IP
+
+# 2. 現状確認: UefiBootSeq に Optical.iDRACVirtual.1-1 が無い
+ssh -F ssh/config idrac8 racadm get BIOS.BiosBootSettings.UefiBootSeq
+
+# 3. サーバを電源オフ → 電源オン
+./pve-lock.sh wait ./oplog.sh ipmitool -I lanplus -H $BMC_IP -U claude -P Claude123 chassis power off
+sleep 15
+./pve-lock.sh wait ./oplog.sh ipmitool -I lanplus -H $BMC_IP -U claude -P Claude123 chassis power on
+```
+
+**Phase A: VNC で BIOS Setup に入り Load Defaults**
+
+```sh
+# 4. POST 開始まで 45 秒待って F2 を連打 (BIOS Setup 入場)
+sleep 45
+python3 ./scripts/idrac-kvm-interact.py --bmc-ip $BMC_IP sendkeys F2 x30 --wait 2000 \
+    --screenshot-each tmp/<sid>/recover-f2 --pre-screenshot
+
+# 5. "System Setup" メニューで "System BIOS" を選択 (Enter)
+python3 ./scripts/idrac-kvm-interact.py --bmc-ip $BMC_IP sendkeys Enter --wait 2000 \
+    --screenshot tmp/<sid>/recover-bios.png
+
+# 6. F3 (Load Defaults) → Enter で確認
+python3 ./scripts/idrac-kvm-interact.py --bmc-ip $BMC_IP sendkeys F3 --wait 2000 \
+    --screenshot tmp/<sid>/recover-f3.png
+python3 ./scripts/idrac-kvm-interact.py --bmc-ip $BMC_IP sendkeys Enter --wait 2000 \
+    --screenshot tmp/<sid>/recover-f3-confirm.png
+```
+
+**Phase B: BootMode を UEFI に戻す (BIOS UI から)**
+
+Load Defaults 後 BootMode は Bios (Legacy) に戻る。VNC BIOS Setup の "Boot Settings" → "Boot Mode" を **UEFI** に手動変更する。**ここで racadm は使わない**。
+
+```sh
+# 7. BIOS 設定画面で Boot Settings に移動 → Boot Mode を UEFI に変更 → Escape → Finish → Enter
+# (具体的なキー操作はスクリーンショットを見ながら適宜)
+```
+
+> ⚠️ **重要な副作用 (2026-04-10 発見)**: BIOS Load Defaults (F3) は BootMode 以外のすべての BIOS 設定もデフォルトに戻す。特に `BIOS.SerialCommSettings` が以下の壊れた状態にリセットされる:
+> - `SerialComm=OnNoConRedir` (シリアルコンソールリダイレクト無効)
+> - `RedirAfterBoot=Disabled`
+>
+> これが放置されたままだと、**次回 OS セットアップの install-monitor フェーズで SOL に installer 出力が流れず永久ハング**する ([os-setup スキルの Phase 4 iDRAC 事前検証](../os-setup/SKILL.md#idrac-の場合) も参照)。復旧手順に **Phase B-2** を必ず含めること。
+
+**Phase B-2: SerialCommSettings の復元 (racadm 経由で安全)**
+
+Phase A で F3 Load Defaults を実行した場合、BIOS.SerialCommSettings を復元する。`BIOS.SerialCommSettings` は `BIOS.BiosBootSettings.BootMode` と異なり、racadm 経由の変更で UefiBootSeq の VirtualMedia エントリを破壊しない。安全に racadm で変更可能:
+
+```sh
+# 7.5. SerialCommSettings を復元
+./pve-lock.sh wait ./oplog.sh ssh -F ssh/config idrac8 racadm set BIOS.SerialCommSettings.SerialComm OnConRedirCom1
+./pve-lock.sh wait ./oplog.sh ssh -F ssh/config idrac8 racadm set BIOS.SerialCommSettings.RedirAfterBoot Enabled
+./pve-lock.sh wait ./oplog.sh ssh -F ssh/config idrac8 racadm jobqueue create BIOS.Setup.1-1 -s TIME_NOW -r pwrcycle
+# BIOS ジョブ完了を jobqueue view でポーリング (5-6 分)
+```
+
+完了を確認:
+```sh
+ssh -F ssh/config idrac8 racadm get BIOS.SerialCommSettings.SerialComm
+# 期待値: SerialComm=OnConRedirCom1 (Pending Value が表示されないこと)
+```
+
+**Phase C: VirtualMedia マウント + 通常電源投入で BIOS に再列挙させる**
+
+```sh
+# 8. 電源オフ
+./pve-lock.sh wait ./oplog.sh ipmitool -I lanplus -H $BMC_IP -U claude -P Claude123 chassis power off
+
+# 9. VirtualMedia ISO をマウント
+./scripts/idrac-virtualmedia.sh mount $BMC_IP "$REMOTE_URI"
+./scripts/idrac-virtualmedia.sh verify $BMC_IP
+
+# 10. 電源オン (boot-once は不要 — BIOS が VirtualMedia を UefiBootSeq に永続登録する)
+./pve-lock.sh wait ./oplog.sh ipmitool -I lanplus -H $BMC_IP -U claude -P Claude123 chassis power on
+
+# 11. 5 分待って VirtualMedia から起動していることを VNC で確認
+sleep 300
+python3 ./scripts/idrac-kvm-interact.py --bmc-ip $BMC_IP screenshot tmp/<sid>/recover-vmboot.png
+
+# 12. UefiBootSeq に Optical.iDRACVirtual.1-1 が追加されていることを確認
+ssh -F ssh/config idrac8 racadm get BIOS.BiosBootSettings.UefiBootSeq
+# 期待値: ...,Optical.iDRACVirtual.1-1,Floppy.iDRACVirtual.1-1,... が含まれる
+```
+
+**復旧後の正常な UefiBootSeq の例 (8号機, 復旧後):**
+
+```
+Unknown.Unknown.1-1, Optical.iDRACVirtual.1-1, Floppy.iDRACVirtual.1-1,
+Optical.SATAEmbedded.E-1, RAID.Integrated.1-1, NIC.Embedded.1-1-1,
+NIC.Embedded.2-1-1, RAID.Integrated.1-1
+```
+
+`Optical.iDRACVirtual.1-1` が登録されると、以降は `boot-once VCD-DVD` も正常動作する（マウント済み状態で）。エントリは BIOS NVStore に永続化される。
+
+**復旧の根本原理**: BIOS Load Defaults (F3) は UefiBootSeq をクリアし、次回 POST で利用可能なデバイスを再列挙する。VirtualMedia がマウントされた状態で POST すると、BIOS が iDRAC Virtual CDROM を検出して `Optical.iDRACVirtual.1-1` として登録する。一度登録されればエントリは永続化される。
 
 ## SOL (Serial Over LAN)
 

@@ -340,7 +340,7 @@ IPMI 電源断で対象ノードの障害をシミュレーションする。
 
 ## サブコマンド: rejoin
 
-離脱済みノードを LINSTOR クラスタに再参加させる。DRBD フル同期が発生するため、550 GiB で ~99分かかる。
+離脱済みノードを LINSTOR クラスタに再参加させる。DRBD フル同期が発生する。
 
 **pve-lock**: 必須
 
@@ -348,31 +348,31 @@ IPMI 電源断で対象ノードの障害をシミュレーションする。
 
 - 対象ノードが `linstor node delete` で離脱済みであること
 - 対象ノードに SSH 接続可能であること
-- 対象ノードの VG (`linstor_vg`) が存在すること (LV は空であること)
+- 対象ノードの ZFS プール (`linstor_zpool`) が存在すること
 
 ### 手順
 
-1. **LVM 状態確認 + minIoSize 対策** (★ N6 対策):
+1. **ZFS プール状態確認**:
    ```sh
-   ssh root@$TARGET_IP "vgs $VG_NAME"
-   ssh root@$TARGET_IP "lvs $VG_NAME 2>/dev/null"
-   # 各ディスクの physical block size を確認
-   ssh root@$TARGET_IP "blockdev --getpbsz /dev/sd{a,b,c,d}"
+   ssh root@$TARGET_IP "zpool status linstor_zpool"
+   ssh root@$TARGET_IP "zpool list linstor_zpool"
    ```
 
-   VG を再作成する場合は **512B block size のディスクを先頭に配置**すること:
+   ZFS プールが存在しない場合は作成:
    ```sh
-   # stale LV がある場合や VG 再構成が必要な場合:
-   # ssh root@$TARGET_IP "lvremove -f $VG_NAME; vgremove -f $VG_NAME; pvremove /dev/sd{a,b,c,d}"
-   # ssh root@$TARGET_IP "wipefs -af /dev/sd{a,b,c,d} && pvcreate /dev/sd{a,b,c,d}"
-   # 512B ディスクを先頭にして VG 作成 (例: sdb=512B の場合):
-   # ssh root@$TARGET_IP "vgcreate $VG_NAME /dev/sdb /dev/sda /dev/sdc /dev/sdd"
+   # Region A (4-6号機): raidz1, /dev/sda-sdd
+   ssh root@$TARGET_IP "zpool create -f linstor_zpool raidz1 /dev/sda /dev/sdb /dev/sdc /dev/sdd"
+   # Region B (7-9号機): /dev/sdb-sde (sda は OS ディスク)
+   ssh root@$TARGET_IP "zpool create -f linstor_zpool /dev/sdb /dev/sdc /dev/sdd /dev/sde"
+   ```
    ```
 
    コントローラノードの minIoSize と一致していることを確認:
    ```sh
-   ssh root@$CONTROLLER_IP "linstor storage-pool list-properties $CONTROLLER_NODE striped-pool" | grep minIoSize
+   ssh root@$CONTROLLER_IP "linstor storage-pool list-properties $CONTROLLER_NODE zfs-pool"
    ```
+
+   > **注**: ZFS 環境では `auto-block-size=512` が resource-group に設定済みのため、minIoSize 不一致は自動解消される。
 
 2. **LINSTOR ノード登録**:
    ```sh
@@ -387,14 +387,9 @@ IPMI 電源断で対象ノードの障害をシミュレーションする。
    ./pve-lock.sh run ./oplog.sh ssh root@$CONTROLLER_IP "linstor node set-property $TARGET_NODE PrefNic $IB_IFACE"
    ```
 
-4. **ストレージプール作成 + ストライプオプション**:
+4. **ZFS ストレージプール作成**:
    ```sh
-   ./pve-lock.sh run ./oplog.sh ssh root@$CONTROLLER_IP "linstor storage-pool create lvm $TARGET_NODE striped-pool $VG_NAME"
-   # LvcreateOptions: ダッシュ引数が承認プロンプトに引っかかるため scp + ssh パターンで実行
-   # tmp/<session-id>/lvcreate-opts.sh に以下を Write:
-   #   linstor storage-pool set-property $TARGET_NODE striped-pool StorDriver/LvcreateOptions -- '-i4 -I64'
-   scp -F ssh/config tmp/<session-id>/lvcreate-opts.sh root@$CONTROLLER_IP:/tmp/lvcreate-opts.sh
-   ./pve-lock.sh run ./oplog.sh ssh root@$CONTROLLER_IP sh /tmp/lvcreate-opts.sh
+   ./pve-lock.sh run ./oplog.sh ssh root@$CONTROLLER_IP "linstor storage-pool create zfs $TARGET_NODE zfs-pool linstor_zpool"
    ```
 
 5. **Auto-eviction 無効化** (★ N1 対策):
@@ -444,13 +439,24 @@ IPMI 電源断で対象ノードの障害をシミュレーションする。
    ssh root@$CONTROLLER_IP "linstor resource list"      # 両ノードにリソースあり
    ```
 
-### 実測値 (SATA HDD over IPoIB, 4x ストライプ)
+### 実測値
+
+**ZFS raidz1 (現環境)**:
+
+| 操作 | 所要時間 | 備考 |
+|------|---------|------|
+| depart (リソース+SP+ノード削除) | ~10-19秒 | リソース有無で変動 |
+| rejoin (ノード登録〜SP作成) | ~2-3分 | satellite 接続待ち含む |
+| DRBD フル同期 (小データ) | ~30-54秒 | VM 1台分 |
+| cross-region パス作成 | ~30秒 | 3本/ノード |
+| multiregion setup | ~10秒 | Protocol A 設定 |
+| **合計 (depart→rejoin完了)** | **~3-5分** | 小データ時 |
+
+**旧 LVM striped (参考)**:
 
 | データ量 | 所要時間 | レート |
 |---------|---------|--------|
 | ~550 GiB | ~99分 | ~94 MiB/s |
-
-2回実行して同一結果を確認済み。
 
 ### N5: stale DRBD メタデータ
 
