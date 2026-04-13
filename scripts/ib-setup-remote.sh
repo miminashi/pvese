@@ -107,12 +107,17 @@ if [ "$persist" = "1" ]; then
     addr_only=$(echo "$ip_addr" | cut -d/ -f1)
     prefix=$(echo "$ip_addr" | cut -d/ -f2)
 
+    echo "--- Writing /etc/modules-load.d/ib_ipoib.conf ---"
+    echo "ib_ipoib" > /etc/modules-load.d/ib_ipoib.conf
+    echo "Module will load at boot via systemd-modules-load.service"
+
     cat > /etc/network/interfaces.d/ib0 <<ENDCONF
 auto $iface
 iface $iface inet static
     address $addr_only/$prefix
     mtu $mtu
     pre-up modprobe ib_ipoib
+    pre-up sleep 2
     pre-up echo $ib_mode > /sys/class/net/$iface/mode || true
 ENDCONF
 
