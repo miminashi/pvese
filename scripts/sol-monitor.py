@@ -5,10 +5,13 @@ Connects to BMC via SOL and monitors installer output without sending
 any keystrokes. Detects installer stages and waits for power-off.
 
 Exit codes:
-  0 = completed (PowerState Off)
+  0 = completed (PowerState Off AND at least one installer stage observed)
   1 = timeout
   2 = connection error
   3 = abnormal termination
+  4 = PowerState Off but NO installer stages observed (probable false
+      positive — installer never produced output, likely stuck in BIOS
+      boot loop or SOL redirection broken)
 """
 import argparse
 import os
@@ -105,20 +108,47 @@ def confirm_powerstate_off(bmc_ip, bmc_user, bmc_pass, context=""):
     return False
 
 
-def monitor_loop(child, log_file, timeout, powerstate_interval, bmc_ip, bmc_user, bmc_pass):
-    """Main monitoring loop. Returns exit code."""
+def gated_success(current_stage_idx, context):
+    """Gate success-path returns on at least one stage being observed.
+
+    Returns 0 if stages were seen, 4 otherwise (false positive).
+    Logs a clear WARNING in the false-positive case so operators can
+    distinguish silent hangs from legitimate completions.
+    """
+    if current_stage_idx < 0:
+        log(
+            f"WARNING: PowerState=Off ({context}) but NO installer stages observed — "
+            f"treating as FALSE POSITIVE (exit 4). "
+            f"Likely causes: BIOS SerialComm redirection broken, installer "
+            f"stuck in boot loop, or ISO/preseed not reached."
+        )
+        return 4
+    log(f"Installation completed successfully (PowerState Off, {context})")
+    return 0
+
+
+def monitor_loop(
+    child, log_file, timeout, powerstate_interval,
+    bmc_ip, bmc_user, bmc_pass, initial_stage_idx=-1,
+):
+    """Main monitoring loop. Returns (exit_code, current_stage_idx).
+
+    The current_stage_idx is returned so callers (main reconnect path)
+    can propagate observed-stage state across SOL reconnect attempts.
+    """
     start = time.time()
     last_powerstate_check = start
-    current_stage_idx = -1
+    last_stage_log = start
+    current_stage_idx = initial_stage_idx
     power_down_detected = False
 
-    log(f"Monitoring started (timeout={timeout}s, powerstate_interval={powerstate_interval}s)")
+    log(f"Monitoring started (timeout={timeout}s, powerstate_interval={powerstate_interval}s, initial_stage_idx={initial_stage_idx})")
 
     while True:
         elapsed = time.time() - start
         if elapsed >= timeout:
             log(f"Timeout reached ({timeout}s)")
-            return 1
+            return 1, current_stage_idx
 
         try:
             idx = child.expect([pexpect.TIMEOUT, pexpect.EOF], timeout=5)
@@ -147,30 +177,31 @@ def monitor_loop(child, log_file, timeout, powerstate_interval, bmc_ip, bmc_user
                 state = check_powerstate(bmc_ip, bmc_user, bmc_pass)
                 log(f"PowerState after shutdown wait: {state}")
                 if state == "Off":
-                    log("Installation completed successfully (PowerState Off)")
-                    return 0
+                    return gated_success(current_stage_idx, "after 'Power down'"), current_stage_idx
                 log("PowerState not Off yet, continuing monitoring...")
+
+        now = time.time()
+        if now - last_stage_log >= 60:
+            last_stage_log = now
+            log(f"Stage observed: COUNT={current_stage_idx + 1}/{len(INSTALLER_STAGES)}")
 
         if idx == 1:  # EOF
             log("SOL connection lost (EOF)")
             state = check_powerstate(bmc_ip, bmc_user, bmc_pass)
             if state == "Off":
                 if confirm_powerstate_off(bmc_ip, bmc_user, bmc_pass, "SOL EOF"):
-                    log("Installation completed (PowerState Off confirmed after SOL EOF)")
-                    return 0
+                    return gated_success(current_stage_idx, "confirmed after SOL EOF"), current_stage_idx
                 log("Transient Off after SOL EOF, treating as abnormal termination")
-            return 3
+            return 3, current_stage_idx
 
-        now = time.time()
         if now - last_powerstate_check >= powerstate_interval:
             last_powerstate_check = now
             state = check_powerstate(bmc_ip, bmc_user, bmc_pass)
             elapsed_min = (now - start) / 60
-            log(f"PowerState poll: {state} ({elapsed_min:.1f}min)")
+            log(f"PowerState poll: {state} ({elapsed_min:.1f}min, stages={current_stage_idx + 1})")
             if state == "Off":
                 if confirm_powerstate_off(bmc_ip, bmc_user, bmc_pass, "periodic poll"):
-                    log("Installation completed (PowerState Off confirmed)")
-                    return 0
+                    return gated_success(current_stage_idx, "confirmed by periodic poll"), current_stage_idx
 
 
 def sol_connect_with_handshake(bmc_ip, bmc_user, bmc_pass):
@@ -238,6 +269,7 @@ def main():
 
     global_start = time.time()
     reconnects = 0
+    stages_seen = -1  # propagated across reconnects
 
     while reconnects <= args.max_reconnects:
         remaining = args.timeout - (time.time() - global_start)
@@ -248,7 +280,7 @@ def main():
         if reconnects == 0:
             log(f"Connecting SOL to {args.bmc_ip}")
         else:
-            log(f"Reconnecting SOL (attempt {reconnects}/{args.max_reconnects})")
+            log(f"Reconnecting SOL (attempt {reconnects}/{args.max_reconnects}, stages_seen={stages_seen + 1})")
 
         child, ok = sol_connect_with_handshake(
             args.bmc_ip, args.bmc_user, args.bmc_pass
@@ -263,15 +295,16 @@ def main():
             continue
 
         log("SOL connected, starting installer monitoring")
-        rc = monitor_loop(
+        rc, stages_seen = monitor_loop(
             child, args.log_file, remaining, args.powerstate_interval,
             args.bmc_ip, args.bmc_user, args.bmc_pass,
+            initial_stage_idx=stages_seen,
         )
 
         disconnect_sol(child)
         child = None
 
-        if rc in (0, 1):
+        if rc in (0, 1, 4):
             sys.exit(rc)
 
         if rc == 3:  # EOF / abnormal
@@ -281,8 +314,7 @@ def main():
                 if confirm_powerstate_off(
                     args.bmc_ip, args.bmc_user, args.bmc_pass, "reconnect check"
                 ):
-                    log("Installation completed (PowerState Off after SOL loss)")
-                    sys.exit(0)
+                    sys.exit(gated_success(stages_seen, "after SOL loss + reconnect check"))
 
             reconnects += 1
             if reconnects > args.max_reconnects:
@@ -293,10 +325,12 @@ def main():
             time.sleep(5)
             continue
 
-        # rc == 2 (connection error)
         sys.exit(rc)
 
-    log(f"Max reconnects ({args.max_reconnects}) exceeded")
+    log(f"Max reconnects ({args.max_reconnects}) exceeded (stages_seen={stages_seen + 1})")
+    if stages_seen < 0:
+        log("No installer stages observed across all reconnect attempts — exit 4 (false positive)")
+        sys.exit(4)
     sys.exit(3)
 
 
