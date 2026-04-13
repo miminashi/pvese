@@ -42,8 +42,19 @@ disk=$("$YQ" '.disk' "$CONFIG")
 root_password=$("$YQ" '.root_password' "$CONFIG")
 user_name=$("$YQ" '.user_name' "$CONFIG")
 user_password=$("$YQ" '.user_password' "$CONFIG")
+static_ip=$("$YQ" '.static_ip' "$CONFIG")
+static_netmask=$("$YQ" '.static_netmask' "$CONFIG")
+static_iface=$("$YQ" '.static_iface' "$CONFIG")
 
 console_order="console=tty0 console=ttyS1,115200n8"
+
+SSH_PUBKEY_FILE="${PROJECT_DIR}/ssh/id_ed25519.pub"
+if [ -f "$SSH_PUBKEY_FILE" ]; then
+    ssh_public_key=$(cat "$SSH_PUBKEY_FILE" | tr -d '\n')
+else
+    echo "WARNING: SSH public key not found at: $SSH_PUBKEY_FILE" >&2
+    ssh_public_key=""
+fi
 
 result=$(sed \
     -e "s|%%HOSTNAME%%|${hostname}|g" \
@@ -53,6 +64,10 @@ result=$(sed \
     -e "s|%%USER_NAME%%|${user_name}|g" \
     -e "s|%%USER_PASSWORD%%|${user_password}|g" \
     -e "s|%%CONSOLE_ORDER%%|${console_order}|g" \
+    -e "s|%%SSH_PUBLIC_KEY%%|${ssh_public_key}|g" \
+    -e "s|%%STATIC_IP%%|${static_ip}|g" \
+    -e "s|%%STATIC_NETMASK%%|${static_netmask}|g" \
+    -e "s|%%STATIC_IFACE%%|${static_iface}|g" \
     "$TEMPLATE")
 
 if [ -n "$OUTPUT" ]; then
