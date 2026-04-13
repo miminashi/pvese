@@ -36,26 +36,38 @@ Host idrac9
 Host pve4
   HostName 10.10.10.204
   User root
+  IdentityFile /home/ubuntu/projects/pvese/ssh/id_ed25519
+  IdentitiesOnly yes
 
 Host pve5
   HostName 10.10.10.205
   User root
+  IdentityFile /home/ubuntu/projects/pvese/ssh/id_ed25519
+  IdentitiesOnly yes
 
 Host pve6
   HostName 10.10.10.206
   User root
+  IdentityFile /home/ubuntu/projects/pvese/ssh/id_ed25519
+  IdentitiesOnly yes
 
-Host pve7
+Host pve7 10.10.10.207
   HostName 10.10.10.207
   User root
+  IdentityFile /home/ubuntu/projects/pvese/ssh/id_ed25519
+  IdentitiesOnly yes
 
-Host pve8
+Host pve8 10.10.10.208
   HostName 10.10.10.208
   User root
+  IdentityFile /home/ubuntu/projects/pvese/ssh/id_ed25519
+  IdentitiesOnly yes
 
-Host pve9
+Host pve9 10.10.10.209
   HostName 10.10.10.209
   User root
+  IdentityFile /home/ubuntu/projects/pvese/ssh/id_ed25519
+  IdentitiesOnly yes
 
 # --- 全ホスト共通 ---
 Host *
