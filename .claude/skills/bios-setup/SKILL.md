@@ -1,12 +1,12 @@
 ---
 name: bios-setup
-description: "Supermicro X11DPU BIOS Setup 操作。KVM スクリーンショット + キーストロークで BIOS メニューを操作する。BIOS 設定変更、確認、保存を行う。4-6号機のみ対応。"
+description: "Supermicro X11DPU/X10DRT-P BIOS Setup 操作。KVM スクリーンショット + キーストロークで BIOS メニューを操作する。BIOS 設定変更、確認、保存を行う。4-6号機 + 10号機対応。"
 argument-hint: "<subcommand: enter|screenshot|navigate|set|verify|save-exit>"
 ---
 
 # BIOS Setup スキル
 
-Supermicro X11DPU (4-6号機) の AMI Aptio UEFI BIOS Setup をリモート操作する。
+Supermicro X11DPU (4-6号機) と X10DRT-P (10号機) の AMI Aptio UEFI BIOS Setup をリモート操作する。
 Redfish BIOS API は DCMS ライセンス不可のため、**KVM スクリーンショット + キーストローク** のインタラクティブ方式で操作する。
 
 | サブコマンド | 用途 |
@@ -20,9 +20,12 @@ Redfish BIOS API は DCMS ライセンス不可のため、**KVM スクリーン
 
 ## 前提条件
 
-- 対象: 4号機 (10.10.10.24), 5号機 (10.10.10.25), 6号機 (10.10.10.26) のみ
+- 対象:
+  - **4号機 (10.10.10.24), 5号機 (10.10.10.25), 6号機 (10.10.10.26)** — Supermicro X11DPU、AMI Aptio 2.20.1276、claude ユーザは BMC index 2
+  - **10号機 (10.10.10.30)** — Supermicro X10DRT-P (Nutanix NX-1065-G5 OEM)、AMI Aptio 2.17.1249、claude ユーザは BMC index 4、Twin Server 構成、出荷時 Boot Mode = LEGACY
 - 7-9号機 (Dell iDRAC) は非対応
 - Playwright + Chromium インストール済み (`.venv/bin/python`)
+- 設定値・選択肢の詳細は [reference.md](reference.md) を参照 (X11DPU 節と X10DRT-P 節のパラレル構成)
 
 ## ツール
 
@@ -113,9 +116,30 @@ sh tmp/<sid>/enter_bios.sh
 **重要**: Delete キーは POST 後半の Supermicro ロゴ画面（電源投入後40-50秒）で受け付けられる。
 PXE ブート中（FlexBoot/Intel Boot Agent）には受け付けられない。
 
-**POST 92 スタック対策** (4号機のみ):
-4号機は PVE カーネルリブート後に POST code 92 (PCI bus init) でスタックする傾向がある。
+**POST 92 スタック対策 (4号機 X11DPU 固有)**:
+4号機 X11DPU は PVE カーネルリブート後に POST code 92 (PCI bus init) でスタックする傾向がある。
 スタックした場合: ForceOff → 20秒待機 → Power On → Delete 連打を再試行。
+5-6号機 (X11DPU) と 10号機 (X10DRT-P) では未観測。
+
+**10号機 (X10DRT-P) の進入特性 (2026-04-30 確認)**:
+- POST 中に Canvas が `720x400` (POST テキストモード) で出始め、BIOS Setup に入ると `800x600` に切り替わる (X11DPU と同等)
+- 60×Delete --wait 1000 のまま動作し、約 22 キー目で BIOS Setup 画面に到達する (4-6号機より早い)
+- 進入後はロゴ画面ではなくテキストの "Aptio Setup Utility - Copyright (C) 2021 American Megatrends, Inc." が表示される
+- 10号機向けコマンド例:
+
+```sh
+./pve-lock.sh run ./oplog.sh ipmitool -I lanplus -H 10.10.10.30 -U claude -P Claude123 power on
+sleep 3
+.venv/bin/python scripts/bmc-kvm-interact.py \
+    --bmc-ip 10.10.10.30 --bmc-user claude --bmc-pass Claude123 --timeout 90 \
+    sendkeys Delete Delete Delete Delete Delete Delete Delete Delete Delete Delete \
+              Delete Delete Delete Delete Delete Delete Delete Delete Delete Delete \
+              Delete Delete Delete Delete Delete Delete Delete Delete Delete Delete \
+              Delete Delete Delete Delete Delete Delete Delete Delete Delete Delete \
+              Delete Delete Delete Delete Delete Delete Delete Delete Delete Delete \
+              Delete Delete Delete Delete Delete Delete Delete Delete Delete Delete \
+    --wait 1000 --screenshot-each tmp/<sid>/bios_entry --post-wait 300 --no-click
+```
 
 ### サブコマンド: screenshot
 
@@ -493,7 +517,57 @@ Enter → PageDown → Enter               (17個目を Disabled)
 - メモリ電圧・タイミング設定
 - Chipset Configuration の高度な設定
 - Security (Administrator Password 設定は慎重に)
-- Trusted Computing (TPM 設定)
+- Trusted Computing (TPM 設定) — X11DPU のみ。X10DRT-P には TPM サブメニューが存在しない
+
+## X10DRT-P (10号機) 固有差分
+
+X10DRT-P は X11DPU と同じ AMI Aptio V を使用し、**タブ構成 (7枚) とキーバインドは完全に互換** だが、世代差 (Broadwell-EP/C612 vs Skylake-SP/C621) と OEM (Nutanix NX-1065-G5) 由来の差分がある。本セキュションでは操作上の重要な差分のみ列挙する (各設定項目の詳細は [reference.md](reference.md) の X10DRT-P 節を参照)。
+
+### Advanced タブのサブメニュー数: 10 (X11DPU は 16)
+
+10号機には以下のサブメニューが存在しない:
+- Trusted Computing (TPM 2.0 設定)
+- HTTP BOOT Configuration
+- Supermicro KMS Server Configuration
+- TLS Authenticate Configuration
+- iSCSI Configuration
+- Driver Health
+
+サブメニュー名の差分:
+- `PCH SATA Configuration` → `SATA Configuration`
+- `PCH eSATA Configuration` → `sSATA Configuration`
+- `Server ME Information` → `Server ME Configuration`
+- `Option ROM Messages` (Boot Feature 内) → `AddOn ROM Display Mode`
+
+### Boot タブが LEGACY モード固定
+
+10号機の出荷時設定は **Boot Mode = LEGACY**。X11DPU の DUAL モードと UI レイアウトが異なる:
+
+- Boot Order は **7 個** (X11DPU DUAL は 17 個)
+- Legacy Boot Order ドロップダウン値は **8 項目** (X11DPU DUAL は 18 項目)
+- UEFI 系の Boot Option (UEFI Hard Disk:debian, UEFI: Built-in EFI Shell 等) は表示されない
+- BBS Priorities サブメニューは `► NETWORK Drive BBS Priorities` のみ (UEFI Hard Disk Drive BBS / UEFI Application Boot Priorities なし)
+
+UEFI ブートを使用するには Security > Secure Boot Menu の **CSM Support を Disabled** にし、Boot タブの **Boot Mode Select を UEFI** に変更する必要がある。Save 前に F2 (Previous Values) で復元できる状態を維持し、変更後は Boot Override や IPMI VirtualMedia で動作確認すること。
+
+### Save & Exit タブの名称差
+
+| 項目 | X11DPU | X10DRT-P |
+|------|--------|----------|
+| 保存して再起動 | Save Changes and Exit | **Save Changes and Reset** |
+| F4 ショートカット | "Save configuration and exit?" | 同等 (Yes デフォルト) |
+
+### BMC FW 更新の制約 (Nutanix OEM)
+
+- 10号機 (Nutanix NX-1065-G5 OEM) では Supermicro 公式 BMC FW を AlUpdate / Web UI で適用しても **silent reject** される (2026-04-30 確認、`memory/server10_nutanix_oem.md` 参照)
+- 現行 BMC FW: 3.65 (運用継続中)
+- BIOS Setup 操作・KVM スクリーンショット・電源操作には影響なし
+
+### 注意事項 (X10DRT-P 固有)
+
+- **Twin Server 構成**: X10DRT-P は 2U Twin Server。10号機は片ノードで、PCIe スロットラベルは `CPU2 SLOT1/SLOT2/SAS/SXB1` のように CPU2 配下が列挙される
+- **claude ユーザの BMC index は 4** (4-6号機 X11DPU は 2、7-9号機 iDRAC は 3)
+- **AST2400 BMC** で X11DPU の AST2500 より旧世代だが、`bmc-kvm-interact.py` (noVNC + 標準 cgi/login.cgi + url_redirect.cgi) は完全互換 (Phase A 確認済み)
 
 ## oplog 記録
 

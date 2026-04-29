@@ -1,4 +1,4 @@
-next_id: 50
+next_id: 52
 issues:
   - id: 1
     title: Test issue
@@ -539,4 +539,28 @@ issues:
     blocked_by: ""
     report: ""
     labels: []
+    description: ""
+  - id: 50
+    title: '10号機 BMC FW: Nutanix 純正 FW 入手不可、現状維持判断'
+    status: done
+    owner: "noble-kernighan"
+    created: "2026-04-29T20:22:25Z"
+    updated: "2026-04-29T20:25:22Z"
+    blocked_by: ""
+    report: "report/2026-04-30_052242_server10_bmc_fw_nutanix_unavailable.md"
+    labels:
+      - ipmi
+      - infra
+    description: ""
+  - id: 51
+    title: 'bios-setup スキルの X10DRT-P (10号機) 対応: 全項目記録 + reference.md パラレル節追加'
+    status: done
+    owner: "bios10x1"
+    created: "2026-04-29T20:54:50Z"
+    updated: "2026-04-29T21:22:55Z"
+    blocked_by: ""
+    report: "report/2026-04-30_061705_bios_setup_x10drt_p_support.md"
+    labels:
+      - doc
+      - infra
     description: ""

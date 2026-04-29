@@ -1,16 +1,23 @@
-# Supermicro X11DPU BIOS 設定リファレンス
+# Supermicro BIOS 設定リファレンス (X11DPU / X10DRT-P)
 
 ## はじめに
 
-本ドキュメントは Supermicro X11DPU マザーボード (4-6号機) の AMI Aptio UEFI BIOS 設定項目の技術リファレンスである。
+本ドキュメントは pvese プロジェクトで使用する Supermicro マザーボード (X11DPU = 4-6号機, X10DRT-P = 10号機) の AMI Aptio UEFI BIOS 設定項目の技術リファレンスである。
 
-- **対象ハードウェア**: Supermicro X11DPU / X11DPU-Z+ (Dual Socket LGA 3647)
-- **CPU**: Intel Xeon Scalable (Skylake-SP / Cascade Lake-SP), 4号機: Xeon Gold 6130 x2
-- **BIOS**: AMI Aptio Setup Utility, Version 2.20.1276 (Build Date 08/11/2023)
-- **CPLD Version**: 03.B0.06
-- **BMC Firmware**: 01.73.06
+- **対象ハードウェア (X11DPU)**: Supermicro X11DPU / X11DPU-Z+ (Dual Socket LGA 3647)
+  - CPU: Intel Xeon Scalable (Skylake-SP / Cascade Lake-SP), 4号機: Xeon Gold 6130 x2
+  - BIOS: AMI Aptio Setup Utility, Version 2.20.1276 (Build Date 08/11/2023)
+  - CPLD Version: 03.B0.06
+  - BMC Firmware: 01.73.06
+- **対象ハードウェア (X10DRT-P)**: Supermicro X10DRT-P-G5-NI22 (Twin Server, Nutanix NX-1065-G5 OEM)
+  - CPU: Intel Xeon E5-2620 v4 x2 (Broadwell-EP, LGA2011-3, 8C/16T, 2.10GHz)
+  - BIOS: AMI Aptio Setup Utility, Version 2.17.1249 (Build Date 07/14/2021), Version G4G5T8.0
+  - CPLD Version: 03.a1.30
+  - BMC Firmware: 3.65 (Nutanix OEM 制約により Supermicro stock FW 更新不可)
 
 各設定項目について、技術的な解説・PVE 推奨値・変更リスクを記載する。BIOS 操作手順は [SKILL.md](SKILL.md) を参照。
+
+ドキュメントは X11DPU の詳細記述を主軸とし、末尾に **「X10DRT-P (10号機) BIOS 設定リファレンス」** 節を設けて X10DRT-P 固有の値・項目を全タブ全サブメニューで網羅する。X11DPU 節も参照しながら読むとよい (タブ構成・キーバインド・基本概念は共通)。
 
 ### リスクレベル定義
 
@@ -22,6 +29,8 @@
 | **Critical** | データ消失やセキュリティ設定の不可逆変更のリスクがある |
 
 ---
+
+# X11DPU (4-6号機) BIOS 設定リファレンス
 
 ## Main タブ
 
@@ -1033,12 +1042,693 @@ BIOS 設定と Linux カーネルブートパラメータの関連。
 
 ---
 
+---
+
+# X10DRT-P (10号機) BIOS 設定リファレンス
+
+## はじめに (X10DRT-P)
+
+本節は Supermicro X10DRT-P-G5-NI22 マザーボード (10号機, Nutanix NX-1065-G5 OEM) の AMI Aptio UEFI BIOS 設定項目を全タブ全サブメニューで網羅した技術リファレンスである。観測時点 (2026-04-30) の実機状態を反映する。
+
+- **対象ハードウェア**: Supermicro X10DRT-P-G5-NI22 (Twin Server 2U, Nutanix NX-1065-G5 OEM)
+- **CPU**: Intel Xeon E5-2620 v4 x2 (Broadwell-EP, LGA2011-3, 8C/16T per socket = 16C/32T total, 2.10GHz, L3 20MB)
+- **チップセット**: Intel C612 系 (推定)
+- **BIOS**: AMI Aptio Setup Utility, Version 2.17.1249
+- **BIOS Version**: G4G5T8.0
+- **Build Date**: 07/14/2021
+- **CPLD Version**: 03.a1.30
+- **BMC**: ASPEED 2400, Firmware 3.65 (Supermicro stock)
+- **Super IO Chip**: AST2400
+- **メモリ**: 65536 MB (64GB), 2133 MHz (DDR4)
+- **タブ構成**: X11DPU と同一 (Main / Advanced / Event Logs / IPMI / Security / Boot / Save & Exit の 7 タブ循環)
+- **キーバインド**: X11DPU と完全一致 (ArrowKeys / Enter / Esc / +/- / F2-F4 / PageUp/PageDown / Tab)
+- **キャンバス解像度**: 800x600 (BIOS Setup), 720x400 (POST)
+- **特記**: Nutanix OEM 由来のため、BMC FW 更新は Supermicro 公式 FW では silent reject される。BIOS Setup 操作には影響なし
+
+リスクレベル定義は X11DPU 節と共通 (Safe / Moderate / High / Critical)。
+
+---
+
+## Main タブ (X10DRT-P)
+
+設定可能項目: System Date, System Time のみ。
+
+#### System Date
+- **オプション**: MM/DD/YYYY 形式
+- **10号機の現在値**: Thu 01/01/2015 (BMC 3.65 リブート由来でリセット済み)
+- **解説**: NTP で OS 起動後に上書きされる
+- **リスク**: Safe
+
+#### System Time
+- **オプション**: HH:MM:SS 形式
+- **10号機の現在値**: 10:08:21 (観測時点)
+- **解説**: NTP で OS 起動後に上書きされる
+- **リスク**: Safe
+
+#### 読み取り専用情報
+
+| 項目 | 10号機の値 |
+|------|-----------|
+| Supermicro X10DRT-P | (マザーボード型番) |
+| BIOS Version | G4G5T8.0 |
+| Build Date | 07/14/2021 |
+| CPLD Version | 03.a1.30 |
+| Total Memory | 65536 MB (64GB) |
+| Memory Speed | 2133 MHz |
+
+> **X11DPU との差分**: X11DPU には Memory Speed 表示がない。X10DRT-P には DDR4 動作周波数が直接表示される。
+
+---
+
+## Advanced タブ (X10DRT-P)
+
+サブメニュー一覧 (10 個、X11DPU の 16 より少ない):
+
+1. Boot Feature
+2. CPU Configuration
+3. Chipset Configuration (► North Bridge / ► South Bridge)
+4. SATA Configuration
+5. sSATA Configuration
+6. Server ME Configuration
+7. PCIe/PCI/PnP Configuration
+8. Super IO Configuration (► Serial Port 1 / ► Serial Port 2 Configuration)
+9. Serial Port Console Redirection
+10. ACPI Settings
+
+> **X11DPU にあって X10DRT-P にないサブメニュー (BIOS UI に項目自体が存在しない)**: Trusted Computing, HTTP BOOT Configuration, Supermicro KMS Server Configuration, TLS Authenticate Configuration, iSCSI Configuration, Driver Health (合計 6 個)。これらは X10 世代 (Broadwell-EP) BIOS の機能セット差分であり、TPM 2.0・HTTP Boot・TCG Opal などの新世代機能は本機では BIOS から直接設定できない。
+
+> **サブメニュー名の差分**: X11DPU の `PCH SATA Configuration` → X10DRT-P の `SATA Configuration`、X11DPU の `PCH eSATA Configuration` → X10DRT-P の `sSATA Configuration`、X11DPU の `Server ME Information` → X10DRT-P の `Server ME Configuration`。
+
+### 1. Boot Feature (X10DRT-P)
+
+#### Quiet Boot
+- **オプション**: Enabled / Disabled
+- **10号機の現在値**: Enabled
+- **PVE 推奨**: Disabled (POST 情報の視認性向上)
+- **リスク**: Safe
+
+#### AddOn ROM Display Mode
+- **オプション**: Force BIOS / Keep Current
+- **10号機の現在値**: Force BIOS
+- **解説**: Option ROM (NIC, RAID 等) の初期化メッセージ表示方法。X11DPU では同等項目が "Option ROM Messages" という名称
+- **PVE 推奨**: Force BIOS
+- **リスク**: Safe
+
+#### Bootup NumLock State
+- **オプション**: On / Off
+- **10号機の現在値**: On
+
+#### Wait For "F1" If Error
+- **オプション**: Enabled / Disabled
+- **10号機の現在値**: **Disabled** (X11DPU デフォルトは Enabled)
+- **解説**: ヘッドレス運用ではこのデフォルトが便利。Disabled でもエラーは IPMI System Event Log に記録される
+- **リスク**: Safe
+
+#### INT19 Trap Response
+- **オプション**: Immediate / Postponed
+- **10号機の現在値**: Immediate
+
+#### Re-try Boot
+- **オプション**: Disabled / Legacy Boot / EFI Boot (X11DPU と同様と推定)
+- **10号機の現在値**: Disabled
+- **PVE 推奨**: EFI Boot (UEFI 切替後)、現状 LEGACY モードでは Legacy Boot
+- **リスク**: Safe
+
+#### Power Configuration
+
+##### Watch Dog Function
+- **オプション**: Enabled / Disabled
+- **10号機の現在値**: Disabled
+- **解説**: POST ウォッチドッグタイマー
+- **リスク**: Moderate
+
+##### Power Button Function
+- **オプション**: Instant Off / 4 Seconds Override
+- **10号機の現在値**: Instant Off
+
+##### Restore on AC Power Loss
+- **オプション**: Stay Off / Power On / Last State
+- **10号機の現在値**: Last State
+- **PVE 推奨**: Last State
+
+> **注**: X11DPU には `Throttle on Power Fail` / `Allow In-band BIOS Updates` 項目があるが、X10DRT-P の Boot Feature サブメニュー初期画面には表示されていない (PageDown でさらに項目があるかは未確認)。
+
+### 2. CPU Configuration (X10DRT-P)
+
+#### CPU 情報 (読み取り専用)
+
+| 項目 | CPU1 | CPU2 |
+|------|------|------|
+| Processor Socket | CPU1 | CPU2 |
+| Processor ID | 000406F1* | 000406F1 |
+| Processor Frequency | 2.100GHz | 2.100GHz |
+| Processor Max Ratio | 15H | 15H |
+| Processor Min Ratio | 0CH | 0CH |
+| Microcode Revision | 0B00003E | 0B00003E |
+| L1 Cache RAM | 512KB | 512KB |
+| L2 Cache RAM | 2048KB | 2048KB |
+| L3 Cache RAM | 20480KB | 20480KB |
+| Version | Intel(R) Xeon(R) CPU E5-2620 v4 @ 2.10GHz | 同左 |
+
+#### Clock Spread Spectrum
+- **オプション**: Enabled / Disabled
+- **10号機の現在値**: Disabled
+- **解説**: クロック広帯域化による EMI 削減。X10DRT-P 固有 (X11DPU には見えない)
+- **PVE 推奨**: Disabled
+- **リスク**: Safe
+
+#### Hyper-Threading (ALL)
+- **オプション**: Enable / Disable
+- **10号機の現在値**: Enable
+- **PVE 推奨**: Enable
+
+#### Cores Enabled
+- **オプション**: 0 (全コア) / 1～8
+- **10号機の現在値**: 0
+- **PVE 推奨**: 0
+
+#### Monitor/Mwait
+- **オプション**: Enable / Disable
+- **10号機の現在値**: Enable
+
+#### Execute Disable Bit
+- **オプション**: Enable / Disable
+- **10号機の現在値**: Enable
+- **PVE 推奨**: Enable (KVM 必須)
+- **リスク**: Moderate (Disable で KVM 不可)
+
+#### PPIN Control
+- **オプション**: Unlock/Enable / Unlock/Disable / Lock/Disable
+- **10号機の現在値**: Unlock/Enable
+
+#### Hardware Prefetcher
+- **オプション**: Enable / Disable
+- **10号機の現在値**: Enable
+
+#### Adjacent Cache Prefetch
+- **オプション**: Enable / Disable
+- **10号機の現在値**: Enable
+- **解説**: X11DPU では "Adjacent Cache Line Prefetch" (名称差)
+
+#### DCU Streamer Prefetcher
+- **オプション**: Enable / Disable
+- **10号機の現在値**: Enable
+
+> **注**: X11DPU の `Intel Virtualization Technology`, `DCU IP Prefetcher`, `LLC Prefetch` 項目は本観測 (1ページ目) では確認できなかった。PageDown で続きがあると推定される。CPU Configuration の続きを観測する場合は別タスクで PageDown を送信する。
+
+### 3. Chipset Configuration (X10DRT-P)
+
+警告メッセージ: `WARNING: Setting wrong values in below sections may cause...`
+
+サブサブメニュー: ► North Bridge, ► South Bridge
+
+詳細項目は本観測では未取得 (Intel VT-d, IIO Configuration, Memory Configuration などが含まれると推定)。設定変更時は X11DPU の Chipset Configuration 節を参照しつつ、必ず実機で項目構成を確認すること。
+
+### 4. SATA Configuration (X10DRT-P)
+
+X11DPU の "PCH SATA Configuration" に相当。X10DRT-P 命名では "PCH" プレフィックスが省略されている。
+
+#### SATA Controller
+- **オプション**: Enabled / Disabled
+- **10号機の現在値**: Enabled
+- **リスク**: High (Disabled で起動不能の可能性)
+
+#### Configure SATA as
+- **オプション**: AHCI / RAID
+- **10号機の現在値**: AHCI
+- **PVE 推奨**: AHCI
+
+#### SATA Support Aggressive Link Power Mgmt
+- **オプション**: Enabled / Disabled
+- **10号機の現在値**: Disabled
+- **解説**: X10DRT-P 固有項目 (X11DPU には見えない)。SATA リンクの省電力モード
+- **PVE 推奨**: Disabled
+- **リスク**: Moderate
+
+#### SATA Port 0-4
+
+10号機は **全 5 ポート Not Installed** (Twin Server 構成のため SATA HDD は搭載されていない、ブートは NVMe 想定)。
+
+##### Port N Hot Plug
+- **オプション**: Enabled / Disabled
+- **10号機の現在値**: **Enabled** (X11DPU デフォルトは Disabled)
+
+##### Port N Spin Up Device
+- **オプション**: Enabled / Disabled
+- **10号機の現在値**: Disabled
+
+##### Port N SATA Device Type
+- **オプション**: Hard Disk Drive / Solid State Drive
+- **10号機の現在値**: Hard Disk Drive
+
+> **注**: X11DPU の `SATA HDD Unlock` 項目は X10DRT-P には見えない。
+
+### 5. sSATA Configuration (X10DRT-P)
+
+X11DPU の "PCH eSATA Configuration" に相当。secondary SATA コントローラ。
+
+#### sSATA Controller
+- **オプション**: Enabled / Disabled
+- **10号機の現在値**: Enabled
+
+#### Configure sSATA as
+- **10号機の現在値**: AHCI
+
+#### sSATA Support Aggressive Link Power Mgmt
+- **10号機の現在値**: Disabled
+
+#### sSATA Port 0-3
+
+10号機は **全 4 ポート Not Installed** (X11DPU は 0-4 で 5 ポート構成)。各ポートの設定構造は SATA Configuration と同形式。
+
+### 6. Server ME Configuration (X10DRT-P)
+
+X11DPU の "Server ME Information" に相当 (本観測では読み取り専用情報のみ確認)。
+
+#### General ME Configuration (読み取り専用)
+
+| 項目 | 10号機の値 |
+|------|-----------|
+| Operational Firmware Version | 3.1.3.72 |
+| ME Firmware Type | SPS |
+| Recovery Firmware Version | 3.1.3.72 |
+| ME Firmware Features | SiEn+NM+PECIProxy+ICC+ |
+| ME Firmware Status #1 | 0x000F0345 |
+| ME Firmware Status #2 | 0x38002000 |
+| Current State | Operational |
+| Error Code | No Error |
+
+> **X11DPU との差分**: X10DRT-P は ME FW Status #1/#2 raw 値を表示する (X11DPU には見えない)。X11DPU は ME FW 4.1.5.2 (Skylake 世代)、X10DRT-P は 3.1.3.72 (Broadwell 世代の SPS = Server Platform Services)。
+
+### 7. PCIe/PCI/PnP Configuration (X10DRT-P)
+
+#### PCI Bus Driver Version
+- **値**: A5.01.05 (読み取り専用)
+
+#### PCI PERR/SERR Support
+- **オプション**: Enabled / Disabled
+- **10号機の現在値**: Disabled
+- **解説**: PCI Parity/System Error の OS 通知。X10DRT-P 固有 (X11DPU には見えない)
+- **リスク**: Safe
+
+#### Above 4G Decoding
+- **オプション**: Enabled / Disabled
+- **10号機の現在値**: Enabled
+- **PVE 推奨**: Enabled (大容量 BAR を持つデバイスに必須)
+
+#### SR-IOV Support
+- **オプション**: Enabled / Disabled
+- **10号機の現在値**: **Enabled** (X11DPU デフォルトは Disabled)
+- **解説**: X10DRT-P は出荷時 SR-IOV が有効。NIC パススルーに即対応可能だが、不要なら Disabled でセキュリティ向上
+- **リスク**: Moderate
+
+#### ARI Forwarding
+- **オプション**: Enabled / Disabled
+- **10号機の現在値**: Disabled
+
+#### Completion Timeout
+- **オプション**: Default / Shorter / Longer / Disabled (推定)
+- **10号機の現在値**: Default
+
+#### Maximum Payload
+- **オプション**: Auto / 128B / 256B / 512B / 1024B / 2048B / 4096B
+- **10号機の現在値**: Auto
+
+#### Maximum Read Request
+- **オプション**: Auto / 128B / 256B / 512B / 1024B / 2048B / 4096B
+- **10号機の現在値**: Auto
+
+#### ASPM Support
+- **オプション**: Auto / Disabled / Force L0s / Force L1 (推定)
+- **10号機の現在値**: Disabled
+- **解説**: PCIe Active State Power Management。X10DRT-P 固有項目 (X11DPU には見えない)
+- **PVE 推奨**: Disabled (ストレージレイテンシ最適化)
+- **リスク**: Moderate
+
+#### MMIOHBase
+- **オプション**: 56 TB / 40 TB / 24 TB / 16 TB / 4 TB / 2 TB / 1 TB / 512 GB / 256 GB (X11DPU 同等の選択肢と推定)
+- **10号機の現在値**: **2 TB** (X11DPU デフォルトは 56T)
+- **解説**: MMIO 上位ベースアドレス。X11DPU では同等項目が "MMIO High Base"
+- **PVE 推奨**: デフォルトのまま
+- **リスク**: High
+
+#### MMIO High Size
+- **オプション**: 1G / 4G / 16G / 64G / 128G / 256G / 1024G (推定)
+- **10号機の現在値**: **128 GB** (X11DPU デフォルトは 256G)
+- **解説**: X11DPU では "MMIO High Granularity Size" (名称差)
+- **リスク**: High
+
+#### MMCFG BASE
+- **オプション**: Auto / 1 GB / 1.5 GB / ... (推定)
+- **10号機の現在値**: Auto
+
+#### CPU2 SLOT1 PCI-E 3.0 X16 OPROM
+- **オプション**: Disabled / Legacy / EFI
+- **10号機の現在値**: Legacy
+
+#### CPU2 SLOT2 PCI-E 3.0 X8 OPROM
+- **10号機の現在値**: Legacy
+
+#### CPU2 SAS PCI-E 3.0 X8 OPROM
+- **10号機の現在値**: Legacy
+
+#### CPU2 SXB1 PCI-E 3.0 X16 OPROM
+- **10号機の現在値**: Legacy
+
+> **注**: X10DRT-P は Twin Server 構成のため、片ノードでは CPU2 配下のスロットのみ列挙される (ノード A vs ノード B でラベルが変わる可能性あり)。
+
+#### LSI HBA OPROM
+- **オプション**: Disabled / Legacy / EFI (推定)
+- **10号機の現在値**: Disabled
+- **解説**: X10DRT-P 内蔵 LSI HBA Option ROM。X11DPU には見えない項目
+
+#### Onboard LAN OPROM Type
+- **オプション**: Legacy / EFI
+- **10号機の現在値**: Legacy
+
+#### Onboard LAN1 OPROM
+- **オプション**: Disabled / PXE / iSCSI (推定)
+- **10号機の現在値**: **PXE** (X11DPU デフォルトは Legacy)
+- **解説**: NIC PXE ブート用 Option ROM
+- **PVE 推奨**: Disabled (PXE 不要時) または PXE (PXE インストール時)
+
+#### Onboard LAN2 OPROM
+- **10号機の現在値**: Disabled
+
+#### Onboard Video OPROM
+- **オプション**: Disabled / Legacy / EFI
+- **10号機の現在値**: Legacy
+
+### 8. Super IO Configuration (X10DRT-P)
+
+#### Super IO Chip
+- **値**: AST2400 (読み取り専用、X11DPU は AST2500)
+- **解説**: BMC 兼 Super I/O。世代差で COM ポート IRQ などが異なる可能性
+
+#### Serial Port 1 Configuration / Serial Port 2 Configuration
+- サブサブメニュー (本観測では詳細未取得)
+
+### 9. Serial Port Console Redirection (X10DRT-P)
+
+#### COM1
+- **COM1 Console Redirection**: Disabled
+- **COM1 Console Redirection Settings**: ► サブサブメニュー (Terminal Type, Bits per second 等)
+
+#### COM2/SOL (X11DPU では SOL Console Redirection に相当)
+- **COM2/SOL Console Redirection**: **Enabled**
+- **COM2/SOL Console Redirection Settings**: ► サブサブメニュー
+- **解説**: SOL は COM2 経由で動作する。OS 側の `console=ttyS1,115200n8` (config/server10.yml の `serial_unit: 1`) が正しい設定
+- **PVE 推奨**: Enabled (SOL リモートコンソールに必須)
+
+#### Serial Port for Out-of-Band Management/Windows EMS
+- **EMS Console Redirection**: Disabled (Linux では使用しない)
+
+### 10. ACPI Settings (X10DRT-P)
+
+#### WHEA Support
+- **オプション**: Enabled / Disabled
+- **10号機の現在値**: Enabled
+- **PVE 推奨**: Enabled
+
+#### High Precision Event Timer
+- **オプション**: Enabled / Disabled
+- **10号機の現在値**: Enabled
+
+#### NUMA
+- **オプション**: Enabled / Disabled
+- **10号機の現在値**: Enabled
+- **PVE 推奨**: Enabled (Dual Socket 必須)
+- **リスク**: Moderate
+
+#### PCI AER Support
+- **オプション**: Enabled / Disabled
+- **10号機の現在値**: Disabled
+- **解説**: PCI Advanced Error Reporting。X10DRT-P 固有 (X11DPU には見えない)。Linux カーネル `pci=noaer` と関連
+- **リスク**: Safe
+
+---
+
+## Event Logs タブ (X10DRT-P)
+
+X11DPU と同一構成。サブメニュー:
+- ► Change SMBIOS Event Log Settings (SMBIOS Event Log [Enabled], Erase Event Log, When Log is Full, Log System Boot Event)
+- ► View SMBIOS Event Log
+
+詳細項目は X11DPU と同等と推定。
+
+---
+
+## IPMI タブ (X10DRT-P)
+
+#### 読み取り専用情報
+
+| 項目 | 10号機の値 |
+|------|-----------|
+| BMC Firmware Revision | 3.65 |
+
+#### サブメニュー
+
+- ► **System Event Log** (SEL Components, Erase SEL, When SEL is Full)
+- ► **BMC Network Configuration** (Update IPMI LAN Configuration, IPMI LAN Selection, Address Source, Station IP)
+
+詳細項目は X11DPU と同等と推定。BMC Network Configuration は出荷時 Static / 10.10.10.30 で動作確認済み。
+
+---
+
+## Security タブ (X10DRT-P)
+
+#### Password Description (情報表示)
+
+X11DPU と同様の文言:
+- "If ONLY the Administrator's password is set, then this only limits access to Setup and is only asked for when entering Setup."
+- "The User's password cannot be set up until system reboot after Administrator Password is set and saved."
+- パスワード長: 最小 3 / 最大 20 文字
+
+#### Password Check
+- **オプション**: Setup / Always
+- **10号機の現在値**: Setup
+- **PVE 推奨**: Setup
+- **リスク**: High (Always に設定するとリモート起動が困難)
+
+#### Administrator Password
+- **10号機の現在値**: Not Installed
+- **PVE 推奨**: 設定しない (ラボ環境)
+
+#### Secure Boot Menu (サブメニュー)
+
+##### 読み取り専用情報
+
+| 項目 | 10号機の値 |
+|------|-----------|
+| System Mode | Setup |
+| Secure Boot | Not Active |
+| Vendor Keys | Not Active |
+
+##### Secure Boot
+- **オプション**: Enabled / Disabled
+- **10号機の現在値**: Disabled
+- **PVE 推奨**: Disabled (PVE のデフォルト)
+
+##### Secure Boot Mode
+- **オプション**: Standard / Custom
+- **10号機の現在値**: **Custom** (X11DPU デフォルトは Standard)
+- **解説**: Custom は PK/KEK/db/dbx を手動管理可能 (Key Management サブメニューから)
+- **リスク**: Moderate
+
+##### CSM Support
+- **オプション**: Enabled / Disabled
+- **10号機の現在値**: **Enabled** (X11DPU の Secure Boot Menu には項目なし)
+- **解説**: Compatibility Support Module。Legacy ブートを有効にする。CSM Enabled の状態で Secure Boot を有効化することは通常できない (CSM は Legacy 互換のため UEFI Secure Boot と排他的)
+- **PVE 推奨**: UEFI ブートを使用する場合は Disabled に変更
+- **リスク**: Moderate (Disabled に切替えると Boot Mode も UEFI に変更が必要)
+
+##### Key Management (サブメニュー)
+- 詳細未取得 (Secure Boot を使用しない場合は変更不要)
+
+> **重要**: 10号機は出荷時 **Boot Mode = LEGACY + CSM Support = Enabled + Secure Boot Mode = Custom** という組み合わせ。UEFI セキュアブートを使うには CSM を Disabled にして Boot Mode を UEFI に変更する必要がある。`config/server10.yml` で UEFI ブート前提のセットアップを行う場合、本タブの 3 項目を事前に変更すること。
+
+---
+
+## Boot タブ (X10DRT-P)
+
+> **重要差分**: 10号機は出荷時 **LEGACY モード**。X11DPU の DUAL モードと構造が大きく異なる。
+
+#### Boot Configuration (見出し)
+
+#### Setup Prompt Timeout
+- **オプション**: 1～65535 (65535 = 無制限待ち)
+- **10号機の現在値**: 1 (秒)
+- **解説**: POST 中に "Press DEL" 入力受付秒数
+
+#### Boot Mode Select
+- **オプション**: LEGACY / UEFI / DUAL (X11DPU と同様の 3 選択肢と推定)
+- **10号機の現在値**: **LEGACY** (X11DPU デフォルトは DUAL)
+- **解説**: ブートモード変更時は Boot Order とサブメニュー構成がリセットされる
+- **リスク**: Moderate (UEFI ブート用に変更する際は CSM Support も Disabled に揃えること)
+
+#### FIXED BOOT ORDER Priorities (LEGACY モード固有レイアウト)
+
+LEGACY モードでは "Legacy Boot Order #1〜#7" が並ぶ (X11DPU の DUAL モードは 17 個の Boot Option):
+
+| 順位 | 10号機の現在値 |
+|------|--------------|
+| Legacy Boot Order #1 | CD/DVD |
+| Legacy Boot Order #2 | USB CD/DVD |
+| Legacy Boot Order #3 | USB Hard Disk |
+| Legacy Boot Order #4 | USB Key |
+| Legacy Boot Order #5 | Hard Disk |
+| Legacy Boot Order #6 | Network: IBA GE Slot 0300 v1572 |
+| Legacy Boot Order #7 | Disabled |
+
+#### サブメニュー (LEGACY モード時)
+
+- ► **NETWORK Drive BBS Priorities** (BIOS Boot Specification)
+
+(DUAL モード固有の `► Add New Boot Option` / `► UEFI Hard Disk Drive BBS Priorities` 等は LEGACY モードでは表示されない)
+
+#### Legacy Boot Order ドロップダウン値 (8 項目)
+
+LEGACY モードの Boot Order #N で Enter を押した時のドロップダウンリスト:
+
+| Index | 値 |
+|-------|-----|
+| 0 | Hard Disk |
+| 1 | CD/DVD |
+| 2 | USB Hard Disk |
+| 3 | USB CD/DVD |
+| 4 | USB Key |
+| 5 | USB Floppy |
+| 6 | Network: IBA GE Slot 0300 v1572 |
+| 7 | Disabled |
+
+UEFI 系 (UEFI Hard Disk, UEFI CD/DVD, UEFI: Built-in EFI Shell 等) は LEGACY モードでは表示されない。X11DPU DUAL モードの 18 項目とは大きく異なる。
+
+#### キーバインド (X11DPU と同等)
+
+| キー | 動作 |
+|------|------|
+| ArrowDown/ArrowUp | 値を選択 (双方向ラップ) |
+| PageDown | 末尾 (Disabled) にジャンプ |
+| PageUp | 先頭 (Hard Disk) にジャンプ |
+| Enter | 選択値を確定 |
+| Escape | キャンセル |
+
+#### +/- キー (ダイアログ不要の値変更)
+
+X11DPU と同様、Boot Order にカーソルを合わせて `+` / `Shift+Equal` または `-` / `Minus` で値を変更可能 (ダイアログなしで即時確定、双方向ラップ)。
+
+> **UEFI 切替時の注意**: Boot Mode Select を UEFI に変更すると Boot Order の項目数が大きく減る (UEFI 系のみ表示)。Save & Exit で保存する前に必ず F2 (Previous Values) で復元できる状態にしておくこと。
+
+---
+
+## Save & Exit タブ (X10DRT-P)
+
+### Save Options
+
+| 項目 | 動作 | リスク |
+|------|------|--------|
+| **Discard Changes and Exit** | 変更を破棄して終了 (再起動) | Safe |
+| **Save Changes and Reset** | 変更を保存して再起動 (X11DPU では "Save Changes and Exit") | Safe |
+| **Save Changes** | 変更を保存 (BIOS Setup に留まる) | Safe |
+| **Discard Changes** | 変更を破棄 (BIOS Setup に留まる) | Safe |
+
+> **X11DPU との名称差**: X10DRT-P は "Save Changes and Reset" だが X11DPU は "Save Changes and Exit"。動作は同等 (どちらも保存後に再起動)。
+
+### Default Options
+
+| 項目 | 動作 | リスク |
+|------|------|--------|
+| **Restore Optimized Defaults** | 工場出荷時デフォルトに戻す | High (VT-x, NUMA 等もリセット) |
+| **Save as User Defaults** | 現在の設定をユーザデフォルトとして保存 | Safe |
+| **Restore User Defaults** | ユーザデフォルトに戻す | Moderate |
+
+### Boot Override (10号機の現在値)
+
+| デバイス |
+|---------|
+| IBA GE Slot 0300 v1572 |
+
+(LEGACY モードのため UEFI 系のオーバーライドエントリは表示されない。Hard Disk が Boot Override に表示されないのは現状 NVMe が認識されていないためと推定)
+
+### Exit Without Saving ダイアログ
+
+BIOS のトップレベルで Escape を押すと "Exit Without Saving - Quit without saving?" ダイアログが表示される。
+
+| 操作 | 方法 |
+|------|------|
+| "No" を選択 (BIOS に留まる) | Tab → Enter |
+| "Yes" を選択 (保存せず終了) | Enter (Yes がデフォルト選択) |
+
+X11DPU と同等の挙動。
+
+---
+
+## X11DPU と X10DRT-P の主要差分サマリー
+
+| 項目 | X11DPU (4-6号機) | X10DRT-P (10号機) |
+|------|-----------------|-------------------|
+| マザーボード | Supermicro X11DPU | Supermicro X10DRT-P-G5-NI22 (Twin Server) |
+| OEM | Supermicro 公式 | **Nutanix NX-1065-G5 OEM** |
+| CPU | Xeon Gold 6130 (Skylake-SP, LGA3647) | Xeon E5-2620 v4 (Broadwell-EP, LGA2011-3) |
+| PCH | C621/C622 | C612 系 (推定) |
+| BMC チップ | ASPEED AST2500 | ASPEED AST2400 |
+| BMC FW | 01.73.06 | **3.65 (Nutanix OEM 制約で更新不可)** |
+| Super IO | AST2500 | AST2400 |
+| BIOS | AMI Aptio V 2.20.1276 / Version 4.0 | AMI Aptio V 2.17.1249 / Version G4G5T8.0 |
+| ME FW | 4.1.5.2 (PCH 内蔵) | 3.1.3.72 (SPS) |
+| Total Memory (実機) | 32 GB | 64 GB |
+| Memory Speed 表示 | なし | あり (2133 MHz) |
+| BIOS タブ構成 | 7 タブ | 同左 (構成は同一) |
+| キーバインド | AMI Aptio 標準 | 同左 (完全一致) |
+| キャンバス解像度 | 800x600 (BIOS), 720x400 (POST) | 同左 |
+| **Advanced サブメニュー数** | 16 | **10** |
+| Trusted Computing / TPM 2.0 | あり | **なし** |
+| HTTP Boot / KMS / TLS / iSCSI / Driver Health | あり | **なし** |
+| SATA サブメニュー名 | PCH SATA / PCH eSATA Configuration | SATA / sSATA Configuration |
+| Server ME 名 | Server ME Information | Server ME Configuration |
+| AddOn ROM Display Mode 名称 | "Option ROM Messages" | "AddOn ROM Display Mode" |
+| Wait For F1 If Error デフォルト | Enabled | **Disabled** |
+| SATA Hot Plug デフォルト | Disabled | **Enabled** |
+| SR-IOV Support デフォルト | Disabled | **Enabled** |
+| MMIOH 設定名 | High Base + High Granularity Size | **MMIOHBase + MMIO High Size** |
+| Onboard LAN1 OPROM デフォルト | Legacy | **PXE** |
+| ACPI 固有項目 | (なし) | **PCI AER Support** |
+| PCIe 固有項目 (X10DRT-P 側) | (なし) | **PCI PERR/SERR Support, ASPM Support, Clock Spread Spectrum, LSI HBA OPROM** |
+| **Boot Mode デフォルト** | DUAL | **LEGACY** |
+| Boot Order 数 | 17 (DUAL) | **7 (LEGACY)** |
+| Boot Order ドロップダウン値数 | 18 | **8** |
+| Secure Boot Mode デフォルト | Standard | **Custom** |
+| **CSM Support 項目** | Secure Boot Menu に項目なし | **あり (Enabled)** |
+| Save & Exit 主要メニュー | "Save Changes and Exit" | **"Save Changes and Reset"** |
+| 設定変更時の安全策 | F2 (Previous Values) | 同左 (動作確認済み) |
+
+---
+
+## X10DRT-P 観測未完了項目 (将来追加観測候補)
+
+以下は本観測では未取得。将来的に reference.md を拡充する場合のチェックリスト:
+
+- Advanced > Boot Feature Page 2 (PageDown 後の項目: Throttle on Power Fail, Allow In-band BIOS Updates 等の有無)
+- Advanced > CPU Configuration Page 2 (Intel Virtualization Technology, DCU IP Prefetcher, LLC Prefetch 等)
+- Advanced > Chipset Configuration > North Bridge (Intel VT-d, IIO Configuration, Memory Configuration 詳細)
+- Advanced > Chipset Configuration > South Bridge (USB Configuration 等)
+- Advanced > Super IO Configuration > Serial Port 1/2 Configuration 詳細
+- Advanced > Serial Port Console Redirection > COM2/SOL Console Redirection Settings (Terminal Type, Bits per second, Flow Control)
+- Boot Mode Select ドロップダウン (LEGACY / UEFI / DUAL の 3 選択肢確認)
+- Security > Secure Boot Menu > Key Management
+
+これらは LEGACY → UEFI 切替時、または PCI パススルー設定時に必要となる。
+
+---
+
 ## 参考資料
 
 - Supermicro X11DPU User's Manual (ManualsLib)
+- Supermicro X10DRT-P / X10DRT-P-G5-NI22 (Nutanix NX-1065-G5 OEM) User's Manual
 - AMI Aptio V UEFI Firmware BIOS Setup Guide
 - Proxmox VE PCI Passthrough Wiki — IOMMU, VT-d 設定
 - Intel Xeon Scalable Processor Tuning Guide
+- Intel Xeon E5-2600 v4 Family Datasheet (Broadwell-EP)
 - Red Hat Enterprise Linux — SR-IOV Configuration Guide
 - SPEC CPU2017 Supermicro Platform Settings
 - Thomas-Krenn BIOS Settings Wiki
