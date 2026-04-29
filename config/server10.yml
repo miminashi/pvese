@@ -1,0 +1,46 @@
+# Server 10 (ayase-web-service-10) configuration
+# Supermicro X10DRT-P (Twin Server)
+
+hostname: ayase-web-service-10
+domain: local
+
+# Network
+# NOTE: NIC names are X11DPU-style placeholders. Verify on first boot
+#       with `ip link` and adjust if X10DRT-P enumerates differently.
+static_ip: 10.10.10.210
+static_netmask: 8
+static_iface: eno2np1
+dhcp_iface: eno1np0
+
+# Debian ISO
+debian_version: 13
+debian_codename: trixie
+debian_iso_url: https://cdimage.debian.org/debian-cd/current/amd64/iso-cd/debian-13.3.0-amd64-netinst.iso
+debian_iso_sha256: c9f09d24b7e834e6834f2ffa565b33d6f1f540d04bd25c79ad9953bc79a8ac02
+
+# Target disk
+# NOTE: assumes NVMe boot like X11DPU. Verify on first boot.
+disk: /dev/nvme0n1
+
+# BMC
+bmc_type: supermicro
+bmc_ip: 10.10.10.30
+bmc_user: claude
+bmc_pass: Claude123
+
+# SMB share for ISO hosting
+smb_host: 10.1.6.1
+smb_share_path: "\\public"
+iso_filename: debian-preseed-s10.iso
+iso_download_dir: /var/samba/public
+
+# Serial console
+# Verified 2026-04-30 via BIOS Setup observation: COM2/SOL Console Redirection
+# is [Enabled] on X10DRT-P (10号機). serial_unit: 1 (= ttyS1 = COM2) is correct,
+# matching X11DPU 4-6号機.
+serial_unit: 1
+
+# OS credentials (lab environment)
+root_password: password
+user_name: debian
+user_password: password

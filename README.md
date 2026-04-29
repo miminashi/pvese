@@ -106,6 +106,19 @@ os-setup 自動化が対応済みのハードウェアプラットフォーム�
 | VirtualMedia | SMB 経由 (CGI API) |
 | SOL | COM2 / ttyS1 (`serial_unit: 1`) |
 
+### Supermicro X10DRT-P (10号機)
+
+| 項目 | 仕様 |
+|------|------|
+| マザーボード | X10DRT-P (Twin Server 用ハーフ幅) |
+| ブートデバイス | NVMe SSD (`/dev/nvme0n1` 想定、実機確認要) |
+| NIC | `eno1np0`, `eno2np1` 想定 (実機確認要) |
+| BMC | Supermicro IPMI (Redfish + CGI API 想定) |
+| ブートモード | UEFI 想定 |
+| VirtualMedia | SMB 経由 (CGI API) |
+| SOL | COM2 / ttyS1 (`serial_unit: 1` 想定、実機確認要) |
+| LINSTOR | 未参加 (IB 接続性確認後に別タスクで構成決定) |
+
 ### DELL PowerEdge R320 (7-9号機)
 
 | 項目 | 仕様 |
@@ -142,9 +155,11 @@ os-setup 自動化が対応済みのハードウェアプラットフォーム�
 | 7号機 | `10.10.10.27` (iDRAC) | `10.10.10.207` | ayase-web-service-7 | DELL PowerEdge R320 |
 | 8号機 | `10.10.10.28` (iDRAC) | `10.10.10.208` | ayase-web-service-8 | DELL PowerEdge R320 |
 | 9号機 | `10.10.10.29` (iDRAC) | `10.10.10.209` | ayase-web-service-9 | DELL PowerEdge R320 |
+| 10号機 | `10.10.10.30` | `10.10.10.210` | ayase-web-service-10 | Supermicro X10DRT-P |
 
 - 4-6号機: Supermicro X11DPU / BMC: IPMI (Redfish + CGI API)
 - 7-9号機: DELL PowerEdge R320 / BMC: iDRAC7 SSH 鍵認証
+- 10号機: Supermicro X10DRT-P (Twin Server) / BMC: IPMI (Redfish + CGI API 想定、実機確認要) / LINSTOR 未参加
 - OS: Debian 13 (Trixie) + Proxmox VE 9
 - PVE クラスタ: 1リージョン1クラスタ構成 (Region A: 4+5+6号機, Region B: 7+8+9号機)
 
@@ -179,6 +194,10 @@ graph LR
             iDRAC9["iDRAC9<br/>10.10.10.29"]
             PVE9["PVE<br/>10.10.10.209"]
         end
+        subgraph srv10["10号機"]
+            BMC10["BMC<br/>10.10.10.30"]
+            PVE10["PVE<br/>10.10.10.210"]
+        end
         SMB["ISO ホスティング<br/>10.1.6.1"]
         IB["SX6036 IB スイッチ<br/>10.10.10.100"]
     end
@@ -195,12 +214,15 @@ graph LR
     CC -- "SSH" --> PVE9
     CC -- "SSH/racadm" --> iDRAC8
     CC -- "SSH/racadm" --> iDRAC9
+    CC -- "SSH" --> PVE10
+    CC -- "IPMI" --> BMC10
     BMC4 -- "SMB" --> SMB
     BMC5 -- "SMB" --> SMB
     BMC6 -- "SMB" --> SMB
     iDRAC7 -- "SMB" --> SMB
     iDRAC8 -- "SMB" --> SMB
     iDRAC9 -- "SMB" --> SMB
+    BMC10 -- "SMB" --> SMB
     PVE4 -- "InfiniBand" --- IB
     PVE5 -- "InfiniBand" --- IB
     PVE6 -- "InfiniBand" --- IB

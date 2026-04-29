@@ -43,9 +43,11 @@ pvese (Proxmox VE Storage Evaluation) — Supermicro IPMI と Proxmox VE を操�
 | 7号機 | `10.10.10.27` (iDRAC) | `10.10.10.207` | ayase-web-service-7 | `config/server7.yml` |
 | 8号機 | `10.10.10.28` (iDRAC) | `10.10.10.208` | ayase-web-service-8 | `config/server8.yml` |
 | 9号機 | `10.10.10.29` (iDRAC) | `10.10.10.209` | ayase-web-service-9 | `config/server9.yml` |
+| 10号機 | `10.10.10.30` | `10.10.10.210` | ayase-web-service-10 | `config/server10.yml` |
 
 4-6号機共通: ユーザ名 `claude` / パスワード `Claude123` / マザーボード Supermicro X11DPU
 7-9号機: DELL PowerEdge R320 / iDRAC SSH 鍵認証 (`ssh/idrac_rsa`) / Web/IPMI は `claude` / `Claude123` / IPMI LAN 有効化済み / FW 2.65.65.65
+10号機: Supermicro X10DRT-P (Twin Server) / ユーザ名 `claude` / パスワード `Claude123` / NIC・disk・serial_unit は X11DPU と同等想定 (実機確認要) / LINSTOR 未参加
 
 接続コマンド例:
 ```sh
