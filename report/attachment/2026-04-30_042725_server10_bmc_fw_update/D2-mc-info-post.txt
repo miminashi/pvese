@@ -1,0 +1,23 @@
+Device ID                 : 32
+Device Revision           : 1
+Firmware Revision         : 3.65
+IPMI Version              : 2.0
+Manufacturer ID           : 10876
+Manufacturer Name         : Super Micro Computer Inc.
+Product ID                : 2084 (0x0824)
+Product Name              : X10DRT-P
+Device Available          : yes
+Provides Device SDRs      : no
+Additional Device Support :
+    Sensor Device
+    SDR Repository Device
+    SEL Device
+    FRU Inventory Device
+    IPMB Event Receiver
+    IPMB Event Generator
+    Chassis Device
+Aux Firmware Rev Info     : 
+    0x00
+    0x00
+    0x00
+    0x00

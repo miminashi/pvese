@@ -1,0 +1,12 @@
+$ ipmitool -I lanplus -H 10.10.10.30 -U claude -P Claude123 chassis status
+System Power         : off
+Power Overload       : false
+Power Interlock      : inactive
+Main Power Fault     : false
+Power Control Fault  : false
+Power Restore Policy : previous
+Last Power Event     :
+Chassis Intrusion    : inactive
+Front-Panel Lockout  : inactive
+Drive Fault          : false
+Cooling/Fan Fault    : false

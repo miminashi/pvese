@@ -1,0 +1,21 @@
+$ ipmitool -I lanplus -H 10.10.10.30 -U claude -P Claude123 fru print 0
+ Chassis Type          : Other
+ Chassis Part Number   : CSE-217HQ+-000NBP
+ Chassis Serial        : ZM175S011542
+ Board Mfg Date        : Unspecified
+ Board Mfg             : Supermicro
+ Board Product         : NONE
+ Board Serial          : ZM175S011542
+ Board Part Number     : X10DRT-P-G5-NI22
+ Product Manufacturer  : Nutanix
+ Product Name          : NONE
+ Product Part Number   : NX-1065-G5
+ Product Version       : NONE
+ Product Serial        : S231485X7710725
+ Product Asset Tag     : 4003889319673073156
+
+# 注釈:
+# - **Nutanix OEM** (NX-1065-G5) サーバ
+# - ベース: Supermicro X10DRT-P-G5-NI22 (Twin Server)
+# - Chassis: CSE-217HQ+-000NBP (2U 4ノード筐体)
+# - BMC FW は Nutanix 改版または Supermicro stock のいずれか不明 — 公式 supermicro.com FW 適用前に要確認
