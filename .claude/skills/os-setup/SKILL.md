@@ -46,7 +46,25 @@ config の `bmc_type` フィールドでプラットフォームを判別する�
 | POST code 監視 | `bmc-power.sh postcode` | N/A (SOL / VNC で代替) |
 | KVM スクリーンショット | `bmc-kvm.sh screenshot` | `idrac-kvm-screenshot.py` (VNC primary + capconsole fallback) |
 | SOL serial unit | ttyS1 (COM2, `serial_unit: 1`) | ttyS0 (COM1, `serial_unit: 0`) |
-| pre-pve-setup | 不要 | 必要 (`pre-pve-setup.sh`) |
+| pre-pve-setup | 不要 (内部 mgmt + 外部 DHCP は legacy bridge で同居) | 必要 (`pre-pve-setup.sh`) |
+
+> **VLAN trunk 環境** (10号機の例、別拠点): host LAN が 1本の VLAN trunk
+> (内部 mgmt + 外部 DHCP がタグ付き) で来る場合、`config/serverN.yml` に
+> 以下を追加すれば自動で対応される。フィールドが無い 4-9号機は従来動作。
+> ```yaml
+> vlan_iface: eno1            # trunk 物理 NIC (Phase 0 で実測)
+> internet_vlan_id: 1120       # DHCP/インターネット側
+> internal_vlan_id: 1083       # 10.0.0.0/8 内部 mgmt 側
+> static_iface: vmbr0          # 静的 IP は vmbr0 上に乗る
+> dhcp_iface: vmbr1            # DHCP は vmbr1 上に乗る
+> ```
+> - `generate-preseed.sh` が early_command で 8021q + VLAN サブを作り、
+>   late_command で 8021q 永続化と VLAN サブインタフェース定義を target に書き込む
+> - `pve-bridge-setup.sh` を Phase 8 で `--vlan-iface` 系フラグ付きで呼ぶ:
+>   `pve-bridge-setup.sh --vlan-iface eno1 --internet-vlan-id 1120
+>   --internal-vlan-id 1083 --static-ip 10.10.10.210/8`
+> - `pre-pve-setup.sh --dhcp-iface eno1.1120` で動作 (GW 動的検出済み)
+> - 拠点固有 GW (4-9号機の `192.168.39.1` とは違う値) も DHCP 経由で動的取得される
 
 ## 設定値の読み取り
 
@@ -524,6 +542,27 @@ CSRF=$(./scripts/bmc-session.sh csrf "$BMC_IP" "$COOKIE_FILE")
 - R320 の POST は 2-3 分 (Lifecycle Controller 初期化)
 - `./scripts/ssh-wait.sh <static_ip> --timeout 210 --interval 10` で SSH 到達を待つ
 - POST code 監視/KVM は使えない。SOL または VNC で代替
+
+#### ステップ 2-A: Disk first boot 失敗時のリカバリ (LSI HBA OPROM)
+
+**症状**: Power On 後に POST → 「`Reboot and Select proper Boot device`」 → PXE フォールバック → DHCP 失敗で停止。SSH も到達しない。
+
+**典型例**: 10号機 (NX-1065-G5) は OS install 先 disk が **LSI SAS HBA 経由** で、出荷時 BIOS 設定の `LSI HBA OPROM=[Disabled]` のままだと Legacy boot 不能。Boot Override に PXE しか出ず、Boot タブの "Hard Disk Drive BBS Priorities" サブメニューが空 (= disk が boot device として列挙されない)。
+
+**判定**: BIOS Setup に入って以下を確認 (`bios-setup` スキル + `--prefer vkbd`):
+1. **Boot タブ** — Legacy Boot Order #5 = "Hard Disk" の論理スロットは存在するか / **HARD DISK Drive BBS Priorities** サブメニューが出ているか
+2. **Save & Exit > Boot Override** — disk (SATA: <model> や Hard Disk) が列挙されているか
+3. **Advanced > SATA / sSATA Configuration** — 各ポートの "Installed/Not Installed" 状態
+4. **Advanced > PCIe/PCI/PnP Configuration > LSI HBA OPROM** — Disabled/Enabled
+
+**判定フロー**:
+- Boot Override に disk が出る → 直接ブート (Plan A.1)
+- 出ないが SATA/sSATA に Installed あり → Boot Order を直接 "Hard Disk" にして Save (Plan A.2)
+- SATA/sSATA すべて Not Installed + LSI HBA OPROM=Disabled → **`LSI HBA OPROM=[Enabled]` に変更 → F4 → Save & Reset** (Plan A.3 — 10号機の本命)
+- 上記すべて NG → Stock ISO で rescue mode → chroot で `grub-install /dev/sda` (Plan B)
+- rescue で grub-pc 不在等 → preseed 修正後フル再インストール (Plan C)
+
+詳細は [report/2026-05-02_*_server10_disk_first_boot_recovery.md](../../../report/) を参照。
 
 #### ステップ 3: SOL 経由でログイン確認・SSH 鍵配置
 
