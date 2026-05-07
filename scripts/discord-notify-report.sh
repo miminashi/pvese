@@ -46,16 +46,21 @@ CONTENT=$(printf '%s' "$INPUT" | jq -r '.tool_input.content // empty')
 TITLE=$(printf '%s' "$CONTENT" | head -1 | sed 's/^# *//')
 [ -z "$TITLE" ] && TITLE="$FILENAME"
 
-# claude -p で要約生成 (haiku, bare モードで再帰防止)
-SUMMARY="$FILENAME"
+# claude -p で要約生成 (haiku, --tools "" で tool 無効化して再帰防止)
+# --bare は OAuth/keychain を読まないため (ANTHROPIC_API_KEY 必須)、ここでは使わず
+# tool 無効化のみで要約用途に絞る。認証失敗時 claude は stdout にエラー文を出して exit 1 で終わるため、
+# 終了コード + 既知エラーパターンの両方をチェックして異常時はタイトルにフォールバックする
+SUMMARY="$TITLE"
 if command -v claude >/dev/null 2>&1; then
-  GENERATED=$(printf '%s' "$CONTENT" | timeout 30 claude -p \
+  GENERATED=$(printf '%s' "$CONTENT" | timeout 60 claude -p \
     --model haiku \
-    --bare \
+    --tools "" \
+    --exclude-dynamic-system-prompt-sections \
     --dangerously-skip-permissions \
     "以下のレポートの結論がわかる簡潔な要約を150字程度の日本語で生成してください。要約のみを出力し、前置きや説明は不要です。" \
-    2>/dev/null) || true
-  if [ -n "$GENERATED" ]; then
+    2>/dev/null) && RC=0 || RC=$?
+  if [ "$RC" -eq 0 ] && [ -n "$GENERATED" ] \
+     && ! printf '%s' "$GENERATED" | grep -qE 'Not logged in|Please run /login|Invalid API key|Usage limit'; then
     SUMMARY="$GENERATED"
   fi
 fi
