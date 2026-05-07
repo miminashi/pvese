@@ -1,0 +1,78 @@
+smartctl 7.4 2024-10-15 r5620 [x86_64-linux-7.0.0-3-pve] (local build)
+Copyright (C) 2002-23, Bruce Allen, Christian Franke, www.smartmontools.org
+
+=== START OF INFORMATION SECTION ===
+Vendor:               SEAGATE
+Product:              DKS5L-J1R2SS
+Revision:             8F0E
+Compliance:           SPC-3
+User Capacity:        1,200,243,695,616 bytes [1.20 TB]
+Logical block size:   512 bytes
+Physical block size:  4096 bytes
+LU is fully provisioned
+Rotation Rate:        10500 rpm
+Form Factor:          2.5 inches
+Logical Unit id:      0x5000c500d8f72b53
+Serial number:        WFKC5AAR0000C2320NAA
+Device type:          disk
+Transport protocol:   SAS (SPL-4)
+Local Time is:        Fri May  8 03:33:36 2026 JST
+SMART support is:     Available - device has SMART capability.
+SMART support is:     Enabled
+Temperature Warning:  Disabled or Not Supported
+
+=== START OF READ SMART DATA SECTION ===
+SMART Health Status: OK
+
+Grown defects during certification = 0
+Total blocks reassigned during format = 0
+Total new blocks reassigned = 0
+Power on minutes since format = 1072
+Current Drive Temperature:     30 C
+Drive Trip Temperature:        68 C
+
+Accumulated power on time, hours:minutes 3240:32
+Manufactured in week 07 of year 2022
+Specified cycle count over device lifetime:  10000
+Accumulated start-stop cycles:  162
+Specified load-unload count over device lifetime:  300000
+Accumulated load-unload cycles:  319
+Elements in grown defect list: 0
+
+Vendor (Seagate Cache) information
+  Blocks sent to initiator = 1518995256
+  Blocks received from initiator = 2490540112
+  Blocks read from cache and sent to initiator = 122196
+  Number of read and write commands whose size <= segment size = 6980764
+  Number of read and write commands whose size > segment size = 35771
+
+Vendor (Seagate/Hitachi) factory information
+  number of hours powered up = 3240.53
+  number of minutes until next internal SMART test = 56
+
+Error counter log:
+           Errors Corrected by           Total   Correction     Gigabytes    Total
+               ECC          rereads/    errors   algorithm      processed    uncorrected
+           fast | delayed   rewrites  corrected  invocations   [10^9 bytes]  errors
+read:   189269759        0         0  189269759          0        789.016           0
+write:         0        0         0         0          0       1276.598           0
+
+Non-medium error count:        0
+
+
+[GLTSD (Global Logging Target Save Disable) set. Enable Save with '-S on']
+SMART Self-test log
+Num  Test              Status                 segment  LifeTime  LBA_first_err [SK ASC ASQ]
+     Description                              number   (hours)
+# 1  Background short  Completed                   -    3234                 - [-   -    -]
+# 2  Background short  Completed                   -    3234                 - [-   -    -]
+# 3  Background short  Completed                   -    3234                 - [-   -    -]
+# 4  Background short  Completed                   -    3233                 - [-   -    -]
+# 5  Background short  Completed                   -    3233                 - [-   -    -]
+# 6  Background short  Completed                   -    3232                 - [-   -    -]
+# 7  Background short  Completed                   -    3227                 - [-   -    -]
+# 8  Background short  Completed                   -    3227                 - [-   -    -]
+# 9  Background short  Completed                   -    3227                 - [-   -    -]
+
+Long (extended) Self-test duration: 5 seconds [0.1 minutes]
+

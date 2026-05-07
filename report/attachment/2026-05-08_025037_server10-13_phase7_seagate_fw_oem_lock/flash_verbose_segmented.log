@@ -1,0 +1,2127 @@
+=== Flash with verbose 3, full log ===
+Date: Fri May  8 02:47:58 AM JST 2026
+
+==========================================================================================
+ SeaChest_Firmware - Seagate drive utilities - NVMe Enabled
+ Copyright (c) 2014-2018 Seagate Technology LLC and/or its Affiliates, All Rights Reserved
+ SeaChest_Firmware Version: 2.5.4-1_18_3 X86_64
+ Build Date: Oct 18 2018
+ Today: Fri May  8 02:47:58 2026
+==========================================================================================
+Sending SCSI Inquiry
+
+  CDB:
+
+        0  1  2  3  4  5  
+  0x00 12 00 00 00 60 00 
+
+
+  Sense Data Buffer:
+
+        0  1  2  3  4  5  6  7  
+  0x00 00 00 00 00 00 00 00 00 
+
+
+Sense Key: 0h = No Error
+ASC & ASCQ: 0h - 0h = No Additional Sense Information
+FRU: 0h = No Additional Information
+Information: 0000000000000000h
+Command Specific Information: 0000000000000000h
+Command Time (ms): 2.61
+
+Inquiry returning: SUCCESS
+
+Sending SCSI Inquiry, VPD = 00h
+
+  CDB:
+
+        0  1  2  3  4  5  
+  0x00 12 01 00 00 60 00 
+
+
+  Sense Data Buffer:
+
+        0  1  2  3  4  5  6  7  
+  0x00 00 00 00 00 00 00 00 00 
+
+
+Sense Key: 0h = No Error
+ASC & ASCQ: 0h - 0h = No Additional Sense Information
+FRU: 0h = No Additional Information
+Information: 0000000000000000h
+Command Specific Information: 0000000000000000h
+Command Time (us): 560.99
+
+Inquiry returning: SUCCESS
+
+Sending SCSI Inquiry, VPD = 80h
+
+  CDB:
+
+        0  1  2  3  4  5  
+  0x00 12 01 80 00 18 00 
+
+
+  Sense Data Buffer:
+
+        0  1  2  3  4  5  6  7  
+  0x00 00 00 00 00 00 00 00 00 
+
+
+Sense Key: 0h = No Error
+ASC & ASCQ: 0h - 0h = No Additional Sense Information
+FRU: 0h = No Additional Information
+Information: 0000000000000000h
+Command Specific Information: 0000000000000000h
+Command Time (us): 493.09
+
+Inquiry returning: SUCCESS
+
+Sending SCSI Inquiry, VPD = 83h
+
+  CDB:
+
+        0  1  2  3  4  5  
+  0x00 12 01 83 00 60 00 
+
+
+  Sense Data Buffer:
+
+        0  1  2  3  4  5  6  7  
+  0x00 00 00 00 00 00 00 00 00 
+
+
+Sense Key: 0h = No Error
+ASC & ASCQ: 0h - 0h = No Additional Sense Information
+FRU: 0h = No Additional Information
+Information: 0000000000000000h
+Command Specific Information: 0000000000000000h
+Command Time (us): 521.30
+
+Inquiry returning: SUCCESS
+
+Sending SCSI Inquiry, VPD = B1h
+
+  CDB:
+
+        0  1  2  3  4  5  
+  0x00 12 01 B1 00 40 00 
+
+
+  Sense Data Buffer:
+
+        0  1  2  3  4  5  6  7  
+  0x00 00 00 00 00 00 00 00 00 
+
+
+Sense Key: 0h = No Error
+ASC & ASCQ: 0h - 0h = No Additional Sense Information
+FRU: 0h = No Additional Information
+Information: 0000000000000000h
+Command Specific Information: 0000000000000000h
+Command Time (us): 486.15
+
+Inquiry returning: SUCCESS
+
+Sending SCSI Read Capacity 10 command
+
+  CDB:
+
+        0  1  2  3  4  5  6  7  8  9  
+  0x00 25 00 00 00 00 00 00 00 00 00 
+
+
+  Sense Data Buffer:
+
+        0  1  2  3  4  5  6  7  
+  0x00 00 00 00 00 00 00 00 00 
+
+
+Sense Key: 0h = No Error
+ASC & ASCQ: 0h - 0h = No Additional Sense Information
+FRU: 0h = No Additional Information
+Information: 0000000000000000h
+Command Specific Information: 0000000000000000h
+Command Time (us): 489.85
+
+Read Capacity 10 returning: SUCCESS
+
+Sending SCSI Read Capacity 16 command
+
+  CDB:
+
+        0  1  2  3  4  5  6  7  8  9  A  B  C  D  E  F  
+  0x00 9E 10 00 00 00 00 00 00 00 00 00 00 00 20 00 00 
+
+
+  Sense Data Buffer:
+
+        0  1  2  3  4  5  6  7  
+  0x00 00 00 00 00 00 00 00 00 
+
+
+Sense Key: 0h = No Error
+ASC & ASCQ: 0h - 0h = No Additional Sense Information
+FRU: 0h = No Additional Information
+Information: 0000000000000000h
+Command Specific Information: 0000000000000000h
+Command Time (us): 504.56
+
+Read Capacity 16 returning: SUCCESS
+
+Sending SCSI Inquiry, VPD = 89h
+
+  CDB:
+
+        0  1  2  3  4  5  
+  0x00 12 01 89 02 3C 00 
+
+
+  Sense Data Buffer:
+
+        0  1  2  3  4  5  6  7  8  9  A  B  C  D  E  F  
+  0x00 72 05 24 00 00 00 00 1C 02 06 00 00 CF 00 02 00 
+  0x10 03 02 00 01 80 0E 00 00 00 00 00 00 00 00 00 00 
+  0x20 00 00 00 00 
+
+
+Sense Key: 5h = Illegal Request
+ASC & ASCQ: 24h - 0h = Invalid Field In CDB
+FRU: 1h = Vendor Specific
+Information: 0000000000000000h
+Command Specific Information: 0000000000000000h
+Sense Key Specific Information:
+	Invalid field in CDB byte 2 bit 7
+Command Time (us): 543.06
+
+Inquiry returning: NOT SUPPORTED
+
+Sending ATA Identify command
+Sending SAT ATA Pass-Through Command:
+	Protocol: PIO
+	Data Direction: Data In
+	Task File Registers:
+	[Feature] = 00h
+	[Count] = 01h
+	[LBA Lo] = 00h
+	[LBA Mid] = 00h
+	[LBA Hi] = 00h
+	[DeviceHead] = A0h
+	[Command] = ECh
+
+
+  CDB:
+
+        0  1  2  3  4  5  6  7  8  9  A  B  C  D  E  F  
+  0x00 85 08 0E 00 00 00 01 00 00 00 00 00 00 A0 EC 00 
+
+
+  Sense Data Buffer:
+
+        0  1  2  3  4  5  6  7  8  9  A  B  C  D  E  F  
+  0x00 72 05 20 00 00 00 00 1C 02 06 00 00 CF 00 00 00 
+  0x10 03 02 00 01 80 0E 00 00 00 00 00 00 00 00 00 00 
+  0x20 00 00 00 00 
+
+
+Sense Key: 5h = Illegal Request
+ASC & ASCQ: 20h - 0h = Invalid Command Operation Code
+FRU: 1h = Vendor Specific
+	Return Task File Registers:
+	[Error] = 00h
+	[Count] = 00h
+	[LBA Lo] = 00h
+	[LBA Mid] = 00h
+	[LBA Hi] = 00h
+	[Device] = 00h
+	[Status] = 00h
+
+Command Time (us): 175.67
+
+Identify returning: NOT SUPPORTED
+
+Sending ATA Identify Packet Device
+Sending SAT ATA Pass-Through Command:
+	Protocol: PIO
+	Data Direction: Data In
+	Task File Registers:
+	[Feature] = 00h
+	[Count] = 01h
+	[LBA Lo] = 00h
+	[LBA Mid] = 00h
+	[LBA Hi] = 00h
+	[DeviceHead] = A0h
+	[Command] = A1h
+
+
+  CDB:
+
+        0  1  2  3  4  5  6  7  8  9  A  B  C  D  E  F  
+  0x00 85 08 0E 00 00 00 01 00 00 00 00 00 00 A0 A1 00 
+
+
+  Sense Data Buffer:
+
+        0  1  2  3  4  5  6  7  8  9  A  B  C  D  E  F  
+  0x00 72 05 20 00 00 00 00 1C 02 06 00 00 CF 00 00 00 
+  0x10 03 02 00 01 80 0E 00 00 00 00 00 00 00 00 00 00 
+  0x20 00 00 00 00 
+
+
+Sense Key: 5h = Illegal Request
+ASC & ASCQ: 20h - 0h = Invalid Command Operation Code
+FRU: 1h = Vendor Specific
+	Return Task File Registers:
+	[Error] = 00h
+	[Count] = 00h
+	[LBA Lo] = 00h
+	[LBA Mid] = 00h
+	[LBA Hi] = 00h
+	[Device] = 00h
+	[Status] = 00h
+
+Command Time (us): 152.15
+
+Identify Packet Device returning: NOT SUPPORTED
+
+Sending SCSI Test Unit Ready
+
+  CDB:
+
+        0  1  2  3  4  5  
+  0x00 00 00 00 00 00 00 
+
+
+  Sense Data Buffer:
+
+        0  1  2  3  4  5  6  7  
+  0x00 00 00 00 00 00 00 00 00 
+
+
+Sense Key: 0h = No Error
+ASC & ASCQ: 0h - 0h = No Additional Sense Information
+FRU: 0h = No Additional Information
+Information: 0000000000000000h
+Command Specific Information: 0000000000000000h
+Command Time (us): 99.33
+
+Test Unit Ready returning: SUCCESS
+
+Sending ATA Check Power Mode
+Sending SAT ATA Pass-Through Command:
+	Protocol: NON-Data
+	Data Direction: No Data
+	Task File Registers:
+	[Feature] = 00h
+	[Count] = 00h
+	[LBA Lo] = 00h
+	[LBA Mid] = 00h
+	[LBA Hi] = 00h
+	[DeviceHead] = A0h
+	[Command] = E5h
+
+
+  CDB:
+
+        0  1  2  3  4  5  6  7  8  9  A  B  
+  0x00 A1 06 20 00 00 00 00 00 A0 E5 00 00 
+
+
+  Sense Data Buffer:
+
+        0  1  2  3  4  5  6  7  8  9  A  B  C  D  E  F  
+  0x00 72 05 20 00 00 00 00 1C 02 06 00 00 CF 00 00 00 
+  0x10 03 02 00 01 80 0E 00 00 00 00 00 00 00 00 00 00 
+  0x20 00 00 00 00 
+
+
+Sense Key: 5h = Illegal Request
+ASC & ASCQ: 20h - 0h = Invalid Command Operation Code
+FRU: 1h = Vendor Specific
+	Return Task File Registers:
+	[Error] = 00h
+	[Count] = 00h
+	[LBA Lo] = 00h
+	[LBA Mid] = 00h
+	[LBA Hi] = 00h
+	[Device] = 00h
+	[Status] = 00h
+
+Command Time (us): 141.52
+
+Check Power Mode returning: NOT SUPPORTED
+
+Sending SCSI Test Unit Ready
+
+  CDB:
+
+        0  1  2  3  4  5  
+  0x00 00 00 00 00 00 00 
+
+
+  Sense Data Buffer:
+
+        0  1  2  3  4  5  6  7  
+  0x00 00 00 00 00 00 00 00 00 
+
+
+Sense Key: 0h = No Error
+ASC & ASCQ: 0h - 0h = No Additional Sense Information
+FRU: 0h = No Additional Information
+Information: 0000000000000000h
+Command Specific Information: 0000000000000000h
+Command Time (us): 94.16
+
+Test Unit Ready returning: SUCCESS
+
+Sending ATA Identify command
+Sending SAT ATA Pass-Through Command:
+	Protocol: PIO
+	Data Direction: Data In
+	Task File Registers:
+	[Feature] = 00h
+	[Count] = 01h
+	[LBA Lo] = 00h
+	[LBA Mid] = 00h
+	[LBA Hi] = 00h
+	[DeviceHead] = A0h
+	[Command] = ECh
+
+
+  CDB:
+
+        0  1  2  3  4  5  6  7  8  9  A  B  
+  0x00 A1 08 0E 00 01 00 00 00 A0 EC 00 00 
+
+
+  Sense Data Buffer:
+
+        0  1  2  3  4  5  6  7  8  9  A  B  C  D  E  F  
+  0x00 72 05 20 00 00 00 00 1C 02 06 00 00 CF 00 00 00 
+  0x10 03 02 00 01 80 0E 00 00 00 00 00 00 00 00 00 00 
+  0x20 00 00 00 00 
+
+
+Sense Key: 5h = Illegal Request
+ASC & ASCQ: 20h - 0h = Invalid Command Operation Code
+FRU: 1h = Vendor Specific
+	Return Task File Registers:
+	[Error] = 00h
+	[Count] = 00h
+	[LBA Lo] = 00h
+	[LBA Mid] = 00h
+	[LBA Hi] = 00h
+	[Device] = 00h
+	[Status] = 00h
+
+Command Time (us): 132.93
+
+Identify returning: NOT SUPPORTED
+
+Sending ATA Identify Packet Device
+Sending SAT ATA Pass-Through Command:
+	Protocol: PIO
+	Data Direction: Data In
+	Task File Registers:
+	[Feature] = 00h
+	[Count] = 01h
+	[LBA Lo] = 00h
+	[LBA Mid] = 00h
+	[LBA Hi] = 00h
+	[DeviceHead] = A0h
+	[Command] = A1h
+
+
+  CDB:
+
+        0  1  2  3  4  5  6  7  8  9  A  B  
+  0x00 A1 08 0E 00 01 00 00 00 A0 A1 00 00 
+
+
+  Sense Data Buffer:
+
+        0  1  2  3  4  5  6  7  8  9  A  B  C  D  E  F  
+  0x00 72 05 20 00 00 00 00 1C 02 06 00 00 CF 00 00 00 
+  0x10 03 02 00 01 80 0E 00 00 00 00 00 00 00 00 00 00 
+  0x20 00 00 00 00 
+
+
+Sense Key: 5h = Illegal Request
+ASC & ASCQ: 20h - 0h = Invalid Command Operation Code
+FRU: 1h = Vendor Specific
+	Return Task File Registers:
+	[Error] = 00h
+	[Count] = 00h
+	[LBA Lo] = 00h
+	[LBA Mid] = 00h
+	[LBA Hi] = 00h
+	[Device] = 00h
+	[Status] = 00h
+
+Command Time (us): 160.54
+
+Identify Packet Device returning: NOT SUPPORTED
+
+
+/dev/sg1 - DKS5L-J1R2SS - WFKC5AAR0000C2320NAA - SCSI
+Requesting SCSI Supported Op Codes
+
+  CDB:
+
+        0  1  2  3  4  5  6  7  8  9  A  B  
+  0x00 A3 0C 02 3B 00 05 00 00 00 0E 00 00 
+
+
+  Sense Data Buffer:
+
+        0  1  2  3  4  5  6  7  
+  0x00 00 00 00 00 00 00 00 00 
+
+
+Sense Key: 0h = No Error
+ASC & ASCQ: 0h - 0h = No Additional Sense Information
+FRU: 0h = No Additional Information
+Information: 0000000000000000h
+Command Specific Information: 0000000000000000h
+Command Time (us): 520.51
+
+Supported Op Codes returning: SUCCESS
+
+Requesting SCSI Supported Op Codes
+
+  CDB:
+
+        0  1  2  3  4  5  6  7  8  9  A  B  
+  0x00 A3 0C 02 3B 00 07 00 00 00 0E 00 00 
+
+
+  Sense Data Buffer:
+
+        0  1  2  3  4  5  6  7  
+  0x00 00 00 00 00 00 00 00 00 
+
+
+Sense Key: 0h = No Error
+ASC & ASCQ: 0h - 0h = No Additional Sense Information
+FRU: 0h = No Additional Information
+Information: 0000000000000000h
+Command Specific Information: 0000000000000000h
+Command Time (us): 483.55
+
+Supported Op Codes returning: SUCCESS
+
+Requesting SCSI Supported Op Codes
+
+  CDB:
+
+        0  1  2  3  4  5  6  7  8  9  A  B  
+  0x00 A3 0C 02 3B 00 0E 00 00 00 0E 00 00 
+
+
+  Sense Data Buffer:
+
+        0  1  2  3  4  5  6  7  
+  0x00 00 00 00 00 00 00 00 00 
+
+
+Sense Key: 0h = No Error
+ASC & ASCQ: 0h - 0h = No Additional Sense Information
+FRU: 0h = No Additional Information
+Information: 0000000000000000h
+Command Specific Information: 0000000000000000h
+Command Time (us): 499.73
+
+Supported Op Codes returning: SUCCESS
+
+Requesting SCSI Supported Op Codes
+
+  CDB:
+
+        0  1  2  3  4  5  6  7  8  9  A  B  
+  0x00 A3 0C 02 3B 00 0D 00 00 00 0E 00 00 
+
+
+  Sense Data Buffer:
+
+        0  1  2  3  4  5  6  7  
+  0x00 00 00 00 00 00 00 00 00 
+
+
+Sense Key: 0h = No Error
+ASC & ASCQ: 0h - 0h = No Additional Sense Information
+FRU: 0h = No Additional Information
+Information: 0000000000000000h
+Command Specific Information: 0000000000000000h
+Command Time (us): 482.07
+
+Supported Op Codes returning: SUCCESS
+
+Sending SCSI Inquiry, VPD = 86h
+
+  CDB:
+
+        0  1  2  3  4  5  
+  0x00 12 01 86 00 40 00 
+
+
+  Sense Data Buffer:
+
+        0  1  2  3  4  5  6  7  
+  0x00 00 00 00 00 00 00 00 00 
+
+
+Sense Key: 0h = No Error
+ASC & ASCQ: 0h - 0h = No Additional Sense Information
+FRU: 0h = No Additional Information
+Information: 0000000000000000h
+Command Specific Information: 0000000000000000h
+Command Time (us): 495.08
+
+Inquiry returning: SUCCESS
+
+Sending SCSI Read Buffer
+
+  CDB:
+
+        0  1  2  3  4  5  6  7  8  9  
+  0x00 3C 03 00 00 00 00 00 00 04 00 
+
+
+  Sense Data Buffer:
+
+        0  1  2  3  4  5  6  7  
+  0x00 00 00 00 00 00 00 00 00 
+
+
+Sense Key: 0h = No Error
+ASC & ASCQ: 0h - 0h = No Additional Sense Information
+FRU: 0h = No Additional Information
+Information: 0000000000000000h
+Command Specific Information: 0000000000000000h
+Command Time (us): 505.33
+
+Read Buffer returning: SUCCESS
+
+Sending SCSI Inquiry, VPD = C3h
+
+  CDB:
+
+        0  1  2  3  4  5  
+  0x00 12 01 C3 00 FF 00 
+
+
+  Sense Data Buffer:
+
+        0  1  2  3  4  5  6  7  
+  0x00 00 00 00 00 00 00 00 00 
+
+
+Sense Key: 0h = No Error
+ASC & ASCQ: 0h - 0h = No Additional Sense Information
+FRU: 0h = No Additional Information
+Information: 0000000000000000h
+Command Specific Information: 0000000000000000h
+Command Time (us): 587.38
+
+Inquiry returning: SUCCESS
+
+Sending SCSI Write Buffer
+
+  CDB:
+
+        0  1  2  3  4  5  6  7  8  9  
+  0x00 3B 07 00 00 00 00 00 80 00 00 
+
+
+  Sense Data Buffer:
+
+        0  1  2  3  4  5  6  7  
+  0x00 00 00 00 00 00 00 00 00 
+
+
+Sense Key: 0h = No Error
+ASC & ASCQ: 0h - 0h = No Additional Sense Information
+FRU: 0h = No Additional Information
+Information: 0000000000000000h
+Command Specific Information: 0000000000000000h
+Command Time (ms): 134.06
+
+Write Buffer returning: SUCCESS
+
+.Sending SCSI Write Buffer
+
+  CDB:
+
+        0  1  2  3  4  5  6  7  8  9  
+  0x00 3B 07 00 00 80 00 00 80 00 00 
+
+
+  Sense Data Buffer:
+
+        0  1  2  3  4  5  6  7  
+  0x00 00 00 00 00 00 00 00 00 
+
+
+Sense Key: 0h = No Error
+ASC & ASCQ: 0h - 0h = No Additional Sense Information
+FRU: 0h = No Additional Information
+Information: 0000000000000000h
+Command Specific Information: 0000000000000000h
+Command Time (us): 593.59
+
+Write Buffer returning: SUCCESS
+
+.Sending SCSI Write Buffer
+
+  CDB:
+
+        0  1  2  3  4  5  6  7  8  9  
+  0x00 3B 07 00 01 00 00 00 80 00 00 
+
+
+  Sense Data Buffer:
+
+        0  1  2  3  4  5  6  7  
+  0x00 00 00 00 00 00 00 00 00 
+
+
+Sense Key: 0h = No Error
+ASC & ASCQ: 0h - 0h = No Additional Sense Information
+FRU: 0h = No Additional Information
+Information: 0000000000000000h
+Command Specific Information: 0000000000000000h
+Command Time (us): 498.02
+
+Write Buffer returning: SUCCESS
+
+.Sending SCSI Write Buffer
+
+  CDB:
+
+        0  1  2  3  4  5  6  7  8  9  
+  0x00 3B 07 00 01 80 00 00 80 00 00 
+
+
+  Sense Data Buffer:
+
+        0  1  2  3  4  5  6  7  
+  0x00 00 00 00 00 00 00 00 00 
+
+
+Sense Key: 0h = No Error
+ASC & ASCQ: 0h - 0h = No Additional Sense Information
+FRU: 0h = No Additional Information
+Information: 0000000000000000h
+Command Specific Information: 0000000000000000h
+Command Time (us): 467.95
+
+Write Buffer returning: SUCCESS
+
+.Sending SCSI Write Buffer
+
+  CDB:
+
+        0  1  2  3  4  5  6  7  8  9  
+  0x00 3B 07 00 02 00 00 00 80 00 00 
+
+
+  Sense Data Buffer:
+
+        0  1  2  3  4  5  6  7  
+  0x00 00 00 00 00 00 00 00 00 
+
+
+Sense Key: 0h = No Error
+ASC & ASCQ: 0h - 0h = No Additional Sense Information
+FRU: 0h = No Additional Information
+Information: 0000000000000000h
+Command Specific Information: 0000000000000000h
+Command Time (us): 465.18
+
+Write Buffer returning: SUCCESS
+
+.Sending SCSI Write Buffer
+
+  CDB:
+
+        0  1  2  3  4  5  6  7  8  9  
+  0x00 3B 07 00 02 80 00 00 80 00 00 
+
+
+  Sense Data Buffer:
+
+        0  1  2  3  4  5  6  7  
+  0x00 00 00 00 00 00 00 00 00 
+
+
+Sense Key: 0h = No Error
+ASC & ASCQ: 0h - 0h = No Additional Sense Information
+FRU: 0h = No Additional Information
+Information: 0000000000000000h
+Command Specific Information: 0000000000000000h
+Command Time (us): 463.08
+
+Write Buffer returning: SUCCESS
+
+.Sending SCSI Write Buffer
+
+  CDB:
+
+        0  1  2  3  4  5  6  7  8  9  
+  0x00 3B 07 00 03 00 00 00 80 00 00 
+
+
+  Sense Data Buffer:
+
+        0  1  2  3  4  5  6  7  
+  0x00 00 00 00 00 00 00 00 00 
+
+
+Sense Key: 0h = No Error
+ASC & ASCQ: 0h - 0h = No Additional Sense Information
+FRU: 0h = No Additional Information
+Information: 0000000000000000h
+Command Specific Information: 0000000000000000h
+Command Time (us): 501.09
+
+Write Buffer returning: SUCCESS
+
+.Sending SCSI Write Buffer
+
+  CDB:
+
+        0  1  2  3  4  5  6  7  8  9  
+  0x00 3B 07 00 03 80 00 00 80 00 00 
+
+
+  Sense Data Buffer:
+
+        0  1  2  3  4  5  6  7  
+  0x00 00 00 00 00 00 00 00 00 
+
+
+Sense Key: 0h = No Error
+ASC & ASCQ: 0h - 0h = No Additional Sense Information
+FRU: 0h = No Additional Information
+Information: 0000000000000000h
+Command Specific Information: 0000000000000000h
+Command Time (us): 475.13
+
+Write Buffer returning: SUCCESS
+
+.Sending SCSI Write Buffer
+
+  CDB:
+
+        0  1  2  3  4  5  6  7  8  9  
+  0x00 3B 07 00 04 00 00 00 80 00 00 
+
+
+  Sense Data Buffer:
+
+        0  1  2  3  4  5  6  7  
+  0x00 00 00 00 00 00 00 00 00 
+
+
+Sense Key: 0h = No Error
+ASC & ASCQ: 0h - 0h = No Additional Sense Information
+FRU: 0h = No Additional Information
+Information: 0000000000000000h
+Command Specific Information: 0000000000000000h
+Command Time (us): 466.73
+
+Write Buffer returning: SUCCESS
+
+.Sending SCSI Write Buffer
+
+  CDB:
+
+        0  1  2  3  4  5  6  7  8  9  
+  0x00 3B 07 00 04 80 00 00 80 00 00 
+
+
+  Sense Data Buffer:
+
+        0  1  2  3  4  5  6  7  
+  0x00 00 00 00 00 00 00 00 00 
+
+
+Sense Key: 0h = No Error
+ASC & ASCQ: 0h - 0h = No Additional Sense Information
+FRU: 0h = No Additional Information
+Information: 0000000000000000h
+Command Specific Information: 0000000000000000h
+Command Time (us): 460.52
+
+Write Buffer returning: SUCCESS
+
+.Sending SCSI Write Buffer
+
+  CDB:
+
+        0  1  2  3  4  5  6  7  8  9  
+  0x00 3B 07 00 05 00 00 00 80 00 00 
+
+
+  Sense Data Buffer:
+
+        0  1  2  3  4  5  6  7  
+  0x00 00 00 00 00 00 00 00 00 
+
+
+Sense Key: 0h = No Error
+ASC & ASCQ: 0h - 0h = No Additional Sense Information
+FRU: 0h = No Additional Information
+Information: 0000000000000000h
+Command Specific Information: 0000000000000000h
+Command Time (us): 459.12
+
+Write Buffer returning: SUCCESS
+
+.Sending SCSI Write Buffer
+
+  CDB:
+
+        0  1  2  3  4  5  6  7  8  9  
+  0x00 3B 07 00 05 80 00 00 80 00 00 
+
+
+  Sense Data Buffer:
+
+        0  1  2  3  4  5  6  7  
+  0x00 00 00 00 00 00 00 00 00 
+
+
+Sense Key: 0h = No Error
+ASC & ASCQ: 0h - 0h = No Additional Sense Information
+FRU: 0h = No Additional Information
+Information: 0000000000000000h
+Command Specific Information: 0000000000000000h
+Command Time (us): 475.55
+
+Write Buffer returning: SUCCESS
+
+.Sending SCSI Write Buffer
+
+  CDB:
+
+        0  1  2  3  4  5  6  7  8  9  
+  0x00 3B 07 00 06 00 00 00 80 00 00 
+
+
+  Sense Data Buffer:
+
+        0  1  2  3  4  5  6  7  
+  0x00 00 00 00 00 00 00 00 00 
+
+
+Sense Key: 0h = No Error
+ASC & ASCQ: 0h - 0h = No Additional Sense Information
+FRU: 0h = No Additional Information
+Information: 0000000000000000h
+Command Specific Information: 0000000000000000h
+Command Time (us): 451.80
+
+Write Buffer returning: SUCCESS
+
+.Sending SCSI Write Buffer
+
+  CDB:
+
+        0  1  2  3  4  5  6  7  8  9  
+  0x00 3B 07 00 06 80 00 00 80 00 00 
+
+
+  Sense Data Buffer:
+
+        0  1  2  3  4  5  6  7  
+  0x00 00 00 00 00 00 00 00 00 
+
+
+Sense Key: 0h = No Error
+ASC & ASCQ: 0h - 0h = No Additional Sense Information
+FRU: 0h = No Additional Information
+Information: 0000000000000000h
+Command Specific Information: 0000000000000000h
+Command Time (us): 464.56
+
+Write Buffer returning: SUCCESS
+
+.Sending SCSI Write Buffer
+
+  CDB:
+
+        0  1  2  3  4  5  6  7  8  9  
+  0x00 3B 07 00 07 00 00 00 80 00 00 
+
+
+  Sense Data Buffer:
+
+        0  1  2  3  4  5  6  7  
+  0x00 00 00 00 00 00 00 00 00 
+
+
+Sense Key: 0h = No Error
+ASC & ASCQ: 0h - 0h = No Additional Sense Information
+FRU: 0h = No Additional Information
+Information: 0000000000000000h
+Command Specific Information: 0000000000000000h
+Command Time (us): 457.60
+
+Write Buffer returning: SUCCESS
+
+.Sending SCSI Write Buffer
+
+  CDB:
+
+        0  1  2  3  4  5  6  7  8  9  
+  0x00 3B 07 00 07 80 00 00 80 00 00 
+
+
+  Sense Data Buffer:
+
+        0  1  2  3  4  5  6  7  
+  0x00 00 00 00 00 00 00 00 00 
+
+
+Sense Key: 0h = No Error
+ASC & ASCQ: 0h - 0h = No Additional Sense Information
+FRU: 0h = No Additional Information
+Information: 0000000000000000h
+Command Specific Information: 0000000000000000h
+Command Time (us): 476.12
+
+Write Buffer returning: SUCCESS
+
+.Sending SCSI Write Buffer
+
+  CDB:
+
+        0  1  2  3  4  5  6  7  8  9  
+  0x00 3B 07 00 08 00 00 00 80 00 00 
+
+
+  Sense Data Buffer:
+
+        0  1  2  3  4  5  6  7  
+  0x00 00 00 00 00 00 00 00 00 
+
+
+Sense Key: 0h = No Error
+ASC & ASCQ: 0h - 0h = No Additional Sense Information
+FRU: 0h = No Additional Information
+Information: 0000000000000000h
+Command Specific Information: 0000000000000000h
+Command Time (us): 454.15
+
+Write Buffer returning: SUCCESS
+
+.Sending SCSI Write Buffer
+
+  CDB:
+
+        0  1  2  3  4  5  6  7  8  9  
+  0x00 3B 07 00 08 80 00 00 80 00 00 
+
+
+  Sense Data Buffer:
+
+        0  1  2  3  4  5  6  7  
+  0x00 00 00 00 00 00 00 00 00 
+
+
+Sense Key: 0h = No Error
+ASC & ASCQ: 0h - 0h = No Additional Sense Information
+FRU: 0h = No Additional Information
+Information: 0000000000000000h
+Command Specific Information: 0000000000000000h
+Command Time (us): 459.24
+
+Write Buffer returning: SUCCESS
+
+.Sending SCSI Write Buffer
+
+  CDB:
+
+        0  1  2  3  4  5  6  7  8  9  
+  0x00 3B 07 00 09 00 00 00 80 00 00 
+
+
+  Sense Data Buffer:
+
+        0  1  2  3  4  5  6  7  
+  0x00 00 00 00 00 00 00 00 00 
+
+
+Sense Key: 0h = No Error
+ASC & ASCQ: 0h - 0h = No Additional Sense Information
+FRU: 0h = No Additional Information
+Information: 0000000000000000h
+Command Specific Information: 0000000000000000h
+Command Time (us): 476.91
+
+Write Buffer returning: SUCCESS
+
+.Sending SCSI Write Buffer
+
+  CDB:
+
+        0  1  2  3  4  5  6  7  8  9  
+  0x00 3B 07 00 09 80 00 00 80 00 00 
+
+
+  Sense Data Buffer:
+
+        0  1  2  3  4  5  6  7  
+  0x00 00 00 00 00 00 00 00 00 
+
+
+Sense Key: 0h = No Error
+ASC & ASCQ: 0h - 0h = No Additional Sense Information
+FRU: 0h = No Additional Information
+Information: 0000000000000000h
+Command Specific Information: 0000000000000000h
+Command Time (us): 447.73
+
+Write Buffer returning: SUCCESS
+
+.Sending SCSI Write Buffer
+
+  CDB:
+
+        0  1  2  3  4  5  6  7  8  9  
+  0x00 3B 07 00 0A 00 00 00 80 00 00 
+
+
+  Sense Data Buffer:
+
+        0  1  2  3  4  5  6  7  
+  0x00 00 00 00 00 00 00 00 00 
+
+
+Sense Key: 0h = No Error
+ASC & ASCQ: 0h - 0h = No Additional Sense Information
+FRU: 0h = No Additional Information
+Information: 0000000000000000h
+Command Specific Information: 0000000000000000h
+Command Time (us): 469.73
+
+Write Buffer returning: SUCCESS
+
+.Sending SCSI Write Buffer
+
+  CDB:
+
+        0  1  2  3  4  5  6  7  8  9  
+  0x00 3B 07 00 0A 80 00 00 80 00 00 
+
+
+  Sense Data Buffer:
+
+        0  1  2  3  4  5  6  7  
+  0x00 00 00 00 00 00 00 00 00 
+
+
+Sense Key: 0h = No Error
+ASC & ASCQ: 0h - 0h = No Additional Sense Information
+FRU: 0h = No Additional Information
+Information: 0000000000000000h
+Command Specific Information: 0000000000000000h
+Command Time (us): 478.31
+
+Write Buffer returning: SUCCESS
+
+.Sending SCSI Write Buffer
+
+  CDB:
+
+        0  1  2  3  4  5  6  7  8  9  
+  0x00 3B 07 00 0B 00 00 00 80 00 00 
+
+
+  Sense Data Buffer:
+
+        0  1  2  3  4  5  6  7  
+  0x00 00 00 00 00 00 00 00 00 
+
+
+Sense Key: 0h = No Error
+ASC & ASCQ: 0h - 0h = No Additional Sense Information
+FRU: 0h = No Additional Information
+Information: 0000000000000000h
+Command Specific Information: 0000000000000000h
+Command Time (us): 450.62
+
+Write Buffer returning: SUCCESS
+
+.Sending SCSI Write Buffer
+
+  CDB:
+
+        0  1  2  3  4  5  6  7  8  9  
+  0x00 3B 07 00 0B 80 00 00 80 00 00 
+
+
+  Sense Data Buffer:
+
+        0  1  2  3  4  5  6  7  
+  0x00 00 00 00 00 00 00 00 00 
+
+
+Sense Key: 0h = No Error
+ASC & ASCQ: 0h - 0h = No Additional Sense Information
+FRU: 0h = No Additional Information
+Information: 0000000000000000h
+Command Specific Information: 0000000000000000h
+Command Time (us): 467.84
+
+Write Buffer returning: SUCCESS
+
+.Sending SCSI Write Buffer
+
+  CDB:
+
+        0  1  2  3  4  5  6  7  8  9  
+  0x00 3B 07 00 0C 00 00 00 80 00 00 
+
+
+  Sense Data Buffer:
+
+        0  1  2  3  4  5  6  7  
+  0x00 00 00 00 00 00 00 00 00 
+
+
+Sense Key: 0h = No Error
+ASC & ASCQ: 0h - 0h = No Additional Sense Information
+FRU: 0h = No Additional Information
+Information: 0000000000000000h
+Command Specific Information: 0000000000000000h
+Command Time (us): 460.85
+
+Write Buffer returning: SUCCESS
+
+.Sending SCSI Write Buffer
+
+  CDB:
+
+        0  1  2  3  4  5  6  7  8  9  
+  0x00 3B 07 00 0C 80 00 00 80 00 00 
+
+
+  Sense Data Buffer:
+
+        0  1  2  3  4  5  6  7  
+  0x00 00 00 00 00 00 00 00 00 
+
+
+Sense Key: 0h = No Error
+ASC & ASCQ: 0h - 0h = No Additional Sense Information
+FRU: 0h = No Additional Information
+Information: 0000000000000000h
+Command Specific Information: 0000000000000000h
+Command Time (us): 474.63
+
+Write Buffer returning: SUCCESS
+
+.Sending SCSI Write Buffer
+
+  CDB:
+
+        0  1  2  3  4  5  6  7  8  9  
+  0x00 3B 07 00 0D 00 00 00 80 00 00 
+
+
+  Sense Data Buffer:
+
+        0  1  2  3  4  5  6  7  
+  0x00 00 00 00 00 00 00 00 00 
+
+
+Sense Key: 0h = No Error
+ASC & ASCQ: 0h - 0h = No Additional Sense Information
+FRU: 0h = No Additional Information
+Information: 0000000000000000h
+Command Specific Information: 0000000000000000h
+Command Time (us): 457.75
+
+Write Buffer returning: SUCCESS
+
+.Sending SCSI Write Buffer
+
+  CDB:
+
+        0  1  2  3  4  5  6  7  8  9  
+  0x00 3B 07 00 0D 80 00 00 80 00 00 
+
+
+  Sense Data Buffer:
+
+        0  1  2  3  4  5  6  7  
+  0x00 00 00 00 00 00 00 00 00 
+
+
+Sense Key: 0h = No Error
+ASC & ASCQ: 0h - 0h = No Additional Sense Information
+FRU: 0h = No Additional Information
+Information: 0000000000000000h
+Command Specific Information: 0000000000000000h
+Command Time (us): 460.88
+
+Write Buffer returning: SUCCESS
+
+.Sending SCSI Write Buffer
+
+  CDB:
+
+        0  1  2  3  4  5  6  7  8  9  
+  0x00 3B 07 00 0E 00 00 00 80 00 00 
+
+
+  Sense Data Buffer:
+
+        0  1  2  3  4  5  6  7  
+  0x00 00 00 00 00 00 00 00 00 
+
+
+Sense Key: 0h = No Error
+ASC & ASCQ: 0h - 0h = No Additional Sense Information
+FRU: 0h = No Additional Information
+Information: 0000000000000000h
+Command Specific Information: 0000000000000000h
+Command Time (us): 475.04
+
+Write Buffer returning: SUCCESS
+
+.Sending SCSI Write Buffer
+
+  CDB:
+
+        0  1  2  3  4  5  6  7  8  9  
+  0x00 3B 07 00 0E 80 00 00 80 00 00 
+
+
+  Sense Data Buffer:
+
+        0  1  2  3  4  5  6  7  
+  0x00 00 00 00 00 00 00 00 00 
+
+
+Sense Key: 0h = No Error
+ASC & ASCQ: 0h - 0h = No Additional Sense Information
+FRU: 0h = No Additional Information
+Information: 0000000000000000h
+Command Specific Information: 0000000000000000h
+Command Time (us): 454.70
+
+Write Buffer returning: SUCCESS
+
+.Sending SCSI Write Buffer
+
+  CDB:
+
+        0  1  2  3  4  5  6  7  8  9  
+  0x00 3B 07 00 0F 00 00 00 80 00 00 
+
+
+  Sense Data Buffer:
+
+        0  1  2  3  4  5  6  7  
+  0x00 00 00 00 00 00 00 00 00 
+
+
+Sense Key: 0h = No Error
+ASC & ASCQ: 0h - 0h = No Additional Sense Information
+FRU: 0h = No Additional Information
+Information: 0000000000000000h
+Command Specific Information: 0000000000000000h
+Command Time (us): 457.62
+
+Write Buffer returning: SUCCESS
+
+.Sending SCSI Write Buffer
+
+  CDB:
+
+        0  1  2  3  4  5  6  7  8  9  
+  0x00 3B 07 00 0F 80 00 00 80 00 00 
+
+
+  Sense Data Buffer:
+
+        0  1  2  3  4  5  6  7  
+  0x00 00 00 00 00 00 00 00 00 
+
+
+Sense Key: 0h = No Error
+ASC & ASCQ: 0h - 0h = No Additional Sense Information
+FRU: 0h = No Additional Information
+Information: 0000000000000000h
+Command Specific Information: 0000000000000000h
+Command Time (us): 478.81
+
+Write Buffer returning: SUCCESS
+
+.Sending SCSI Write Buffer
+
+  CDB:
+
+        0  1  2  3  4  5  6  7  8  9  
+  0x00 3B 07 00 10 00 00 00 80 00 00 
+
+
+  Sense Data Buffer:
+
+        0  1  2  3  4  5  6  7  
+  0x00 00 00 00 00 00 00 00 00 
+
+
+Sense Key: 0h = No Error
+ASC & ASCQ: 0h - 0h = No Additional Sense Information
+FRU: 0h = No Additional Information
+Information: 0000000000000000h
+Command Specific Information: 0000000000000000h
+Command Time (us): 457.50
+
+Write Buffer returning: SUCCESS
+
+.Sending SCSI Write Buffer
+
+  CDB:
+
+        0  1  2  3  4  5  6  7  8  9  
+  0x00 3B 07 00 10 80 00 00 80 00 00 
+
+
+  Sense Data Buffer:
+
+        0  1  2  3  4  5  6  7  
+  0x00 00 00 00 00 00 00 00 00 
+
+
+Sense Key: 0h = No Error
+ASC & ASCQ: 0h - 0h = No Additional Sense Information
+FRU: 0h = No Additional Information
+Information: 0000000000000000h
+Command Specific Information: 0000000000000000h
+Command Time (us): 458.47
+
+Write Buffer returning: SUCCESS
+
+.Sending SCSI Write Buffer
+
+  CDB:
+
+        0  1  2  3  4  5  6  7  8  9  
+  0x00 3B 07 00 11 00 00 00 80 00 00 
+
+
+  Sense Data Buffer:
+
+        0  1  2  3  4  5  6  7  
+  0x00 00 00 00 00 00 00 00 00 
+
+
+Sense Key: 0h = No Error
+ASC & ASCQ: 0h - 0h = No Additional Sense Information
+FRU: 0h = No Additional Information
+Information: 0000000000000000h
+Command Specific Information: 0000000000000000h
+Command Time (us): 461.75
+
+Write Buffer returning: SUCCESS
+
+.Sending SCSI Write Buffer
+
+  CDB:
+
+        0  1  2  3  4  5  6  7  8  9  
+  0x00 3B 07 00 11 80 00 00 80 00 00 
+
+
+  Sense Data Buffer:
+
+        0  1  2  3  4  5  6  7  
+  0x00 00 00 00 00 00 00 00 00 
+
+
+Sense Key: 0h = No Error
+ASC & ASCQ: 0h - 0h = No Additional Sense Information
+FRU: 0h = No Additional Information
+Information: 0000000000000000h
+Command Specific Information: 0000000000000000h
+Command Time (us): 461.14
+
+Write Buffer returning: SUCCESS
+
+.Sending SCSI Write Buffer
+
+  CDB:
+
+        0  1  2  3  4  5  6  7  8  9  
+  0x00 3B 07 00 12 00 00 00 80 00 00 
+
+
+  Sense Data Buffer:
+
+        0  1  2  3  4  5  6  7  
+  0x00 00 00 00 00 00 00 00 00 
+
+
+Sense Key: 0h = No Error
+ASC & ASCQ: 0h - 0h = No Additional Sense Information
+FRU: 0h = No Additional Information
+Information: 0000000000000000h
+Command Specific Information: 0000000000000000h
+Command Time (us): 458.12
+
+Write Buffer returning: SUCCESS
+
+.Sending SCSI Write Buffer
+
+  CDB:
+
+        0  1  2  3  4  5  6  7  8  9  
+  0x00 3B 07 00 12 80 00 00 80 00 00 
+
+
+  Sense Data Buffer:
+
+        0  1  2  3  4  5  6  7  
+  0x00 00 00 00 00 00 00 00 00 
+
+
+Sense Key: 0h = No Error
+ASC & ASCQ: 0h - 0h = No Additional Sense Information
+FRU: 0h = No Additional Information
+Information: 0000000000000000h
+Command Specific Information: 0000000000000000h
+Command Time (us): 457.68
+
+Write Buffer returning: SUCCESS
+
+.Sending SCSI Write Buffer
+
+  CDB:
+
+        0  1  2  3  4  5  6  7  8  9  
+  0x00 3B 07 00 13 00 00 00 80 00 00 
+
+
+  Sense Data Buffer:
+
+        0  1  2  3  4  5  6  7  
+  0x00 00 00 00 00 00 00 00 00 
+
+
+Sense Key: 0h = No Error
+ASC & ASCQ: 0h - 0h = No Additional Sense Information
+FRU: 0h = No Additional Information
+Information: 0000000000000000h
+Command Specific Information: 0000000000000000h
+Command Time (us): 458.42
+
+Write Buffer returning: SUCCESS
+
+.Sending SCSI Write Buffer
+
+  CDB:
+
+        0  1  2  3  4  5  6  7  8  9  
+  0x00 3B 07 00 13 80 00 00 80 00 00 
+
+
+  Sense Data Buffer:
+
+        0  1  2  3  4  5  6  7  
+  0x00 00 00 00 00 00 00 00 00 
+
+
+Sense Key: 0h = No Error
+ASC & ASCQ: 0h - 0h = No Additional Sense Information
+FRU: 0h = No Additional Information
+Information: 0000000000000000h
+Command Specific Information: 0000000000000000h
+Command Time (us): 458.74
+
+Write Buffer returning: SUCCESS
+
+.Sending SCSI Write Buffer
+
+  CDB:
+
+        0  1  2  3  4  5  6  7  8  9  
+  0x00 3B 07 00 14 00 00 00 80 00 00 
+
+
+  Sense Data Buffer:
+
+        0  1  2  3  4  5  6  7  
+  0x00 00 00 00 00 00 00 00 00 
+
+
+Sense Key: 0h = No Error
+ASC & ASCQ: 0h - 0h = No Additional Sense Information
+FRU: 0h = No Additional Information
+Information: 0000000000000000h
+Command Specific Information: 0000000000000000h
+Command Time (us): 472.97
+
+Write Buffer returning: SUCCESS
+
+.Sending SCSI Write Buffer
+
+  CDB:
+
+        0  1  2  3  4  5  6  7  8  9  
+  0x00 3B 07 00 14 80 00 00 80 00 00 
+
+
+  Sense Data Buffer:
+
+        0  1  2  3  4  5  6  7  
+  0x00 00 00 00 00 00 00 00 00 
+
+
+Sense Key: 0h = No Error
+ASC & ASCQ: 0h - 0h = No Additional Sense Information
+FRU: 0h = No Additional Information
+Information: 0000000000000000h
+Command Specific Information: 0000000000000000h
+Command Time (us): 449.44
+
+Write Buffer returning: SUCCESS
+
+.Sending SCSI Write Buffer
+
+  CDB:
+
+        0  1  2  3  4  5  6  7  8  9  
+  0x00 3B 07 00 15 00 00 00 80 00 00 
+
+
+  Sense Data Buffer:
+
+        0  1  2  3  4  5  6  7  
+  0x00 00 00 00 00 00 00 00 00 
+
+
+Sense Key: 0h = No Error
+ASC & ASCQ: 0h - 0h = No Additional Sense Information
+FRU: 0h = No Additional Information
+Information: 0000000000000000h
+Command Specific Information: 0000000000000000h
+Command Time (us): 465.71
+
+Write Buffer returning: SUCCESS
+
+.Sending SCSI Write Buffer
+
+  CDB:
+
+        0  1  2  3  4  5  6  7  8  9  
+  0x00 3B 07 00 15 80 00 00 80 00 00 
+
+
+  Sense Data Buffer:
+
+        0  1  2  3  4  5  6  7  
+  0x00 00 00 00 00 00 00 00 00 
+
+
+Sense Key: 0h = No Error
+ASC & ASCQ: 0h - 0h = No Additional Sense Information
+FRU: 0h = No Additional Information
+Information: 0000000000000000h
+Command Specific Information: 0000000000000000h
+Command Time (us): 472.19
+
+Write Buffer returning: SUCCESS
+
+.Sending SCSI Write Buffer
+
+  CDB:
+
+        0  1  2  3  4  5  6  7  8  9  
+  0x00 3B 07 00 16 00 00 00 80 00 00 
+
+
+  Sense Data Buffer:
+
+        0  1  2  3  4  5  6  7  
+  0x00 00 00 00 00 00 00 00 00 
+
+
+Sense Key: 0h = No Error
+ASC & ASCQ: 0h - 0h = No Additional Sense Information
+FRU: 0h = No Additional Information
+Information: 0000000000000000h
+Command Specific Information: 0000000000000000h
+Command Time (us): 462.64
+
+Write Buffer returning: SUCCESS
+
+.Sending SCSI Write Buffer
+
+  CDB:
+
+        0  1  2  3  4  5  6  7  8  9  
+  0x00 3B 07 00 16 80 00 00 80 00 00 
+
+
+  Sense Data Buffer:
+
+        0  1  2  3  4  5  6  7  
+  0x00 00 00 00 00 00 00 00 00 
+
+
+Sense Key: 0h = No Error
+ASC & ASCQ: 0h - 0h = No Additional Sense Information
+FRU: 0h = No Additional Information
+Information: 0000000000000000h
+Command Specific Information: 0000000000000000h
+Command Time (us): 481.62
+
+Write Buffer returning: SUCCESS
+
+.Sending SCSI Write Buffer
+
+  CDB:
+
+        0  1  2  3  4  5  6  7  8  9  
+  0x00 3B 07 00 17 00 00 00 80 00 00 
+
+
+  Sense Data Buffer:
+
+        0  1  2  3  4  5  6  7  
+  0x00 00 00 00 00 00 00 00 00 
+
+
+Sense Key: 0h = No Error
+ASC & ASCQ: 0h - 0h = No Additional Sense Information
+FRU: 0h = No Additional Information
+Information: 0000000000000000h
+Command Specific Information: 0000000000000000h
+Command Time (us): 462.00
+
+Write Buffer returning: SUCCESS
+
+.Sending SCSI Write Buffer
+
+  CDB:
+
+        0  1  2  3  4  5  6  7  8  9  
+  0x00 3B 07 00 17 80 00 00 80 00 00 
+
+
+  Sense Data Buffer:
+
+        0  1  2  3  4  5  6  7  
+  0x00 00 00 00 00 00 00 00 00 
+
+
+Sense Key: 0h = No Error
+ASC & ASCQ: 0h - 0h = No Additional Sense Information
+FRU: 0h = No Additional Information
+Information: 0000000000000000h
+Command Specific Information: 0000000000000000h
+Command Time (us): 465.27
+
+Write Buffer returning: SUCCESS
+
+.Sending SCSI Write Buffer
+
+  CDB:
+
+        0  1  2  3  4  5  6  7  8  9  
+  0x00 3B 07 00 18 00 00 00 80 00 00 
+
+
+  Sense Data Buffer:
+
+        0  1  2  3  4  5  6  7  
+  0x00 00 00 00 00 00 00 00 00 
+
+
+Sense Key: 0h = No Error
+ASC & ASCQ: 0h - 0h = No Additional Sense Information
+FRU: 0h = No Additional Information
+Information: 0000000000000000h
+Command Specific Information: 0000000000000000h
+Command Time (us): 461.99
+
+Write Buffer returning: SUCCESS
+
+.Sending SCSI Write Buffer
+
+  CDB:
+
+        0  1  2  3  4  5  6  7  8  9  
+  0x00 3B 07 00 18 80 00 00 80 00 00 
+
+
+  Sense Data Buffer:
+
+        0  1  2  3  4  5  6  7  
+  0x00 00 00 00 00 00 00 00 00 
+
+
+Sense Key: 0h = No Error
+ASC & ASCQ: 0h - 0h = No Additional Sense Information
+FRU: 0h = No Additional Information
+Information: 0000000000000000h
+Command Specific Information: 0000000000000000h
+Command Time (us): 458.35
+
+Write Buffer returning: SUCCESS
+
+.Sending SCSI Write Buffer
+
+  CDB:
+
+        0  1  2  3  4  5  6  7  8  9  
+  0x00 3B 07 00 19 00 00 00 80 00 00 
+
+
+  Sense Data Buffer:
+
+        0  1  2  3  4  5  6  7  
+  0x00 00 00 00 00 00 00 00 00 
+
+
+Sense Key: 0h = No Error
+ASC & ASCQ: 0h - 0h = No Additional Sense Information
+FRU: 0h = No Additional Information
+Information: 0000000000000000h
+Command Specific Information: 0000000000000000h
+Command Time (us): 483.24
+
+Write Buffer returning: SUCCESS
+
+.Sending SCSI Write Buffer
+
+  CDB:
+
+        0  1  2  3  4  5  6  7  8  9  
+  0x00 3B 07 00 19 80 00 00 80 00 00 
+
+
+  Sense Data Buffer:
+
+        0  1  2  3  4  5  6  7  
+  0x00 00 00 00 00 00 00 00 00 
+
+
+Sense Key: 0h = No Error
+ASC & ASCQ: 0h - 0h = No Additional Sense Information
+FRU: 0h = No Additional Information
+Information: 0000000000000000h
+Command Specific Information: 0000000000000000h
+Command Time (us): 450.23
+
+Write Buffer returning: SUCCESS
+
+.Sending SCSI Write Buffer
+
+  CDB:
+
+        0  1  2  3  4  5  6  7  8  9  
+  0x00 3B 07 00 1A 00 00 00 80 00 00 
+
+
+  Sense Data Buffer:
+
+        0  1  2  3  4  5  6  7  
+  0x00 00 00 00 00 00 00 00 00 
+
+
+Sense Key: 0h = No Error
+ASC & ASCQ: 0h - 0h = No Additional Sense Information
+FRU: 0h = No Additional Information
+Information: 0000000000000000h
+Command Specific Information: 0000000000000000h
+Command Time (us): 458.55
+
+Write Buffer returning: SUCCESS
+
+.Sending SCSI Write Buffer
+
+  CDB:
+
+        0  1  2  3  4  5  6  7  8  9  
+  0x00 3B 07 00 1A 80 00 00 80 00 00 
+
+
+  Sense Data Buffer:
+
+        0  1  2  3  4  5  6  7  
+  0x00 00 00 00 00 00 00 00 00 
+
+
+Sense Key: 0h = No Error
+ASC & ASCQ: 0h - 0h = No Additional Sense Information
+FRU: 0h = No Additional Information
+Information: 0000000000000000h
+Command Specific Information: 0000000000000000h
+Command Time (us): 456.52
+
+Write Buffer returning: SUCCESS
+
+.Sending SCSI Write Buffer
+
+  CDB:
+
+        0  1  2  3  4  5  6  7  8  9  
+  0x00 3B 07 00 1B 00 00 00 80 00 00 
+
+
+  Sense Data Buffer:
+
+        0  1  2  3  4  5  6  7  
+  0x00 00 00 00 00 00 00 00 00 
+
+
+Sense Key: 0h = No Error
+ASC & ASCQ: 0h - 0h = No Additional Sense Information
+FRU: 0h = No Additional Information
+Information: 0000000000000000h
+Command Specific Information: 0000000000000000h
+Command Time (us): 457.94
+
+Write Buffer returning: SUCCESS
+
+.Sending SCSI Write Buffer
+
+  CDB:
+
+        0  1  2  3  4  5  6  7  8  9  
+  0x00 3B 07 00 1B 80 00 00 80 00 00 
+
+
+  Sense Data Buffer:
+
+        0  1  2  3  4  5  6  7  
+  0x00 00 00 00 00 00 00 00 00 
+
+
+Sense Key: 0h = No Error
+ASC & ASCQ: 0h - 0h = No Additional Sense Information
+FRU: 0h = No Additional Information
+Information: 0000000000000000h
+Command Specific Information: 0000000000000000h
+Command Time (us): 452.90
+
+Write Buffer returning: SUCCESS
+
+.Sending SCSI Write Buffer
+
+  CDB:
+
+        0  1  2  3  4  5  6  7  8  9  
+  0x00 3B 07 00 1C 00 00 00 80 00 00 
+
+
+  Sense Data Buffer:
+
+        0  1  2  3  4  5  6  7  
+  0x00 00 00 00 00 00 00 00 00 
+
+
+Sense Key: 0h = No Error
+ASC & ASCQ: 0h - 0h = No Additional Sense Information
+FRU: 0h = No Additional Information
+Information: 0000000000000000h
+Command Specific Information: 0000000000000000h
+Command Time (us): 458.16
+
+Write Buffer returning: SUCCESS
+
+.Sending SCSI Write Buffer
+
+  CDB:
+
+        0  1  2  3  4  5  6  7  8  9  
+  0x00 3B 07 00 1C 80 00 00 80 00 00 
+
+
+  Sense Data Buffer:
+
+        0  1  2  3  4  5  6  7  
+  0x00 00 00 00 00 00 00 00 00 
+
+
+Sense Key: 0h = No Error
+ASC & ASCQ: 0h - 0h = No Additional Sense Information
+FRU: 0h = No Additional Information
+Information: 0000000000000000h
+Command Specific Information: 0000000000000000h
+Command Time (us): 460.56
+
+Write Buffer returning: SUCCESS
+
+.Sending SCSI Write Buffer
+
+  CDB:
+
+        0  1  2  3  4  5  6  7  8  9  
+  0x00 3B 07 00 1D 00 00 00 80 00 00 
+
+
+  Sense Data Buffer:
+
+        0  1  2  3  4  5  6  7  
+  0x00 00 00 00 00 00 00 00 00 
+
+
+Sense Key: 0h = No Error
+ASC & ASCQ: 0h - 0h = No Additional Sense Information
+FRU: 0h = No Additional Information
+Information: 0000000000000000h
+Command Specific Information: 0000000000000000h
+Command Time (us): 459.59
+
+Write Buffer returning: SUCCESS
+
+.Sending SCSI Write Buffer
+
+  CDB:
+
+        0  1  2  3  4  5  6  7  8  9  
+  0x00 3B 07 00 1D 80 00 00 80 00 00 
+
+
+  Sense Data Buffer:
+
+        0  1  2  3  4  5  6  7  
+  0x00 00 00 00 00 00 00 00 00 
+
+
+Sense Key: 0h = No Error
+ASC & ASCQ: 0h - 0h = No Additional Sense Information
+FRU: 0h = No Additional Information
+Information: 0000000000000000h
+Command Specific Information: 0000000000000000h
+Command Time (us): 476.36
+
+Write Buffer returning: SUCCESS
+
+.Sending SCSI Write Buffer
+
+  CDB:
+
+        0  1  2  3  4  5  6  7  8  9  
+  0x00 3B 07 00 1E 00 00 00 80 00 00 
+
+
+  Sense Data Buffer:
+
+        0  1  2  3  4  5  6  7  
+  0x00 00 00 00 00 00 00 00 00 
+
+
+Sense Key: 0h = No Error
+ASC & ASCQ: 0h - 0h = No Additional Sense Information
+FRU: 0h = No Additional Information
+Information: 0000000000000000h
+Command Specific Information: 0000000000000000h
+Command Time (us): 452.26
+
+Write Buffer returning: SUCCESS
+
+.Sending SCSI Write Buffer
+
+  CDB:
+
+        0  1  2  3  4  5  6  7  8  9  
+  0x00 3B 07 00 1E 80 00 00 80 00 00 
+
+
+  Sense Data Buffer:
+
+        0  1  2  3  4  5  6  7  
+  0x00 00 00 00 00 00 00 00 00 
+
+
+Sense Key: 0h = No Error
+ASC & ASCQ: 0h - 0h = No Additional Sense Information
+FRU: 0h = No Additional Information
+Information: 0000000000000000h
+Command Specific Information: 0000000000000000h
+Command Time (us): 458.59
+
+Write Buffer returning: SUCCESS
+
+.Sending SCSI Write Buffer
+
+  CDB:
+
+        0  1  2  3  4  5  6  7  8  9  
+  0x00 3B 07 00 1F 00 00 00 80 00 00 
+
+
+  Sense Data Buffer:
+
+        0  1  2  3  4  5  6  7  
+  0x00 00 00 00 00 00 00 00 00 
+
+
+Sense Key: 0h = No Error
+ASC & ASCQ: 0h - 0h = No Additional Sense Information
+FRU: 0h = No Additional Information
+Information: 0000000000000000h
+Command Specific Information: 0000000000000000h
+Command Time (us): 474.53
+
+Write Buffer returning: SUCCESS
+
+.Sending SCSI Write Buffer
+
+  CDB:
+
+        0  1  2  3  4  5  6  7  8  9  
+  0x00 3B 07 00 1F 80 00 00 80 00 00 
+
+
+  Sense Data Buffer:
+
+        0  1  2  3  4  5  6  7  
+  0x00 00 00 00 00 00 00 00 00 
+
+
+Sense Key: 0h = No Error
+ASC & ASCQ: 0h - 0h = No Additional Sense Information
+FRU: 0h = No Additional Information
+Information: 0000000000000000h
+Command Specific Information: 0000000000000000h
+Command Time (us): 458.23
+
+Write Buffer returning: SUCCESS
+
+.Sending SCSI Write Buffer
+
+  CDB:
+
+        0  1  2  3  4  5  6  7  8  9  
+  0x00 3B 07 00 20 00 00 00 40 00 00 
+
+
+  Sense Data Buffer:
+
+        0  1  2  3  4  5  6  7  8  9  A  B  C  D  E  F  
+  0x00 72 05 26 99 00 00 00 14 03 02 00 05 80 0E 00 00 
+  0x10 00 00 00 00 00 00 00 00 00 00 00 00 
+
+
+Sense Key: 5h = Illegal Request
+ASC & ASCQ: 26h - 99h = Vendor specific ascq code
+FRU: 5h = Vendor Specific
+Information: 0000000000000000h
+Command Specific Information: 0000000000000000h
+Command Time (ms): 18.35
+
+Write Buffer returning: UNKNOWN: 20
+
+.
+Firmware Download failed
+
+Exit code: 3

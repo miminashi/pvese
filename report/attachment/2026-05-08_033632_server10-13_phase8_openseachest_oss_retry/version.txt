@@ -1,0 +1,21 @@
+==========================================================================================
+ openSeaChest_Firmware - openSeaChest drive utilities - NVMe Enabled
+ Copyright (c) 2014-2026 Seagate Technology LLC and/or its Affiliates, All Rights Reserved
+ openSeaChest_Firmware Version: 26.03.1 X86_64
+ Build Date: Apr 24 2026
+ Today: 20260508T033336	User: root
+==========================================================================================
+Version Info for openSeaChest_Firmware:
+	Utility Version: 26.03.1
+	opensea-common Version: 6.1.0
+	opensea-transport Version: 10.3.0
+	opensea-operations Version: 9.4.0
+	Build Date: Apr 24 2026
+	Compiled Architecture: X86_64
+	Detected Endianness: Little Endian
+	Compiler Used: GCC
+	Compiler Version: 14.2.0
+	Operating System Type: Linux
+	Operating System Version: 7.0.0-3
+	Operating System Name: Debian GNU/Linux 13 (trixie)
+

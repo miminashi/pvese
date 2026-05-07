@@ -1,0 +1,4 @@
+openSeaChest_Firmware: unknown option -- info
+openSeaChest_Firmware: Unable to parse --info command line option
+Please use --help for more information.
+

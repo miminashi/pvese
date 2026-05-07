@@ -1,0 +1,77 @@
+===== Reset page 0x23 to default =====
+-rw-r--r-- 1 root root 16 May  8 01:28 /tmp/ms-page23.bin
+
+--- Post: 0x23 current ---
+SCSI Status: Good 
+
+
+>> page_code: 0x23, page_control: current
+ 00     a3 0a fc 01 01 02 01 82  02 00 00 00
+===== Write test =====
+dd: error writing '/dev/sdc': Input/output error
+1+0 records in
+0+0 records out
+0 bytes copied, 0.463214 s, 0.0 kB/s
+(write failed)
+rc=0
+
+===== sg_logs --page=0x18 (protocol-specific port) =====
+    SEAGATE   DKS5H-J1R2SS      7FA9
+Protocol specific port log page  [0x18]
+Protocol specific port log page for SAS SSP  [0x18]
+ Relative target port identifier = 1
+  generation code = 2
+  number of phys = 1
+  phy identifier= 0x0
+    attached SAS device type: SAS or SATA device
+    attached reason: unknown
+    reason: unknown
+    negotiated logical link rate: 12 Gbps
+    attached initiator port: ssp=1 stp=1 smp=1
+    attached target port: ssp=0 stp=0 smp=0
+    SAS address = 0x5000c500b853e3d5
+    attached SAS address = 0x500304801c010303
+    attached phy identifier= 0x2
+    Invalid DWORD count = 0
+    Running disparity error count = 0
+    Loss of DWORD synchronization count = 3
+    Phy reset problem count = 0
+    Phy event descriptors:
+      Invalid word count: 0
+      Running disparity error count: 0
+      Loss of dword synchronization count: 3
+      Phy reset problem count: 0
+ Relative target port identifier = 2
+  generation code = 2
+  number of phys = 1
+  phy identifier= 0x1
+    attached SAS device type: no device attached
+    attached reason: unknown
+    reason: unknown
+    negotiated logical link rate: phy enabled; unknown rate
+    attached initiator port: ssp=0 stp=0 smp=0
+    attached target port: ssp=0 stp=0 smp=0
+    SAS address = 0x5000c500b853e3d6
+    attached SAS address = 0x0
+    attached phy identifier= 0x0
+    Invalid DWORD count = 0
+    Running disparity error count = 0
+    Loss of DWORD synchronization count = 0
+    Phy reset problem count = 0
+    Phy event descriptors:
+      Invalid word count: 0
+      Running disparity error count: 0
+      Loss of dword synchronization count: 0
+      Phy reset problem count: 0
+
+===== dmesg =====
+[Fri May  8 01:27:08 2026] sd 4:0:2:0: [sdc] tag#1392 FAILED Result: hostbyte=DID_OK driverbyte=DRIVER_OK cmd_age=0s
+[Fri May  8 01:27:08 2026] sd 4:0:2:0: [sdc] tag#1392 Sense Key : Aborted Command [current] 
+[Fri May  8 01:27:08 2026] sd 4:0:2:0: [sdc] tag#1392 <<vendor>>ASC=0x81 ASCQ=0x0 
+[Fri May  8 01:27:08 2026] sd 4:0:2:0: [sdc] tag#1392 CDB: Write(10) 2a 00 00 00 27 12 00 00 01 00
+[Fri May  8 01:27:08 2026] I/O error, dev sdc, sector 10002 op 0x1:(WRITE) flags 0x8800 phys_seg 1 prio class 2
+[Fri May  8 01:28:03 2026] sd 4:0:2:0: [sdc] tag#1091 FAILED Result: hostbyte=DID_OK driverbyte=DRIVER_OK cmd_age=0s
+[Fri May  8 01:28:03 2026] sd 4:0:2:0: [sdc] tag#1091 Sense Key : Aborted Command [current] 
+[Fri May  8 01:28:03 2026] sd 4:0:2:0: [sdc] tag#1091 <<vendor>>ASC=0x81 ASCQ=0x0 
+[Fri May  8 01:28:03 2026] sd 4:0:2:0: [sdc] tag#1091 CDB: Write(10) 2a 00 00 00 27 13 00 00 01 00
+[Fri May  8 01:28:03 2026] I/O error, dev sdc, sector 10003 op 0x1:(WRITE) flags 0x8800 phys_seg 1 prio class 2

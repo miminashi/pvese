@@ -1,0 +1,35 @@
+open /dev/sg1 with flags=0x802
+tried to read 8388608 bytes from /root/fw/N005.LOD, got 2113536 bytes
+will write 2113536 bytes
+sending single write buffer, mode=0x4, mpsec=0, id=0, offset=0, len=2113536
+    Write buffer cdb: [3b 04 00 00 00 00 20 40 00 00]
+    Write buffer parameter list (first 256 bytes):
+e7 1a 0e 59 01 00 02 00  00 00 00 00 00 00 19 00
+00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00
+00 00 00 00 00 40 20 00  00 00 00 00 00 00 00 00
+00 00 00 00 00 00 00 00  00 00 00 00 00 00 cf 4b
+00 00 00 00 00 00 00 00  00 00 00 00 00 00 07 00
+f0 01 00 00 00 00 00 00  00 00 00 00 00 00 00 00
+00 00 00 00 00 3e 20 00  00 00 00 00 00 00 00 00
+00 00 00 00 00 00 00 00  00 00 00 00 00 00 e9 bf
+00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00
+00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00
+00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00
+00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00
+00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00
+00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00
+00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00
+00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00
+Write buffer:
+Descriptor format, current; Sense key: Illegal Request
+Additional sense: Invalid field in cdb
+  Descriptor type: Sense key specific: Field pointer:
+        Error in Command: byte 1 bit 4
+  Descriptor type: Field replaceable unit code: 0x1
+  Descriptor type: Vendor specific [0x80]
+    00 00 00 00 00 00 00 00 00 00 00 00 00 00 
+ Raw sense data (in hex), sb_len=36, calculated_len=36
+        72 05 24 00 00 00 00 1c  02 06 00 00 cc 00 01 00
+        03 02 00 01 80 0e 00 00  00 00 00 00 00 00 00 00
+        00 00 00 00
+Write buffer failed: Illegal request, type: sense key, apart from Invalid opcode

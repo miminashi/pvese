@@ -1,0 +1,2371 @@
+==========================================================================================
+ openSeaChest_Firmware - openSeaChest drive utilities - NVMe Enabled
+ Copyright (c) 2014-2026 Seagate Technology LLC and/or its Affiliates, All Rights Reserved
+ openSeaChest_Firmware Version: 26.03.1 X86_64
+ Build Date: Apr 24 2026
+ Today: 20260508T033523	User: root
+==========================================================================================
+Attempting to open handle "/dev/sg1"
+get_Lin_Device: Getting device for /dev/sg1
+posix_Get_Device_Handle: Attempting to open /dev/sg1
+Getting SG SCSI address
+Getting SG driver version
+Setting interface, drive type, secondary handles
+SCSI interface!
+name = /dev/sg1	 friendly name = sg1
+2ndName = /dev/sdb	2ndFName = sdb
+h:c:t:l = 0:0:1:0
+SG driver version = 3.5.36
+Partition count for /dev/sdb = 0
+fill_Drive_Info_Data: -->
+fill_In_Device_Info: -->
+Sending SCSI Test Unit Ready
+
+  CDB:
+
+        0  1  2  3  4  5
+  0x00 00 00 00 00 00 00                                                    
+
+-->send_IO 
+-->send_sg_io 
+SG IO Issued as Indirect IO
+<--send_sg_io (0)
+<--send_IO (0)
+
+  Sense Data Buffer:
+
+        0  1  2  3  4  5  6  7
+  0x00 00 00 00 00 00 00 00 00                                              
+
+
+Sense Key: 0h = No Error
+ASC & ASCQ: 0h - 0h = No Additional Sense Information
+FRU: 0h = No Additional Information
+Information: 0000000000000000h
+Command Specific Information: 0000000000000000h
+Command Time: (us): 125.34
+Test Unit Ready returning: SUCCESS
+
+Sending SCSI Inquiry
+
+  CDB:
+
+        0  1  2  3  4  5
+  0x00 12 00 00 00 60 00                                                    
+
+-->send_IO 
+-->send_sg_io 
+SG IO Issued as Indirect IO
+<--send_sg_io (0)
+<--send_IO (0)
+
+  Sense Data Buffer:
+
+        0  1  2  3  4  5  6  7
+  0x00 00 00 00 00 00 00 00 00                                              
+
+
+Sense Key: 0h = No Error
+ASC & ASCQ: 0h - 0h = No Additional Sense Information
+FRU: 0h = No Additional Information
+Information: 0000000000000000h
+Command Specific Information: 0000000000000000h
+Command Time: (us): 520.03
+Inquiry returning: SUCCESS
+
+Sending SCSI Report LUNs
+
+  CDB:
+
+        0  1  2  3  4  5  6  7  8  9  A  B
+  0x00 A0 00 00 00 00 00 00 00 00 10 00 00                                  
+
+-->send_IO 
+-->send_sg_io 
+SG IO Issued as Indirect IO
+<--send_sg_io (0)
+<--send_IO (0)
+
+  Sense Data Buffer:
+
+        0  1  2  3  4  5  6  7
+  0x00 00 00 00 00 00 00 00 00                                              
+
+
+Sense Key: 0h = No Error
+ASC & ASCQ: 0h - 0h = No Additional Sense Information
+FRU: 0h = No Additional Information
+Information: 0000000000000000h
+Command Specific Information: 0000000000000000h
+Command Time: (us): 504.48
+Report LUNs returning: SUCCESS
+
+Sending SCSI Inquiry, VPD = 00h
+
+  CDB:
+
+        0  1  2  3  4  5
+  0x00 12 01 00 00 60 00                                                    
+
+-->send_IO 
+-->send_sg_io 
+SG IO Issued as Indirect IO
+<--send_sg_io (0)
+<--send_IO (0)
+
+  Sense Data Buffer:
+
+        0  1  2  3  4  5  6  7
+  0x00 00 00 00 00 00 00 00 00                                              
+
+
+Sense Key: 0h = No Error
+ASC & ASCQ: 0h - 0h = No Additional Sense Information
+FRU: 0h = No Additional Information
+Information: 0000000000000000h
+Command Specific Information: 0000000000000000h
+Command Time: (us): 500.68
+Inquiry returning: SUCCESS
+
+Sending SCSI Inquiry, VPD = 80h
+
+  CDB:
+
+        0  1  2  3  4  5
+  0x00 12 01 80 00 18 00                                                    
+
+-->send_IO 
+-->send_sg_io 
+SG IO Issued as Indirect IO
+<--send_sg_io (0)
+<--send_IO (0)
+
+  Sense Data Buffer:
+
+        0  1  2  3  4  5  6  7
+  0x00 00 00 00 00 00 00 00 00                                              
+
+
+Sense Key: 0h = No Error
+ASC & ASCQ: 0h - 0h = No Additional Sense Information
+FRU: 0h = No Additional Information
+Information: 0000000000000000h
+Command Specific Information: 0000000000000000h
+Command Time: (us): 484.51
+Inquiry returning: SUCCESS
+
+Sending SCSI Inquiry, VPD = 83h
+
+  CDB:
+
+        0  1  2  3  4  5
+  0x00 12 01 83 00 60 00                                                    
+
+-->send_IO 
+-->send_sg_io 
+SG IO Issued as Indirect IO
+<--send_sg_io (0)
+<--send_IO (0)
+
+  Sense Data Buffer:
+
+        0  1  2  3  4  5  6  7
+  0x00 00 00 00 00 00 00 00 00                                              
+
+
+Sense Key: 0h = No Error
+ASC & ASCQ: 0h - 0h = No Additional Sense Information
+FRU: 0h = No Additional Information
+Information: 0000000000000000h
+Command Specific Information: 0000000000000000h
+Command Time: (us): 534.22
+Inquiry returning: SUCCESS
+
+Sending SCSI Inquiry, VPD = B1h
+
+  CDB:
+
+        0  1  2  3  4  5
+  0x00 12 01 B1 00 40 00                                                    
+
+-->send_IO 
+-->send_sg_io 
+SG IO Issued as Indirect IO
+<--send_sg_io (0)
+<--send_IO (0)
+
+  Sense Data Buffer:
+
+        0  1  2  3  4  5  6  7
+  0x00 00 00 00 00 00 00 00 00                                              
+
+
+Sense Key: 0h = No Error
+ASC & ASCQ: 0h - 0h = No Additional Sense Information
+FRU: 0h = No Additional Information
+Information: 0000000000000000h
+Command Specific Information: 0000000000000000h
+Command Time: (us): 497.67
+Inquiry returning: SUCCESS
+
+Sending SCSI Read Capacity 16 command
+
+  CDB:
+
+        0  1  2  3  4  5  6  7  8  9  A  B  C  D  E  F
+  0x00 9E 10 00 00 00 00 00 00 00 00 00 00 00 20 00 00                      
+
+-->send_IO 
+-->send_sg_io 
+SG IO Issued as Indirect IO
+<--send_sg_io (0)
+<--send_IO (0)
+
+  Sense Data Buffer:
+
+        0  1  2  3  4  5  6  7
+  0x00 00 00 00 00 00 00 00 00                                              
+
+
+Sense Key: 0h = No Error
+ASC & ASCQ: 0h - 0h = No Additional Sense Information
+FRU: 0h = No Additional Information
+Information: 0000000000000000h
+Command Specific Information: 0000000000000000h
+Command Time: (us): 496.87
+Read Capacity 16 returning: SUCCESS
+
+
+scsi helper
+Drive type: 2
+Interface type: 2
+Media type: 0
+fill_In_Device_Info: <--
+Drive type: 2
+Interface type: 2
+Media type: 0
+fill_Drive_Info_Data: <--
+
+sg helper
+Drive type: 2
+Interface type: 2
+Media type: 0
+
+/dev/sg1 - DKS5L-J1R2SS - WFKC5AAR - 8F0E - SCSI
+Checking directory security: /root/fw
+Checking "/"
+Checking UIDs
+Checking "/root"
+Checking UIDs
+Checking "/root/fw"
+Checking UIDs
+Filesize set to 2113536
+--> firmware_Download
+Sending SCSI Inquiry, VPD = 86h
+
+  CDB:
+
+        0  1  2  3  4  5
+  0x00 12 01 86 00 40 00                                                    
+
+-->send_IO 
+-->send_sg_io 
+SG IO Issued as Indirect IO
+<--send_sg_io (0)
+<--send_IO (0)
+
+  Sense Data Buffer:
+
+        0  1  2  3  4  5  6  7
+  0x00 00 00 00 00 00 00 00 00                                              
+
+
+Sense Key: 0h = No Error
+ASC & ASCQ: 0h - 0h = No Additional Sense Information
+FRU: 0h = No Additional Information
+Information: 0000000000000000h
+Command Specific Information: 0000000000000000h
+Command Time: (us): 499.92
+Inquiry returning: SUCCESS
+
+Requesting SCSI Supported Op Codes
+
+  CDB:
+
+        0  1  2  3  4  5  6  7  8  9  A  B
+  0x00 A3 0C 02 3B 00 05 00 00 01 08 00 00                                  
+
+-->send_IO 
+-->send_sg_io 
+SG IO Issued as Indirect IO
+<--send_sg_io (0)
+<--send_IO (0)
+
+  Sense Data Buffer:
+
+        0  1  2  3  4  5  6  7
+  0x00 00 00 00 00 00 00 00 00                                              
+
+
+Sense Key: 0h = No Error
+ASC & ASCQ: 0h - 0h = No Additional Sense Information
+FRU: 0h = No Additional Information
+Information: 0000000000000000h
+Command Specific Information: 0000000000000000h
+Command Time: (us): 503.98
+Supported Op Codes returning: SUCCESS
+
+Requesting SCSI Supported Op Codes
+
+  CDB:
+
+        0  1  2  3  4  5  6  7  8  9  A  B
+  0x00 A3 0C 02 3B 00 07 00 00 01 08 00 00                                  
+
+-->send_IO 
+-->send_sg_io 
+SG IO Issued as Indirect IO
+<--send_sg_io (0)
+<--send_IO (0)
+
+  Sense Data Buffer:
+
+        0  1  2  3  4  5  6  7
+  0x00 00 00 00 00 00 00 00 00                                              
+
+
+Sense Key: 0h = No Error
+ASC & ASCQ: 0h - 0h = No Additional Sense Information
+FRU: 0h = No Additional Information
+Information: 0000000000000000h
+Command Specific Information: 0000000000000000h
+Command Time: (us): 496.17
+Supported Op Codes returning: SUCCESS
+
+Requesting SCSI Supported Op Codes
+
+  CDB:
+
+        0  1  2  3  4  5  6  7  8  9  A  B
+  0x00 A3 0C 02 3B 00 0E 00 00 01 08 00 00                                  
+
+-->send_IO 
+-->send_sg_io 
+SG IO Issued as Indirect IO
+<--send_sg_io (0)
+<--send_IO (0)
+
+  Sense Data Buffer:
+
+        0  1  2  3  4  5  6  7
+  0x00 00 00 00 00 00 00 00 00                                              
+
+
+Sense Key: 0h = No Error
+ASC & ASCQ: 0h - 0h = No Additional Sense Information
+FRU: 0h = No Additional Information
+Information: 0000000000000000h
+Command Specific Information: 0000000000000000h
+Command Time: (us): 484.37
+Supported Op Codes returning: SUCCESS
+
+Requesting SCSI Supported Op Codes
+
+  CDB:
+
+        0  1  2  3  4  5  6  7  8  9  A  B
+  0x00 A3 0C 02 3B 00 0D 00 00 01 08 00 00                                  
+
+-->send_IO 
+-->send_sg_io 
+SG IO Issued as Indirect IO
+<--send_sg_io (0)
+<--send_IO (0)
+
+  Sense Data Buffer:
+
+        0  1  2  3  4  5  6  7
+  0x00 00 00 00 00 00 00 00 00                                              
+
+
+Sense Key: 0h = No Error
+ASC & ASCQ: 0h - 0h = No Additional Sense Information
+FRU: 0h = No Additional Information
+Information: 0000000000000000h
+Command Specific Information: 0000000000000000h
+Command Time: (us): 483.18
+Supported Op Codes returning: SUCCESS
+
+Sending SCSI Read Buffer
+
+  CDB:
+
+        0  1  2  3  4  5  6  7  8  9
+  0x00 3C 03 00 00 00 00 00 00 04 00                                        
+
+-->send_IO 
+-->send_sg_io 
+SG IO Issued as Indirect IO
+<--send_sg_io (0)
+<--send_IO (0)
+
+  Sense Data Buffer:
+
+        0  1  2  3  4  5  6  7
+  0x00 00 00 00 00 00 00 00 00                                              
+
+
+Sense Key: 0h = No Error
+ASC & ASCQ: 0h - 0h = No Additional Sense Information
+FRU: 0h = No Additional Information
+Information: 0000000000000000h
+Command Specific Information: 0000000000000000h
+Command Time: (us): 489.70
+Read Buffer returning: SUCCESS
+
+Sending SCSI Test Unit Ready
+
+  CDB:
+
+        0  1  2  3  4  5
+  0x00 00 00 00 00 00 00                                                    
+
+-->send_IO 
+-->send_sg_io 
+SG IO Issued as Indirect IO
+<--send_sg_io (0)
+<--send_IO (0)
+
+  Sense Data Buffer:
+
+        0  1  2  3  4  5  6  7
+  0x00 00 00 00 00 00 00 00 00                                              
+
+
+Sense Key: 0h = No Error
+ASC & ASCQ: 0h - 0h = No Additional Sense Information
+FRU: 0h = No Additional Information
+Information: 0000000000000000h
+Command Specific Information: 0000000000000000h
+Command Time: (us): 102.97
+Test Unit Ready returning: SUCCESS
+
+Sending SCSI Synchronize Cache 10
+
+  CDB:
+
+        0  1  2  3  4  5  6  7  8  9
+  0x00 35 00 00 00 00 00 00 00 00 00                                        
+
+-->send_IO 
+-->send_sg_io 
+SG IO Issued as Indirect IO
+<--send_sg_io (0)
+<--send_IO (0)
+
+  Sense Data Buffer:
+
+        0  1  2  3  4  5  6  7
+  0x00 00 00 00 00 00 00 00 00                                              
+
+
+Sense Key: 0h = No Error
+ASC & ASCQ: 0h - 0h = No Additional Sense Information
+FRU: 0h = No Additional Information
+Information: 0000000000000000h
+Command Specific Information: 0000000000000000h
+Command Time: (us): 96.99
+Synchronize Cache 10 returning: SUCCESS
+
+-->firmware_Download_Command
+Sending SCSI Write Buffer
+
+  CDB:
+
+        0  1  2  3  4  5  6  7  8  9
+  0x00 3B 0E 00 00 00 00 00 80 00 00                                        
+
+-->send_IO 
+-->send_sg_io 
+SG IO Issued as Indirect IO
+<--send_sg_io (0)
+<--send_IO (0)
+
+  Sense Data Buffer:
+
+        0  1  2  3  4  5  6  7
+  0x00 00 00 00 00 00 00 00 00                                              
+
+
+Sense Key: 0h = No Error
+ASC & ASCQ: 0h - 0h = No Additional Sense Information
+FRU: 0h = No Additional Information
+Information: 0000000000000000h
+Command Specific Information: 0000000000000000h
+Command Time: (ms): 119.99
+Write Buffer returning: SUCCESS
+
+<--firmware_Download_Command (0)
+.-->firmware_Download_Command
+Sending SCSI Write Buffer
+
+  CDB:
+
+        0  1  2  3  4  5  6  7  8  9
+  0x00 3B 0E 00 00 80 00 00 80 00 00                                        
+
+-->send_IO 
+-->send_sg_io 
+SG IO Issued as Indirect IO
+<--send_sg_io (0)
+<--send_IO (0)
+
+  Sense Data Buffer:
+
+        0  1  2  3  4  5  6  7
+  0x00 00 00 00 00 00 00 00 00                                              
+
+
+Sense Key: 0h = No Error
+ASC & ASCQ: 0h - 0h = No Additional Sense Information
+FRU: 0h = No Additional Information
+Information: 0000000000000000h
+Command Specific Information: 0000000000000000h
+Command Time: (us): 573.09
+Write Buffer returning: SUCCESS
+
+<--firmware_Download_Command (0)
+-->firmware_Download_Command
+Sending SCSI Write Buffer
+
+  CDB:
+
+        0  1  2  3  4  5  6  7  8  9
+  0x00 3B 0E 00 01 00 00 00 80 00 00                                        
+
+-->send_IO 
+-->send_sg_io 
+SG IO Issued as Indirect IO
+<--send_sg_io (0)
+<--send_IO (0)
+
+  Sense Data Buffer:
+
+        0  1  2  3  4  5  6  7
+  0x00 00 00 00 00 00 00 00 00                                              
+
+
+Sense Key: 0h = No Error
+ASC & ASCQ: 0h - 0h = No Additional Sense Information
+FRU: 0h = No Additional Information
+Information: 0000000000000000h
+Command Specific Information: 0000000000000000h
+Command Time: (us): 493.28
+Write Buffer returning: SUCCESS
+
+<--firmware_Download_Command (0)
+-->firmware_Download_Command
+Sending SCSI Write Buffer
+
+  CDB:
+
+        0  1  2  3  4  5  6  7  8  9
+  0x00 3B 0E 00 01 80 00 00 80 00 00                                        
+
+-->send_IO 
+-->send_sg_io 
+SG IO Issued as Indirect IO
+<--send_sg_io (0)
+<--send_IO (0)
+
+  Sense Data Buffer:
+
+        0  1  2  3  4  5  6  7
+  0x00 00 00 00 00 00 00 00 00                                              
+
+
+Sense Key: 0h = No Error
+ASC & ASCQ: 0h - 0h = No Additional Sense Information
+FRU: 0h = No Additional Information
+Information: 0000000000000000h
+Command Specific Information: 0000000000000000h
+Command Time: (us): 475.36
+Write Buffer returning: SUCCESS
+
+<--firmware_Download_Command (0)
+-->firmware_Download_Command
+Sending SCSI Write Buffer
+
+  CDB:
+
+        0  1  2  3  4  5  6  7  8  9
+  0x00 3B 0E 00 02 00 00 00 80 00 00                                        
+
+-->send_IO 
+-->send_sg_io 
+SG IO Issued as Indirect IO
+<--send_sg_io (0)
+<--send_IO (0)
+
+  Sense Data Buffer:
+
+        0  1  2  3  4  5  6  7
+  0x00 00 00 00 00 00 00 00 00                                              
+
+
+Sense Key: 0h = No Error
+ASC & ASCQ: 0h - 0h = No Additional Sense Information
+FRU: 0h = No Additional Information
+Information: 0000000000000000h
+Command Specific Information: 0000000000000000h
+Command Time: (us): 473.50
+Write Buffer returning: SUCCESS
+
+<--firmware_Download_Command (0)
+-->firmware_Download_Command
+Sending SCSI Write Buffer
+
+  CDB:
+
+        0  1  2  3  4  5  6  7  8  9
+  0x00 3B 0E 00 02 80 00 00 80 00 00                                        
+
+-->send_IO 
+-->send_sg_io 
+SG IO Issued as Indirect IO
+<--send_sg_io (0)
+<--send_IO (0)
+
+  Sense Data Buffer:
+
+        0  1  2  3  4  5  6  7
+  0x00 00 00 00 00 00 00 00 00                                              
+
+
+Sense Key: 0h = No Error
+ASC & ASCQ: 0h - 0h = No Additional Sense Information
+FRU: 0h = No Additional Information
+Information: 0000000000000000h
+Command Specific Information: 0000000000000000h
+Command Time: (us): 469.95
+Write Buffer returning: SUCCESS
+
+<--firmware_Download_Command (0)
+-->firmware_Download_Command
+Sending SCSI Write Buffer
+
+  CDB:
+
+        0  1  2  3  4  5  6  7  8  9
+  0x00 3B 0E 00 03 00 00 00 80 00 00                                        
+
+-->send_IO 
+-->send_sg_io 
+SG IO Issued as Indirect IO
+<--send_sg_io (0)
+<--send_IO (0)
+
+  Sense Data Buffer:
+
+        0  1  2  3  4  5  6  7
+  0x00 00 00 00 00 00 00 00 00                                              
+
+
+Sense Key: 0h = No Error
+ASC & ASCQ: 0h - 0h = No Additional Sense Information
+FRU: 0h = No Additional Information
+Information: 0000000000000000h
+Command Specific Information: 0000000000000000h
+Command Time: (us): 468.83
+Write Buffer returning: SUCCESS
+
+<--firmware_Download_Command (0)
+-->firmware_Download_Command
+Sending SCSI Write Buffer
+
+  CDB:
+
+        0  1  2  3  4  5  6  7  8  9
+  0x00 3B 0E 00 03 80 00 00 80 00 00                                        
+
+-->send_IO 
+-->send_sg_io 
+SG IO Issued as Indirect IO
+<--send_sg_io (0)
+<--send_IO (0)
+
+  Sense Data Buffer:
+
+        0  1  2  3  4  5  6  7
+  0x00 00 00 00 00 00 00 00 00                                              
+
+
+Sense Key: 0h = No Error
+ASC & ASCQ: 0h - 0h = No Additional Sense Information
+FRU: 0h = No Additional Information
+Information: 0000000000000000h
+Command Specific Information: 0000000000000000h
+Command Time: (us): 463.06
+Write Buffer returning: SUCCESS
+
+<--firmware_Download_Command (0)
+-->firmware_Download_Command
+Sending SCSI Write Buffer
+
+  CDB:
+
+        0  1  2  3  4  5  6  7  8  9
+  0x00 3B 0E 00 04 00 00 00 80 00 00                                        
+
+-->send_IO 
+-->send_sg_io 
+SG IO Issued as Indirect IO
+<--send_sg_io (0)
+<--send_IO (0)
+
+  Sense Data Buffer:
+
+        0  1  2  3  4  5  6  7
+  0x00 00 00 00 00 00 00 00 00                                              
+
+
+Sense Key: 0h = No Error
+ASC & ASCQ: 0h - 0h = No Additional Sense Information
+FRU: 0h = No Additional Information
+Information: 0000000000000000h
+Command Specific Information: 0000000000000000h
+Command Time: (us): 465.20
+Write Buffer returning: SUCCESS
+
+<--firmware_Download_Command (0)
+-->firmware_Download_Command
+Sending SCSI Write Buffer
+
+  CDB:
+
+        0  1  2  3  4  5  6  7  8  9
+  0x00 3B 0E 00 04 80 00 00 80 00 00                                        
+
+-->send_IO 
+-->send_sg_io 
+SG IO Issued as Indirect IO
+<--send_sg_io (0)
+<--send_IO (0)
+
+  Sense Data Buffer:
+
+        0  1  2  3  4  5  6  7
+  0x00 00 00 00 00 00 00 00 00                                              
+
+
+Sense Key: 0h = No Error
+ASC & ASCQ: 0h - 0h = No Additional Sense Information
+FRU: 0h = No Additional Information
+Information: 0000000000000000h
+Command Specific Information: 0000000000000000h
+Command Time: (us): 464.19
+Write Buffer returning: SUCCESS
+
+<--firmware_Download_Command (0)
+-->firmware_Download_Command
+Sending SCSI Write Buffer
+
+  CDB:
+
+        0  1  2  3  4  5  6  7  8  9
+  0x00 3B 0E 00 05 00 00 00 80 00 00                                        
+
+-->send_IO 
+-->send_sg_io 
+SG IO Issued as Indirect IO
+<--send_sg_io (0)
+<--send_IO (0)
+
+  Sense Data Buffer:
+
+        0  1  2  3  4  5  6  7
+  0x00 00 00 00 00 00 00 00 00                                              
+
+
+Sense Key: 0h = No Error
+ASC & ASCQ: 0h - 0h = No Additional Sense Information
+FRU: 0h = No Additional Information
+Information: 0000000000000000h
+Command Specific Information: 0000000000000000h
+Command Time: (us): 480.84
+Write Buffer returning: SUCCESS
+
+<--firmware_Download_Command (0)
+-->firmware_Download_Command
+Sending SCSI Write Buffer
+
+  CDB:
+
+        0  1  2  3  4  5  6  7  8  9
+  0x00 3B 0E 00 05 80 00 00 80 00 00                                        
+
+-->send_IO 
+-->send_sg_io 
+SG IO Issued as Indirect IO
+<--send_sg_io (0)
+<--send_IO (0)
+
+  Sense Data Buffer:
+
+        0  1  2  3  4  5  6  7
+  0x00 00 00 00 00 00 00 00 00                                              
+
+
+Sense Key: 0h = No Error
+ASC & ASCQ: 0h - 0h = No Additional Sense Information
+FRU: 0h = No Additional Information
+Information: 0000000000000000h
+Command Specific Information: 0000000000000000h
+Command Time: (us): 453.71
+Write Buffer returning: SUCCESS
+
+<--firmware_Download_Command (0)
+-->firmware_Download_Command
+Sending SCSI Write Buffer
+
+  CDB:
+
+        0  1  2  3  4  5  6  7  8  9
+  0x00 3B 0E 00 06 00 00 00 80 00 00                                        
+
+-->send_IO 
+-->send_sg_io 
+SG IO Issued as Indirect IO
+<--send_sg_io (0)
+<--send_IO (0)
+
+  Sense Data Buffer:
+
+        0  1  2  3  4  5  6  7
+  0x00 00 00 00 00 00 00 00 00                                              
+
+
+Sense Key: 0h = No Error
+ASC & ASCQ: 0h - 0h = No Additional Sense Information
+FRU: 0h = No Additional Information
+Information: 0000000000000000h
+Command Specific Information: 0000000000000000h
+Command Time: (us): 469.23
+Write Buffer returning: SUCCESS
+
+<--firmware_Download_Command (0)
+-->firmware_Download_Command
+Sending SCSI Write Buffer
+
+  CDB:
+
+        0  1  2  3  4  5  6  7  8  9
+  0x00 3B 0E 00 06 80 00 00 80 00 00                                        
+
+-->send_IO 
+-->send_sg_io 
+SG IO Issued as Indirect IO
+<--send_sg_io (0)
+<--send_IO (0)
+
+  Sense Data Buffer:
+
+        0  1  2  3  4  5  6  7
+  0x00 00 00 00 00 00 00 00 00                                              
+
+
+Sense Key: 0h = No Error
+ASC & ASCQ: 0h - 0h = No Additional Sense Information
+FRU: 0h = No Additional Information
+Information: 0000000000000000h
+Command Specific Information: 0000000000000000h
+Command Time: (us): 465.51
+Write Buffer returning: SUCCESS
+
+<--firmware_Download_Command (0)
+-->firmware_Download_Command
+Sending SCSI Write Buffer
+
+  CDB:
+
+        0  1  2  3  4  5  6  7  8  9
+  0x00 3B 0E 00 07 00 00 00 80 00 00                                        
+
+-->send_IO 
+-->send_sg_io 
+SG IO Issued as Indirect IO
+<--send_sg_io (0)
+<--send_IO (0)
+
+  Sense Data Buffer:
+
+        0  1  2  3  4  5  6  7
+  0x00 00 00 00 00 00 00 00 00                                              
+
+
+Sense Key: 0h = No Error
+ASC & ASCQ: 0h - 0h = No Additional Sense Information
+FRU: 0h = No Additional Information
+Information: 0000000000000000h
+Command Specific Information: 0000000000000000h
+Command Time: (us): 467.77
+Write Buffer returning: SUCCESS
+
+<--firmware_Download_Command (0)
+-->firmware_Download_Command
+Sending SCSI Write Buffer
+
+  CDB:
+
+        0  1  2  3  4  5  6  7  8  9
+  0x00 3B 0E 00 07 80 00 00 80 00 00                                        
+
+-->send_IO 
+-->send_sg_io 
+SG IO Issued as Indirect IO
+<--send_sg_io (0)
+<--send_IO (0)
+
+  Sense Data Buffer:
+
+        0  1  2  3  4  5  6  7
+  0x00 00 00 00 00 00 00 00 00                                              
+
+
+Sense Key: 0h = No Error
+ASC & ASCQ: 0h - 0h = No Additional Sense Information
+FRU: 0h = No Additional Information
+Information: 0000000000000000h
+Command Specific Information: 0000000000000000h
+Command Time: (us): 462.64
+Write Buffer returning: SUCCESS
+
+<--firmware_Download_Command (0)
+-->firmware_Download_Command
+Sending SCSI Write Buffer
+
+  CDB:
+
+        0  1  2  3  4  5  6  7  8  9
+  0x00 3B 0E 00 08 00 00 00 80 00 00                                        
+
+-->send_IO 
+-->send_sg_io 
+SG IO Issued as Indirect IO
+<--send_sg_io (0)
+<--send_IO (0)
+
+  Sense Data Buffer:
+
+        0  1  2  3  4  5  6  7
+  0x00 00 00 00 00 00 00 00 00                                              
+
+
+Sense Key: 0h = No Error
+ASC & ASCQ: 0h - 0h = No Additional Sense Information
+FRU: 0h = No Additional Information
+Information: 0000000000000000h
+Command Specific Information: 0000000000000000h
+Command Time: (us): 470.73
+Write Buffer returning: SUCCESS
+
+<--firmware_Download_Command (0)
+-->firmware_Download_Command
+Sending SCSI Write Buffer
+
+  CDB:
+
+        0  1  2  3  4  5  6  7  8  9
+  0x00 3B 0E 00 08 80 00 00 80 00 00                                        
+
+-->send_IO 
+-->send_sg_io 
+SG IO Issued as Indirect IO
+<--send_sg_io (0)
+<--send_IO (0)
+
+  Sense Data Buffer:
+
+        0  1  2  3  4  5  6  7
+  0x00 00 00 00 00 00 00 00 00                                              
+
+
+Sense Key: 0h = No Error
+ASC & ASCQ: 0h - 0h = No Additional Sense Information
+FRU: 0h = No Additional Information
+Information: 0000000000000000h
+Command Specific Information: 0000000000000000h
+Command Time: (us): 465.49
+Write Buffer returning: SUCCESS
+
+<--firmware_Download_Command (0)
+-->firmware_Download_Command
+Sending SCSI Write Buffer
+
+  CDB:
+
+        0  1  2  3  4  5  6  7  8  9
+  0x00 3B 0E 00 09 00 00 00 80 00 00                                        
+
+-->send_IO 
+-->send_sg_io 
+SG IO Issued as Indirect IO
+<--send_sg_io (0)
+<--send_IO (0)
+
+  Sense Data Buffer:
+
+        0  1  2  3  4  5  6  7
+  0x00 00 00 00 00 00 00 00 00                                              
+
+
+Sense Key: 0h = No Error
+ASC & ASCQ: 0h - 0h = No Additional Sense Information
+FRU: 0h = No Additional Information
+Information: 0000000000000000h
+Command Specific Information: 0000000000000000h
+Command Time: (us): 469.94
+Write Buffer returning: SUCCESS
+
+<--firmware_Download_Command (0)
+-->firmware_Download_Command
+Sending SCSI Write Buffer
+
+  CDB:
+
+        0  1  2  3  4  5  6  7  8  9
+  0x00 3B 0E 00 09 80 00 00 80 00 00                                        
+
+-->send_IO 
+-->send_sg_io 
+SG IO Issued as Indirect IO
+<--send_sg_io (0)
+<--send_IO (0)
+
+  Sense Data Buffer:
+
+        0  1  2  3  4  5  6  7
+  0x00 00 00 00 00 00 00 00 00                                              
+
+
+Sense Key: 0h = No Error
+ASC & ASCQ: 0h - 0h = No Additional Sense Information
+FRU: 0h = No Additional Information
+Information: 0000000000000000h
+Command Specific Information: 0000000000000000h
+Command Time: (us): 465.49
+Write Buffer returning: SUCCESS
+
+<--firmware_Download_Command (0)
+-->firmware_Download_Command
+Sending SCSI Write Buffer
+
+  CDB:
+
+        0  1  2  3  4  5  6  7  8  9
+  0x00 3B 0E 00 0A 00 00 00 80 00 00                                        
+
+-->send_IO 
+-->send_sg_io 
+SG IO Issued as Indirect IO
+<--send_sg_io (0)
+<--send_IO (0)
+
+  Sense Data Buffer:
+
+        0  1  2  3  4  5  6  7
+  0x00 00 00 00 00 00 00 00 00                                              
+
+
+Sense Key: 0h = No Error
+ASC & ASCQ: 0h - 0h = No Additional Sense Information
+FRU: 0h = No Additional Information
+Information: 0000000000000000h
+Command Specific Information: 0000000000000000h
+Command Time: (us): 494.19
+Write Buffer returning: SUCCESS
+
+<--firmware_Download_Command (0)
+.-->firmware_Download_Command
+Sending SCSI Write Buffer
+
+  CDB:
+
+        0  1  2  3  4  5  6  7  8  9
+  0x00 3B 0E 00 0A 80 00 00 80 00 00                                        
+
+-->send_IO 
+-->send_sg_io 
+SG IO Issued as Indirect IO
+<--send_sg_io (0)
+<--send_IO (0)
+
+  Sense Data Buffer:
+
+        0  1  2  3  4  5  6  7
+  0x00 00 00 00 00 00 00 00 00                                              
+
+
+Sense Key: 0h = No Error
+ASC & ASCQ: 0h - 0h = No Additional Sense Information
+FRU: 0h = No Additional Information
+Information: 0000000000000000h
+Command Specific Information: 0000000000000000h
+Command Time: (us): 452.58
+Write Buffer returning: SUCCESS
+
+<--firmware_Download_Command (0)
+-->firmware_Download_Command
+Sending SCSI Write Buffer
+
+  CDB:
+
+        0  1  2  3  4  5  6  7  8  9
+  0x00 3B 0E 00 0B 00 00 00 80 00 00                                        
+
+-->send_IO 
+-->send_sg_io 
+SG IO Issued as Indirect IO
+<--send_sg_io (0)
+<--send_IO (0)
+
+  Sense Data Buffer:
+
+        0  1  2  3  4  5  6  7
+  0x00 00 00 00 00 00 00 00 00                                              
+
+
+Sense Key: 0h = No Error
+ASC & ASCQ: 0h - 0h = No Additional Sense Information
+FRU: 0h = No Additional Information
+Information: 0000000000000000h
+Command Specific Information: 0000000000000000h
+Command Time: (us): 456.24
+Write Buffer returning: SUCCESS
+
+<--firmware_Download_Command (0)
+-->firmware_Download_Command
+Sending SCSI Write Buffer
+
+  CDB:
+
+        0  1  2  3  4  5  6  7  8  9
+  0x00 3B 0E 00 0B 80 00 00 80 00 00                                        
+
+-->send_IO 
+-->send_sg_io 
+SG IO Issued as Indirect IO
+<--send_sg_io (0)
+<--send_IO (0)
+
+  Sense Data Buffer:
+
+        0  1  2  3  4  5  6  7
+  0x00 00 00 00 00 00 00 00 00                                              
+
+
+Sense Key: 0h = No Error
+ASC & ASCQ: 0h - 0h = No Additional Sense Information
+FRU: 0h = No Additional Information
+Information: 0000000000000000h
+Command Specific Information: 0000000000000000h
+Command Time: (us): 463.76
+Write Buffer returning: SUCCESS
+
+<--firmware_Download_Command (0)
+-->firmware_Download_Command
+Sending SCSI Write Buffer
+
+  CDB:
+
+        0  1  2  3  4  5  6  7  8  9
+  0x00 3B 0E 00 0C 00 00 00 80 00 00                                        
+
+-->send_IO 
+-->send_sg_io 
+SG IO Issued as Indirect IO
+<--send_sg_io (0)
+<--send_IO (0)
+
+  Sense Data Buffer:
+
+        0  1  2  3  4  5  6  7
+  0x00 00 00 00 00 00 00 00 00                                              
+
+
+Sense Key: 0h = No Error
+ASC & ASCQ: 0h - 0h = No Additional Sense Information
+FRU: 0h = No Additional Information
+Information: 0000000000000000h
+Command Specific Information: 0000000000000000h
+Command Time: (us): 462.20
+Write Buffer returning: SUCCESS
+
+<--firmware_Download_Command (0)
+-->firmware_Download_Command
+Sending SCSI Write Buffer
+
+  CDB:
+
+        0  1  2  3  4  5  6  7  8  9
+  0x00 3B 0E 00 0C 80 00 00 80 00 00                                        
+
+-->send_IO 
+-->send_sg_io 
+SG IO Issued as Indirect IO
+<--send_sg_io (0)
+<--send_IO (0)
+
+  Sense Data Buffer:
+
+        0  1  2  3  4  5  6  7
+  0x00 00 00 00 00 00 00 00 00                                              
+
+
+Sense Key: 0h = No Error
+ASC & ASCQ: 0h - 0h = No Additional Sense Information
+FRU: 0h = No Additional Information
+Information: 0000000000000000h
+Command Specific Information: 0000000000000000h
+Command Time: (us): 461.98
+Write Buffer returning: SUCCESS
+
+<--firmware_Download_Command (0)
+-->firmware_Download_Command
+Sending SCSI Write Buffer
+
+  CDB:
+
+        0  1  2  3  4  5  6  7  8  9
+  0x00 3B 0E 00 0D 00 00 00 80 00 00                                        
+
+-->send_IO 
+-->send_sg_io 
+SG IO Issued as Indirect IO
+<--send_sg_io (0)
+<--send_IO (0)
+
+  Sense Data Buffer:
+
+        0  1  2  3  4  5  6  7
+  0x00 00 00 00 00 00 00 00 00                                              
+
+
+Sense Key: 0h = No Error
+ASC & ASCQ: 0h - 0h = No Additional Sense Information
+FRU: 0h = No Additional Information
+Information: 0000000000000000h
+Command Specific Information: 0000000000000000h
+Command Time: (us): 464.01
+Write Buffer returning: SUCCESS
+
+<--firmware_Download_Command (0)
+-->firmware_Download_Command
+Sending SCSI Write Buffer
+
+  CDB:
+
+        0  1  2  3  4  5  6  7  8  9
+  0x00 3B 0E 00 0D 80 00 00 80 00 00                                        
+
+-->send_IO 
+-->send_sg_io 
+SG IO Issued as Indirect IO
+<--send_sg_io (0)
+<--send_IO (0)
+
+  Sense Data Buffer:
+
+        0  1  2  3  4  5  6  7
+  0x00 00 00 00 00 00 00 00 00                                              
+
+
+Sense Key: 0h = No Error
+ASC & ASCQ: 0h - 0h = No Additional Sense Information
+FRU: 0h = No Additional Information
+Information: 0000000000000000h
+Command Specific Information: 0000000000000000h
+Command Time: (us): 465.00
+Write Buffer returning: SUCCESS
+
+<--firmware_Download_Command (0)
+-->firmware_Download_Command
+Sending SCSI Write Buffer
+
+  CDB:
+
+        0  1  2  3  4  5  6  7  8  9
+  0x00 3B 0E 00 0E 00 00 00 80 00 00                                        
+
+-->send_IO 
+-->send_sg_io 
+SG IO Issued as Indirect IO
+<--send_sg_io (0)
+<--send_IO (0)
+
+  Sense Data Buffer:
+
+        0  1  2  3  4  5  6  7
+  0x00 00 00 00 00 00 00 00 00                                              
+
+
+Sense Key: 0h = No Error
+ASC & ASCQ: 0h - 0h = No Additional Sense Information
+FRU: 0h = No Additional Information
+Information: 0000000000000000h
+Command Specific Information: 0000000000000000h
+Command Time: (us): 459.66
+Write Buffer returning: SUCCESS
+
+<--firmware_Download_Command (0)
+-->firmware_Download_Command
+Sending SCSI Write Buffer
+
+  CDB:
+
+        0  1  2  3  4  5  6  7  8  9
+  0x00 3B 0E 00 0E 80 00 00 80 00 00                                        
+
+-->send_IO 
+-->send_sg_io 
+SG IO Issued as Indirect IO
+<--send_sg_io (0)
+<--send_IO (0)
+
+  Sense Data Buffer:
+
+        0  1  2  3  4  5  6  7
+  0x00 00 00 00 00 00 00 00 00                                              
+
+
+Sense Key: 0h = No Error
+ASC & ASCQ: 0h - 0h = No Additional Sense Information
+FRU: 0h = No Additional Information
+Information: 0000000000000000h
+Command Specific Information: 0000000000000000h
+Command Time: (us): 470.85
+Write Buffer returning: SUCCESS
+
+<--firmware_Download_Command (0)
+-->firmware_Download_Command
+Sending SCSI Write Buffer
+
+  CDB:
+
+        0  1  2  3  4  5  6  7  8  9
+  0x00 3B 0E 00 0F 00 00 00 80 00 00                                        
+
+-->send_IO 
+-->send_sg_io 
+SG IO Issued as Indirect IO
+<--send_sg_io (0)
+<--send_IO (0)
+
+  Sense Data Buffer:
+
+        0  1  2  3  4  5  6  7
+  0x00 00 00 00 00 00 00 00 00                                              
+
+
+Sense Key: 0h = No Error
+ASC & ASCQ: 0h - 0h = No Additional Sense Information
+FRU: 0h = No Additional Information
+Information: 0000000000000000h
+Command Specific Information: 0000000000000000h
+Command Time: (us): 477.18
+Write Buffer returning: SUCCESS
+
+<--firmware_Download_Command (0)
+-->firmware_Download_Command
+Sending SCSI Write Buffer
+
+  CDB:
+
+        0  1  2  3  4  5  6  7  8  9
+  0x00 3B 0E 00 0F 80 00 00 80 00 00                                        
+
+-->send_IO 
+-->send_sg_io 
+SG IO Issued as Indirect IO
+<--send_sg_io (0)
+<--send_IO (0)
+
+  Sense Data Buffer:
+
+        0  1  2  3  4  5  6  7
+  0x00 00 00 00 00 00 00 00 00                                              
+
+
+Sense Key: 0h = No Error
+ASC & ASCQ: 0h - 0h = No Additional Sense Information
+FRU: 0h = No Additional Information
+Information: 0000000000000000h
+Command Specific Information: 0000000000000000h
+Command Time: (us): 447.66
+Write Buffer returning: SUCCESS
+
+<--firmware_Download_Command (0)
+-->firmware_Download_Command
+Sending SCSI Write Buffer
+
+  CDB:
+
+        0  1  2  3  4  5  6  7  8  9
+  0x00 3B 0E 00 10 00 00 00 80 00 00                                        
+
+-->send_IO 
+-->send_sg_io 
+SG IO Issued as Indirect IO
+<--send_sg_io (0)
+<--send_IO (0)
+
+  Sense Data Buffer:
+
+        0  1  2  3  4  5  6  7
+  0x00 00 00 00 00 00 00 00 00                                              
+
+
+Sense Key: 0h = No Error
+ASC & ASCQ: 0h - 0h = No Additional Sense Information
+FRU: 0h = No Additional Information
+Information: 0000000000000000h
+Command Specific Information: 0000000000000000h
+Command Time: (us): 458.20
+Write Buffer returning: SUCCESS
+
+<--firmware_Download_Command (0)
+-->firmware_Download_Command
+Sending SCSI Write Buffer
+
+  CDB:
+
+        0  1  2  3  4  5  6  7  8  9
+  0x00 3B 0E 00 10 80 00 00 80 00 00                                        
+
+-->send_IO 
+-->send_sg_io 
+SG IO Issued as Indirect IO
+<--send_sg_io (0)
+<--send_IO (0)
+
+  Sense Data Buffer:
+
+        0  1  2  3  4  5  6  7
+  0x00 00 00 00 00 00 00 00 00                                              
+
+
+Sense Key: 0h = No Error
+ASC & ASCQ: 0h - 0h = No Additional Sense Information
+FRU: 0h = No Additional Information
+Information: 0000000000000000h
+Command Specific Information: 0000000000000000h
+Command Time: (us): 462.26
+Write Buffer returning: SUCCESS
+
+<--firmware_Download_Command (0)
+-->firmware_Download_Command
+Sending SCSI Write Buffer
+
+  CDB:
+
+        0  1  2  3  4  5  6  7  8  9
+  0x00 3B 0E 00 11 00 00 00 80 00 00                                        
+
+-->send_IO 
+-->send_sg_io 
+SG IO Issued as Indirect IO
+<--send_sg_io (0)
+<--send_IO (0)
+
+  Sense Data Buffer:
+
+        0  1  2  3  4  5  6  7
+  0x00 00 00 00 00 00 00 00 00                                              
+
+
+Sense Key: 0h = No Error
+ASC & ASCQ: 0h - 0h = No Additional Sense Information
+FRU: 0h = No Additional Information
+Information: 0000000000000000h
+Command Specific Information: 0000000000000000h
+Command Time: (us): 465.40
+Write Buffer returning: SUCCESS
+
+<--firmware_Download_Command (0)
+-->firmware_Download_Command
+Sending SCSI Write Buffer
+
+  CDB:
+
+        0  1  2  3  4  5  6  7  8  9
+  0x00 3B 0E 00 11 80 00 00 80 00 00                                        
+
+-->send_IO 
+-->send_sg_io 
+SG IO Issued as Indirect IO
+<--send_sg_io (0)
+<--send_IO (0)
+
+  Sense Data Buffer:
+
+        0  1  2  3  4  5  6  7
+  0x00 00 00 00 00 00 00 00 00                                              
+
+
+Sense Key: 0h = No Error
+ASC & ASCQ: 0h - 0h = No Additional Sense Information
+FRU: 0h = No Additional Information
+Information: 0000000000000000h
+Command Specific Information: 0000000000000000h
+Command Time: (us): 457.90
+Write Buffer returning: SUCCESS
+
+<--firmware_Download_Command (0)
+-->firmware_Download_Command
+Sending SCSI Write Buffer
+
+  CDB:
+
+        0  1  2  3  4  5  6  7  8  9
+  0x00 3B 0E 00 12 00 00 00 80 00 00                                        
+
+-->send_IO 
+-->send_sg_io 
+SG IO Issued as Indirect IO
+<--send_sg_io (0)
+<--send_IO (0)
+
+  Sense Data Buffer:
+
+        0  1  2  3  4  5  6  7
+  0x00 00 00 00 00 00 00 00 00                                              
+
+
+Sense Key: 0h = No Error
+ASC & ASCQ: 0h - 0h = No Additional Sense Information
+FRU: 0h = No Additional Information
+Information: 0000000000000000h
+Command Specific Information: 0000000000000000h
+Command Time: (us): 461.27
+Write Buffer returning: SUCCESS
+
+<--firmware_Download_Command (0)
+-->firmware_Download_Command
+Sending SCSI Write Buffer
+
+  CDB:
+
+        0  1  2  3  4  5  6  7  8  9
+  0x00 3B 0E 00 12 80 00 00 80 00 00                                        
+
+-->send_IO 
+-->send_sg_io 
+SG IO Issued as Indirect IO
+<--send_sg_io (0)
+<--send_IO (0)
+
+  Sense Data Buffer:
+
+        0  1  2  3  4  5  6  7
+  0x00 00 00 00 00 00 00 00 00                                              
+
+
+Sense Key: 0h = No Error
+ASC & ASCQ: 0h - 0h = No Additional Sense Information
+FRU: 0h = No Additional Information
+Information: 0000000000000000h
+Command Specific Information: 0000000000000000h
+Command Time: (us): 479.56
+Write Buffer returning: SUCCESS
+
+<--firmware_Download_Command (0)
+-->firmware_Download_Command
+Sending SCSI Write Buffer
+
+  CDB:
+
+        0  1  2  3  4  5  6  7  8  9
+  0x00 3B 0E 00 13 00 00 00 80 00 00                                        
+
+-->send_IO 
+-->send_sg_io 
+SG IO Issued as Indirect IO
+<--send_sg_io (0)
+<--send_IO (0)
+
+  Sense Data Buffer:
+
+        0  1  2  3  4  5  6  7
+  0x00 00 00 00 00 00 00 00 00                                              
+
+
+Sense Key: 0h = No Error
+ASC & ASCQ: 0h - 0h = No Additional Sense Information
+FRU: 0h = No Additional Information
+Information: 0000000000000000h
+Command Specific Information: 0000000000000000h
+Command Time: (us): 455.15
+Write Buffer returning: SUCCESS
+
+<--firmware_Download_Command (0)
+-->firmware_Download_Command
+Sending SCSI Write Buffer
+
+  CDB:
+
+        0  1  2  3  4  5  6  7  8  9
+  0x00 3B 0E 00 13 80 00 00 80 00 00                                        
+
+-->send_IO 
+-->send_sg_io 
+SG IO Issued as Indirect IO
+<--send_sg_io (0)
+<--send_IO (0)
+
+  Sense Data Buffer:
+
+        0  1  2  3  4  5  6  7
+  0x00 00 00 00 00 00 00 00 00                                              
+
+
+Sense Key: 0h = No Error
+ASC & ASCQ: 0h - 0h = No Additional Sense Information
+FRU: 0h = No Additional Information
+Information: 0000000000000000h
+Command Specific Information: 0000000000000000h
+Command Time: (us): 458.32
+Write Buffer returning: SUCCESS
+
+<--firmware_Download_Command (0)
+-->firmware_Download_Command
+Sending SCSI Write Buffer
+
+  CDB:
+
+        0  1  2  3  4  5  6  7  8  9
+  0x00 3B 0E 00 14 00 00 00 80 00 00                                        
+
+-->send_IO 
+-->send_sg_io 
+SG IO Issued as Indirect IO
+<--send_sg_io (0)
+<--send_IO (0)
+
+  Sense Data Buffer:
+
+        0  1  2  3  4  5  6  7
+  0x00 00 00 00 00 00 00 00 00                                              
+
+
+Sense Key: 0h = No Error
+ASC & ASCQ: 0h - 0h = No Additional Sense Information
+FRU: 0h = No Additional Information
+Information: 0000000000000000h
+Command Specific Information: 0000000000000000h
+Command Time: (us): 465.23
+Write Buffer returning: SUCCESS
+
+<--firmware_Download_Command (0)
+.-->firmware_Download_Command
+Sending SCSI Write Buffer
+
+  CDB:
+
+        0  1  2  3  4  5  6  7  8  9
+  0x00 3B 0E 00 14 80 00 00 80 00 00                                        
+
+-->send_IO 
+-->send_sg_io 
+SG IO Issued as Indirect IO
+<--send_sg_io (0)
+<--send_IO (0)
+
+  Sense Data Buffer:
+
+        0  1  2  3  4  5  6  7
+  0x00 00 00 00 00 00 00 00 00                                              
+
+
+Sense Key: 0h = No Error
+ASC & ASCQ: 0h - 0h = No Additional Sense Information
+FRU: 0h = No Additional Information
+Information: 0000000000000000h
+Command Specific Information: 0000000000000000h
+Command Time: (us): 462.63
+Write Buffer returning: SUCCESS
+
+<--firmware_Download_Command (0)
+-->firmware_Download_Command
+Sending SCSI Write Buffer
+
+  CDB:
+
+        0  1  2  3  4  5  6  7  8  9
+  0x00 3B 0E 00 15 00 00 00 80 00 00                                        
+
+-->send_IO 
+-->send_sg_io 
+SG IO Issued as Indirect IO
+<--send_sg_io (0)
+<--send_IO (0)
+
+  Sense Data Buffer:
+
+        0  1  2  3  4  5  6  7
+  0x00 00 00 00 00 00 00 00 00                                              
+
+
+Sense Key: 0h = No Error
+ASC & ASCQ: 0h - 0h = No Additional Sense Information
+FRU: 0h = No Additional Information
+Information: 0000000000000000h
+Command Specific Information: 0000000000000000h
+Command Time: (us): 462.76
+Write Buffer returning: SUCCESS
+
+<--firmware_Download_Command (0)
+-->firmware_Download_Command
+Sending SCSI Write Buffer
+
+  CDB:
+
+        0  1  2  3  4  5  6  7  8  9
+  0x00 3B 0E 00 15 80 00 00 80 00 00                                        
+
+-->send_IO 
+-->send_sg_io 
+SG IO Issued as Indirect IO
+<--send_sg_io (0)
+<--send_IO (0)
+
+  Sense Data Buffer:
+
+        0  1  2  3  4  5  6  7
+  0x00 00 00 00 00 00 00 00 00                                              
+
+
+Sense Key: 0h = No Error
+ASC & ASCQ: 0h - 0h = No Additional Sense Information
+FRU: 0h = No Additional Information
+Information: 0000000000000000h
+Command Specific Information: 0000000000000000h
+Command Time: (us): 465.81
+Write Buffer returning: SUCCESS
+
+<--firmware_Download_Command (0)
+-->firmware_Download_Command
+Sending SCSI Write Buffer
+
+  CDB:
+
+        0  1  2  3  4  5  6  7  8  9
+  0x00 3B 0E 00 16 00 00 00 80 00 00                                        
+
+-->send_IO 
+-->send_sg_io 
+SG IO Issued as Indirect IO
+<--send_sg_io (0)
+<--send_IO (0)
+
+  Sense Data Buffer:
+
+        0  1  2  3  4  5  6  7
+  0x00 00 00 00 00 00 00 00 00                                              
+
+
+Sense Key: 0h = No Error
+ASC & ASCQ: 0h - 0h = No Additional Sense Information
+FRU: 0h = No Additional Information
+Information: 0000000000000000h
+Command Specific Information: 0000000000000000h
+Command Time: (us): 466.79
+Write Buffer returning: SUCCESS
+
+<--firmware_Download_Command (0)
+-->firmware_Download_Command
+Sending SCSI Write Buffer
+
+  CDB:
+
+        0  1  2  3  4  5  6  7  8  9
+  0x00 3B 0E 00 16 80 00 00 80 00 00                                        
+
+-->send_IO 
+-->send_sg_io 
+SG IO Issued as Indirect IO
+<--send_sg_io (0)
+<--send_IO (0)
+
+  Sense Data Buffer:
+
+        0  1  2  3  4  5  6  7
+  0x00 00 00 00 00 00 00 00 00                                              
+
+
+Sense Key: 0h = No Error
+ASC & ASCQ: 0h - 0h = No Additional Sense Information
+FRU: 0h = No Additional Information
+Information: 0000000000000000h
+Command Specific Information: 0000000000000000h
+Command Time: (us): 464.12
+Write Buffer returning: SUCCESS
+
+<--firmware_Download_Command (0)
+-->firmware_Download_Command
+Sending SCSI Write Buffer
+
+  CDB:
+
+        0  1  2  3  4  5  6  7  8  9
+  0x00 3B 0E 00 17 00 00 00 80 00 00                                        
+
+-->send_IO 
+-->send_sg_io 
+SG IO Issued as Indirect IO
+<--send_sg_io (0)
+<--send_IO (0)
+
+  Sense Data Buffer:
+
+        0  1  2  3  4  5  6  7
+  0x00 00 00 00 00 00 00 00 00                                              
+
+
+Sense Key: 0h = No Error
+ASC & ASCQ: 0h - 0h = No Additional Sense Information
+FRU: 0h = No Additional Information
+Information: 0000000000000000h
+Command Specific Information: 0000000000000000h
+Command Time: (us): 461.37
+Write Buffer returning: SUCCESS
+
+<--firmware_Download_Command (0)
+-->firmware_Download_Command
+Sending SCSI Write Buffer
+
+  CDB:
+
+        0  1  2  3  4  5  6  7  8  9
+  0x00 3B 0E 00 17 80 00 00 80 00 00                                        
+
+-->send_IO 
+-->send_sg_io 
+SG IO Issued as Indirect IO
+<--send_sg_io (0)
+<--send_IO (0)
+
+  Sense Data Buffer:
+
+        0  1  2  3  4  5  6  7
+  0x00 00 00 00 00 00 00 00 00                                              
+
+
+Sense Key: 0h = No Error
+ASC & ASCQ: 0h - 0h = No Additional Sense Information
+FRU: 0h = No Additional Information
+Information: 0000000000000000h
+Command Specific Information: 0000000000000000h
+Command Time: (us): 476.71
+Write Buffer returning: SUCCESS
+
+<--firmware_Download_Command (0)
+-->firmware_Download_Command
+Sending SCSI Write Buffer
+
+  CDB:
+
+        0  1  2  3  4  5  6  7  8  9
+  0x00 3B 0E 00 18 00 00 00 80 00 00                                        
+
+-->send_IO 
+-->send_sg_io 
+SG IO Issued as Indirect IO
+<--send_sg_io (0)
+<--send_IO (0)
+
+  Sense Data Buffer:
+
+        0  1  2  3  4  5  6  7
+  0x00 00 00 00 00 00 00 00 00                                              
+
+
+Sense Key: 0h = No Error
+ASC & ASCQ: 0h - 0h = No Additional Sense Information
+FRU: 0h = No Additional Information
+Information: 0000000000000000h
+Command Specific Information: 0000000000000000h
+Command Time: (us): 467.67
+Write Buffer returning: SUCCESS
+
+<--firmware_Download_Command (0)
+-->firmware_Download_Command
+Sending SCSI Write Buffer
+
+  CDB:
+
+        0  1  2  3  4  5  6  7  8  9
+  0x00 3B 0E 00 18 80 00 00 80 00 00                                        
+
+-->send_IO 
+-->send_sg_io 
+SG IO Issued as Indirect IO
+<--send_sg_io (0)
+<--send_IO (0)
+
+  Sense Data Buffer:
+
+        0  1  2  3  4  5  6  7
+  0x00 00 00 00 00 00 00 00 00                                              
+
+
+Sense Key: 0h = No Error
+ASC & ASCQ: 0h - 0h = No Additional Sense Information
+FRU: 0h = No Additional Information
+Information: 0000000000000000h
+Command Specific Information: 0000000000000000h
+Command Time: (us): 466.15
+Write Buffer returning: SUCCESS
+
+<--firmware_Download_Command (0)
+-->firmware_Download_Command
+Sending SCSI Write Buffer
+
+  CDB:
+
+        0  1  2  3  4  5  6  7  8  9
+  0x00 3B 0E 00 19 00 00 00 80 00 00                                        
+
+-->send_IO 
+-->send_sg_io 
+SG IO Issued as Indirect IO
+<--send_sg_io (0)
+<--send_IO (0)
+
+  Sense Data Buffer:
+
+        0  1  2  3  4  5  6  7
+  0x00 00 00 00 00 00 00 00 00                                              
+
+
+Sense Key: 0h = No Error
+ASC & ASCQ: 0h - 0h = No Additional Sense Information
+FRU: 0h = No Additional Information
+Information: 0000000000000000h
+Command Specific Information: 0000000000000000h
+Command Time: (us): 465.30
+Write Buffer returning: SUCCESS
+
+<--firmware_Download_Command (0)
+-->firmware_Download_Command
+Sending SCSI Write Buffer
+
+  CDB:
+
+        0  1  2  3  4  5  6  7  8  9
+  0x00 3B 0E 00 19 80 00 00 80 00 00                                        
+
+-->send_IO 
+-->send_sg_io 
+SG IO Issued as Indirect IO
+<--send_sg_io (0)
+<--send_IO (0)
+
+  Sense Data Buffer:
+
+        0  1  2  3  4  5  6  7
+  0x00 00 00 00 00 00 00 00 00                                              
+
+
+Sense Key: 0h = No Error
+ASC & ASCQ: 0h - 0h = No Additional Sense Information
+FRU: 0h = No Additional Information
+Information: 0000000000000000h
+Command Specific Information: 0000000000000000h
+Command Time: (us): 461.60
+Write Buffer returning: SUCCESS
+
+<--firmware_Download_Command (0)
+-->firmware_Download_Command
+Sending SCSI Write Buffer
+
+  CDB:
+
+        0  1  2  3  4  5  6  7  8  9
+  0x00 3B 0E 00 1A 00 00 00 80 00 00                                        
+
+-->send_IO 
+-->send_sg_io 
+SG IO Issued as Indirect IO
+<--send_sg_io (0)
+<--send_IO (0)
+
+  Sense Data Buffer:
+
+        0  1  2  3  4  5  6  7
+  0x00 00 00 00 00 00 00 00 00                                              
+
+
+Sense Key: 0h = No Error
+ASC & ASCQ: 0h - 0h = No Additional Sense Information
+FRU: 0h = No Additional Information
+Information: 0000000000000000h
+Command Specific Information: 0000000000000000h
+Command Time: (us): 466.51
+Write Buffer returning: SUCCESS
+
+<--firmware_Download_Command (0)
+-->firmware_Download_Command
+Sending SCSI Write Buffer
+
+  CDB:
+
+        0  1  2  3  4  5  6  7  8  9
+  0x00 3B 0E 00 1A 80 00 00 80 00 00                                        
+
+-->send_IO 
+-->send_sg_io 
+SG IO Issued as Indirect IO
+<--send_sg_io (0)
+<--send_IO (0)
+
+  Sense Data Buffer:
+
+        0  1  2  3  4  5  6  7
+  0x00 00 00 00 00 00 00 00 00                                              
+
+
+Sense Key: 0h = No Error
+ASC & ASCQ: 0h - 0h = No Additional Sense Information
+FRU: 0h = No Additional Information
+Information: 0000000000000000h
+Command Specific Information: 0000000000000000h
+Command Time: (us): 479.18
+Write Buffer returning: SUCCESS
+
+<--firmware_Download_Command (0)
+-->firmware_Download_Command
+Sending SCSI Write Buffer
+
+  CDB:
+
+        0  1  2  3  4  5  6  7  8  9
+  0x00 3B 0E 00 1B 00 00 00 80 00 00                                        
+
+-->send_IO 
+-->send_sg_io 
+SG IO Issued as Indirect IO
+<--send_sg_io (0)
+<--send_IO (0)
+
+  Sense Data Buffer:
+
+        0  1  2  3  4  5  6  7
+  0x00 00 00 00 00 00 00 00 00                                              
+
+
+Sense Key: 0h = No Error
+ASC & ASCQ: 0h - 0h = No Additional Sense Information
+FRU: 0h = No Additional Information
+Information: 0000000000000000h
+Command Specific Information: 0000000000000000h
+Command Time: (us): 450.75
+Write Buffer returning: SUCCESS
+
+<--firmware_Download_Command (0)
+-->firmware_Download_Command
+Sending SCSI Write Buffer
+
+  CDB:
+
+        0  1  2  3  4  5  6  7  8  9
+  0x00 3B 0E 00 1B 80 00 00 80 00 00                                        
+
+-->send_IO 
+-->send_sg_io 
+SG IO Issued as Indirect IO
+<--send_sg_io (0)
+<--send_IO (0)
+
+  Sense Data Buffer:
+
+        0  1  2  3  4  5  6  7
+  0x00 00 00 00 00 00 00 00 00                                              
+
+
+Sense Key: 0h = No Error
+ASC & ASCQ: 0h - 0h = No Additional Sense Information
+FRU: 0h = No Additional Information
+Information: 0000000000000000h
+Command Specific Information: 0000000000000000h
+Command Time: (us): 466.42
+Write Buffer returning: SUCCESS
+
+<--firmware_Download_Command (0)
+-->firmware_Download_Command
+Sending SCSI Write Buffer
+
+  CDB:
+
+        0  1  2  3  4  5  6  7  8  9
+  0x00 3B 0E 00 1C 00 00 00 80 00 00                                        
+
+-->send_IO 
+-->send_sg_io 
+SG IO Issued as Indirect IO
+<--send_sg_io (0)
+<--send_IO (0)
+
+  Sense Data Buffer:
+
+        0  1  2  3  4  5  6  7
+  0x00 00 00 00 00 00 00 00 00                                              
+
+
+Sense Key: 0h = No Error
+ASC & ASCQ: 0h - 0h = No Additional Sense Information
+FRU: 0h = No Additional Information
+Information: 0000000000000000h
+Command Specific Information: 0000000000000000h
+Command Time: (us): 468.46
+Write Buffer returning: SUCCESS
+
+<--firmware_Download_Command (0)
+-->firmware_Download_Command
+Sending SCSI Write Buffer
+
+  CDB:
+
+        0  1  2  3  4  5  6  7  8  9
+  0x00 3B 0E 00 1C 80 00 00 80 00 00                                        
+
+-->send_IO 
+-->send_sg_io 
+SG IO Issued as Indirect IO
+<--send_sg_io (0)
+<--send_IO (0)
+
+  Sense Data Buffer:
+
+        0  1  2  3  4  5  6  7
+  0x00 00 00 00 00 00 00 00 00                                              
+
+
+Sense Key: 0h = No Error
+ASC & ASCQ: 0h - 0h = No Additional Sense Information
+FRU: 0h = No Additional Information
+Information: 0000000000000000h
+Command Specific Information: 0000000000000000h
+Command Time: (us): 464.30
+Write Buffer returning: SUCCESS
+
+<--firmware_Download_Command (0)
+-->firmware_Download_Command
+Sending SCSI Write Buffer
+
+  CDB:
+
+        0  1  2  3  4  5  6  7  8  9
+  0x00 3B 0E 00 1D 00 00 00 80 00 00                                        
+
+-->send_IO 
+-->send_sg_io 
+SG IO Issued as Indirect IO
+<--send_sg_io (0)
+<--send_IO (0)
+
+  Sense Data Buffer:
+
+        0  1  2  3  4  5  6  7
+  0x00 00 00 00 00 00 00 00 00                                              
+
+
+Sense Key: 0h = No Error
+ASC & ASCQ: 0h - 0h = No Additional Sense Information
+FRU: 0h = No Additional Information
+Information: 0000000000000000h
+Command Specific Information: 0000000000000000h
+Command Time: (us): 479.89
+Write Buffer returning: SUCCESS
+
+<--firmware_Download_Command (0)
+-->firmware_Download_Command
+Sending SCSI Write Buffer
+
+  CDB:
+
+        0  1  2  3  4  5  6  7  8  9
+  0x00 3B 0E 00 1D 80 00 00 80 00 00                                        
+
+-->send_IO 
+-->send_sg_io 
+SG IO Issued as Indirect IO
+<--send_sg_io (0)
+<--send_IO (0)
+
+  Sense Data Buffer:
+
+        0  1  2  3  4  5  6  7
+  0x00 00 00 00 00 00 00 00 00                                              
+
+
+Sense Key: 0h = No Error
+ASC & ASCQ: 0h - 0h = No Additional Sense Information
+FRU: 0h = No Additional Information
+Information: 0000000000000000h
+Command Specific Information: 0000000000000000h
+Command Time: (us): 451.28
+Write Buffer returning: SUCCESS
+
+<--firmware_Download_Command (0)
+-->firmware_Download_Command
+Sending SCSI Write Buffer
+
+  CDB:
+
+        0  1  2  3  4  5  6  7  8  9
+  0x00 3B 0E 00 1E 00 00 00 80 00 00                                        
+
+-->send_IO 
+-->send_sg_io 
+SG IO Issued as Indirect IO
+<--send_sg_io (0)
+<--send_IO (0)
+
+  Sense Data Buffer:
+
+        0  1  2  3  4  5  6  7
+  0x00 00 00 00 00 00 00 00 00                                              
+
+
+Sense Key: 0h = No Error
+ASC & ASCQ: 0h - 0h = No Additional Sense Information
+FRU: 0h = No Additional Information
+Information: 0000000000000000h
+Command Specific Information: 0000000000000000h
+Command Time: (us): 458.61
+Write Buffer returning: SUCCESS
+
+<--firmware_Download_Command (0)
+.-->firmware_Download_Command
+Sending SCSI Write Buffer
+
+  CDB:
+
+        0  1  2  3  4  5  6  7  8  9
+  0x00 3B 0E 00 1E 80 00 00 80 00 00                                        
+
+-->send_IO 
+-->send_sg_io 
+SG IO Issued as Indirect IO
+<--send_sg_io (0)
+<--send_IO (0)
+
+  Sense Data Buffer:
+
+        0  1  2  3  4  5  6  7
+  0x00 00 00 00 00 00 00 00 00                                              
+
+
+Sense Key: 0h = No Error
+ASC & ASCQ: 0h - 0h = No Additional Sense Information
+FRU: 0h = No Additional Information
+Information: 0000000000000000h
+Command Specific Information: 0000000000000000h
+Command Time: (us): 455.96
+Write Buffer returning: SUCCESS
+
+<--firmware_Download_Command (0)
+-->firmware_Download_Command
+Sending SCSI Write Buffer
+
+  CDB:
+
+        0  1  2  3  4  5  6  7  8  9
+  0x00 3B 0E 00 1F 00 00 00 80 00 00                                        
+
+-->send_IO 
+-->send_sg_io 
+SG IO Issued as Indirect IO
+<--send_sg_io (0)
+<--send_IO (0)
+
+  Sense Data Buffer:
+
+        0  1  2  3  4  5  6  7
+  0x00 00 00 00 00 00 00 00 00                                              
+
+
+Sense Key: 0h = No Error
+ASC & ASCQ: 0h - 0h = No Additional Sense Information
+FRU: 0h = No Additional Information
+Information: 0000000000000000h
+Command Specific Information: 0000000000000000h
+Command Time: (us): 461.40
+Write Buffer returning: SUCCESS
+
+<--firmware_Download_Command (0)
+-->firmware_Download_Command
+Sending SCSI Write Buffer
+
+  CDB:
+
+        0  1  2  3  4  5  6  7  8  9
+  0x00 3B 0E 00 1F 80 00 00 80 00 00                                        
+
+-->send_IO 
+-->send_sg_io 
+SG IO Issued as Indirect IO
+<--send_sg_io (0)
+<--send_IO (0)
+
+  Sense Data Buffer:
+
+        0  1  2  3  4  5  6  7
+  0x00 00 00 00 00 00 00 00 00                                              
+
+
+Sense Key: 0h = No Error
+ASC & ASCQ: 0h - 0h = No Additional Sense Information
+FRU: 0h = No Additional Information
+Information: 0000000000000000h
+Command Specific Information: 0000000000000000h
+Command Time: (us): 463.29
+Write Buffer returning: SUCCESS
+
+<--firmware_Download_Command (0)
+-->firmware_Download_Command
+Sending SCSI Write Buffer
+
+  CDB:
+
+        0  1  2  3  4  5  6  7  8  9
+  0x00 3B 0E 00 20 00 00 00 40 00 00                                        
+
+-->send_IO 
+-->send_sg_io 
+SG IO Issued as Indirect IO
+SG Masked Status = 01h - Check Condition
+SG Driver Status = 08h - Driver Sense Data Available
+<--send_sg_io (0)
+<--send_IO (0)
+
+  Sense Data Buffer:
+
+        0  1  2  3  4  5  6  7  8  9  A  B  C  D  E  F
+  0x00 72 05 26 99 00 00 00 14 03 02 00 05 80 0E 00 00                      
+  0x10 00 00 00 00 00 00 00 00 00 00 00 00                                  
+
+
+Sense Key: 5h = Illegal Request
+ASC & ASCQ: 26h - 99h = Vendor specific ascq code
+FRU: 5h = Vendor Specific
+Information: 0000000000000000h
+Command Specific Information: 0000000000000000h
+Command Time: (ms): 56.31
+Write Buffer returning: UNKNOWN
+
+<--firmware_Download_Command (39)
+.
+<-- firmware_Download (39)
+Firmware Download failed
+

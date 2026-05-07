@@ -1,0 +1,109 @@
+==========================================================================================
+ openSeaChest_Firmware - openSeaChest drive utilities - NVMe Enabled
+ Copyright (c) 2014-2026 Seagate Technology LLC and/or its Affiliates, All Rights Reserved
+ openSeaChest_Firmware Version: 26.03.1 X86_64
+ Build Date: Apr 24 2026
+ Today: 20260508T033336	User: root
+==========================================================================================
+Attempting to open handle "/dev/sg1"
+get_Lin_Device: Getting device for /dev/sg1
+posix_Get_Device_Handle: Attempting to open /dev/sg1
+Getting SG SCSI address
+Getting SG driver version
+Setting interface, drive type, secondary handles
+SCSI interface!
+name = /dev/sg1	 friendly name = sg1
+2ndName = /dev/sdb	2ndFName = sdb
+h:c:t:l = 0:0:1:0
+SG driver version = 3.5.36
+Partition count for /dev/sdb = 0
+fill_Drive_Info_Data: -->
+fill_In_Device_Info: -->
+-->send_IO 
+-->send_sg_io 
+<--send_sg_io (0)
+<--send_IO (0)
+-->send_IO 
+-->send_sg_io 
+<--send_sg_io (0)
+<--send_IO (0)
+-->send_IO 
+-->send_sg_io 
+<--send_sg_io (0)
+<--send_IO (0)
+-->send_IO 
+-->send_sg_io 
+<--send_sg_io (0)
+<--send_IO (0)
+-->send_IO 
+-->send_sg_io 
+<--send_sg_io (0)
+<--send_IO (0)
+-->send_IO 
+-->send_sg_io 
+<--send_sg_io (0)
+<--send_IO (0)
+-->send_IO 
+-->send_sg_io 
+<--send_sg_io (0)
+<--send_IO (0)
+-->send_IO 
+-->send_sg_io 
+<--send_sg_io (0)
+<--send_IO (0)
+
+scsi helper
+Drive type: 2
+Interface type: 2
+Media type: 0
+fill_In_Device_Info: <--
+Drive type: 2
+Interface type: 2
+Media type: 0
+fill_Drive_Info_Data: <--
+
+sg helper
+Drive type: 2
+Interface type: 2
+Media type: 0
+
+/dev/sg1 - DKS5L-J1R2SS - WFKC5AAR - 8F0E - SCSI
+-->send_IO 
+-->send_sg_io 
+<--send_sg_io (0)
+<--send_IO (0)
+-->send_IO 
+-->send_sg_io 
+<--send_sg_io (0)
+<--send_IO (0)
+-->send_IO 
+-->send_sg_io 
+<--send_sg_io (0)
+<--send_IO (0)
+-->send_IO 
+-->send_sg_io 
+<--send_sg_io (0)
+<--send_IO (0)
+-->send_IO 
+-->send_sg_io 
+<--send_sg_io (0)
+<--send_IO (0)
+-->send_IO 
+-->send_sg_io 
+<--send_sg_io (0)
+<--send_IO (0)
+===Download Support information===
+Model Number: DKS5L-J1R2SS
+Firmware Revision: 8F0E
+Modes Supported:
+	Full
+	Segmented
+	Deferred (Requires power cycle or activation command to activate)
+	Deferred - Select activation events
+Maximum Segment Size (512B Blocks): No maximum
+Minimum Segment Size (512B Blocks): No minimum
+Recommended Segment Size (512B Blocks): 64
+Buffer Offset required (Bytes): 8
+Microcode Activation: Activated before completion of final command in write buffer sequence
+
+

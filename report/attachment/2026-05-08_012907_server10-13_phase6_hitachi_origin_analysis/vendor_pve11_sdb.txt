@@ -1,0 +1,411 @@
+===== device: /dev/sdb =====
+VPD INQUIRY, page code=0x80:
+00 80 00 14 57 46 4b 43  35 41 41 52 30 30 30 30    ....WFKC5AAR0000
+43 32 33 32 30 4e 41 41                             C2320NAA        
+
+
+===== Page Control = 0 (current) =====
+--- mode page 0x20 ---
+    SEAGATE   DKS5L-J1R2SS      8F0E   peripheral_type: disk [0x0]
+Mode parameter header from MODE SENSE(10):
+ 00     00 3e 00 10 00 00 00 08
+  Mode data length=64, medium type=0x00, WP=0, CAPPID=0, DpoFua=1, longlba=0
+  Block descriptor length=8
+> Direct access device block descriptors:
+   Density code=0x0
+ 00     8b ba 0c b0 00 00 02 00
+
+>> page_code: 0x20, page_control: current
+ 00     a0 2e 00 00 00 00 00 00  00 00 00 00 00 00 00 00
+ 10     00 00 00 00 00 00 00 00  00 00 00 18 00 00 00 00
+ 20     00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00
+--- mode page 0x22 ---
+    SEAGATE   DKS5L-J1R2SS      8F0E   peripheral_type: disk [0x0]
+Mode parameter header from MODE SENSE(10):
+ 00     00 22 00 10 00 00 00 08
+  Mode data length=36, medium type=0x00, WP=0, CAPPID=0, DpoFua=1, longlba=0
+  Block descriptor length=8
+> Direct access device block descriptors:
+   Density code=0x0
+ 00     8b ba 0c b0 00 00 02 00
+
+>> page_code: 0x22, page_control: current
+ 00     a2 12 01 01 00 00 00 00  86 33 b8 00 00 00 00 00
+ 10     86 33 b8 00
+--- mode page 0x23 ---
+    SEAGATE   DKS5L-J1R2SS      8F0E   peripheral_type: disk [0x0]
+Mode parameter header from MODE SENSE(10):
+ 00     00 1a 00 10 00 00 00 08
+  Mode data length=28, medium type=0x00, WP=0, CAPPID=0, DpoFua=1, longlba=0
+  Block descriptor length=8
+> Direct access device block descriptors:
+   Density code=0x0
+ 00     8b ba 0c b0 00 00 02 00
+
+>> page_code: 0x23, page_control: current
+ 00     a3 0a fc 01 01 02 01 82  02 26 00 00
+--- mode page 0x38 ---
+    SEAGATE   DKS5L-J1R2SS      8F0E   peripheral_type: disk [0x0]
+Mode parameter header from MODE SENSE(10):
+ 00     00 56 00 10 00 00 00 08
+  Mode data length=88, medium type=0x00, WP=0, CAPPID=0, DpoFua=1, longlba=0
+  Block descriptor length=8
+> Direct access device block descriptors:
+   Density code=0x0
+ 00     8b ba 0c b0 00 00 02 00
+
+>> page_code: 0x38, page_control: current
+ 00     b8 46 00 00 02 06 00 02  00 00 00 00 86 33 b8 00
+ 10     02 00 00 12 00 00 00 00  00 00 00 00 00 00 00 00
+ 20     00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00
+ 30     00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00
+ 40     00 00 00 00 00 00 00 00
+--- mode page 0x01 ---
+    SEAGATE   DKS5L-J1R2SS      8F0E   peripheral_type: disk [0x0]
+Mode parameter header from MODE SENSE(10):
+ 00     00 1a 00 10 00 00 00 08
+  Mode data length=28, medium type=0x00, WP=0, CAPPID=0, DpoFua=1, longlba=0
+  Block descriptor length=8
+> Direct access device block descriptors:
+   Density code=0x0
+ 00     8b ba 0c b0 00 00 02 00
+
+>> Read-Write error recovery, page_control: current
+ 00     81 0a 0c 0a ff 00 00 00  05 00 07 d0
+--- mode page 0x0a ---
+    SEAGATE   DKS5L-J1R2SS      8F0E   peripheral_type: disk [0x0]
+Mode parameter header from MODE SENSE(10):
+ 00     00 1a 00 10 00 00 00 08
+  Mode data length=28, medium type=0x00, WP=0, CAPPID=0, DpoFua=1, longlba=0
+  Block descriptor length=8
+> Direct access device block descriptors:
+   Density code=0x0
+ 00     8b ba 0c b0 00 00 02 00
+
+>> Control, page_control: current
+ 00     8a 0a 06 00 00 80 00 00  00 00 00 05
+===== Page Control = 1 (changeable) =====
+--- mode page 0x20 ---
+    SEAGATE   DKS5L-J1R2SS      8F0E   peripheral_type: disk [0x0]
+Mode parameter header from MODE SENSE(10):
+ 00     00 3e 00 10 00 00 00 08
+  Mode data length=64, medium type=0x00, WP=0, CAPPID=0, DpoFua=1, longlba=0
+  Block descriptor length=8
+> Direct access device block descriptors:
+   Density code=0x0
+ 00     8b ba 0c b0 00 00 02 00
+
+>> page_code: 0x20, page_control: changeable
+ 00     a0 2e 00 00 0c 00 00 00  00 00 00 00 00 00 00 00
+ 10     00 00 00 00 00 00 00 00  00 00 00 f8 00 00 01 f1
+ 20     00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00
+--- mode page 0x22 ---
+    SEAGATE   DKS5L-J1R2SS      8F0E   peripheral_type: disk [0x0]
+Mode parameter header from MODE SENSE(10):
+ 00     00 22 00 10 00 00 00 08
+  Mode data length=36, medium type=0x00, WP=0, CAPPID=0, DpoFua=1, longlba=0
+  Block descriptor length=8
+> Direct access device block descriptors:
+   Density code=0x0
+ 00     8b ba 0c b0 00 00 02 00
+
+>> page_code: 0x22, page_control: changeable
+ 00     a2 12 ff ff ff ff ff ff  ff ff ff ff ff ff ff ff
+ 10     ff ff ff ff
+--- mode page 0x23 ---
+    SEAGATE   DKS5L-J1R2SS      8F0E   peripheral_type: disk [0x0]
+Mode parameter header from MODE SENSE(10):
+ 00     00 1a 00 10 00 00 00 08
+  Mode data length=28, medium type=0x00, WP=0, CAPPID=0, DpoFua=1, longlba=0
+  Block descriptor length=8
+> Direct access device block descriptors:
+   Density code=0x0
+ 00     8b ba 0c b0 00 00 02 00
+
+>> page_code: 0x23, page_control: changeable
+ 00     a3 0a 00 ff ff ff ff ff  ff ff ff ff
+--- mode page 0x38 ---
+    SEAGATE   DKS5L-J1R2SS      8F0E   peripheral_type: disk [0x0]
+Mode parameter header from MODE SENSE(10):
+ 00     00 56 00 10 00 00 00 08
+  Mode data length=88, medium type=0x00, WP=0, CAPPID=0, DpoFua=1, longlba=0
+  Block descriptor length=8
+> Direct access device block descriptors:
+   Density code=0x0
+ 00     8b ba 0c b0 00 00 02 00
+
+>> page_code: 0x38, page_control: changeable
+ 00     b8 46 ff ff ff ff ff ff  ff ff ff ff ff ff ff ff
+ 10     ff 00 00 1b 01 00 00 00  ff ff ff ff ff ff ff ff
+ 20     00 01 00 00 00 00 00 00  00 00 00 00 00 00 00 00
+ 30     00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00
+ 40     00 00 00 00 00 00 00 00
+--- mode page 0x01 ---
+    SEAGATE   DKS5L-J1R2SS      8F0E   peripheral_type: disk [0x0]
+Mode parameter header from MODE SENSE(10):
+ 00     00 1a 00 10 00 00 00 08
+  Mode data length=28, medium type=0x00, WP=0, CAPPID=0, DpoFua=1, longlba=0
+  Block descriptor length=8
+> Direct access device block descriptors:
+   Density code=0x0
+ 00     8b ba 0c b0 00 00 02 00
+
+>> Read-Write error recovery, page_control: changeable
+ 00     81 0a ef ff 00 00 00 00  ff 00 ff ff
+--- mode page 0x0a ---
+    SEAGATE   DKS5L-J1R2SS      8F0E   peripheral_type: disk [0x0]
+Mode parameter header from MODE SENSE(10):
+ 00     00 1a 00 10 00 00 00 08
+  Mode data length=28, medium type=0x00, WP=0, CAPPID=0, DpoFua=1, longlba=0
+  Block descriptor length=8
+> Direct access device block descriptors:
+   Density code=0x0
+ 00     8b ba 0c b0 00 00 02 00
+
+>> Control, page_control: changeable
+ 00     8a 0a 0f f6 00 10 00 00  00 00 ff ff
+===== Page Control = 2 (default) =====
+--- mode page 0x20 ---
+    SEAGATE   DKS5L-J1R2SS      8F0E   peripheral_type: disk [0x0]
+Mode parameter header from MODE SENSE(10):
+ 00     00 3e 00 10 00 00 00 08
+  Mode data length=64, medium type=0x00, WP=0, CAPPID=0, DpoFua=1, longlba=0
+  Block descriptor length=8
+> Direct access device block descriptors:
+   Density code=0x0
+ 00     8b ba 0c b0 00 00 02 00
+
+>> page_code: 0x20, page_control: default
+ 00     a0 2e 00 00 00 00 00 00  00 00 00 00 00 00 00 00
+ 10     00 00 00 00 00 00 00 00  00 00 00 18 00 00 00 00
+ 20     00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00
+--- mode page 0x22 ---
+    SEAGATE   DKS5L-J1R2SS      8F0E   peripheral_type: disk [0x0]
+Mode parameter header from MODE SENSE(10):
+ 00     00 22 00 10 00 00 00 08
+  Mode data length=36, medium type=0x00, WP=0, CAPPID=0, DpoFua=1, longlba=0
+  Block descriptor length=8
+> Direct access device block descriptors:
+   Density code=0x0
+ 00     8b ba 0c b0 00 00 02 00
+
+>> page_code: 0x22, page_control: default
+ 00     a2 12 01 01 00 00 00 00  8b ba 0c b0 00 00 00 00
+ 10     8b ba 0c b0
+--- mode page 0x23 ---
+    SEAGATE   DKS5L-J1R2SS      8F0E   peripheral_type: disk [0x0]
+Mode parameter header from MODE SENSE(10):
+ 00     00 1a 00 10 00 00 00 08
+  Mode data length=28, medium type=0x00, WP=0, CAPPID=0, DpoFua=1, longlba=0
+  Block descriptor length=8
+> Direct access device block descriptors:
+   Density code=0x0
+ 00     8b ba 0c b0 00 00 02 00
+
+>> page_code: 0x23, page_control: default
+ 00     a3 0a fc 01 01 02 01 82  02 00 00 00
+--- mode page 0x38 ---
+    SEAGATE   DKS5L-J1R2SS      8F0E   peripheral_type: disk [0x0]
+Mode parameter header from MODE SENSE(10):
+ 00     00 56 00 10 00 00 00 08
+  Mode data length=88, medium type=0x00, WP=0, CAPPID=0, DpoFua=1, longlba=0
+  Block descriptor length=8
+> Direct access device block descriptors:
+   Density code=0x0
+ 00     8b ba 0c b0 00 00 02 00
+
+>> page_code: 0x38, page_control: default
+ 00     b8 46 00 02 00 03 74 08  00 00 00 00 8b ba 0c b0
+ 10     00 00 00 0a 00 00 00 00  00 00 00 00 00 00 00 00
+ 20     00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00
+ 30     00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00
+ 40     00 00 00 00 00 00 00 00
+--- mode page 0x01 ---
+    SEAGATE   DKS5L-J1R2SS      8F0E   peripheral_type: disk [0x0]
+Mode parameter header from MODE SENSE(10):
+ 00     00 1a 00 10 00 00 00 08
+  Mode data length=28, medium type=0x00, WP=0, CAPPID=0, DpoFua=1, longlba=0
+  Block descriptor length=8
+> Direct access device block descriptors:
+   Density code=0x0
+ 00     8b ba 0c b0 00 00 02 00
+
+>> Read-Write error recovery, page_control: default
+ 00     81 0a c0 14 ff 00 00 00  05 00 ff ff
+--- mode page 0x0a ---
+    SEAGATE   DKS5L-J1R2SS      8F0E   peripheral_type: disk [0x0]
+Mode parameter header from MODE SENSE(10):
+ 00     00 1a 00 10 00 00 00 08
+  Mode data length=28, medium type=0x00, WP=0, CAPPID=0, DpoFua=1, longlba=0
+  Block descriptor length=8
+> Direct access device block descriptors:
+   Density code=0x0
+ 00     8b ba 0c b0 00 00 02 00
+
+>> Control, page_control: default
+ 00     8a 0a 02 00 00 80 00 00  00 00 00 0f
+===== Page Control = 3 (saved) =====
+--- mode page 0x20 ---
+    SEAGATE   DKS5L-J1R2SS      8F0E   peripheral_type: disk [0x0]
+Mode parameter header from MODE SENSE(10):
+ 00     00 3e 00 10 00 00 00 08
+  Mode data length=64, medium type=0x00, WP=0, CAPPID=0, DpoFua=1, longlba=0
+  Block descriptor length=8
+> Direct access device block descriptors:
+   Density code=0x0
+ 00     8b ba 0c b0 00 00 02 00
+
+>> page_code: 0x20, page_control: saved
+ 00     a0 2e 00 00 00 00 00 00  00 00 00 00 00 00 00 00
+ 10     00 00 00 00 00 00 00 00  00 00 00 18 00 00 00 00
+ 20     00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00
+--- mode page 0x22 ---
+    SEAGATE   DKS5L-J1R2SS      8F0E   peripheral_type: disk [0x0]
+Mode parameter header from MODE SENSE(10):
+ 00     00 22 00 10 00 00 00 08
+  Mode data length=36, medium type=0x00, WP=0, CAPPID=0, DpoFua=1, longlba=0
+  Block descriptor length=8
+> Direct access device block descriptors:
+   Density code=0x0
+ 00     8b ba 0c b0 00 00 02 00
+
+>> page_code: 0x22, page_control: saved
+ 00     a2 12 01 01 00 00 00 00  86 33 b8 00 00 00 00 00
+ 10     86 33 b8 00
+--- mode page 0x23 ---
+    SEAGATE   DKS5L-J1R2SS      8F0E   peripheral_type: disk [0x0]
+Mode parameter header from MODE SENSE(10):
+ 00     00 1a 00 10 00 00 00 08
+  Mode data length=28, medium type=0x00, WP=0, CAPPID=0, DpoFua=1, longlba=0
+  Block descriptor length=8
+> Direct access device block descriptors:
+   Density code=0x0
+ 00     8b ba 0c b0 00 00 02 00
+
+>> page_code: 0x23, page_control: saved
+ 00     a3 0a fc 01 01 02 01 82  02 26 00 00
+--- mode page 0x38 ---
+    SEAGATE   DKS5L-J1R2SS      8F0E   peripheral_type: disk [0x0]
+Mode parameter header from MODE SENSE(10):
+ 00     00 56 00 10 00 00 00 08
+  Mode data length=88, medium type=0x00, WP=0, CAPPID=0, DpoFua=1, longlba=0
+  Block descriptor length=8
+> Direct access device block descriptors:
+   Density code=0x0
+ 00     8b ba 0c b0 00 00 02 00
+
+>> page_code: 0x38, page_control: saved
+ 00     b8 46 00 00 02 06 00 02  00 00 00 00 86 33 b8 00
+ 10     02 00 00 12 00 00 00 00  00 00 00 00 00 00 00 00
+ 20     00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00
+ 30     00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00
+ 40     00 00 00 00 00 00 00 00
+--- mode page 0x01 ---
+    SEAGATE   DKS5L-J1R2SS      8F0E   peripheral_type: disk [0x0]
+Mode parameter header from MODE SENSE(10):
+ 00     00 1a 00 10 00 00 00 08
+  Mode data length=28, medium type=0x00, WP=0, CAPPID=0, DpoFua=1, longlba=0
+  Block descriptor length=8
+> Direct access device block descriptors:
+   Density code=0x0
+ 00     8b ba 0c b0 00 00 02 00
+
+>> Read-Write error recovery, page_control: saved
+ 00     81 0a 0c 0a ff 00 00 00  05 00 07 d0
+--- mode page 0x0a ---
+    SEAGATE   DKS5L-J1R2SS      8F0E   peripheral_type: disk [0x0]
+Mode parameter header from MODE SENSE(10):
+ 00     00 1a 00 10 00 00 00 08
+  Mode data length=28, medium type=0x00, WP=0, CAPPID=0, DpoFua=1, longlba=0
+  Block descriptor length=8
+> Direct access device block descriptors:
+   Density code=0x0
+ 00     8b ba 0c b0 00 00 02 00
+
+>> Control, page_control: saved
+ 00     8a 0a 06 00 00 80 00 00  00 00 00 05
+===== Mode Sense raw 8b (sg_raw 1A 00 PG 00 LEN) for each page =====
+--- raw 0x20 ---
+SCSI Status: Good 
+
+Received 60 bytes of data:
+ 00     3b 00 10 08 8b ba 0c b0  00 00 02 00 a0 2e 00 00    ;...............
+ 10     00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00    ................
+ 20     00 00 00 00 00 00 00 18  00 00 00 00 00 00 00 00    ................
+ 30     00 00 00 00 00 00 00 00  00 00 00 00                ............
+--- raw 0x22 ---
+SCSI Status: Good 
+
+Received 32 bytes of data:
+ 00     1f 00 10 08 8b ba 0c b0  00 00 02 00 a2 12 01 01    ................
+ 10     00 00 00 00 86 33 b8 00  00 00 00 00 86 33 b8 00    .....3.......3..
+--- raw 0x23 ---
+SCSI Status: Good 
+
+Received 24 bytes of data:
+ 00     17 00 10 08 8b ba 0c b0  00 00 02 00 a3 0a fc 01    ................
+ 10     01 02 01 82 02 26 00 00                             .....&..
+--- raw 0x38 ---
+SCSI Status: Good 
+
+Received 84 bytes of data:
+ 00     53 00 10 08 8b ba 0c b0  00 00 02 00 b8 46 00 00    S............F..
+ 10     02 06 00 02 00 00 00 00  86 33 b8 00 02 00 00 12    .........3......
+ 20     00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00    ................
+ 30     00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00    ................
+ 40     00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00    ................
+ 50     00 00 00 00                                         ....
+===== sg_modes --all (full dump) =====
+    SEAGATE   DKS5L-J1R2SS      8F0E   peripheral_type: disk [0x0]
+Mode parameter header from MODE SENSE(10):
+ 00     01 72 00 10 00 00 00 08
+  Mode data length=372, medium type=0x00, WP=0, CAPPID=0, DpoFua=1, longlba=0
+  Block descriptor length=8
+> Direct access device block descriptors:
+   Density code=0x0
+ 00     8b ba 0c b0 00 00 02 00
+
+>> Read-Write error recovery, page_control: current
+ 00     81 0a 0c 0a ff 00 00 00  05 00 07 d0
+>> Disconnect-Reconnect, page_control: current
+ 00     82 0e 00 00 00 00 00 00  00 00 04 10 00 00 00 00
+>> Format (obsolete), page_control: current
+ 00     83 16 bb d0 00 00 00 00  03 80 04 c4 10 00 00 01
+ 10     00 b0 00 20 40 00 00 00
+>> Rigid disk geometry (obsolete), page_control: current
+ 00     84 16 03 ce 18 04 00 00  00 00 00 00 00 00 00 00
+ 10     00 00 00 00 29 04 00 00
+>> Verify error recovery, page_control: current
+ 00     87 0a 06 05 ff 00 00 00  00 00 03 e8
+>> Caching, page_control: current
+ 00     88 12 10 00 ff ff 00 00  ff ff ff ff 91 20 00 00
+ 10     00 00 00 00
+>> Control, page_control: current
+ 00     8a 0a 06 00 00 80 00 00  00 00 00 05
+>> Protocol specific logical unit (SPL), page_control: current
+ 00     18 06 06 00 00 00 00 00
+>> Protocol specific port (SPL), page_control: current
+ 00     99 0e 16 00 01 92 07 d0  00 00 00 00 00 00 00 00
+>> Power condition, page_control: current
+ 00     9a 26 00 00 00 00 00 0a  00 00 8c a0 00 00 17 70
+ 10     00 00 46 50 00 00 46 50  00 00 00 00 00 00 00 00
+ 20     00 00 00 00 00 00 00 58
+>> Informational exceptions control, page_control: current
+ 00     9c 0a 80 04 00 00 00 00  00 00 00 01
+>> page_code: 0x20, page_control: current
+ 00     a0 2e 00 00 00 00 00 00  00 00 00 00 00 00 00 00
+ 10     00 00 00 00 00 00 00 00  00 00 00 18 00 00 00 00
+ 20     00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00
+>> page_code: 0x22, page_control: current
+ 00     a2 12 01 01 00 00 00 00  86 33 b8 00 00 00 00 00
+ 10     86 33 b8 00
+>> page_code: 0x23, page_control: current
+ 00     a3 0a fc 01 01 02 01 82  02 26 00 00
+>> page_code: 0x38, page_control: current
+ 00     b8 46 00 00 02 06 00 02  00 00 00 00 86 33 b8 00
+ 10     02 00 00 12 00 00 00 00  00 00 00 00 00 00 00 00
+ 20     00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00
+ 30     00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00
+ 40     00 00 00 00 00 00 00 00
+>> Unit Attention condition [vendor specific format], page_control: current
+ 00     80 06 96 00 0f 00 00 00

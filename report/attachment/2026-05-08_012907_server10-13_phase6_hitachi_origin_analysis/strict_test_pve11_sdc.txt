@@ -1,0 +1,99 @@
+===== Pre-test =====
+
+>> Unit Attention condition [vendor specific format], page_control: current
+ 00     80 06 96 00 0f 00 00 00
+---
+
+>> Control, page_control: current
+ 00     8a 0a 02 00 00 80 00 00  00 00 00 05
+
+===== Step 1: MODE SELECT page 0x00 default (STRICT=0) =====
+-rw-r--r-- 1 root root 12 May  8 01:27 /tmp/ms-page00.bin
+
+--- Post-step1: Page 0x00 current ---
+SCSI Status: Good 
+
+
+>> Unit Attention condition [vendor specific format], page_control: current
+ 00     80 06 00 00 0f 00 00 00
+--- Post-step1: Control changeable ---
+
+>> Control, page_control: changeable
+ 00     8a 0a 0f f6 00 00 00 00  00 00 ff ff
+
+===== Write test 1 =====
+dd: error writing '/dev/sdc': Remote I/O error
+1+0 records in
+0+0 records out
+0 bytes copied, 0.0078457 s, 0.0 kB/s
+(write failed)
+
+===== Step 2: MODE SELECT Control page (ATO cleared) =====
+-rw-r--r-- 1 root root 16 May  8 01:27 /tmp/ms-control.bin
+SCSI Status: Good 
+
+
+--- Post-step2: Control current ---
+
+>> Control, page_control: current
+ 00     8a 0a 02 00 00 80 00 00  00 00 00 0e
+
+===== Write test 2 =====
+dd: error writing '/dev/sdc': Remote I/O error
+1+0 records in
+0+0 records out
+(write failed)
+
+===== Step 3: MODE SELECT page 0x38 default =====
+0 bytes copied, 0.0221427 s, 0.0 kB/s
+-rw-r--r-- 1 root root 76 May  8 01:27 /tmp/ms-page38.bin
+param list length=76
+
+--- Post-step3: Page 0x38 current ---
+SCSI Status: Good 
+
+>> page_code: 0x38, page_control: current
+ 00     b8 46 00 02 00 03 74 08  00 00 00 00 8b ba 0c b0
+ 10     00 00 00 0a 00 00 00 00  00 00 00 00 00 00 00 00
+ 20     00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00
+ 30     00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00
+ 40     00 00 00 00 00 00 00 00
+
+===== Write test 3 =====
+(write failed)
+
+===== dmesg =====
+dd: error writing '/dev/sdc': Input/output error
+1+0 records in
+0+0 records out
+0 bytes copied, 0.25987 s, 0.0 kB/s
+[Fri May  8 01:24:31 2026] sd 4:0:2:0: [sdc] tag#1149 FAILED Result: hostbyte=DID_OK driverbyte=DRIVER_OK cmd_age=0s
+[Fri May  8 01:24:31 2026] sd 4:0:2:0: [sdc] tag#1149 Sense Key : Hardware Error [current] 
+[Fri May  8 01:24:31 2026] sd 4:0:2:0: [sdc] tag#1149 <<vendor>>ASC=0x81 ASCQ=0x0 
+[Fri May  8 01:24:31 2026] sd 4:0:2:0: [sdc] tag#1149 CDB: Write(10) 2a 00 00 00 27 10 00 00 01 00
+[Fri May  8 01:24:31 2026] critical target error, dev sdc, sector 10000 op 0x1:(WRITE) flags 0x8800 phys_seg 1 prio class 2
+[Fri May  8 01:24:31 2026] sd 4:0:2:0: [sdc] tag#1090 FAILED Result: hostbyte=DID_OK driverbyte=DRIVER_OK cmd_age=0s
+[Fri May  8 01:24:31 2026] sd 4:0:2:0: [sdc] tag#1090 Sense Key : Hardware Error [current] 
+[Fri May  8 01:24:31 2026] sd 4:0:2:0: [sdc] tag#1090 <<vendor>>ASC=0x81 ASCQ=0x0 
+[Fri May  8 01:24:31 2026] sd 4:0:2:0: [sdc] tag#1090 CDB: Write(10) 2a 00 00 00 27 11 00 00 01 00
+[Fri May  8 01:24:31 2026] critical target error, dev sdc, sector 10001 op 0x1:(WRITE) flags 0x8800 phys_seg 1 prio class 2
+[Fri May  8 01:24:31 2026] sd 4:0:2:0: [sdc] tag#1091 FAILED Result: hostbyte=DID_OK driverbyte=DRIVER_OK cmd_age=0s
+[Fri May  8 01:24:31 2026] sd 4:0:2:0: [sdc] tag#1091 Sense Key : Hardware Error [current] 
+[Fri May  8 01:24:31 2026] sd 4:0:2:0: [sdc] tag#1091 <<vendor>>ASC=0x81 ASCQ=0x0 
+[Fri May  8 01:24:31 2026] sd 4:0:2:0: [sdc] tag#1091 CDB: Write(10) 2a 00 00 00 27 12 00 00 01 00
+[Fri May  8 01:24:31 2026] critical target error, dev sdc, sector 10002 op 0x1:(WRITE) flags 0x8800 phys_seg 1 prio class 2
+[Fri May  8 01:27:07 2026] sd 4:0:2:0: [sdc] tag#950 FAILED Result: hostbyte=DID_OK driverbyte=DRIVER_OK cmd_age=0s
+[Fri May  8 01:27:07 2026] sd 4:0:2:0: [sdc] tag#950 Sense Key : Hardware Error [current] 
+[Fri May  8 01:27:07 2026] sd 4:0:2:0: [sdc] tag#950 <<vendor>>ASC=0x81 ASCQ=0x0 
+[Fri May  8 01:27:07 2026] sd 4:0:2:0: [sdc] tag#950 CDB: Write(10) 2a 00 00 00 27 10 00 00 01 00
+[Fri May  8 01:27:07 2026] critical target error, dev sdc, sector 10000 op 0x1:(WRITE) flags 0x8800 phys_seg 1 prio class 2
+[Fri May  8 01:27:07 2026] sd 4:0:2:0: [sdc] tag#1929 FAILED Result: hostbyte=DID_OK driverbyte=DRIVER_OK cmd_age=0s
+[Fri May  8 01:27:07 2026] sd 4:0:2:0: [sdc] tag#1929 Sense Key : Hardware Error [current] 
+[Fri May  8 01:27:07 2026] sd 4:0:2:0: [sdc] tag#1929 <<vendor>>ASC=0x81 ASCQ=0x0 
+[Fri May  8 01:27:07 2026] sd 4:0:2:0: [sdc] tag#1929 CDB: Write(10) 2a 00 00 00 27 11 00 00 01 00
+[Fri May  8 01:27:07 2026] critical target error, dev sdc, sector 10001 op 0x1:(WRITE) flags 0x8800 phys_seg 1 prio class 2
+[Fri May  8 01:27:08 2026] sd 4:0:2:0: [sdc] tag#1392 FAILED Result: hostbyte=DID_OK driverbyte=DRIVER_OK cmd_age=0s
+[Fri May  8 01:27:08 2026] sd 4:0:2:0: [sdc] tag#1392 Sense Key : Aborted Command [current] 
+[Fri May  8 01:27:08 2026] sd 4:0:2:0: [sdc] tag#1392 <<vendor>>ASC=0x81 ASCQ=0x0 
+[Fri May  8 01:27:08 2026] sd 4:0:2:0: [sdc] tag#1392 CDB: Write(10) 2a 00 00 00 27 12 00 00 01 00
+[Fri May  8 01:27:08 2026] I/O error, dev sdc, sector 10002 op 0x1:(WRITE) flags 0x8800 phys_seg 1 prio class 2

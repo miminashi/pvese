@@ -1,0 +1,227 @@
+===== uname / kernel =====
+Linux ayase-web-service-10 6.12.63+deb13-amd64 #1 SMP PREEMPT_DYNAMIC Debian 6.12.63-1 (2025-12-30) x86_64 GNU/Linux
+
+===== sg_inq (standard) =====
+standard INQUIRY:
+  PQual=0  PDT=0  RMB=0  LU_CONG=0  hot_pluggable=0  version=0x05  [SPC-3]
+  [AERC=0]  [TrmTsk=0]  NormACA=0  HiSUP=1  Resp_data_format=2
+  SCCS=0  ACC=0  TPGS=0  3PC=0  Protect=0  [BQue=0]
+  EncServ=0  MultiP=1 (VS=0)  [MChngr=0]  [ACKREQQ=0]  Addr16=0
+  [RelAdr=0]  WBus16=0  Sync=0  [Linked=0]  [TranDis=0]  CmdQue=1
+  [SPI: Clocking=0x0  QAS=0  IUS=0]
+    length=144 (0x90)   Peripheral device type: disk
+ Vendor identification: SEAGATE 
+ Product identification: DKS5H-J1R2SS    
+ Product revision level: 7FA9
+
+===== sg_inq -p sinq (serial / WWN / firmware) =====
+VPD INQUIRY, page code=0x80:
+00 80 00 14 57 34 30 32  42 51 4e 34 30 30 30 30    ....W402BQN40000
+4b 38 34 33 35 43 4d 43                             K8435CMC        
+
+VPD INQUIRY, page code=0x83:
+00 83 00 48 01 03 00 08  50 00 c5 00 b8 53 e7 db    ...H....P....S..
+61 93 00 08 50 00 c5 00  b8 53 e7 d9 61 94 00 04    a...P....S..a...
+00 00 00 01 61 a3 00 08  50 00 c5 00 b8 53 e7 d8    ....a...P....S..
+03 28 00 18 6e 61 61 2e  35 30 30 30 43 35 30 30    .(..naa.5000C500
+42 38 35 33 45 37 44 38  00 00 00 00                B853E7D8....    
+
+VPD INQUIRY, page code=0xb0:
+00 b0 00 3c 00 00 00 08  00 00 ff ff 00 00 00 00    ...<............
+00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00    ................
+00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00    ................
+00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00    ................
+
+VPD INQUIRY, page code=0xb1:
+00 b1 00 3c 29 04 00 03  00 00 00 00 00 00 00 00    ...<)...........
+00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00    ................
+00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00    ................
+00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00    ................
+
+VPD INQUIRY, page code=0xb2:
+00 b2 00 04 00 00 00 00                             ........        
+
+
+===== sedutil-cli --query (TCG SED state) =====
+
+===== sedutil-cli --scan (SED capability summary) =====
+Scanning for Opal compliant disks
+/dev/sda   No  DKS5H-J1R2SS     7FA9
+/dev/sdb   No  TOSHIBA THNSNJ240PCSZ                    JZET6102
+/dev/sdc   No  DKS5H-J1R2SS     7FA9
+No more disks present ending scan
+
+===== sg_persist --in --read-keys =====
+  SEAGATE   DKS5H-J1R2SS      7FA9
+  Peripheral device type: disk
+  PR generation=0x0, there are NO registered reservation keys
+
+===== sg_persist --in --read-reservation =====
+  SEAGATE   DKS5H-J1R2SS      7FA9
+  Peripheral device type: disk
+  PR generation=0x0, there is NO reservation held
+
+===== sg_modes --all (mode pages) =====
+    SEAGATE   DKS5H-J1R2SS      7FA9   peripheral_type: disk [0x0]
+Mode parameter header from MODE SENSE(10):
+ 00     01 72 00 10 00 00 00 08
+  Mode data length=372, medium type=0x00, WP=0, CAPPID=0, DpoFua=1, longlba=0
+  Block descriptor length=8
+> Direct access device block descriptors:
+   Density code=0x0
+ 00     8b ba 0c b0 00 00 02 00
+
+>> Read-Write error recovery, page_control: current
+ 00     81 0a 0c 0a ff 00 00 00  05 00 07 d0
+>> Disconnect-Reconnect, page_control: current
+ 00     82 0e 00 00 00 00 00 00  00 00 04 10 00 00 00 00
+>> Format (obsolete), page_control: current
+ 00     83 16 bb d0 00 00 00 00  03 80 04 c4 10 00 00 01
+ 10     00 8e 00 18 40 00 00 00
+>> Rigid disk geometry (obsolete), page_control: current
+ 00     84 16 03 43 28 06 00 00  00 00 00 00 00 00 00 00
+ 10     00 00 00 00 29 04 00 00
+>> Verify error recovery, page_control: current
+ 00     87 0a 06 05 ff 00 00 00  00 00 03 e8
+>> Caching, page_control: current
+ 00     88 12 10 00 ff ff 00 00  ff ff ff ff 90 20 00 00
+ 10     00 00 00 00
+>> Control, page_control: current
+ 00     8a 0a 02 00 00 80 00 00  00 00 00 05
+>> Protocol specific logical unit (SPL), page_control: current
+ 00     18 06 06 00 00 00 00 00
+>> Protocol specific port (SPL), page_control: current
+ 00     99 0e 16 00 01 92 07 d0  00 00 00 00 00 00 00 00
+>> Power condition, page_control: current
+ 00     9a 26 00 00 00 00 00 0a  00 00 8c a0 00 00 17 70
+ 10     00 00 46 50 00 00 46 50  00 00 00 00 00 00 00 00
+ 20     00 00 00 00 00 00 00 58
+>> Informational exceptions control, page_control: current
+ 00     9c 0a 80 04 00 00 00 00  00 00 00 01
+>> page_code: 0x20, page_control: current
+ 00     a0 2e 00 00 00 00 00 00  00 00 00 00 00 00 00 00
+ 10     00 00 00 00 00 00 00 00  00 00 00 18 00 00 00 00
+ 20     00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00
+>> page_code: 0x22, page_control: current
+ 00     a2 12 01 01 00 00 00 00  8b ba 0c b0 00 00 00 00
+ 10     8b ba 0c b0
+>> page_code: 0x23, page_control: current
+ 00     a3 0a fc 01 01 02 01 82  02 6e 00 00
+>> page_code: 0x38, page_control: current
+ 00     b8 46 00 00 05 06 00 02  00 00 00 00 8b ba 0c b0
+ 10     02 00 00 12 00 00 00 00  00 00 00 00 00 00 00 00
+ 20     00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00
+ 30     00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00
+ 40     00 00 00 00 00 00 00 00
+>> Unit Attention condition [vendor specific format], page_control: current
+ 00     80 06 96 00 0f 00 00 00
+
+===== sg_logs --all (log pages) =====
+    SEAGATE   DKS5H-J1R2SS      7FA9
+
+===== sg_senddiag -l (supported diag pages) =====
+Supported diagnostic pages response:
+  0x00  Supported diagnostic pages
+  0x3f  Protocol specific (SAS transport)
+  0x40  Translate address (direct access)
+
+===== smartctl -a (full SMART) =====
+smartctl 7.4 2023-08-01 r5530 [x86_64-linux-6.12.63+deb13-amd64] (local build)
+Copyright (C) 2002-23, Bruce Allen, Christian Franke, www.smartmontools.org
+
+=== START OF INFORMATION SECTION ===
+Vendor:               SEAGATE
+Product:              DKS5H-J1R2SS
+Revision:             7FA9
+Compliance:           SPC-3
+User Capacity:        1,200,243,695,616 bytes [1.20 TB]
+Logical block size:   512 bytes
+Physical block size:  4096 bytes
+LU is fully provisioned
+Rotation Rate:        10500 rpm
+Form Factor:          2.5 inches
+Logical Unit id:      0x5000c500b853e7db
+Serial number:        W402BQN40000K8435CMC
+Device type:          disk
+Transport protocol:   SAS (SPL-4)
+Local Time is:        Fri May  8 00:46:00 2026 JST
+SMART support is:     Available - device has SMART capability.
+SMART support is:     Enabled
+Temperature Warning:  Disabled or Not Supported
+
+=== START OF READ SMART DATA SECTION ===
+SMART Health Status: OK
+
+Grown defects during certification = 0
+Total blocks reassigned during format = 0
+Total new blocks reassigned = 0
+Power on minutes since format = 2970
+Current Drive Temperature:     30 C
+Drive Trip Temperature:        68 C
+
+Accumulated power on time, hours:minutes 56992:56
+Manufactured in week 19 of year 2018
+Specified cycle count over device lifetime:  10000
+Accumulated start-stop cycles:  518
+Specified load-unload count over device lifetime:  300000
+Accumulated load-unload cycles:  2878
+Elements in grown defect list: 1
+
+Vendor (Seagate Cache) information
+  Blocks sent to initiator = 18478912
+  Blocks received from initiator = 0
+  Blocks read from cache and sent to initiator = 27115
+  Number of read and write commands whose size <= segment size = 61
+  Number of read and write commands whose size > segment size = 0
+
+Vendor (Seagate/Hitachi) factory information
+  number of hours powered up = 56992.93
+  number of minutes until next internal SMART test = 57
+
+Error counter log:
+           Errors Corrected by           Total   Correction     Gigabytes    Total
+               ECC          rereads/    errors   algorithm      processed    uncorrected
+           fast | delayed   rewrites  corrected  invocations   [10^9 bytes]  errors
+read:   12826073        0         0  12826073          0          9.462           0
+write:         0        0         0         0          0          0.052           0
+
+Non-medium error count:        0
+
+
+[GLTSD (Global Logging Target Save Disable) set. Enable Save with '-S on']
+No Self-tests have been logged
+
+
+===== smartctl -l background (background scan log) =====
+smartctl 7.4 2023-08-01 r5530 [x86_64-linux-6.12.63+deb13-amd64] (local build)
+Copyright (C) 2002-23, Bruce Allen, Christian Franke, www.smartmontools.org
+
+=== START OF READ SMART DATA SECTION ===
+Background scan results log
+  Status: no scans active
+    Accumulated power on time, hours:minutes 56992:56 [3419576 minutes]
+    Number of background scans performed: 0,  scan progress: 0.00%
+    Number of background medium scans performed: 0
+
+===== dmesg | grep sd  (latest 30 lines) =====
+[Fri May  8 00:43:55 2026] sd 0:0:2:0: [sda] 2344225968 512-byte logical blocks: (1.20 TB/1.09 TiB)
+[Fri May  8 00:43:55 2026] sd 0:0:2:0: [sda] 4096-byte physical blocks
+[Fri May  8 00:43:55 2026] sd 0:0:0:0: [sdb] 468862128 512-byte logical blocks: (240 GB/224 GiB)
+[Fri May  8 00:43:55 2026] sd 0:0:1:0: [sdc] 2344225968 512-byte logical blocks: (1.20 TB/1.09 TiB)
+[Fri May  8 00:43:55 2026] sd 0:0:1:0: [sdc] 4096-byte physical blocks
+[Fri May  8 00:43:55 2026] sd 0:0:2:0: [sda] Write Protect is off
+[Fri May  8 00:43:55 2026] sd 0:0:2:0: [sda] Mode Sense: 13 00 10 08
+[Fri May  8 00:43:55 2026] sd 0:0:1:0: [sdc] Write Protect is off
+[Fri May  8 00:43:55 2026] sd 0:0:1:0: [sdc] Mode Sense: 13 00 10 08
+[Fri May  8 00:43:55 2026] sd 0:0:2:0: [sda] Write cache: disabled, read cache: enabled, supports DPO and FUA
+[Fri May  8 00:43:55 2026] sd 0:0:1:0: [sdc] Write cache: enabled, read cache: enabled, supports DPO and FUA
+[Fri May  8 00:43:55 2026] sd 0:0:2:0: [sda] Preferred minimum I/O size 4096 bytes
+[Fri May  8 00:43:55 2026] sd 0:0:1:0: [sdc] Preferred minimum I/O size 4096 bytes
+[Fri May  8 00:43:55 2026] sd 0:0:0:0: [sdb] Write Protect is off
+[Fri May  8 00:43:55 2026] sd 0:0:0:0: [sdb] Mode Sense: 9b 00 10 08
+[Fri May  8 00:43:55 2026] sd 0:0:0:0: [sdb] Write cache: disabled, read cache: enabled, supports DPO and FUA
+[Fri May  8 00:43:55 2026] sd 0:0:1:0: [sdc] Attached SCSI disk
+[Fri May  8 00:43:55 2026] sd 0:0:2:0: [sda] Attached SCSI disk
+[Fri May  8 00:43:55 2026]  sdb: sdb1 sdb2 < sdb5 >
+[Fri May  8 00:43:55 2026] sd 0:0:0:0: [sdb] Attached SCSI disk
+[Fri May  8 00:43:58 2026] EXT4-fs (sdb1): mounted filesystem d7d27bab-4962-460e-b7f6-590f0965c689 r/w with ordered data mode. Quota mode: none.
