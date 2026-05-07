@@ -75,6 +75,24 @@ Host pve10 10.10.10.210
   IdentityFile /home/ubuntu/projects/pvese/ssh/id_ed25519
   IdentitiesOnly yes
 
+Host pve11 10.10.10.211
+  HostName 10.10.10.211
+  User root
+  IdentityFile /home/ubuntu/projects/pvese/ssh/id_ed25519
+  IdentitiesOnly yes
+
+Host pve12 10.10.10.212
+  HostName 10.10.10.212
+  User root
+  IdentityFile /home/ubuntu/projects/pvese/ssh/id_ed25519
+  IdentitiesOnly yes
+
+Host pve13 10.10.10.213
+  HostName 10.10.10.213
+  User root
+  IdentityFile /home/ubuntu/projects/pvese/ssh/id_ed25519
+  IdentitiesOnly yes
+
 # --- 全ホスト共通 ---
 Host *
   ConnectTimeout 10

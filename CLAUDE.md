@@ -44,10 +44,13 @@ pvese (Proxmox VE Storage Evaluation) — Supermicro IPMI と Proxmox VE を操�
 | 8号機 | `10.10.10.28` (iDRAC) | `10.10.10.208` | ayase-web-service-8 | `config/server8.yml` |
 | 9号機 | `10.10.10.29` (iDRAC) | `10.10.10.209` | ayase-web-service-9 | `config/server9.yml` |
 | 10号機 | `10.10.10.30` | `10.10.10.210` | ayase-web-service-10 | `config/server10.yml` |
+| 11号機 | `10.10.10.31` | `10.10.10.211` | ayase-web-service-11 | `config/server11.yml` |
+| 12号機 | `10.10.10.32` | `10.10.10.212` | ayase-web-service-12 | `config/server12.yml` |
+| 13号機 | `10.10.10.33` | `10.10.10.213` | ayase-web-service-13 | `config/server13.yml` |
 
 4-6号機共通: ユーザ名 `claude` / パスワード `Claude123` / マザーボード Supermicro X11DPU
 7-9号機: DELL PowerEdge R320 / iDRAC SSH 鍵認証 (`ssh/idrac_rsa`) / Web/IPMI は `claude` / `Claude123` / IPMI LAN 有効化済み / FW 2.65.65.65
-10号機: Supermicro X10DRT-P (Twin Server) / ユーザ名 `claude` / パスワード `Claude123` / NIC・disk・serial_unit は X11DPU と同等想定 (実機確認要) / LINSTOR 未参加
+10-13号機共通: Supermicro X10DRT-P (Twin Server, Nutanix OEM) / ユーザ名 `claude` / パスワード `Claude123` / 別拠点設置 + VLAN trunk (1120/1083) 経由配信 / NIC は `eno1` のみ link up / LINSTOR 未参加 / 10号機: NX-1065-G5 (BMC FW 3.65 stock) / 11-12号機: NX-3060-G5 (BIOS G4G5T4.0、Redfish に末尾 `/` 必須 — `bmc-power.sh` は `-L` で対応済) / 13号機: NX-3060-G5 (BIOS G4G5T8.0 新版、Redfish 1.3.0)
 
 接続コマンド例:
 ```sh

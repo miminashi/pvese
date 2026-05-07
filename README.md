@@ -156,10 +156,13 @@ os-setup 自動化が対応済みのハードウェアプラットフォーム�
 | 8号機 | `10.10.10.28` (iDRAC) | `10.10.10.208` | ayase-web-service-8 | DELL PowerEdge R320 |
 | 9号機 | `10.10.10.29` (iDRAC) | `10.10.10.209` | ayase-web-service-9 | DELL PowerEdge R320 |
 | 10号機 | `10.10.10.30` | `10.10.10.210` | ayase-web-service-10 | Supermicro X10DRT-P |
+| 11号機 | `10.10.10.31` | `10.10.10.211` | ayase-web-service-11 | Supermicro X10DRT-P |
+| 12号機 | `10.10.10.32` | `10.10.10.212` | ayase-web-service-12 | Supermicro X10DRT-P |
+| 13号機 | `10.10.10.33` | `10.10.10.213` | ayase-web-service-13 | Supermicro X10DRT-P |
 
 - 4-6号機: Supermicro X11DPU / BMC: IPMI (Redfish + CGI API)
 - 7-9号機: DELL PowerEdge R320 / BMC: iDRAC7 SSH 鍵認証
-- 10号機: Supermicro X10DRT-P (Twin Server) / BMC: IPMI (Redfish + CGI API 想定、実機確認要) / LINSTOR 未参加
+- 10-13号機: Supermicro X10DRT-P (Twin Server, Nutanix OEM) / BMC: IPMI (Redfish + CGI API) / 別拠点 + VLAN trunk (1120/1083) / LINSTOR 未参加
 - OS: Debian 13 (Trixie) + Proxmox VE 9
 - PVE クラスタ: 1リージョン1クラスタ構成 (Region A: 4+5+6号機, Region B: 7+8+9号機)
 
@@ -198,6 +201,18 @@ graph LR
             BMC10["BMC<br/>10.10.10.30"]
             PVE10["PVE<br/>10.10.10.210"]
         end
+        subgraph srv11["11号機"]
+            BMC11["BMC<br/>10.10.10.31"]
+            PVE11["PVE<br/>10.10.10.211"]
+        end
+        subgraph srv12["12号機"]
+            BMC12["BMC<br/>10.10.10.32"]
+            PVE12["PVE<br/>10.10.10.212"]
+        end
+        subgraph srv13["13号機"]
+            BMC13["BMC<br/>10.10.10.33"]
+            PVE13["PVE<br/>10.10.10.213"]
+        end
         SMB["ISO ホスティング<br/>10.1.6.1"]
         IB["SX6036 IB スイッチ<br/>10.10.10.100"]
     end
@@ -216,6 +231,12 @@ graph LR
     CC -- "SSH/racadm" --> iDRAC9
     CC -- "SSH" --> PVE10
     CC -- "IPMI" --> BMC10
+    CC -- "SSH" --> PVE11
+    CC -- "IPMI" --> BMC11
+    CC -- "SSH" --> PVE12
+    CC -- "IPMI" --> BMC12
+    CC -- "SSH" --> PVE13
+    CC -- "IPMI" --> BMC13
     BMC4 -- "SMB" --> SMB
     BMC5 -- "SMB" --> SMB
     BMC6 -- "SMB" --> SMB
@@ -223,6 +244,9 @@ graph LR
     iDRAC8 -- "SMB" --> SMB
     iDRAC9 -- "SMB" --> SMB
     BMC10 -- "SMB" --> SMB
+    BMC11 -- "SMB" --> SMB
+    BMC12 -- "SMB" --> SMB
+    BMC13 -- "SMB" --> SMB
     PVE4 -- "InfiniBand" --- IB
     PVE5 -- "InfiniBand" --- IB
     PVE6 -- "InfiniBand" --- IB
