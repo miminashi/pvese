@@ -90,24 +90,31 @@ cmd_status() {
 }
 
 cmd_verify() {
+    # Probe the modern Redfish path first (/VirtualMedia/CD1), then fall back
+    # to the legacy Supermicro layout used by 10号機 (BMC FW 3.65, Nutanix OEM):
+    #   /redfish/v1/Managers/1/VM1/CD1
+    # That older firmware also misspells the field as "ConnecteVia" (no 'd'),
+    # so accept either spelling.
     bmc_ip="$1"
     bmc_user="$2"
     bmc_pass="$3"
 
-    result=$(curl -sk -u "${bmc_user}:${bmc_pass}" \
-        "https://${bmc_ip}/redfish/v1/Managers/1/VirtualMedia/CD1")
+    for path in "Managers/1/VirtualMedia/CD1" "Managers/1/VM1/CD1"; do
+        result=$(curl -skL -u "${bmc_user}:${bmc_pass}" \
+            "https://${bmc_ip}/redfish/v1/${path}")
+        if echo "$result" | grep -q '"Inserted"'; then
+            inserted=$(echo "$result" | sed -n 's/.*"Inserted"[[:space:]]*:[[:space:]]*\([a-z]*\).*/\1/p')
+            connected=$(echo "$result" | sed -n 's/.*"Connecte\(d\)\?Via"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\2/p')
+            echo "Inserted: $inserted, ConnectedVia: $connected (via ${path})"
+            if [ "$inserted" = "true" ]; then
+                return 0
+            fi
+            break
+        fi
+    done
 
-    inserted=$(echo "$result" | sed -n 's/.*"Inserted"[[:space:]]*:[[:space:]]*\([a-z]*\).*/\1/p')
-    connected=$(echo "$result" | sed -n 's/.*"ConnectedVia"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p')
-
-    echo "Inserted: $inserted, ConnectedVia: $connected"
-
-    if [ "$inserted" = "true" ]; then
-        return 0
-    else
-        echo "ERROR: VirtualMedia not inserted (CSRF token may have expired)" >&2
-        return 1
-    fi
+    echo "ERROR: VirtualMedia not inserted (CSRF token may have expired or Redfish path mismatch)" >&2
+    return 1
 }
 
 if [ $# -lt 1 ]; then

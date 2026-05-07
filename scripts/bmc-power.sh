@@ -25,7 +25,7 @@ redfish_get() {
     pass="$3"
     path="$4"
 
-    curl -sk -u "${user}:${pass}" "https://${bmc_ip}${path}"
+    curl -skL -u "${user}:${pass}" "https://${bmc_ip}${path}"
 }
 
 redfish_post() {
@@ -35,7 +35,7 @@ redfish_post() {
     path="$4"
     data="$5"
 
-    curl -sk -u "${user}:${pass}" \
+    curl -skL -u "${user}:${pass}" \
         -X POST "https://${bmc_ip}${path}" \
         -H "Content-Type: application/json" \
         -d "$data"
@@ -48,7 +48,7 @@ redfish_patch() {
     path="$4"
     data="$5"
 
-    curl -sk -u "${user}:${pass}" \
+    curl -skL -u "${user}:${pass}" \
         -X PATCH "https://${bmc_ip}${path}" \
         -H "Content-Type: application/json" \
         -d "$data"
