@@ -1,0 +1,93 @@
+===== uname/os =====
+Linux ayase-web-service-10 7.0.0-3-pve #1 SMP PREEMPT_DYNAMIC PMX 7.0.0-3 (2026-04-21T22:56Z) x86_64 GNU/Linux
+PRETTY_NAME="Debian GNU/Linux 13 (trixie)"
+VERSION_ID="13"
+
+===== pveversion =====
+pve-manager/9.1.9/ee7bad0a3d1546c9 (running kernel: 7.0.0-3-pve)
+
+===== lsblk -o NAME,SIZE,ROTA,MODEL,SERIAL,TRAN,TYPE,MOUNTPOINTS,FSTYPE =====
+NAME                                     SIZE ROTA MODEL                 SERIAL               TRAN TYPE MOUNTPOINTS FSTYPE
+sda                                    223.6G    0 TOSHIBA THNSNJ240PCSZ 75LS1019TM5W         sas  disk             
+├─sda1                                   976M    0                                                 part /boot       ext4
+├─sda2                                     1K    0                                                 part             
+└─sda5                                 222.6G    0                                                 part             LVM2_member
+  ├─ayase--web--service--10--vg-root   211.3G    0                                                 lvm  /           ext4
+  └─ayase--web--service--10--vg-swap_1  11.3G    0                                                 lvm  [SWAP]      swap
+sdb                                      1.1T    1 DKS5H-J1R2SS          W402BDD80000K8438EET sas  disk             
+sdc                                      1.1T    1 DKS5H-J1R2SS          W402BQN40000K8435CMC sas  disk             
+
+===== lsblk -d -o NAME,SIZE,ROTA,MODEL,SERIAL,TRAN,VENDOR,REV =====
+NAME   SIZE ROTA MODEL                 SERIAL               TRAN VENDOR        REV
+sda  223.6G    0 TOSHIBA THNSNJ240PCSZ 75LS1019TM5W         sas  ATA      JZET6102
+sdb    1.1T    1 DKS5H-J1R2SS          W402BDD80000K8438EET sas  SEAGATE      7FA9
+sdc    1.1T    1 DKS5H-J1R2SS          W402BQN40000K8435CMC sas  SEAGATE      7FA9
+
+===== df -hT =====
+Filesystem                                   Type  Size  Used Avail Use% Mounted on
+/dev/mapper/ayase--web--service--10--vg-root ext4  207G  5.1G  192G   3% /
+/dev/sda1                                    ext4  943M  118M  760M  14% /boot
+/dev/fuse                                    fuse  128M   16K  128M   1% /etc/pve
+
+===== pvs / vgs / lvs =====
+  PV         VG                      Fmt  Attr PSize   PFree
+  /dev/sda5  ayase-web-service-10-vg lvm2 a--  222.61g    0 
+
+  VG                      #PV #LV #SN Attr   VSize   VFree
+  ayase-web-service-10-vg   1   2   0 wz--n- 222.61g    0 
+
+  LV     VG                      Attr       LSize   Pool Origin Data%  Meta%  Move Log Cpy%Sync Convert
+  root   ayase-web-service-10-vg -wi-ao---- 211.30g                                                    
+  swap_1 ayase-web-service-10-vg -wi-ao----  11.31g                                                    
+
+===== ZFS pools =====
+no pools available
+
+
+===== lspci storage =====
+00:11.4 SATA controller [0106]: Intel Corporation C610/X99 series chipset sSATA Controller [AHCI mode] [8086:8d62] (rev 05)
+00:1f.2 SATA controller [0106]: Intel Corporation C610/X99 series chipset 6-Port SATA Controller [AHCI mode] [8086:8d02] (rev 05)
+01:00.0 Serial Attached SCSI controller [0107]: Broadcom / LSI SAS3008 PCI-Express Fusion-MPT SAS-3 [1000:0097] (rev 02)
+
+===== smartctl --scan =====
+/dev/sda -d scsi # /dev/sda, SCSI device
+/dev/sdb -d scsi # /dev/sdb, SCSI device
+/dev/sdc -d scsi # /dev/sdc, SCSI device
+
+===== /proc/mdstat =====
+Personalities : 
+unused devices: <none>
+
+===== mount summary =====
+/dev/fuse on /etc/pve type fuse (rw,nosuid,nodev,relatime,user_id=0,group_id=0,default_permissions,allow_other)
+/dev/mapper/ayase--web--service--10--vg-root on / type ext4 (rw,relatime,errors=remount-ro,stripe=32)
+devpts on /dev/pts type devpts (rw,nosuid,noexec,relatime,gid=5,mode=600,ptmxmode=000)
+/dev/sda1 on /boot type ext4 (rw,relatime,stripe=32)
+lxcfs on /var/lib/lxcfs type fuse.lxcfs (rw,nosuid,nodev,relatime,user_id=0,group_id=0,allow_other)
+sunrpc on /run/rpc_pipefs type rpc_pipefs (rw,relatime)
+udev on /dev type devtmpfs (rw,nosuid,relatime,size=30408564k,nr_inodes=7602141,mode=755,inode64)
+
+===== smartctl per-disk (model/serial/size/state) =====
+--- /dev/sda ---
+Device Model:     TOSHIBA THNSNJ240PCSZ
+Serial Number:    75LS1019TM5W
+User Capacity:    240,057,409,536 bytes [240 GB]
+Rotation Rate:    Solid State Device
+Form Factor:      2.5 inches
+SATA Version is:  SATA 3.2, 6.0 Gb/s (current: 6.0 Gb/s)
+--- /dev/sdb ---
+Vendor:               SEAGATE
+Product:              DKS5H-J1R2SS
+User Capacity:        1,200,243,695,616 bytes [1.20 TB]
+Logical block size:   512 bytes
+Rotation Rate:        10500 rpm
+Form Factor:          2.5 inches
+Transport protocol:   SAS (SPL-4)
+--- /dev/sdc ---
+Vendor:               SEAGATE
+Product:              DKS5H-J1R2SS
+User Capacity:        1,200,243,695,616 bytes [1.20 TB]
+Logical block size:   512 bytes
+Rotation Rate:        10500 rpm
+Form Factor:          2.5 inches
+Transport protocol:   SAS (SPL-4)
