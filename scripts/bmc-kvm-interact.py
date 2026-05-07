@@ -316,13 +316,69 @@ def detect_rfb_client(page):
     return rfb_obj
 
 
+def detect_vkbd(page):
+    """Detect VirtualKeyboard-style key sending mechanism on Supermicro iKVM.
+
+    Returns a dict with capabilities (truthy) or None if no VKbd-style
+    machinery is available. The Supermicro iKVM HTML5 viewer exposes
+    UI.rfb.sendMacro() which is what the on-screen Hot Key buttons call;
+    it constructs a full key-down + key-up wire sequence (and supports
+    modifier combos), so it is more robust than sendKey() for special
+    keys like F2/F11/Delete.
+
+    Note: All UI.rfb.send* functions short-circuit when
+    UI.rfb._rfb_state !== "normal" or _view_only is true. Callers must
+    wait for the connection to reach 'normal' state before sending.
+    """
+    info = page.evaluate(
+        """() => {
+            const out = {};
+            if (typeof UI === 'undefined' || !UI.rfb) return out;
+            out.has_sendMacro = typeof UI.rfb.sendMacro === 'function';
+            out.has_sendKey = typeof UI.rfb.sendKey === 'function';
+            out.sendKey_arity = out.has_sendKey ? UI.rfb.sendKey.length : 0;
+            out.has_sendKeyHold = typeof UI.rfb.sendKeyHold === 'function';
+            out.rfb_state = UI.rfb._rfb_state;
+            out.insydevnc = !!UI.rfb._rfb_insydevnc;
+            out.view_only = !!UI.rfb._view_only;
+            return out;
+        }"""
+    )
+    if not info or not info.get("has_sendMacro"):
+        log(f"VKbd detection: not available ({info})")
+        return None
+    log(f"VKbd detection: sendMacro available, sendKey arity={info.get('sendKey_arity')}, "
+        f"insydevnc={info.get('insydevnc')}, state={info.get('rfb_state')}")
+    return info
+
+
+def wait_rfb_normal(page, timeout_sec=5):
+    """Poll UI.rfb._rfb_state until it becomes 'normal' or timeout. Returns final state."""
+    deadline = time.time() + timeout_sec
+    last = None
+    while time.time() < deadline:
+        last = page.evaluate(
+            "() => (typeof UI !== 'undefined' && UI.rfb) ? UI.rfb._rfb_state : null"
+        )
+        if last == "normal":
+            return last
+        time.sleep(0.1)
+    return last
+
+
 def send_key_playwright(page, key):
     """Send a key using Playwright's keyboard API."""
     page.keyboard.press(key)
 
 
 def send_key_rfb(page, key, rfb_obj_name):
-    """Send a key using RFB protocol direct injection."""
+    """Send a key using RFB protocol direct injection.
+
+    Note: UI.rfb.sendKey returns false silently if _rfb_state !== "normal"
+    or _view_only is set, so a True return here indicates only that
+    sendKey() was called and reported success — not necessarily that the
+    key reached the remote.
+    """
     keysym = X11_KEYSYMS.get(key)
     if keysym is None:
         if len(key) == 1:
@@ -333,39 +389,113 @@ def send_key_rfb(page, key, rfb_obj_name):
 
     js_code = f"""() => {{
         var obj = {rfb_obj_name};
-        if (obj && typeof obj.sendKey === 'function') {{
-            obj.sendKey({keysym}, true);
-            obj.sendKey({keysym}, false);
-            return true;
-        }}
-        return false;
+        if (!obj || typeof obj.sendKey !== 'function') return false;
+        if (obj._rfb_state !== undefined && obj._rfb_state !== 'normal') return false;
+        var r1 = obj.sendKey({keysym}, true);
+        var r2 = obj.sendKey({keysym}, false);
+        return (r1 !== false) && (r2 !== false);
     }}"""
     result = page.evaluate(js_code)
     return result
 
 
-def send_keys(page, keys, wait_ms, rfb_obj_name=None,
-              screenshot_each_prefix=None, post_wait_ms=500,
+def send_key_vkbd(page, key, vkbd_info):
+    """Send a key via UI.rfb.sendMacro (Supermicro iKVM Hot Key mechanism).
+
+    sendMacro builds a full down+up sequence and uses keyEventInsyde
+    encoding on InsydeVNC firmware (where the Supermicro KVM lives).
+    Returns False if the RFB state is not 'normal' (silent no-op
+    otherwise) so callers know to fall back.
+    """
+    keysym = X11_KEYSYMS.get(key)
+    if keysym is None:
+        if len(key) == 1:
+            keysym = ord(key)
+        else:
+            return False
+
+    js = f"""() => {{
+        if (typeof UI === 'undefined' || !UI.rfb) {{
+            return {{ok: false, reason: 'no UI.rfb'}};
+        }}
+        if (UI.rfb._rfb_state !== 'normal') {{
+            return {{ok: false, reason: 'state=' + UI.rfb._rfb_state}};
+        }}
+        if (UI.rfb._view_only) {{
+            return {{ok: false, reason: 'view_only'}};
+        }}
+        if (typeof UI.rfb.sendMacro !== 'function') {{
+            return {{ok: false, reason: 'no sendMacro'}};
+        }}
+        try {{
+            var r = UI.rfb.sendMacro([{keysym}]);
+            return {{ok: r !== false}};
+        }} catch (e) {{
+            return {{ok: false, reason: String(e)}};
+        }}
+    }}"""
+    res = page.evaluate(js)
+    if not res or not res.get("ok"):
+        log(f"  [vkbd] not delivered: {res}")
+        return False
+    return True
+
+
+def send_keys(page, keys, wait_ms, rfb_obj_name=None, vkbd_info=None,
+              prefer="auto", screenshot_each_prefix=None, post_wait_ms=500,
               safe_click=False, no_click=False):
     """Send a sequence of keys with delay between each.
+
+    Path priority by --prefer:
+      auto / vkbd: vkbd (sendMacro) > rfb (sendKey) > playwright
+      rfb:         rfb > vkbd > playwright
+      playwright:  playwright only
+
+    The vkbd path uses UI.rfb.sendMacro which is more robust on Supermicro
+    iKVM HTML5 viewers (InsydeVNC) than direct DOM key events because it
+    bypasses canvas focus / keymap translation issues. Both vkbd and rfb
+    short-circuit when _rfb_state !== "normal", so this routine waits for
+    the RFB connection to reach 'normal' state before the first send.
 
     If screenshot_each_prefix is set, capture a screenshot after each key
     as PREFIX_001.png, PREFIX_002.png, etc.
     """
     focus_canvas(page, safe_click=safe_click, no_click=no_click)
 
+    if vkbd_info or rfb_obj_name in ("rfb", "window.rfb", "UI.rfb"):
+        state = wait_rfb_normal(page, timeout_sec=5)
+        log(f"RFB state before sending: {state}")
+
+    order = {
+        "auto":       ["vkbd", "rfb", "playwright"],
+        "vkbd":       ["vkbd", "rfb", "playwright"],
+        "rfb":        ["rfb", "vkbd", "playwright"],
+        "playwright": ["playwright"],
+    }.get(prefer, ["vkbd", "rfb", "playwright"])
+
     for i, key in enumerate(keys, 1):
         log(f"Sending key [{i}/{len(keys)}]: {key}")
 
         sent = False
-        if rfb_obj_name and rfb_obj_name in ("rfb", "window.rfb", "UI.rfb"):
-            sent = send_key_rfb(page, key, rfb_obj_name)
-            if sent:
-                log(f"  -> sent via RFB ({rfb_obj_name})")
+        for path in order:
+            if path == "vkbd" and vkbd_info:
+                if send_key_vkbd(page, key, vkbd_info):
+                    log("  -> sent via vkbd (UI.rfb.sendMacro)")
+                    sent = True
+                    break
+            elif path == "rfb" and rfb_obj_name in ("rfb", "window.rfb", "UI.rfb"):
+                if send_key_rfb(page, key, rfb_obj_name):
+                    log(f"  -> sent via rfb ({rfb_obj_name}.sendKey)")
+                    sent = True
+                    break
+            elif path == "playwright":
+                send_key_playwright(page, key)
+                log("  -> sent via playwright keyboard")
+                sent = True
+                break
 
         if not sent:
-            send_key_playwright(page, key)
-            log(f"  -> sent via Playwright keyboard")
+            log(f"  WARNING: key '{key}' not delivered by any path")
 
         time.sleep(wait_ms / 1000.0)
 
@@ -375,29 +505,41 @@ def send_keys(page, keys, wait_ms, rfb_obj_name=None,
             capture_canvas(page, outfile)
 
 
-def send_text(page, text, wait_ms, rfb_obj_name=None):
-    """Type a text string character by character."""
+def send_text(page, text, wait_ms, rfb_obj_name=None, vkbd_info=None, prefer="auto"):
+    """Type a text string character by character.
+
+    Uses the same path priority as send_keys: vkbd (sendMacro) > rfb > playwright.
+    """
     focus_canvas(page)
+
+    if vkbd_info or rfb_obj_name in ("rfb", "window.rfb", "UI.rfb"):
+        state = wait_rfb_normal(page, timeout_sec=5)
+        log(f"RFB state before sending: {state}")
+
+    order = {
+        "auto":       ["vkbd", "rfb", "playwright"],
+        "vkbd":       ["vkbd", "rfb", "playwright"],
+        "rfb":        ["rfb", "vkbd", "playwright"],
+        "playwright": ["playwright"],
+    }.get(prefer, ["vkbd", "rfb", "playwright"])
 
     for ch in text:
         log(f"Typing: '{ch}'")
 
         sent = False
-        if rfb_obj_name and rfb_obj_name in ("rfb", "window.rfb", "UI.rfb"):
-            keysym = ord(ch)
-            js_code = f"""() => {{
-                var obj = {rfb_obj_name};
-                if (obj && typeof obj.sendKey === 'function') {{
-                    obj.sendKey({keysym}, true);
-                    obj.sendKey({keysym}, false);
-                    return true;
-                }}
-                return false;
-            }}"""
-            sent = page.evaluate(js_code)
-
-        if not sent:
-            page.keyboard.type(ch)
+        for path in order:
+            if path == "vkbd" and vkbd_info:
+                if send_key_vkbd(page, ch, vkbd_info):
+                    sent = True
+                    break
+            elif path == "rfb" and rfb_obj_name in ("rfb", "window.rfb", "UI.rfb"):
+                if send_key_rfb(page, ch, rfb_obj_name):
+                    sent = True
+                    break
+            elif path == "playwright":
+                page.keyboard.type(ch)
+                sent = True
+                break
 
         time.sleep(wait_ms / 1000.0)
 
@@ -440,6 +582,7 @@ def cmd_sendkeys(args):
             return 1
 
         rfb_obj = detect_rfb_client(page)
+        vkbd_info = detect_vkbd(page)
 
         screenshot_each = getattr(args, "screenshot_each", None)
 
@@ -448,7 +591,8 @@ def cmd_sendkeys(args):
             log("Capturing pre-screenshot...")
             capture_canvas(page, outfile)
 
-        send_keys(page, args.keys, args.wait, rfb_obj,
+        send_keys(page, args.keys, args.wait, rfb_obj, vkbd_info=vkbd_info,
+                  prefer=getattr(args, "prefer", "auto"),
                   screenshot_each_prefix=screenshot_each,
                   post_wait_ms=args.post_wait,
                   safe_click=getattr(args, "safe_click", False),
@@ -480,7 +624,9 @@ def cmd_type(args):
             return 1
 
         rfb_obj = detect_rfb_client(page)
-        send_text(page, args.text, args.wait, rfb_obj)
+        vkbd_info = detect_vkbd(page)
+        send_text(page, args.text, args.wait, rfb_obj, vkbd_info=vkbd_info,
+                  prefer=getattr(args, "prefer", "auto"))
 
         rc = 0
         if args.screenshot:
@@ -541,6 +687,13 @@ def main():
         "--no-click", action="store_true",
         help="Use JS focus() instead of clicking canvas (no mouse event sent to remote)",
     )
+    p_sendkeys.add_argument(
+        "--prefer", choices=["auto", "vkbd", "rfb", "playwright"], default="auto",
+        help="Key injection path priority (default: auto = vkbd > rfb > playwright). "
+             "vkbd uses UI.rfb.sendMacro (Supermicro Hot Key path, recommended for "
+             "BIOS/POST navigation). rfb uses UI.rfb.sendKey. playwright sends DOM "
+             "key events to the browser canvas.",
+    )
 
     # type command
     p_type = subparsers.add_parser("type", help="Type text string")
@@ -556,6 +709,10 @@ def main():
     p_type.add_argument(
         "--post-wait", type=int, default=500,
         help="Wait before screenshot in ms (default: 500)",
+    )
+    p_type.add_argument(
+        "--prefer", choices=["auto", "vkbd", "rfb", "playwright"], default="auto",
+        help="Key injection path priority (default: auto = vkbd > rfb > playwright)",
     )
 
     args = parser.parse_args()

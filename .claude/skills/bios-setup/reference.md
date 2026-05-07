@@ -1398,9 +1398,23 @@ X11DPU の "Server ME Information" に相当 (本観測では読み取り専用�
 > **注**: X10DRT-P は Twin Server 構成のため、片ノードでは CPU2 配下のスロットのみ列挙される (ノード A vs ノード B でラベルが変わる可能性あり)。
 
 #### LSI HBA OPROM
-- **オプション**: Disabled / Legacy / EFI (推定)
-- **10号機の現在値**: Disabled
-- **解説**: X10DRT-P 内蔵 LSI HBA Option ROM。X11DPU には見えない項目
+- **オプション**: Disabled / Legacy / EFI (推定。Legacy 動作は 2026-05-02 確認済み、Enabled = Legacy 想定)
+- **出荷時 (Nutanix OEM) default**: Disabled
+- **10号機の現在値**: **Enabled** (2026-05-02 変更、Issue #53 対応)
+- **解説**: X10DRT-P 内蔵 LSI SAS HBA の Option ROM。X11DPU には見えない項目。
+- **Linux Legacy boot 必須**: 10号機 OS disk (`/dev/sda` = Toshiba THNSNJ240PCSZ 240GB) は **LSI SAS HBA 配下 (mpt3sas)** なので、`LSI HBA OPROM=Disabled` だと BIOS が disk を boot device として列挙せず、preseed install 完走後の disk first boot で `Reboot and Select proper Boot device` で停止 → PXE フォールバック → DHCP 失敗ループに陥る。Legacy boot を使う場合は **Enabled が必須**。Nutanix OEM 出荷時は AOS (Foundation/Phoenix) 起動前提のため Disabled になっている。
+- **Disabled 時の症状**:
+  - Save & Exit > Boot Override に PXE (`IBA GE Slot 0300 v1572`) のみ表示
+  - Boot タブの "Hard Disk Drive BBS Priorities" サブメニューが出ない (HDD list 空)
+  - Legacy Boot Order #5 = "Hard Disk" スロットは存在するが backing physical device 無し
+- **Enabled への変更手順**:
+  1. POST 中 Delete x60 で BIOS Setup 入場 (`bios-setup` スキル、`--prefer vkbd` で安定)
+  2. Advanced タブ → PCIe/PCI/PnP Configuration → Enter
+  3. ArrowDown 連打で `LSI HBA OPROM` までスクロール (項目 16 番目程度、help text "Enable/Disable LSI HBA firmware to be loaded" で同定)
+  4. Enter → ArrowDown で "Enabled" 選択 → Enter
+  5. F4 → Enter で Save & Reset (POST が長くなるが約 1.5-2 分で boot 完了)
+- **検証**: 設定後 SSH 到達 (`ssh -F ssh/config pve10 hostname`) で確認可能
+- **関連**: Issue #53, レポート 2026-04-30_094039 / 2026-05-02_060639, メモリ `server10_lsi_hba_oprom.md`
 
 #### Onboard LAN OPROM Type
 - **オプション**: Legacy / EFI

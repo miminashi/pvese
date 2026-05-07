@@ -121,7 +121,7 @@ PXE ブート中（FlexBoot/Intel Boot Agent）には受け付けられない。
 スタックした場合: ForceOff → 20秒待機 → Power On → Delete 連打を再試行。
 5-6号機 (X11DPU) と 10号機 (X10DRT-P) では未観測。
 
-**10号機 (X10DRT-P) の進入特性 (2026-04-30 確認)**:
+**10号機 (X10DRT-P) の進入特性 (2026-04-30 確認, 2026-05-02 VKbd 経路で再確認)**:
 - POST 中に Canvas が `720x400` (POST テキストモード) で出始め、BIOS Setup に入ると `800x600` に切り替わる (X11DPU と同等)
 - 60×Delete --wait 1000 のまま動作し、約 22 キー目で BIOS Setup 画面に到達する (4-6号機より早い)
 - 進入後はロゴ画面ではなくテキストの "Aptio Setup Utility - Copyright (C) 2021 American Megatrends, Inc." が表示される
@@ -138,8 +138,26 @@ sleep 3
               Delete Delete Delete Delete Delete Delete Delete Delete Delete Delete \
               Delete Delete Delete Delete Delete Delete Delete Delete Delete Delete \
               Delete Delete Delete Delete Delete Delete Delete Delete Delete Delete \
-    --wait 1000 --screenshot-each tmp/<sid>/bios_entry --post-wait 300 --no-click
+    --wait 1000 --no-click --prefer vkbd \
+    --screenshot-each tmp/<sid>/bios_entry --post-wait 300
 ```
+
+### `--prefer` オプション (2026-05-02 追加)
+
+`bmc-kvm-interact.py` のキー送信は 3 つのパスを持つ:
+
+| 値 | パス | 仕組み | 備考 |
+|----|------|--------|------|
+| `auto` (デフォルト) | vkbd > rfb > playwright | 検出に成功した順 | 通常これでよい |
+| `vkbd` | `UI.rfb.sendMacro([keysym])` | Supermicro Hot Key ボタンと同じ経路 | ★推奨。canvas focus 非依存で BIOS/POST/ISOLINUX 全段で安定 |
+| `rfb` | `UI.rfb.sendKey(keysym, down)` | down/up を別 call で送る | display mode 切替時に状態問題あり |
+| `playwright` | `page.keyboard.press(key)` | DOM keydown/keyup | canvas focus 必須 |
+
+すべての RFB 経路は `UI.rfb._rfb_state !== "normal"` で silent no-op するため、`bmc-kvm-interact.py` は送信前に state が `normal` に到達するまで自動的に待機する。
+
+10号機向け recipe には `--prefer vkbd` を必ず付けること。`auto` でも 10号機の BMC FW 3.65 では vkbd が選ばれるが、明示することで失敗時の挙動 (rfb fallback) を抑制できる。
+
+X11DPU (4-6号機) でも auto = vkbd が選ばれる (Supermicro iKVM viewer 共通)。
 
 ### サブコマンド: screenshot
 
