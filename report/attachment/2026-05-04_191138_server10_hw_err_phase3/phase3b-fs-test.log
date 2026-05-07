@@ -1,0 +1,82 @@
+=== B1 sysfs queue parameters ===
+  max_sectors_kb = 4096
+  max_hw_sectors_kb = 16383
+  write_zeroes_max_bytes = 33550336
+  discard_zeroes_data = 0
+  discard_max_bytes = 0
+  discard_granularity = 0
+  max_discard_segments = 1
+  rotational = 1
+
+=== B2 SCSI bsg device check ===
+/dev/sg0
+/dev/sg1
+/dev/sg2
+0:0:0:0
+0:0:1:0
+0:0:2:0
+end_device-0:0
+end_device-0:1
+end_device-0:2
+sas_host0
+
+=== B3 blkdiscard --zeroout (WRITE SAME(16) 経由を期待) range 4MB ===
+rc=0
+
+=== B4 wipefs / sgdisk による partition table 書き込み ===
+wipefs rc=0
+
+=== B5 sgdisk new GPT 作成試行 ===
+Creating new GPT entries in memory.
+The operation has completed successfully.
+sgdisk rc=0
+[Mon May  4 18:57:07 2026] sd 0:0:1:0: [sdb] tag#5720 FAILED Result: hostbyte=DID_OK driverbyte=DRIVER_OK cmd_age=0s
+[Mon May  4 18:57:07 2026] sd 0:0:1:0: [sdb] tag#5720 Sense Key : Hardware Error [current] 
+[Mon May  4 18:57:07 2026] sd 0:0:1:0: [sdb] tag#5720 <<vendor>>ASC=0x81 ASCQ=0x1 
+[Mon May  4 18:57:07 2026] sd 0:0:1:0: [sdb] tag#5720 CDB: Write(10) 2a 00 00 00 00 00 00 00 28 00
+[Mon May  4 18:57:07 2026] critical target error, dev sdb, sector 0 op 0x1:(WRITE) flags 0x800800 phys_seg 5 prio class 2
+[Mon May  4 18:57:07 2026] Buffer I/O error on dev sdb, logical block 0, lost async page write
+[Mon May  4 18:57:07 2026] Buffer I/O error on dev sdb, logical block 1, lost async page write
+[Mon May  4 18:57:07 2026] Buffer I/O error on dev sdb, logical block 2, lost async page write
+[Mon May  4 18:57:07 2026] Buffer I/O error on dev sdb, logical block 3, lost async page write
+[Mon May  4 18:57:07 2026] Buffer I/O error on dev sdb, logical block 4, lost async page write
+
+=== B6 mkfs.ext4 (lazy_journal_init=0,lazy_itable_init=0 で WRITE SAME 強制) ===
+mke2fs 1.47.2 (1-Jan-2025)
+Creating filesystem with 293028246 4k blocks and 73261056 inodes
+Filesystem UUID: e6da0c87-af05-4154-ac75-a04a5baeec8d
+Superblock backups stored on blocks: 
+	32768, 98304, 163840, 229376, 294912, 819200, 884736, 1605632, 2654208, 
+	4096000, 7962624, 11239424, 20480000, 23887872, 71663616, 78675968, 
+	102400000, 214990848
+
+Allocating group tables:    0/8943         done                            
+Writing inode tables:    0/8943  17/8943 113/8943 225/8943 337/8943 433/8943 545/8943 641/8943 737/8943 849/8943 945/89431057/89431153/89431249/89431361/89431457/89431553/89431665/89431761/89431841/89431937/89432049/89432145/89432241/89432337/89432433/89432529/89432625/89432721/89432817/89432913/89433009/89433105/89433201/89433281/89433377/89433457/89433553/89433633/89433729/89433825/89433905/89434001/89434097/89434177/89434273/89434369/89434449/89434545/89434625/89434721/89434801/89434897/89434977/89435057/89435153/89435233/89435313/89435409/89435489/89435569/89435665/89435745/89435825/89435905/89435985/89436065/89436145/89436225/89436305/89436385/89436465/89436545/89436625/89436705/89436785/89436865/89436929/89437009/89437089/89437153/89437233/89437313/89437377/89437457/89437521/89437601/89437665/89437745/89437809/89437873/89437953/89438017/89438081/89438145/89438209/89438273/89438353/89438417/89438481/89438545/89438609/89438673/89438721/89438785/89438849/89438913/8943         done                            
+Creating journal (262144 blocks): done
+Writing superblocks and filesystem accounting information:    0/8943         mkfs.ext4: Input/output error while writing out and closing file system
+mkfs.ext4 rc=0
+[Mon May  4 18:59:01 2026] sd 0:0:1:0: [sdb] tag#6151 <<vendor>>ASC=0x81 ASCQ=0x1 
+[Mon May  4 18:59:01 2026] critical target error, dev sdb, sector 8 op 0x1:(WRITE) flags 0x804800 phys_seg 128 prio class 2
+[Mon May  4 18:59:01 2026] sd 0:0:1:0: [sdb] tag#6152 <<vendor>>ASC=0x81 ASCQ=0x1 
+[Mon May  4 18:59:01 2026] critical target error, dev sdb, sector 1032 op 0x1:(WRITE) flags 0x804800 phys_seg 128 prio class 2
+[Mon May  4 18:59:01 2026] sd 0:0:1:0: [sdb] tag#6153 <<vendor>>ASC=0x81 ASCQ=0x1 
+[Mon May  4 18:59:01 2026] critical target error, dev sdb, sector 2056 op 0x1:(WRITE) flags 0x804800 phys_seg 128 prio class 2
+[Mon May  4 18:59:01 2026] sd 0:0:1:0: [sdb] tag#6154 <<vendor>>ASC=0x81 ASCQ=0x1 
+[Mon May  4 18:59:01 2026] critical target error, dev sdb, sector 3080 op 0x1:(WRITE) flags 0x804800 phys_seg 128 prio class 2
+[Mon May  4 18:59:01 2026] sd 0:0:1:0: [sdb] tag#6155 <<vendor>>ASC=0x81 ASCQ=0x1 
+[Mon May  4 18:59:01 2026] critical target error, dev sdb, sector 4104 op 0x1:(WRITE) flags 0x804800 phys_seg 128 prio class 2
+[Mon May  4 18:59:01 2026] sd 0:0:1:0: [sdb] tag#6156 <<vendor>>ASC=0x81 ASCQ=0x1 
+[Mon May  4 18:59:01 2026] critical target error, dev sdb, sector 5128 op 0x1:(WRITE) flags 0x804800 phys_seg 128 prio class 2
+[Mon May  4 18:59:01 2026] sd 0:0:1:0: [sdb] tag#6157 <<vendor>>ASC=0x81 ASCQ=0x1 
+[Mon May  4 18:59:01 2026] critical target error, dev sdb, sector 6152 op 0x1:(WRITE) flags 0x804800 phys_seg 128 prio class 2
+[Mon May  4 18:59:01 2026] sd 0:0:1:0: [sdb] tag#6158 <<vendor>>ASC=0x81 ASCQ=0x1 
+[Mon May  4 18:59:01 2026] critical target error, dev sdb, sector 7176 op 0x1:(WRITE) flags 0x804800 phys_seg 128 prio class 2
+[Mon May  4 18:59:01 2026] sd 0:0:1:0: [sdb] tag#6159 <<vendor>>ASC=0x81 ASCQ=0x1 
+[Mon May  4 18:59:01 2026] critical target error, dev sdb, sector 8200 op 0x1:(WRITE) flags 0x804800 phys_seg 128 prio class 2
+[Mon May  4 18:59:01 2026] sd 0:0:1:0: [sdb] tag#6172 <<vendor>>ASC=0x81 ASCQ=0x1 
+[Mon May  4 18:59:01 2026] critical target error, dev sdb, sector 262144 op 0x1:(WRITE) flags 0x804800 phys_seg 128 prio class 2
+
+=== B7 mkfs.ext4 mount + write 試行 ===
+mount: /mnt/sdb-test: wrong fs type, bad option, bad superblock on /dev/sdb, missing codepage or helper program, or other error.
+       dmesg(1) may have more information after failed mount system call.
+mount rc=32

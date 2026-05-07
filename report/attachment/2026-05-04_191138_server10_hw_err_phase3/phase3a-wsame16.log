@@ -1,0 +1,54 @@
+0xAA pat md5: 33460dca3b35ad41df455259d2334079
+0x55 pat md5: 09db0bdd287b2d7ff01a701e81bcd2c3
+DEAD   md5: 3b403aca3814b3f11a8371a26371a985
+
+=== W1 WRITE SAME(16) 0x55 single block at LBA=4000 ===
+SCSI Status: Good 
+
+  read md5 = 09db0bdd287b2d7ff01a701e81bcd2c3
+
+=== W2 WRITE SAME(16) DEADBEEF at LBA=5000 ===
+SCSI Status: Good 
+
+  read md5 = 2a4e09f483af23aee737d766bbfabe39
+
+=== W3 WRITE SAME(16) 0xAA NUMBER_OF_LBAS=8 at LBA=6000 ===
+SCSI Status: Good 
+
+  read md5 (8 blks) = 3e4309c7cc81f23d45e260a8f13ca860
+  expected md5     = 3e4309c7cc81f23d45e260a8f13ca860
+
+=== W4 WRITE SAME(16) 0x55 NUMBER_OF_LBAS=1000 at LBA=10000 ===
+(t0=1777888602.784655503)
+SCSI Status: Good 
+
+(t1=1777888603.795812394)
+  read md5 (1000 blks) = aa1a32706c5fcf6040b69eded1701941
+  expected md5         = aa1a32706c5fcf6040b69eded1701941
+
+=== W5 WRITE SAME(16) 0xAA NUMBER_OF_LBAS=0 (rest of disk) at LBA=20000 ===
+(NOTE: NUMBER OF LBAS=0 means rest of disk, may take long. Cancel if hangs.)
+(t0=1777888604.485778911)
+>>> transport error: Host_status=0x03 [DID_TIME_OUT]
+
+SCSI Status: Good 
+
+(t1=1777888624.530100996, rc=99)
+  read md5 LBA=20000 (1 blk) = 33460dca3b35ad41df455259d2334079
+  read md5 LBA=200000        = 33460dca3b35ad41df455259d2334079
+  read md5 LBA=2000000       = 33460dca3b35ad41df455259d2334079
+
+=== W6 WRITE SAME(16) UNMAP=1 at LBA=30000 ===
+SCSI Status: Check Condition 
+
+Sense Information:
+Fixed format, current; Sense key: Illegal Request
+Additional sense: Invalid field in cdb
+  Field replaceable unit code: 1
+  Sense Key Specific: Error in Command: byte 1 bit 3
+
+
+  read md5 = 33460dca3b35ad41df455259d2334079
+
+=== Summary ===
+-rw-r--r-- 1 root root 512 May  4 18:57 /tmp/r.bin

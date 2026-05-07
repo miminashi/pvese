@@ -1,0 +1,85 @@
+pattern md5 (0xAA*512): 33460dca3b35ad41df455259d2334079  /tmp/aa512
+zero    md5         : bf619eac0cdf3f68d496ea9344137e8b  /tmp/z512
+
+=== T1 baseline read at LBA=2000 ===
+[T1-pre] LBA=2000 md5: 33460dca3b35ad41df455259d2334079  /tmp/post.bin
+
+=== T2 WRITE AND VERIFY(10) 0x2e の 0xAA 書き込み試行 ===
+    cdb to send: [2e 00 00 00 07 d0 00 00 01 00]
+SCSI Status: Check Condition 
+
+Sense Information:
+Fixed format, current; Sense key: Hardware Error
+vendor specific ASC=81, ASCQ=01 (hex)
+  Info fld=0x7d0 [2000] 
+ Raw sense data (in hex), sb_len=27
+        f0 00 04 00 00 07 d0 13  00 00 07 e8 81 01 00 00
+        00 00 00 00 00 00 00 00  00 00 00
+
+
+Medium or hardware error
+[T2-WAV10-AA] LBA=2000 md5: 33460dca3b35ad41df455259d2334079  /tmp/post.bin
+
+=== T3 WRITE(10) で zero に戻し試行 (ASC=0x81 が出る想定) ===
+dd: error writing '/dev/sdb': Remote I/O error
+1+0 records in
+0+0 records out
+0 bytes copied, 0.00734524 s, 0.0 kB/s
+[Mon May  4 18:56:34 2026] sd 0:0:1:0: [sdb] tag#4554 FAILED Result: hostbyte=DID_OK driverbyte=DRIVER_OK cmd_age=0s
+[Mon May  4 18:56:34 2026] sd 0:0:1:0: [sdb] tag#4554 Sense Key : Hardware Error [current] 
+[Mon May  4 18:56:34 2026] sd 0:0:1:0: [sdb] tag#4554 <<vendor>>ASC=0x81 ASCQ=0x0 
+[Mon May  4 18:56:34 2026] sd 0:0:1:0: [sdb] tag#4554 CDB: Write(10) 2a 00 00 00 07 d0 00 00 01 00
+[Mon May  4 18:56:34 2026] critical target error, dev sdb, sector 2000 op 0x1:(WRITE) flags 0x8800 phys_seg 1 prio class 2
+[T3-after-write10] LBA=2000 md5: 33460dca3b35ad41df455259d2334079  /tmp/post.bin
+
+=== T4 WRITE AND VERIFY(10) 0x2e で zero パターン書き込み ===
+    cdb to send: [2e 00 00 00 07 d0 00 00 01 00]
+SCSI Status: Good 
+
+
+[T4-WAV10-zero] LBA=2000 md5: bf619eac0cdf3f68d496ea9344137e8b  /tmp/post.bin
+
+=== T5 WRITE AND VERIFY(16) 0x8e で 0xAA 書き込み ===
+    cdb to send: [8e 00 00 00 00 00 00 00 07 d0 00 00 00 01 00 00]
+SCSI Status: Check Condition 
+
+Sense Information:
+Fixed format, current; Sense key: Hardware Error
+vendor specific ASC=81, ASCQ=01 (hex)
+  Info fld=0x7d0 [2000] 
+ Raw sense data (in hex), sb_len=27
+        f0 00 04 00 00 07 d0 13  00 00 23 d0 81 01 00 00
+        00 00 00 00 00 00 00 00  00 00 00
+
+
+Medium or hardware error
+[T5-WAV16-AA] LBA=2000 md5: bf619eac0cdf3f68d496ea9344137e8b  /tmp/post.bin
+
+=== T6 WRITE SAME(16) 0x93 で 0xAA 書き込み ===
+    cdb to send: [93 00 00 00 00 00 00 00 07 d0 00 00 00 01 00 00]
+SCSI Status: Good 
+
+
+[T6-WSAME16-AA] LBA=2000 md5: 33460dca3b35ad41df455259d2334079  /tmp/post.bin
+
+=== T7 大きい範囲で WRITE AND VERIFY(10) 0xAA 書き込み (LBA=3000, 8 blocks) ===
+-rw-r--r-- 1 root root 4096 May  4 18:56 /tmp/aaN.bin
+    cdb to send: [2e 00 00 00 0b b8 00 00 08 00]
+SCSI Status: Check Condition 
+
+Sense Information:
+Fixed format, current; Sense key: Hardware Error
+vendor specific ASC=81, ASCQ=01 (hex)
+  Info fld=0xbb8 [3000] 
+ Raw sense data (in hex), sb_len=27
+        f0 00 04 00 00 0b b8 13  00 00 23 d0 81 01 00 00
+        00 00 00 00 00 00 00 00  00 00 00
+
+
+Medium or hardware error
+[T7] reading 8 blocks at LBA=3000
+620f0b67a91f7f74151bc5be745b7110  /tmp/lba3000.bin
+
+=== T8 同範囲を vanilla dd で読み戻して 0xAA パターンか確認 ===
+/tmp/phase3a-verify.sh: 71: xxd: not found
+/tmp/phase3a-verify.sh: 72: xxd: not found

@@ -1,0 +1,142 @@
+=== pre-test baseline ===
+dd: error writing '/dev/sdb': Remote I/O error
+1+0 records in
+0+0 records out
+0 bytes copied, 0.00800585 s, 0.0 kB/s
+--- dmesg --since 5s ---
+[Mon May  4 18:56:23 2026] scsi_io_completion_action: 615 callbacks suppressed
+[Mon May  4 18:56:23 2026] sd 0:0:1:0: [sdb] tag#1576 FAILED Result: hostbyte=DID_OK driverbyte=DRIVER_OK cmd_age=0s
+[Mon May  4 18:56:23 2026] sd 0:0:1:0: [sdb] tag#1576 Sense Key : Hardware Error [current] 
+[Mon May  4 18:56:23 2026] sd 0:0:1:0: [sdb] tag#1576 <<vendor>>ASC=0x81 ASCQ=0x0 
+[Mon May  4 18:56:23 2026] sd 0:0:1:0: [sdb] tag#1576 CDB: Write(10) 2a 00 00 00 03 e8 00 00 01 00
+[Mon May  4 18:56:23 2026] blk_print_req_error: 615 callbacks suppressed
+[Mon May  4 18:56:23 2026] critical target error, dev sdb, sector 1000 op 0x1:(WRITE) flags 0x8800 phys_seg 1 prio class 2
+
+=== 3a-1 WRITE(16) opcode 0x8a (LBA=1000, 1 block) ===
+=== WRITE(16) ===
+    cdb to send: [8a 00 00 00 00 00 00 00 03 e8 00 00 00 01 00 00]
+SCSI Status: Check Condition 
+
+Sense Information:
+Fixed format, current; Sense key: Hardware Error
+vendor specific ASC=81, ASCQ=00 (hex)
+  Info fld=0x3e8 [1000] 
+ Raw sense data (in hex), sb_len=27
+        f0 00 04 00 00 03 e8 13  00 00 07 e8 81 00 00 00
+        00 00 00 00 00 00 00 00  00 00 00
+
+
+Medium or hardware error
+rc=3
+
+=== 3a-2 WRITE AND VERIFY(10) opcode 0x2e ===
+=== WRITE AND VERIFY(10) ===
+    cdb to send: [2e 00 00 00 03 e8 00 00 01 00]
+SCSI Status: Good 
+
+
+rc=0
+
+=== 3a-3 WRITE AND VERIFY(16) opcode 0x8e ===
+=== WRITE AND VERIFY(16) ===
+    cdb to send: [8e 00 00 00 00 00 00 00 03 e8 00 00 00 01 00 00]
+SCSI Status: Good 
+
+
+rc=0
+
+=== 3a-4 WRITE SAME(16) opcode 0x93 ===
+=== WRITE SAME(16) ===
+    cdb to send: [93 00 00 00 00 00 00 00 03 e8 00 00 00 01 00 00]
+SCSI Status: Good 
+
+
+rc=0
+
+=== 3a-5 COMPARE AND WRITE opcode 0x89 ===
+=== COMPARE AND WRITE ===
+    cdb to send: [89 00 00 00 00 00 00 00 03 e8 00 00 00 01 00 00]
+SCSI Status: Check Condition 
+
+Sense Information:
+Fixed format, current; Sense key: Illegal Request
+Additional sense: Invalid command operation code
+  Field replaceable unit code: 1
+  Sense Key Specific: Error in Command: byte 0 bit 7
+ Raw sense data (in hex), sb_len=27, calculated_len=27
+        70 00 05 00 00 00 00 13  00 00 00 00 20 00 01 cf
+        00 00 00 00 00 00 00 00  00 00 00
+
+
+Illegal request, Invalid opcode
+rc=9
+
+=== 3a-6 ORWRITE(16) opcode 0x8b ===
+=== ORWRITE(16) ===
+    cdb to send: [8b 00 00 00 00 00 00 00 03 e8 00 00 00 01 00 00]
+SCSI Status: Check Condition 
+
+Sense Information:
+Fixed format, current; Sense key: Illegal Request
+Additional sense: Invalid command operation code
+  Field replaceable unit code: 1
+  Sense Key Specific: Error in Command: byte 0 bit 7
+ Raw sense data (in hex), sb_len=27, calculated_len=27
+        70 00 05 00 00 00 00 13  00 00 00 00 20 00 01 cf
+        00 00 00 00 00 00 00 00  00 00 00
+
+
+Illegal request, Invalid opcode
+rc=9
+
+=== 3a-7 WRITE STREAM(16) opcode 0x9a (期待値低) ===
+=== WRITE STREAM(16) ===
+    cdb to send: [9a 00 00 00 00 00 00 00 03 e8 00 00 00 01 00 00]
+SCSI Status: Check Condition 
+
+Sense Information:
+Fixed format, current; Sense key: Illegal Request
+Additional sense: Invalid command operation code
+  Field replaceable unit code: 1
+  Sense Key Specific: Error in Command: byte 0 bit 7
+ Raw sense data (in hex), sb_len=27, calculated_len=27
+        70 00 05 00 00 00 00 13  00 00 00 00 20 00 01 cf
+        00 00 00 00 00 00 00 00  00 00 00
+
+
+Illegal request, Invalid opcode
+rc=9
+
+=== 3a-8 ATA PASS-THROUGH(12) opcode 0xa1 IDENTIFY (排除目的) ===
+    cdb to send: [a1 08 0e 00 00 00 00 00 00 ec 00 00]
+SCSI Status: Check Condition 
+
+Sense Information:
+Fixed format, current; Sense key: Illegal Request
+Additional sense: Invalid command operation code
+  Field replaceable unit code: 1
+  Sense Key Specific: Error in Command: byte 0 bit 7
+ Raw sense data (in hex), sb_len=27, calculated_len=27
+        70 00 05 00 00 00 00 13  00 00 00 00 20 00 01 cf
+        00 00 00 00 00 00 00 00  00 00 00
+
+
+Error 9 occurred, no data received
+Illegal request, Invalid opcode
+rc=9
+
+=== 3a-9 LBA=1000 読み戻し ===
+pre  md5: bf619eac0cdf3f68d496ea9344137e8b  /tmp/lba1000-pre.bin
+post md5: bf619eac0cdf3f68d496ea9344137e8b  /tmp/lba1000-post.bin
+zero md5: bf619eac0cdf3f68d496ea9344137e8b  /tmp/z512
+=== 3a-10 final WRITE(10) check (vanilla dd) ===
+dd: error writing '/dev/sdb': Remote I/O error
+1+0 records in
+0+0 records out
+0 bytes copied, 0.00820215 s, 0.0 kB/s
+rc=1
+[Mon May  4 18:56:32 2026] sd 0:0:1:0: [sdb] tag#6173 FAILED Result: hostbyte=DID_OK driverbyte=DRIVER_OK cmd_age=0s
+[Mon May  4 18:56:32 2026] sd 0:0:1:0: [sdb] tag#6173 Sense Key : Hardware Error [current] 
+[Mon May  4 18:56:32 2026] sd 0:0:1:0: [sdb] tag#6173 <<vendor>>ASC=0x81 ASCQ=0x0 
+[Mon May  4 18:56:32 2026] sd 0:0:1:0: [sdb] tag#6173 CDB: Write(10) 2a 00 00 00 03 e8 00 00 01 00
+[Mon May  4 18:56:32 2026] critical target error, dev sdb, sector 1000 op 0x1:(WRITE) flags 0x8800 phys_seg 1 prio class 2

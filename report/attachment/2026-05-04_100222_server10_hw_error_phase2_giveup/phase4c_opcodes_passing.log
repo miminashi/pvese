@@ -1,0 +1,42 @@
+=== Phase 4c WRITE LONG + REASSIGN BLOCKS for /dev/sdc ===
+重要な発見: 通常 WRITE(10) は ASC=0x81 で拒否されるが、以下の opcode は全て通る:
+
+## Step 1: WRITE LONG (xfer_len=590) - opcode 0x3f
+sg_write_long --in=/tmp/long.bin --xfer_len=590 --lba=0 /dev/sdc
+→ 出力なし (成功)
+直後 dmesg: critical medium error, dev sdc, sector 0 op 0x0:(READ)
+→ WRITE LONG が物理セクタ全体 (512 data + 78 ECC) に zero を書き込み成功。
+   不正な ECC により後続 read で Medium Error。意図通りの動作。
+
+## Step 4: VERIFY(10) - opcode 0x2f (read-only)
+sg_verify --lba=0 --count=1 /dev/sdc
+→ Medium Error / Unrecovered read error / FRU=131
+→ Step 1 で書いた bad ECC を検出。WRITE LONG は確実に書き込まれている。
+
+## Step 5: REASSIGN BLOCKS - opcode 0x07
+sg_reassign --address=0 /dev/sdc
+→ 出力なし (成功)
+→ LBA 0 を再配置。SCSI コマンドとして通る。
+
+## Step 8: dd if=/dev/sdc (read after reassign)
+dd if=/dev/sdc of=/tmp/lba0.bin bs=512 count=1
+→ 512 bytes copied (read 成功、内容 全 0x00)
+→ REASSIGN 後、LBA 0 の read が成功 (zero 化されている)
+→ 物理的にディスクへの書き込み (zero pattern) は完了している
+
+## Phase 4 全期間で繰り返し試行した dd write test
+dd if=/dev/zero of=/dev/sdc bs=512 count=1 oflag=direct
+→ 全試行で Remote I/O error
+→ dmesg: ASC=0x81 / CDB: Write(10) 2a 00 ...
+→ opcode 0x2a (WRITE(10)) のみ vendor reject される
+
+=== 結論 ===
+- opcode 0x3f (WRITE LONG) → 通る
+- opcode 0x07 (REASSIGN BLOCKS) → 通る
+- opcode 0x04 (FORMAT UNIT) → 通る (Phase 4b で実証)
+- opcode 0x48 (SANITIZE Overwrite) → 通る (Phase 5c で実証)
+- opcode 0x2a (WRITE(10)) → ASC=0x81 vendor reject
+
+→ Nutanix が **特定の opcode のみを vendor-specific reject する保護機構**をファームウェアレベルで実装していると強く示唆される。
+   FORMAT/SANITIZE/WRITE LONG など「ディスク内部処理を伴う特殊コマンド」は通すが、
+   ホスト OS からの汎用 WRITE は拒否する設計。

@@ -1,0 +1,239 @@
+=== sg_format START on ayase-web-service-13 /dev/sdb at 2026-05-03T23:54:25+09:00 ===
+    SEAGATE   DKS5H-J1R2SS      7FA9   peripheral_type: disk [0x0]
+      Unit serial number: W402BD1J0000K8435CXF
+      LU name: 5000c500b85427eb
+Mode Sense (block descriptor) data, prior to changes:
+  Number of blocks=2294615392 [0x88c50d60]
+  Block size=520 [0x208]
+
+A FORMAT UNIT command will commence in 15 seconds
+    ALL data on /dev/sdb will be DESTROYED
+        Press control-C to abort
+
+A FORMAT UNIT command will commence in 10 seconds
+    ALL data on /dev/sdb will be DESTROYED
+        Press control-C to abort
+
+A FORMAT UNIT command will commence in 5 seconds
+    ALL data on /dev/sdb will be DESTROYED
+        Press control-C to abort
+
+Format unit has started
+Format unit in progress, 0.57% done
+Format unit in progress, 1.15% done
+Format unit in progress, 1.73% done
+Format unit in progress, 2.32% done
+Format unit in progress, 2.90% done
+Format unit in progress, 3.48% done
+Format unit in progress, 4.06% done
+Format unit in progress, 4.63% done
+Format unit in progress, 5.21% done
+Format unit in progress, 5.79% done
+Format unit in progress, 6.37% done
+Format unit in progress, 6.94% done
+Format unit in progress, 7.52% done
+Format unit in progress, 8.09% done
+Format unit in progress, 8.67% done
+Format unit in progress, 9.24% done
+Format unit in progress, 9.81% done
+Format unit in progress, 10.38% done
+Format unit in progress, 10.95% done
+Format unit in progress, 11.52% done
+Format unit in progress, 12.08% done
+Format unit in progress, 12.65% done
+Format unit in progress, 13.22% done
+Format unit in progress, 13.78% done
+Format unit in progress, 14.35% done
+Format unit in progress, 14.91% done
+Format unit in progress, 15.47% done
+Format unit in progress, 16.04% done
+Format unit in progress, 16.60% done
+Format unit in progress, 17.15% done
+Format unit in progress, 17.71% done
+Format unit in progress, 18.27% done
+Format unit in progress, 18.83% done
+Format unit in progress, 19.38% done
+Format unit in progress, 19.93% done
+Format unit in progress, 20.48% done
+Format unit in progress, 21.04% done
+Format unit in progress, 21.59% done
+Format unit in progress, 22.14% done
+Format unit in progress, 22.68% done
+Format unit in progress, 23.23% done
+Format unit in progress, 23.78% done
+Format unit in progress, 24.33% done
+Format unit in progress, 24.87% done
+Format unit in progress, 25.41% done
+Format unit in progress, 25.96% done
+Format unit in progress, 26.50% done
+Format unit in progress, 27.04% done
+Format unit in progress, 27.58% done
+Format unit in progress, 28.12% done
+Format unit in progress, 28.66% done
+Format unit in progress, 29.20% done
+Format unit in progress, 29.74% done
+Format unit in progress, 30.27% done
+Format unit in progress, 30.80% done
+Format unit in progress, 31.33% done
+Format unit in progress, 31.86% done
+Format unit in progress, 32.39% done
+Format unit in progress, 32.92% done
+Format unit in progress, 33.45% done
+Format unit in progress, 33.97% done
+Format unit in progress, 34.49% done
+Format unit in progress, 35.01% done
+Format unit in progress, 35.53% done
+Format unit in progress, 36.05% done
+Format unit in progress, 36.57% done
+Format unit in progress, 37.09% done
+Format unit in progress, 37.61% done
+Format unit in progress, 38.13% done
+Format unit in progress, 38.65% done
+Format unit in progress, 39.17% done
+Format unit in progress, 39.68% done
+Format unit in progress, 40.20% done
+Format unit in progress, 40.71% done
+Format unit in progress, 41.22% done
+Format unit in progress, 41.73% done
+Format unit in progress, 42.24% done
+Format unit in progress, 42.75% done
+Format unit in progress, 43.26% done
+Format unit in progress, 43.77% done
+Format unit in progress, 44.28% done
+Format unit in progress, 44.78% done
+Format unit in progress, 45.29% done
+Format unit in progress, 45.79% done
+Format unit in progress, 46.30% done
+Format unit in progress, 46.79% done
+Format unit in progress, 47.29% done
+Format unit in progress, 47.79% done
+Format unit in progress, 48.28% done
+Format unit in progress, 48.78% done
+Format unit in progress, 49.27% done
+Format unit in progress, 49.76% done
+Format unit in progress, 50.26% done
+Format unit in progress, 50.75% done
+Format unit in progress, 51.24% done
+Format unit in progress, 51.74% done
+Format unit in progress, 52.22% done
+Format unit in progress, 52.71% done
+Format unit in progress, 53.19% done
+Format unit in progress, 53.68% done
+Format unit in progress, 54.17% done
+Format unit in progress, 54.65% done
+Format unit in progress, 55.13% done
+Format unit in progress, 55.61% done
+Format unit in progress, 56.10% done
+Format unit in progress, 56.57% done
+Format unit in progress, 57.05% done
+Format unit in progress, 57.53% done
+Format unit in progress, 58.00% done
+Format unit in progress, 58.48% done
+Format unit in progress, 58.95% done
+Format unit in progress, 59.42% done
+Format unit in progress, 59.89% done
+Format unit in progress, 60.36% done
+Format unit in progress, 60.83% done
+Format unit in progress, 61.30% done
+Format unit in progress, 61.76% done
+Format unit in progress, 62.23% done
+Format unit in progress, 62.69% done
+Format unit in progress, 63.16% done
+Format unit in progress, 63.61% done
+Format unit in progress, 64.07% done
+Format unit in progress, 64.52% done
+Format unit in progress, 64.97% done
+Format unit in progress, 65.43% done
+Format unit in progress, 65.88% done
+Format unit in progress, 66.33% done
+Format unit in progress, 66.77% done
+Format unit in progress, 67.22% done
+Format unit in progress, 67.67% done
+Format unit in progress, 68.12% done
+Format unit in progress, 68.57% done
+Format unit in progress, 69.02% done
+Format unit in progress, 69.46% done
+Format unit in progress, 69.91% done
+Format unit in progress, 70.35% done
+Format unit in progress, 70.79% done
+Format unit in progress, 71.23% done
+Format unit in progress, 71.66% done
+Format unit in progress, 72.10% done
+Format unit in progress, 72.53% done
+Format unit in progress, 72.96% done
+Format unit in progress, 73.39% done
+Format unit in progress, 73.82% done
+Format unit in progress, 74.25% done
+Format unit in progress, 74.68% done
+Format unit in progress, 75.10% done
+Format unit in progress, 75.53% done
+Format unit in progress, 75.95% done
+Format unit in progress, 76.37% done
+Format unit in progress, 76.79% done
+Format unit in progress, 77.21% done
+Format unit in progress, 77.63% done
+Format unit in progress, 78.05% done
+Format unit in progress, 78.46% done
+Format unit in progress, 78.88% done
+Format unit in progress, 79.29% done
+Format unit in progress, 79.70% done
+Format unit in progress, 80.12% done
+Format unit in progress, 80.52% done
+Format unit in progress, 80.93% done
+Format unit in progress, 81.33% done
+Format unit in progress, 81.74% done
+Format unit in progress, 82.14% done
+Format unit in progress, 82.54% done
+Format unit in progress, 82.94% done
+Format unit in progress, 83.34% done
+Format unit in progress, 83.73% done
+Format unit in progress, 84.13% done
+Format unit in progress, 84.53% done
+Format unit in progress, 84.92% done
+Format unit in progress, 85.32% done
+Format unit in progress, 85.71% done
+Format unit in progress, 86.10% done
+Format unit in progress, 86.49% done
+Format unit in progress, 86.87% done
+Format unit in progress, 87.26% done
+Format unit in progress, 87.65% done
+Format unit in progress, 88.03% done
+Format unit in progress, 88.41% done
+Format unit in progress, 88.79% done
+Format unit in progress, 89.16% done
+Format unit in progress, 89.53% done
+Format unit in progress, 89.89% done
+Format unit in progress, 90.26% done
+Format unit in progress, 90.62% done
+Format unit in progress, 90.99% done
+Format unit in progress, 91.35% done
+Format unit in progress, 91.71% done
+Format unit in progress, 92.08% done
+Format unit in progress, 92.44% done
+Format unit in progress, 92.80% done
+Format unit in progress, 93.16% done
+Format unit in progress, 93.52% done
+Format unit in progress, 93.87% done
+Format unit in progress, 94.23% done
+Format unit in progress, 94.59% done
+Format unit in progress, 94.94% done
+Format unit in progress, 95.29% done
+Format unit in progress, 95.64% done
+Format unit in progress, 95.99% done
+Format unit in progress, 96.33% done
+Format unit in progress, 96.68% done
+Format unit in progress, 97.02% done
+Format unit in progress, 97.36% done
+Format unit in progress, 97.70% done
+Format unit in progress, 98.03% done
+Format unit in progress, 98.37% done
+Format unit in progress, 98.70% done
+Format unit in progress, 99.03% done
+Format unit in progress, 99.37% done
+Format unit in progress, 99.70% done
+Format unit in progress, 99.99% done
+FORMAT UNIT Complete
+=== sg_format END on ayase-web-service-13 /dev/sdb at 2026-05-04T03:28:42+09:00 ===
+--- post-format lsblk ---
+NAME MAJ:MIN RM          SIZE RO TYPE MOUNTPOINTS
+sdb    8:16   0 1200243695616  0 disk 

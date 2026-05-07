@@ -1,0 +1,38 @@
+[Sun May  3 23:52:11 2026] sd 0:0:1:0: Attached scsi generic sg1 type 0
+[Sun May  3 23:52:11 2026] sd 0:0:2:0: Attached scsi generic sg2 type 0
+[Sun May  3 23:52:11 2026] sd 0:0:2:0: [sdc] Unsupported sector size 520.
+[Sun May  3 23:52:11 2026] sd 0:0:2:0: [sdc] 0 512-byte logical blocks: (0 B/0 B)
+[Sun May  3 23:52:11 2026] sd 0:0:2:0: [sdc] 4160-byte physical blocks
+[Sun May  3 23:52:11 2026] sd 0:0:1:0: [sdb] Unsupported sector size 520.
+[Sun May  3 23:52:11 2026] sd 0:0:1:0: [sdb] 0 512-byte logical blocks: (0 B/0 B)
+[Sun May  3 23:52:11 2026] sd 0:0:1:0: [sdb] 4160-byte physical blocks
+[Sun May  3 23:52:11 2026] sd 0:0:2:0: [sdc] Write Protect is off
+[Sun May  3 23:52:11 2026] sd 0:0:2:0: [sdc] Mode Sense: 13 00 10 08
+[Sun May  3 23:52:11 2026] sd 0:0:1:0: [sdb] Write Protect is off
+[Sun May  3 23:52:11 2026] sd 0:0:1:0: [sdb] Mode Sense: 13 00 10 08
+[Sun May  3 23:52:11 2026] sd 0:0:2:0: [sdc] Write cache: disabled, read cache: enabled, supports DPO and FUA
+[Sun May  3 23:52:11 2026] sd 0:0:1:0: [sdb] Write cache: disabled, read cache: enabled, supports DPO and FUA
+[Sun May  3 23:52:11 2026] sd 0:0:2:0: [sdc] Preferred minimum I/O size 4096 bytes not a multiple of physical block size (4160 bytes)
+[Sun May  3 23:52:11 2026] sd 0:0:1:0: [sdb] Preferred minimum I/O size 4096 bytes not a multiple of physical block size (4160 bytes)
+[Sun May  3 23:52:11 2026] sd 0:0:2:0: [sdc] Attached SCSI disk
+[Sun May  3 23:52:11 2026] sd 0:0:1:0: [sdb] Attached SCSI disk
+[Mon May  4 03:26:39 2026] sd 0:0:2:0: [sdc] 2344225968 512-byte logical blocks: (1.20 TB/1.09 TiB)
+[Mon May  4 03:26:39 2026] sd 0:0:2:0: [sdc] 4096-byte physical blocks
+[Mon May  4 03:27:33 2026] sd 0:0:1:0: [sdb] 2344225968 512-byte logical blocks: (1.20 TB/1.09 TiB)
+[Mon May  4 03:27:33 2026] sd 0:0:1:0: [sdb] 4096-byte physical blocks
+[Mon May  4 03:40:19 2026] sd 0:0:1:0: [sdb] tag#1736 FAILED Result: hostbyte=DID_OK driverbyte=DRIVER_OK cmd_age=0s
+[Mon May  4 03:40:19 2026] sd 0:0:1:0: [sdb] tag#1736 Sense Key : Hardware Error [current] 
+[Mon May  4 03:40:19 2026] sd 0:0:1:0: [sdb] tag#1736 <<vendor>>ASC=0x81 ASCQ=0x0 
+[Mon May  4 03:40:19 2026] sd 0:0:1:0: [sdb] tag#1736 CDB: Write(10) 2a 00 00 00 00 00 00 04 00 00
+[Mon May  4 03:40:19 2026] sd 0:0:1:0: [sdb] tag#1737 FAILED Result: hostbyte=DID_OK driverbyte=DRIVER_OK cmd_age=0s
+[Mon May  4 03:40:19 2026] sd 0:0:1:0: [sdb] tag#1737 Sense Key : Hardware Error [current] 
+[Mon May  4 03:40:19 2026] sd 0:0:1:0: [sdb] tag#1737 <<vendor>>ASC=0x81 ASCQ=0x0 
+[Mon May  4 03:40:19 2026] sd 0:0:1:0: [sdb] tag#1737 CDB: Write(10) 2a 00 00 00 04 00 00 04 00 00
+[Mon May  4 03:40:19 2026] sd 0:0:2:0: [sdc] tag#483 FAILED Result: hostbyte=DID_OK driverbyte=DRIVER_OK cmd_age=0s
+[Mon May  4 03:40:19 2026] sd 0:0:2:0: [sdc] tag#483 Sense Key : Hardware Error [current] 
+[Mon May  4 03:40:19 2026] sd 0:0:2:0: [sdc] tag#483 <<vendor>>ASC=0x81 ASCQ=0x0 
+[Mon May  4 03:40:19 2026] sd 0:0:2:0: [sdc] tag#483 CDB: Write(10) 2a 00 00 00 00 00 00 04 00 00
+[Mon May  4 03:40:19 2026] sd 0:0:2:0: [sdc] tag#484 FAILED Result: hostbyte=DID_OK driverbyte=DRIVER_OK cmd_age=0s
+[Mon May  4 03:40:19 2026] sd 0:0:2:0: [sdc] tag#484 Sense Key : Hardware Error [current] 
+[Mon May  4 03:40:19 2026] sd 0:0:2:0: [sdc] tag#484 <<vendor>>ASC=0x81 ASCQ=0x0 
+[Mon May  4 03:40:19 2026] sd 0:0:2:0: [sdc] tag#484 CDB: Write(10) 2a 00 00 00 04 00 00 04 00 00

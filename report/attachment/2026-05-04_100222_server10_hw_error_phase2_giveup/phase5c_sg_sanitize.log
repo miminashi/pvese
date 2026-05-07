@@ -1,0 +1,35 @@
+=== Phase 5c SANITIZE Overwrite for /dev/sdb ===
+Mon May  4 07:57:33 AM JST 2026
+## sg_sanitize --overwrite --ipl=4 --zero --quick
+## (1.2 TB SAS HDD = 4-8 hours, NOT INTERRUPTABLE)
+    SEAGATE   DKS5H-J1R2SS      7FA9   peripheral_type: disk [0x0]
+      Unit serial number: W402BDD80000K8438EET
+      LU name: 5000c500b85418e7
+Progress indication: 1% done
+Progress indication: 2% done
+... (1% increments) ...
+Progress indication: 99% done
+## sg_sanitize exit: 0
+Mon May  4 09:59:33 AM JST 2026
+## Verify: dd write test
+dd: error writing '/dev/sdb': Remote I/O error
+1+0 records in
+0+0 records out
+0 bytes copied, 0.0144921 s, 0.0 kB/s
+## Verify: dmesg
+[Mon May  4 09:59:33 2026] sd 4:0:1:0: [sdb] 2344225968 512-byte logical blocks: (1.20 TB/1.09 TiB)
+[Mon May  4 09:59:33 2026] sd 4:0:1:0: [sdb] 4096-byte physical blocks
+[Mon May  4 09:59:33 2026] sd 4:0:1:0: [sdb] Write cache: enabled, read cache: enabled, supports DPO and FUA
+[Mon May  4 09:59:33 2026] sdb: detected capacity change from 0 to 2344225968
+[Mon May  4 09:59:33 2026] sd 4:0:1:0: [sdb] tag#7555 FAILED Result: hostbyte=DID_OK driverbyte=DRIVER_OK cmd_age=0s
+[Mon May  4 09:59:33 2026] sd 4:0:1:0: [sdb] tag#7555 Sense Key : Hardware Error [current]
+[Mon May  4 09:59:33 2026] sd 4:0:1:0: [sdb] tag#7555 <<vendor>>ASC=0x81 ASCQ=0x0
+[Mon May  4 09:59:33 2026] sd 4:0:1:0: [sdb] tag#7555 CDB: Write(10) 2a 00 00 00 00 00 00 00 01 00
+[Mon May  4 09:59:33 2026] critical target error, dev sdb, sector 0 op 0x1:(WRITE) flags 0x8800 phys_seg 1 prio class 2
+Mon May  4 09:59:33 AM JST 2026
+=== Phase 5c done ===
+
+# 所要時間: 2時間2分 (07:57:33 - 09:59:33)
+# 結果: SANITIZE Overwrite (1.2 TB / 1パス zero) 完走 → write 拒否は変わらず ASC=0x81
+# 重要: SANITIZE 後 Caching は disabled→enabled に変化 (デフォルト復元)
+# 結論: 通常 WRITE(10) opcode 0x2a は依然 vendor reject
