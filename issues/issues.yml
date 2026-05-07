@@ -1,4 +1,4 @@
-next_id: 52
+next_id: 62
 issues:
   - id: 1
     title: Test issue
@@ -563,4 +563,116 @@ issues:
     labels:
       - doc
       - infra
+    description: ""
+  - id: 52
+    title: 10号機 OS セットアップ + VLAN 対応化 (X10DRT-P)
+    status: verify
+    owner: "s10vlanKySJ"
+    created: "2026-04-29T22:25:46Z"
+    updated: "2026-04-30T00:56:25Z"
+    blocked_by: ""
+    report: ""
+    labels:
+      - infra
+      - script
+    description: ""
+  - id: 53
+    title: 10号機 disk first boot 不能 (Legacy BIOS / MBR / Boot Order)
+    status: done
+    owner: "s10vkbd"
+    created: "2026-04-30T00:56:30Z"
+    updated: "2026-05-01T21:09:42Z"
+    blocked_by: ""
+    report: "report/2026-05-02_060639_server10_disk_first_boot_recovery.md"
+    labels:
+      - infra
+    description: ""
+  - id: 54
+    title: --help
+    status: done
+    owner: "s10vkbd"
+    created: "2026-05-01T21:09:07Z"
+    updated: "2026-05-01T21:09:31Z"
+    blocked_by: ""
+    report: ""
+    labels: []
+    description: ""
+  - id: 55
+    title: 'preseed netcfg が VLAN モードでも物理 NIC (eno1) に static IP を書く: untagged eno1 と eno1.1083 で 10.10.10.210 が重複し SSH 不到達。VLAN モード時は netcfg を抑制し late_command で VLAN サブのみに IP を書く改修要'
+    status: done
+    owner: "ef91a37c"
+    created: "2026-05-01T21:09:37Z"
+    updated: "2026-05-01T22:04:02Z"
+    blocked_by: ""
+    report: "report/2026-05-02_070349_preseed_netcfg_vlan_overwrite_fix.md"
+    labels:
+      - infra
+    description: ""
+  - id: 56
+    title: preseed netcfg レポート 残タスク対応 (server10.yml/reference.md/反復2サイクル)
+    status: done
+    owner: "rainbow"
+    created: "2026-05-01T23:10:41Z"
+    updated: "2026-05-02T00:08:47Z"
+    blocked_by: ""
+    report: "report/2026-05-02_090532_iter_test_preseed_netcfg.md"
+    labels:
+      - infra
+      - doc
+    description: ""
+  - id: 57
+    title: 11号機 OS+PVE セットアップ通しテスト
+    status: done
+    owner: "jolly-taco"
+    created: "2026-05-02T12:02:16Z"
+    updated: "2026-05-02T13:46:07Z"
+    blocked_by: ""
+    report: "report/2026-05-02_224408_server11-13_os_install.md"
+    labels:
+      - infra
+    description: ""
+  - id: 58
+    title: 12号機 OS+PVE セットアップ通しテスト
+    status: done
+    owner: "jolly-taco"
+    created: "2026-05-02T12:02:16Z"
+    updated: "2026-05-02T13:46:08Z"
+    blocked_by: ""
+    report: "report/2026-05-02_224408_server11-13_os_install.md"
+    labels:
+      - infra
+    description: ""
+  - id: 59
+    title: 13号機 OS+PVE セットアップ通しテスト
+    status: done
+    owner: "jolly-taco"
+    created: "2026-05-02T12:02:17Z"
+    updated: "2026-05-02T13:46:08Z"
+    blocked_by: ""
+    report: "report/2026-05-02_224408_server11-13_os_install.md"
+    labels:
+      - infra
+    description: ""
+  - id: 60
+    title: 10-13号機 起動とストレージ構成確認
+    status: done
+    owner: "storagechk"
+    created: "2026-05-03T13:38:35Z"
+    updated: "2026-05-03T13:48:32Z"
+    blocked_by: ""
+    report: "report/2026-05-03_224709_server10-13_storage_inventory.md"
+    labels:
+      - infra
+    description: ""
+  - id: 61
+    title: 10-13号機 LINSTOR 4ノードクラスタ構築 + ベンチマーク
+    status: done
+    owner: "s10ph6"
+    created: "2026-05-03T14:50:39Z"
+    updated: "2026-05-07T18:02:02Z"
+    blocked_by: ""
+    report: "report/2026-05-08_012907_server10-13_phase6_hitachi_origin_analysis.md"
+    labels:
+      - infra
+      - bench
     description: ""
