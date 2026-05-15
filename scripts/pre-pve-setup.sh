@@ -80,6 +80,13 @@ if ip route show default | grep -q "via ${static_gw}"; then
 else
     echo "No default route via ${static_gw} found"
 fi
+gw_re=$(printf '%s' "$static_gw" | sed 's/\./\\./g')
+if grep -qE "^[[:space:]]*gateway[[:space:]]+${gw_re}[[:space:]]*$" /etc/network/interfaces; then
+    sed -i "/^[[:space:]]*gateway[[:space:]]\\+${gw_re}[[:space:]]*\$/d" /etc/network/interfaces
+    echo "Removed 'gateway ${static_gw}' from /etc/network/interfaces"
+else
+    echo "No 'gateway ${static_gw}' line in /etc/network/interfaces"
+fi
 dhcp_gw=$(ip route show dev "$dhcp_iface" 2>/dev/null | grep -o 'default via [0-9.]*' | awk '{print $3}')
 if [ -z "$dhcp_gw" ]; then
     dhcp_gw=$(ip route show dev "$dhcp_iface" 2>/dev/null | grep -o '[0-9.]*/[0-9]*' | head -1 | sed 's|/.*||; s|\.[0-9]*$|.1|')
