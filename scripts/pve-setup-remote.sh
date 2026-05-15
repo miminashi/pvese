@@ -139,7 +139,7 @@ HOOK_EOF
         rm -f /etc/apt/sources.list.d/pve-enterprise.sources
         apt-get update
         pve_kernel=$(uname -r)
-        DEBIAN_FRONTEND=noninteractive apt-get -y install gcc "proxmox-headers-${pve_kernel}" drbd-dkms drbd-utils linstor-satellite linstor-client linstor-proxmox
+        DEBIAN_FRONTEND=noninteractive apt-get -y install build-essential "proxmox-headers-${pve_kernel}" drbd-dkms drbd-utils linstor-satellite linstor-client linstor-proxmox
         dkms autoinstall || true
         systemctl enable linstor-satellite
         echo "LINSTOR/DRBD setup complete"
