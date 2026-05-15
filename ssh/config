@@ -32,6 +32,25 @@ Host idrac9
   HostKeyAlgorithms +ssh-rsa,ssh-dss
   PubkeyAcceptedAlgorithms +ssh-rsa
 
+# --- iDRAC8 (14-15号機 PowerEdge R430) ---
+Host idrac14
+  HostName 10.10.10.34
+  User claude
+  IdentityFile /home/ubuntu/projects/pvese/ssh/idrac_rsa
+  IdentitiesOnly yes
+  KexAlgorithms +diffie-hellman-group14-sha1,diffie-hellman-group1-sha1
+  HostKeyAlgorithms +ssh-rsa,ssh-dss
+  PubkeyAcceptedAlgorithms +ssh-rsa
+
+Host idrac15
+  HostName 10.10.10.35
+  User claude
+  IdentityFile /home/ubuntu/projects/pvese/ssh/idrac_rsa
+  IdentitiesOnly yes
+  KexAlgorithms +diffie-hellman-group14-sha1,diffie-hellman-group1-sha1
+  HostKeyAlgorithms +ssh-rsa,ssh-dss
+  PubkeyAcceptedAlgorithms +ssh-rsa
+
 # --- PVE ノード (4-9号機) ---
 Host pve4
   HostName 10.10.10.204
@@ -89,6 +108,18 @@ Host pve12 10.10.10.212
 
 Host pve13 10.10.10.213
   HostName 10.10.10.213
+  User root
+  IdentityFile /home/ubuntu/projects/pvese/ssh/id_ed25519
+  IdentitiesOnly yes
+
+Host pve14 10.10.10.214
+  HostName 10.10.10.214
+  User root
+  IdentityFile /home/ubuntu/projects/pvese/ssh/id_ed25519
+  IdentitiesOnly yes
+
+Host pve15 10.10.10.215
+  HostName 10.10.10.215
   User root
   IdentityFile /home/ubuntu/projects/pvese/ssh/id_ed25519
   IdentitiesOnly yes

@@ -31,7 +31,7 @@ pvese (Proxmox VE Storage Evaluation) — Supermicro IPMI と Proxmox VE を操�
 | `10.0.0.0/8` (vmbr0) | 管理用 (SSH, IPMI, PVE API) | `10.10.10.1` | **不可** |
 | `192.168.39.0/24` (vmbr1) | DHCP, インターネット接続 | `192.168.39.1` | 可 |
 
-> **重要**: `10.0.0.0/8` はインターネットに到達できない内部ネットワーク。apt, wget, curl 等の外部通信が必要な場合は `192.168.39.1` をデフォルトゲートウェイに設定すること。`10.10.10.1` をデフォルトゲートウェイに設定してはならない（preseed でインストール時に設定されるが、PVE セットアップ前に必ず削除する）。
+> **重要**: `10.0.0.0/8` はインターネットに到達できない内部ネットワーク。apt, wget, curl 等の外部通信が必要な場合は `192.168.39.1` をデフォルトゲートウェイに設定すること。`10.10.10.1` をデフォルトゲートウェイに設定してはならない（preseed の `netcfg/get_gateway` がこの値を `/etc/network/interfaces` に書き込むため、ifupdown 再評価で復活する。対策として `preseed/late_command` と `scripts/pre-pve-setup.sh` の両方で interfaces からこの行を自動削除する。`scripts/pve-setup-remote.sh` の `/etc/network/if-up.d/z-fix-default-route` はさらなる保険）。
 
 ## サーバ一覧
 
@@ -47,10 +47,13 @@ pvese (Proxmox VE Storage Evaluation) — Supermicro IPMI と Proxmox VE を操�
 | 11号機 | `10.10.10.31` | `10.10.10.211` | ayase-web-service-11 | `config/server11.yml` |
 | 12号機 | `10.10.10.32` | `10.10.10.212` | ayase-web-service-12 | `config/server12.yml` |
 | 13号機 | `10.10.10.33` | `10.10.10.213` | ayase-web-service-13 | `config/server13.yml` |
+| 14号機 | `10.10.10.34` (iDRAC8) | `10.10.10.214` | ayase-web-service-14 | `config/server14.yml` |
+| 15号機 | `10.10.10.35` (iDRAC8) | `10.10.10.215` | ayase-web-service-15 | `config/server15.yml` |
 
 4-6号機共通: ユーザ名 `claude` / パスワード `Claude123` / マザーボード Supermicro X11DPU
 7-9号機: DELL PowerEdge R320 / iDRAC SSH 鍵認証 (`ssh/idrac_rsa`) / Web/IPMI は `claude` / `Claude123` / IPMI LAN 有効化済み / FW 2.65.65.65
 10-13号機共通: Supermicro X10DRT-P (Twin Server, Nutanix OEM) / ユーザ名 `claude` / パスワード `Claude123` / 別拠点設置 + VLAN trunk (1120/1083) 経由配信 / NIC は `eno1` のみ link up / LINSTOR 未参加 / 10号機: NX-1065-G5 (BMC FW 3.65 stock) / 11-12号機: NX-3060-G5 (BIOS G4G5T4.0、Redfish に末尾 `/` 必須 — `bmc-power.sh` は `-L` で対応済) / 13号機: NX-3060-G5 (BIOS G4G5T8.0 新版、Redfish 1.3.0)
+14-15号機共通: DELL PowerEdge R430 / iDRAC8 SSH 鍵認証 (`ssh/idrac_rsa`) / Web/IPMI は `claude` / `Claude123` (claude index = 3) / IPMI LAN 有効化済み / PERC H730/H730P Mini / 本拠点設置 (4-9号機と同じ 10.10.10.0/8 + 192.168.39.0/24 DHCP) / 14号機: iDRAC FW 2.63.60.61, BIOS 2.9.1, ServiceTag GLYHKF2 / 15号機: iDRAC FW 2.85.85.85, BIOS 2.15.0, ServiceTag 53221L2
 
 接続コマンド例:
 ```sh

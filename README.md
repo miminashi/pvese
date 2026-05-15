@@ -159,10 +159,13 @@ os-setup 自動化が対応済みのハードウェアプラットフォーム�
 | 11号機 | `10.10.10.31` | `10.10.10.211` | ayase-web-service-11 | Supermicro X10DRT-P |
 | 12号機 | `10.10.10.32` | `10.10.10.212` | ayase-web-service-12 | Supermicro X10DRT-P |
 | 13号機 | `10.10.10.33` | `10.10.10.213` | ayase-web-service-13 | Supermicro X10DRT-P |
+| 14号機 | `10.10.10.34` (iDRAC) | `10.10.10.214` | ayase-web-service-14 | DELL PowerEdge R430 |
+| 15号機 | `10.10.10.35` (iDRAC) | `10.10.10.215` | ayase-web-service-15 | DELL PowerEdge R430 |
 
 - 4-6号機: Supermicro X11DPU / BMC: IPMI (Redfish + CGI API)
 - 7-9号機: DELL PowerEdge R320 / BMC: iDRAC7 SSH 鍵認証
 - 10-13号機: Supermicro X10DRT-P (Twin Server, Nutanix OEM) / BMC: IPMI (Redfish + CGI API) / 別拠点 + VLAN trunk (1120/1083) / LINSTOR 未参加
+- 14-15号機: DELL PowerEdge R430 / BMC: iDRAC8 SSH 鍵認証 / PERC H730/H730P Mini / 本拠点 / LINSTOR 未参加
 - OS: Debian 13 (Trixie) + Proxmox VE 9
 - PVE クラスタ: 1リージョン1クラスタ構成 (Region A: 4+5+6号機, Region B: 7+8+9号機)
 
@@ -212,6 +215,14 @@ graph LR
         subgraph srv13["13号機"]
             BMC13["BMC<br/>10.10.10.33"]
             PVE13["PVE<br/>10.10.10.213"]
+        end
+        subgraph srv14["14号機"]
+            iDRAC14["iDRAC8<br/>10.10.10.34"]
+            PVE14["PVE<br/>10.10.10.214"]
+        end
+        subgraph srv15["15号機"]
+            iDRAC15["iDRAC8<br/>10.10.10.35"]
+            PVE15["PVE<br/>10.10.10.215"]
         end
         SMB["ISO ホスティング<br/>10.1.6.1"]
         IB["SX6036 IB スイッチ<br/>10.10.10.100"]

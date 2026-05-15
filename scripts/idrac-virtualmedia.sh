@@ -29,6 +29,8 @@ resolve_idrac_host() {
         10.10.10.27) echo "idrac7" ;;
         10.10.10.28) echo "idrac8" ;;
         10.10.10.29) echo "idrac9" ;;
+        10.10.10.34) echo "idrac14" ;;
+        10.10.10.35) echo "idrac15" ;;
         *) echo "idrac7" ;;
     esac
 }
