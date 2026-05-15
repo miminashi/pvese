@@ -1,4 +1,4 @@
-next_id: 62
+next_id: 67
 issues:
   - id: 1
     title: Test issue
@@ -515,11 +515,32 @@ issues:
     status: plan
     owner: ""
     created: "2026-04-11T03:34:56Z"
-    updated: "2026-04-11T03:34:56Z"
+    updated: "2026-05-15T07:35:31Z"
     blocked_by: ""
-    report: ""
+    report: "report/2026-05-14_091100_os_setup_18trial_x10dpu_r320.md"
     labels: []
-    description: ""
+    description: |
+      Dell R320 + iDRAC7 系 (server 7-9) で NVRAM efivars が枯渇すると、
+      preseed/early_command の Boot#### cleanup を実施しても grub-install が
+      "efivarfs_set_variable: No space left on device" で失敗する。
+
+      2026-05-14 検証 (18 trial) で再確認:
+        - server 9 Round 1+2: 6/6 attempt が grub-install で発火
+        - server 9 Round 3: 1/1 attempt で発火せず install 完走
+          → NVRAM 枯渇は**間欠故障**として個体差で発生することが確証された
+
+      発火タイミング: preseed 初回 install の grub-install フェーズ。
+      preseed/early_command の efivars cleanup は実行されているが、間欠的に
+      cleanup 後の空き領域でも書き込みに失敗するケースが残る。
+
+      回避策候補 (要検証):
+        1. BIOS Setup から "Delete All System Setup Boot Options" 手動実行
+        2. racadm systemerase nvramclr (Service Tag 等の出荷情報も消える可能性)
+        3. preseed/early_command で chattr -i + rm に加え NvVar 系も削除
+        4. Round 単位の racreset soft で NVRAM コントローラ側を初期化
+
+      関連: trial-1-s9.md, trial-2-s9.md, trial-3-s9.md
+      (report/attachment/2026-05-14_091100_os_setup_18trial_x10dpu_r320/)
   - id: 48
     title: 'preseed 診断 visibility: logger / /dev/kmsg が d-i 経由の UDP syslog に届かない。nc で直接 UDP 送信に書き換える'
     status: plan
@@ -675,4 +696,59 @@ issues:
     labels:
       - infra
       - bench
+    description: ""
+  - id: 62
+    title: 14-15号機 (PowerEdge R430 + iDRAC8) 新規追加 - iDRAC 疎通 + OS/PVE セットアップ
+    status: done
+    owner: "r4301415"
+    created: "2026-05-10T19:30:20Z"
+    updated: "2026-05-11T19:07:01Z"
+    blocked_by: ""
+    report: "report/2026-05-12_040320_server14_os_install_retry.md"
+    labels:
+      - infra
+    description: ""
+  - id: 63
+    title: 14号機 PERC H730P で RAID-1 VD 作成不能 (BGI 26% 停滞 + createvd Failed) - PERC controller / disk 診断要
+    status: done
+    owner: "02b7cfcc"
+    created: "2026-05-11T06:56:12Z"
+    updated: "2026-05-11T19:07:00Z"
+    blocked_by: ""
+    report: "report/2026-05-12_040320_server14_os_install_retry.md"
+    labels:
+      - infra
+    description: ""
+  - id: 64
+    title: 14号機 RAID 再構成 (Bay 0+1 RAID-1 boot + Bay 2-7 ZFS RAID-Z1 data) + PERC FW 25.5.9 更新
+    status: done
+    owner: "7565c32c"
+    created: "2026-05-12T17:35:54Z"
+    updated: "2026-05-12T21:47:55Z"
+    blocked_by: ""
+    report: "report/2026-05-13_060418_server14_perc_fw_upgrade_hba_zfs_mirror.md"
+    labels:
+      - infra
+    description: ""
+  - id: 65
+    title: server4-9 OS setup 18 trial デグレ検証 (x10dpu + R320)
+    status: done
+    owner: "os-setup-18trial"
+    created: "2026-05-14T00:10:57Z"
+    updated: "2026-05-14T19:10:32Z"
+    blocked_by: ""
+    report: "report/2026-05-14_091100_os_setup_18trial_x10dpu_r320.md"
+    labels:
+      - infra
+    description: ""
+  - id: 66
+    title: '18 trial regression fix: generate-preseed.sh + build-essential + sol-monitor + SKILL.md + #47'
+    status: done
+    owner: "regen-fix-04170977"
+    created: "2026-05-14T22:42:26Z"
+    updated: "2026-05-15T02:37:46Z"
+    blocked_by: ""
+    report: "report/2026-05-15_073531_18trial_regression_fix.md"
+    labels:
+      - script
     description: ""

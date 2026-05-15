@@ -106,6 +106,7 @@ SERVER_SUFFIX = hostname の末尾数字 (例: ayase-web-service-4 → "4")
 | SOL connect (sol-monitor.py) | 3 | 5s | POST code ポーリング (Supermicro) / VNC (iDRAC) |
 | SSH connect (ssh-wait.sh) | 30 | 10s | SOL 確認 |
 | DHCP IPv4 (pre-pve-setup.sh) | 6 | 5s | dhclient |
+| iDRAC install retry (full bmc-mount-boot 単位) | 3 | 5min | **racadm racreset soft** → 再 mount → 再 boot (R430 で実証) |
 
 ## フェーズ実行
 
@@ -153,6 +154,16 @@ SERVER_SUFFIX = hostname の末尾数字 (例: ayase-web-service-4 → "4")
 **iDRAC の場合**:
 1. preseed は `preseed/preseed-server7.cfg` を手動管理。`generate-preseed.sh` は使用しない
 2. preseed ファイルの内容を確認するだけでよい
+
+> **⚠️ `netcfg/choose_interface` は明示的に静的側 NIC を指定すること** (Round 1 s15/s5 で観測):
+> `netcfg/choose_interface auto` は link up している先頭 NIC を選ぶため、mgmt 配線が `eno2` のサーバでも `eno1` (DHCP 側) に静的 IP が割り当てられ、Phase 6 で SSH 不到達になる。
+> `generate-preseed.sh` は `static_iface` の値を自動設定するので、config の `static_iface` が正しければ問題ない。preseed.cfg.template は `%%CHOOSE_INTERFACE%%` プレースホルダーを使用。
+
+> **⚠️ `netcfg/no_default_route` と `netcfg/gateway_unreachable` の両方を preseed に追加すること** (Round 1 s5 で観測):
+> 管理ネットワーク (10.0.0.0/8) はインターネット到達性がないため、以下の 2 つのダイアログが blocking する:
+> 1. "Continue without a default route?" — `d-i netcfg/no_default_route boolean true` で自動応答
+> 2. "Gateway unreachable, continue?" — `d-i netcfg/gateway_unreachable boolean true` で自動応答
+> `preseed.cfg.template` には両方追加済み (2026-05-14)。iDRAC 用の手動管理 preseed にも追記すること。
 
 完了: `./scripts/os-setup-phase.sh mark preseed-generate --config "$CONFIG"`
 
@@ -255,6 +266,14 @@ racadm config -g cfgServerInfo -o cfgServerBootOnce 0   # 無効化
 `FirstBootDevice` は `racadm set iDRAC.ServerBoot.FirstBootDevice` が正常に動作する。
 `idrac-virtualmedia.sh` は修正済み (legacy コマンドを使用)。
 
+#### iDRAC8 (R430) 固有の注意
+
+- **`racadm raid clearforeignconfig` は存在しない**: foreign disk 解除には `racadm raid resetconfig:RAID.Integrated.1-1` を使う (Blocked disk 解除にも有効)
+- **`/dev/sdb` として vFlash SD slot が exposed**: R430 は **内蔵 vFlash SD slot** (実 SD カード未装着でも) を `/dev/sdb` として OS から見える状態にすることがある。preseed の `partman/early_command` で `for disk in $(list-devices disk)` を使うと不正な空 disk (`/dev/sdb size= block=`) が partman に渡され `partman-auto` が失敗する。**`for disk in /dev/sda; do ...`** のように明示的に対象 disk のみ処理すること (server14.cfg で対応済)
+- **PERC H730P FW 25.5.5 + 4Kn block では `partman-auto/method regular` + atomic recipe が失敗**: root mountpoint が割り当てられず「No root file system」dialog ループになる。**`partman-auto/method lvm` + atomic-lvm recipe** で確実に動作する (vg0 + root LV + swap_1 LV 構成)。LVM 経由は 4Kn alignment 自動調整も良好
+- **iDRAC FW 2.63 (古い) でも racadm 主要コマンド (raid, jobqueue, remoteimage, set BIOS.*) は新版と同じ構文** で動作する。ただし `remoteimage` SMB マウントが不安定なら umount → 5 秒 → 再 mount を最大 3 回試行
+- **iDRAC8 BIOS は出荷時 UEFI**。R430 を iDRAC7 + R320 と同じ感覚で BootMode 変更しないこと (BIOS 2.9.1 確認済)。`racadm get BIOS.BiosBootSettings.BootMode` が `Uefi` のままなら触らない
+
 ---
 
 ### Phase 4: bmc-mount-boot
@@ -345,6 +364,46 @@ PowerState=$(./scripts/bmc-power.sh status "$BMC_IP" "$BMC_USER" "$BMC_PASS")
 
 #### iDRAC の場合
 
+##### R430 + PERC H730/H730P 固有: RAID 事前整備 (Phase 4 の前提)
+
+R430 では Phase 4 開始前に **OS 用 VD が State=Online で存在すること** を確認する。
+VD が無い、Foreign / Blocked disk が残っている、または前回 fail ジョブが pending に残っている場合は、以下の整備手順を実行してから Phase 4 に入る (詳細: `report/2026-05-12_040320_server14_os_install_retry.md`):
+
+```sh
+ssh -F ssh/config idrac<N> racadm raid get vdisks
+ssh -F ssh/config idrac<N> racadm raid get pdisks -o -p Size,State
+ssh -F ssh/config idrac<N> racadm jobqueue view
+```
+
+- VD0 が無い or pdisks に Blocked / Foreign が混在: 全構成を消す:
+  ```sh
+  ./pve-lock.sh wait ./oplog.sh ssh -F ssh/config idrac<N> racadm jobqueue delete --all
+  ./pve-lock.sh wait ./oplog.sh ssh -F ssh/config idrac<N> racadm raid resetconfig:RAID.Integrated.1-1
+  ./pve-lock.sh wait ./oplog.sh ssh -F ssh/config idrac<N> racadm jobqueue create RAID.Integrated.1-1 -s TIME_NOW -r pwrcycle
+  ```
+  > **iDRAC8 注意**: `clearforeignconfig` は **存在しない**。`clearconfig` も「No foreign drives detected」エラーで失敗することがある。`resetconfig` を使うこと。foreign + local + pending + Blocked が一括解除される。
+
+> **⚠️ resetconfig 後の SCP Export ジョブに注意** (Round 2 s15 で観測):
+> `racadm raid resetconfig` 完了後、iDRAC が自動的に `Export: Server Configuration Profile` job を生成する。これが完了する前に `racadm raid createvd` を実行すると **`LC062`** で失敗する。
+> ```sh
+> ssh -F ssh/config idrac<N> racadm jobqueue view
+> ```
+> resetconfig job + Export job 両方が `Completed (100)` を確認してから createvd へ進む。
+
+- VD 作成 (Bay 1+6 で OS_RAID1 を作る例):
+  ```sh
+  ./pve-lock.sh wait ./oplog.sh ssh -F ssh/config idrac<N> racadm raid createvd:RAID.Integrated.1-1 -rl r1 \
+    -pdkey:Disk.Bay.1:Enclosure.Internal.0-1:RAID.Integrated.1-1,Disk.Bay.6:Enclosure.Internal.0-1:RAID.Integrated.1-1 \
+    -name OS_RAID1
+  ./pve-lock.sh wait ./oplog.sh ssh -F ssh/config idrac<N> racadm jobqueue create RAID.Integrated.1-1 -s TIME_NOW -r pwrcycle
+  ```
+  `racadm jobqueue view` を 30 秒間隔でポーリングして `Completed (100)` を待つ (3-5 分目安)。
+
+> **⚠️ PERC RAID-1 disk スペック一致必須**: link speed + sector size + model が一致したペアを選ぶこと。
+> - 不一致 (例: ST300MP0026 12Gb/s + ST9300653SS 6Gb/s) は **BGI 26% 付近で停滞する** (14号機で確認、issue #63)
+> - 同モデル・同サイズ・同 link speed なら BGI **スキップで即時 Online** になる
+> - State=Online, OperationalState=Not applicable で BGI 不要
+
 1. **事前検証: BIOS SerialCommSettings** (R320 固有、install-monitor 成立の必須条件):
 
    iDRAC SOL で Debian インストーラの進行を監視するためには、BIOS のシリアルコンソールリダイレクトが有効でなければならない。`BIOS.SerialCommSettings.SerialComm` が **`OnConRedirCom1`** でない場合、BIOS POST 以降の出力 (カーネルログ、インストーラテキスト) が iDRAC SOL に流れず、`sol-monitor.py` は永久に進行を検知できない (install-monitor フェーズがハング)。
@@ -354,7 +413,7 @@ PowerState=$(./scripts/bmc-power.sh status "$BMC_IP" "$BMC_USER" "$BMC_PASS")
    ```sh
    SERIAL_CURRENT=$(ssh -F ssh/config "$IDRAC_HOST" racadm get BIOS.SerialCommSettings.SerialComm | grep '^SerialComm=' | cut -d= -f2 | tr -d '\r\n')
    REDIR_CURRENT=$(ssh -F ssh/config "$IDRAC_HOST" racadm get BIOS.SerialCommSettings.RedirAfterBoot | grep '^RedirAfterBoot=' | cut -d= -f2 | tr -d '\r\n')
-   if [ "$SERIAL_CURRENT" != "OnConRedirCom1" ] || [ "$REDIR_CURRENT" != "Enabled" ]; then
+   if [ "$SERIAL_CURRENT" != "OnConRedirCom1" ] && [ "$SERIAL_CURRENT" != "OnConRedirAuto" ] || [ "$REDIR_CURRENT" != "Enabled" ]; then
        echo "FIX: SerialComm=$SERIAL_CURRENT RedirAfterBoot=$REDIR_CURRENT → restoring"
        ./pve-lock.sh wait ./oplog.sh ssh -F ssh/config "$IDRAC_HOST" racadm set BIOS.SerialCommSettings.SerialComm OnConRedirCom1
        ./pve-lock.sh wait ./oplog.sh ssh -F ssh/config "$IDRAC_HOST" racadm set BIOS.SerialCommSettings.RedirAfterBoot Enabled
@@ -364,6 +423,8 @@ PowerState=$(./scripts/bmc-power.sh status "$BMC_IP" "$BMC_USER" "$BMC_PASS")
    ```
 
    `BIOS.SerialCommSettings` は `BIOS.BiosBootSettings.BootMode` と異なり、racadm 経由の変更で UefiBootSeq の VirtualMedia エントリを破壊しない。安全に racadm で変更可能。
+
+   > **注**: `OnConRedirCom1` だけでなく `OnConRedirAuto` も install-monitor 互換 (R430 + BIOS 2.9.1 / 2.15.0 で確認、Round 1)。両方とも許容値として扱う。
 
 2. **VirtualMedia マウント**:
    ```sh
@@ -482,6 +543,43 @@ fi
 python3 ./scripts/idrac-kvm-screenshot.py --bmc-ip "$BMC_IP" --bmc-user "$BMC_USER" --bmc-pass "$BMC_PASS" --output tmp/<session-id>/screenshot.png
 ```
 
+#### 4. iDRAC VirtualMedia 連続失敗時の回復 (R430 で確認)
+
+**症状**: install attempt 2-3 回失敗後、GRUB 無限ループ (POST → GRUB プロンプト → again) で installer に到達しない。VirtualMedia status は Inserted=true を返すが、boot 時に iDRAC が ISO を正しく hand-off しない内部状態 corruption。
+
+**解決**: iDRAC を soft reset → clean state で再 mount → install 再実行 (14号機 attempt 6 で成功実証):
+
+```sh
+./pve-lock.sh wait ./oplog.sh ssh -F ssh/config idrac<N> racadm racreset soft
+# 約 2-3 分で iDRAC 再起動完了 (SSH 切断 → 再接続可能まで)
+./scripts/ssh-wait.sh 10.10.10.<3N> --timeout 240 --interval 10
+# 再起動後に bmc-mount-boot から再実行
+./scripts/os-setup-phase.sh reset bmc-mount-boot --config "$CONFIG"
+./scripts/os-setup-phase.sh reset install-monitor --config "$CONFIG"
+```
+
+> **目安**: 同一 ISO + 同一 preseed で **install attempt 3 連続失敗 (GRUB 無限ループ or false-positive exit 4)** が発生した場合は racreset soft を最初に試すこと。VirtualMedia をいくら再 mount しても状態は元に戻らない。
+>
+> **早期 trigger (Round 3 で観測)**: 以下のいずれかで 1 回目から racreset soft 即発動可:
+> - **partman stuck**: stage 5/9 で 15 分以上停滞 + installer-syslog で `No matching physical volumes found` / `partman: ...failed` 等の同種エラー後の沈黙が 10 分以上 (Round 3/5 で実証)。SOL に **byobu status bar** が表示されたまま動かないのもサイン
+> - **GRUB sector read error**: SOL に `error: failure reading sector 0x... from cd0` が連続出力
+> - **iDRAC SSH 復旧確認**: `ssh-wait.sh` は root@host 限定。iDRAC は `ssh -F ssh/config idrac<N> racadm getsysinfo` を 30 秒間隔でポーリング (~2-3 分で復旧)
+
+#### 5. SOL の dialog 表示単独では install 失敗と判断しない
+
+preseed の `partman/confirm boolean true` は dialog を auto-confirm して partman 再試行を許す。`partman-base/no_root_device` 等の error dialog が SOL に表示されても、preseed が auto-confirm して install を最後まで進めている可能性がある (14号機 attempt 1, 3 で発生)。
+
+**判定手順**:
+1. SOL に dialog を観測しても **強制終了しない**
+2. **installer-syslog (UDP 5514) を確認**:
+   - `grub-installer` / `finish-install` の進行ログがあれば → install 進行中
+   - syslog が空 or `partman-auto` で stop している → 真の失敗
+3. installer-syslog が立ち上がっていない場合は KVM screenshot で実画面を確認
+   ```sh
+   python3 ./scripts/idrac-kvm-screenshot.py --bmc-ip "$BMC_IP" --bmc-user "$BMC_USER" --bmc-pass "$BMC_PASS" --output tmp/<sid>/check.png
+   ```
+4. PowerState=Off に到達するまで `sol-monitor.py` を継続走らせる (1 ステージでも観測されていれば EOF 再接続で正常完了する)
+
 #### 完了処理
 
 1. SOL を切断: `ipmitool ... sol deactivate`（sol-monitor.py が自動切断するが念のため）
@@ -573,6 +671,11 @@ CSRF=$(./scripts/bmc-session.sh csrf "$BMC_IP" "$COOKIE_FILE")
 > SSH 鍵が未配置のままだと、後続の Phase 7 (pve-install) で SSH 接続できない。
 
 a. SSH 公開鍵を Read ツールで `ssh/id_ed25519.pub` から取得（**注意**: `~/.ssh/id_ed25519.pub` ではなく `ssh/id_ed25519.pub` を使うこと。`ssh/config` の pve7-9 エントリは `ssh/id_ed25519` を IdentityFile として使用するため、これが正しいプロジェクト鍵）
+> **⚠️ SOL コマンド送信のベストプラクティス** (Round 1 s15 で観測):
+> - **heredoc は使えない**: `sol-login.py` は行単位送信のため `cat <<EOF ... EOF` が複数 echo に分解される。**`printf '...\n...\n' > file` を使うこと**
+> - **stdout は捕捉されない**: SOL 経由で `ip addr` 等を実行しても出力は SOL ログに混ざるだけで構造化キャプチャできない。状態確認は `> /tmp/result.txt` でファイル化してから後続 SSH で読み出すこと
+> - **`printf '...' > /file` で出る "Command may have failed" 警告は誤検知** (Round 2 s15): リダイレクト自体は成功している。SSH 鍵認証成功 / ファイル存在で間接的に検証する
+
 b. コマンドファイルを `tmp/<session-id>/sol-commands-s${SUFFIX}.txt` に作成:
    ```
    sed -i "s/^#PermitRootLogin.*/PermitRootLogin yes/" /etc/ssh/sshd_config
@@ -602,6 +705,44 @@ c. `./scripts/sol-login.py` で実行:
    ./scripts/sol-login.py --bmc-ip "$BMC_IP" --bmc-user "$BMC_USER" --bmc-pass "$BMC_PASS" \
        --root-pass "$ROOT_PASS" --commands-file tmp/<session-id>/sol-commands-s${SUFFIX}.txt
    ```
+
+> **⚠️ DETECTING timeout** (Round 3 R430 で観測): 最初の sol-login.py が boot 完了前に DETECTING で 180s timeout する場合がある。120-180 秒待って再試行するか、ssh-wait.sh で SSH 到達してからにする (R430 + Debian 13 minimal で 5-6 分かかることがある)
+
+> **⚠️ eno1 (DHCP iface) は preseed install 後 DOWN がデフォルト** (Round 3 で観測):
+> preseed の `netcfg/choose_interface select eno2` で静的側 NIC を選んだ場合、DHCP 側の `eno1` は `/etc/network/interfaces` に未記述で boot 時 DOWN になる。Phase 7 で `pre-pve-setup.sh` が dhcpcd を試す前に `ip link set eno1 up` が必要なケースがある。
+> SOL コマンドリストに以下を追加して preventive に対処:
+> ```sh
+> ip link set <dhcp_iface> up
+> printf 'auto <dhcp_iface>\niface <dhcp_iface> inet manual\n' >> /etc/network/interfaces
+> ```
+
+> **⚠️ SOL の `|` (pipe) 文字解釈失敗 (R430 で観測)**:
+> `echo "..." | base64 -d > /root/.ssh/authorized_keys` を SOL で実行すると、`|` の前後で escape が一部失敗し `authorized_keysecho` 等の **変名ファイル** が作られることがある (鍵配置が silent failure になり、後続 SSH が認証エラー)。
+>
+> **対策**: pexpect 経由のパスワード SSH (DHCP IP 経由) で鍵を配置する。SOL では PermitRootLogin + PasswordAuthentication の最低限の設定だけ行い、authorized_keys は SSH で:
+> ```sh
+> # SOL では PermitRootLogin / PasswordAuthentication のみ
+> sed -i "s/^#PermitRootLogin.*/PermitRootLogin yes/" /etc/ssh/sshd_config
+> sed -i "s/^#PasswordAuthentication.*/PasswordAuthentication yes/" /etc/ssh/sshd_config
+> systemctl restart sshd
+> ```
+> ```sh
+> # 別途 pexpect でパスワード SSH → 鍵配置 (DHCP IP は preseed install 後にログから取得)
+> python3 -c "
+> import pexpect
+> p = pexpect.spawn('ssh -F ssh/config -o StrictHostKeyChecking=no root@<dhcp_ip>')
+> p.expect('password:')
+> p.sendline('<root_pass>')
+> p.expect(r'#\s*$')
+> p.sendline('mkdir -p /root/.ssh && chmod 700 /root/.ssh')
+> p.expect(r'#\s*$')
+> p.sendline('echo <pubkey> > /root/.ssh/authorized_keys')
+> p.expect(r'#\s*$')
+> p.sendline('chmod 600 /root/.ssh/authorized_keys')
+> p.expect(r'#\s*$')
+> "
+> ```
+> SOL 経由で `|` が必要な処理 (base64 デコード等) は **一切回避する**。短い鍵 (ed25519, 80 文字程度) なら base64 不要で直接 echo 可能。
 
 **sol-login.py がタイムアウトした場合** (Supermicro):
 POST code 確認 → `0x92` なら ForceOff → 20秒 → On → `ssh-wait.sh --timeout 180 --interval 10` → sol-login.py を再実行。
@@ -646,6 +787,10 @@ fi
 
 両方のタイムスタンプが install-monitor 開始より新しいことを確認できたら正規のリインストールが行われたと判断する。
 
+> **⚠️ initramfs dropout false-success** (Round 9 s14 attempt 2 で新規観測):
+> sol-monitor が exit 0 (installation completed) を返したが、OS が `(initramfs)` プロンプトで停止していたケース。partman の "No root file system" dialog を preseed が auto-confirm し、kernel+initrd は書かれたが rootfs が実際は空のまま install monitor 完了。
+> **検出**: 上記 `/etc/machine-id` mtime チェックの前に、SSH 不到達 → SOL 経由で Enter flood → `(initramfs)` プロンプトが返ってきたら initramfs dropout 確定。bmc-mount-boot + install-monitor を reset して再 install。
+
 完了: `./scripts/os-setup-phase.sh mark post-install-config --config "$CONFIG"`
 
 ---
@@ -656,7 +801,7 @@ fi
 
 PVE のインストールを SSH 経由で実行。
 
-> **ネットワーク制約**: `10.0.0.0/8` はインターネット到達不可。preseed で設定された `default via 10.10.10.1` を削除し、`192.168.39.1` 経由に切り替えないと apt/wget が失敗する。
+> **ネットワーク制約**: `10.0.0.0/8` はインターネット到達不可。preseed で設定された `default via 10.10.10.1` を削除し、`192.168.39.1` 経由に切り替えないと apt/wget が失敗する。`preseed/late_command` と `pre-pve-setup.sh` の両方で `/etc/network/interfaces` から `gateway 10.10.10.1` 行を自動削除するため、新規セットアップでは原則手動操作不要。`ip route show default` が `via 192.168.39.1 ...` を返すことだけ確認する。
 
 #### ステップ 0: インターネット接続確保 (iDRAC / CD-only preseed の場合)
 
@@ -667,6 +812,20 @@ ssh -F ssh/config root@<static_ip> sh /tmp/pre-pve-setup.sh --dhcp-iface <dhcp_i
 ```
 
 `pre-pve-setup.sh` は DHCP 有効化、デフォルトルート修正、apt sources 設定、wget/ca-certificates インストールを自動で行う。
+
+> **⚠️ DHCP 取得が timeout する場合 (Debian 13 minimal で観測)**:
+> Debian 13 minimal install は `isc-dhcp-client` 不在で初回 DHCP が 30 秒 timeout する。
+> `pre-pve-setup.sh` は内部で fallback 順序 (`ifup → dhclient → dhcpcd`) を持つが、タイミング依存で失敗することがある。
+> その場合、手動で `dhcpcd -1 -t 30 <dhcp_iface>` を先に流してから `pre-pve-setup.sh` を再実行する:
+> ```sh
+> ssh -F ssh/config root@<static_ip> dhcpcd -1 -t 30 <dhcp_iface>
+> ssh -F ssh/config root@<static_ip> sh /tmp/pre-pve-setup.sh --dhcp-iface <dhcp_iface> --static-gw 10.10.10.1 --codename <codename>
+> ```
+> **IPv4LL fallback 対処** (Round 8 s15 で観測): `dhcpcd` で 169.254.x が割り当てられたら実 DHCP 不取得。`ip addr flush dev <iface>` → `dhcpcd -t 60 <iface>` 再試行で復旧:
+> ```sh
+> ssh -F ssh/config root@<static_ip> ip addr flush dev <dhcp_iface>
+> ssh -F ssh/config root@<static_ip> dhcpcd -t 60 <dhcp_iface>
+> ```
 
 #### ステップ 1: スクリプト転送 + pre-reboot
 
@@ -724,6 +883,33 @@ ssh -F ssh/config root@<static_ip> /tmp/pve-setup-remote.sh --phase post-reboot 
 
 > **`--linstor` フラグ**: LINBIT リポジトリの GPG 鍵追加 + DRBD/LINSTOR パッケージインストールを行う。LINSTOR クラスタに参加するサーバでは必ず指定すること。省略すると LINSTOR 関連のセットアップはスキップされる。
 > enterprise リポジトリ (`.list` + `.sources`) の除去は `--linstor` の有無にかかわらず常に実行される。
+
+> **⚠️ LINBIT GPG empty-file silent failure** (Round 2 s14 で観測):
+> `wget` は 404 でも exit 0 + 空ファイルを残すケースがあり、`pve-setup-remote.sh` の内部 fallback (`wget` 失敗時のみ ubuntu keyserver) が発動しない。
+> **`--linstor` を使う場合は事前にローカルから ubuntu キーサーバ経由で取得して配置することを推奨**:
+
+> **🚨 post-reboot 中の default route 消失 → apt 失敗 (5 trial 連続再現)** (Round 4-6):
+> `pve-setup-remote.sh --phase post-reboot` 実行中に `proxmox-ve` パッケージインストールが ifupdown2 を再初期化し、default route via 192.168.39.1 が消える。続く apt が `Temporary failure resolving 'packages.linbit.com'` で fail する。**5 trial 連続再現 = 必発**。
+> **必須対処手順**: `pve-setup-remote.sh --phase post-reboot` が exit 100 で停止したら:
+> 1. `ssh root@<static_ip> sh /tmp/pre-pve-setup.sh --dhcp-iface <dhcp_iface> --static-gw 10.10.10.1 --codename trixie` でルート修復
+> 2. `ssh root@<static_ip> sh /tmp/pve-setup-remote.sh --phase post-reboot ... ` を再実行 (冪等性で resume される)
+>
+> 根本対処は `pve-setup-remote.sh` 内部に route check + dhclient 埋込が必要 (別 issue 候補)。
+
+> **⚠️ LINBIT linstor-common (56MB) ダウンロード時間に注意** (Round 3 s15 で観測):
+> `packages.linbit.com` 経由の `linstor-common` (56.6 MB) は ~150 KB/sec で 5-15 分かかることがある。`apt` が進捗なしに見えても `/var/cache/apt/archives/partial/` 内のファイルサイズが増えていれば正常。`-o Acquire::http::Timeout=60 -o Acquire::Retries=3` 検討余地あり。
+
+> **⚠️ DRBD DKMS は build-essential / libc6-dev 必須** (Round 2 s14 で観測):
+> `pve-setup-remote.sh --linstor` 完了後の DKMS ビルドが `stdio.h: No such file` で失敗し drbd-dkms が `iF` (Failed) 状態になる。
+> 事前に build-essential を入れておく:
+> ```sh
+> ssh -F ssh/config root@<static_ip> apt-get install -y build-essential
+> ```
+> その後 `pve-setup-remote.sh --phase post-reboot --linstor` を再実行すると DKMS ビルドが通る。
+
+> **🚨 LINBIT keyring 事前配置 (3/6 trial で必発)** — `--linstor` を使う場合は **必須ステップ**:
+> wget からの 404 (silent failure) と内部 fallback の組合せが半数の trial で fail する。
+> **`--linstor` を使う前に必ず事前配置**:
 
 > **LINBIT GPG キーが 404 になる場合の対処**: `pve-setup-remote.sh` は `https://packages.linbit.com/package-signing-pubkey.gpg` から GPG キーを取得するが、URL が変更されて 404 になることがある。この場合はローカルマシンで Ubuntu キーサーバから取得してサーバに配置する:
 > ```sh
@@ -796,9 +982,11 @@ ssh -F ssh/config root@<static_ip> reboot || true
    - ネットワーク: `ssh -F ssh/config root@<static_ip> ip -brief addr`
    - Web UI: `curl -sk https://<static_ip>:8006`
 
-5. **ブリッジ設定** (vmbr0/vmbr1):
-   PVE で VM を利用するにはブリッジが必要。config YAML から NIC 名・IP を読み取り設定する。
+5. **ブリッジ設定** (vmbr0/vmbr1) — **必須ステップ**:
+   PVE で VM を利用するにはブリッジが必要。`pve-setup-remote.sh` は **vmbr0/vmbr1 を作らない** ので、必ず `pve-bridge-setup.sh` を別途実行すること (Round 5 で見落とし発生)。
    冪等: ブリッジが既に設定済みならスキップされる。
+   実行前 check: `ip route` で default route 有無を確認 → 不在なら `dhclient -1 -v <dhcp_iface>` で復旧 (Round 5-7 で連続観測)。
+   > `pve-setup-remote.sh` が installing する `/etc/network/if-up.d/z-fix-default-route` hook は final reboot 後の route loss を防げないことがある (Round 7 で確認)。`dhclient` 復旧手順を確実に流すこと。
    ```sh
    STATIC_IFACE=$("$YQ" '.static_iface' "$CONFIG")
    STATIC_IP=$("$YQ" '.static_ip' "$CONFIG")
@@ -835,6 +1023,17 @@ ssh -F ssh/config root@<static_ip> reboot || true
 
 失敗したフェーズは `./scripts/os-setup-phase.sh reset <phase> --config "$CONFIG"` でリセットして再実行可能。
 
+### 完全リセット (OS install をやり直す)
+
+特定サーバの **全フェーズを pending に戻して Phase 1 からやり直す** 場合、state ディレクトリの中身を一括削除する:
+
+```sh
+find state/os-setup/<host> -mindepth 1 -delete
+./scripts/os-setup-phase.sh init --config config/<host>.yml
+```
+
+> **⚠️ `rm -rf state/os-setup/<host>/*` は CLAUDE.md の shell 安全チェックでブロックされる** ことが多い (top-level wildcard 検出)。`find ... -mindepth 1 -delete` を使うこと (Round 1 s14 で確認)。
+
 ## pve-lock の使い方
 
 Phase 4〜8 では状態変更操作に `./pve-lock.sh` を使用する:
@@ -845,3 +1044,175 @@ Phase 4〜8 では状態変更操作に `./pve-lock.sh` を使用する:
 ```
 
 ロック中の場合は別の課題に着手し、ロック解放後に再開する。
+
+## 2026-05-14/15 デグレ検証で確定した運用知見
+
+`report/2026-05-14_091100_os_setup_18trial_x10dpu_r320.md` の 18 trial と
+`report/2026-05-15_*_18trial_regression_fix.md` の後続検証で確定した実運用注意。
+
+### `racreset soft` 後の VirtualMedia 復旧
+
+iDRAC7/iDRAC8 で `racadm racreset soft` を実行すると、BMC リブート後に
+**VirtualMedia の "Remote File Share" 設定が消失する**ことがある (trial-1-s9 で発生)。
+症状: `racadm remoteimage -s` が `Status=Disabled` を返し、ISO がマウントされていない。
+
+復旧手順:
+1. `./scripts/idrac-virtualmedia.sh mount <bmc_ip>` を再実行 (SMB パスは config YAML の `vm_smb_path` を使う)
+2. `racadm config -g cfgServerInfo -o cfgServerBootOnce 1` で boot-once を再設定
+3. `racadm config -g cfgServerInfo -o cfgServerFirstBootDevice VCD-DVD` で次ブートを VCD に
+4. `racadm serveraction powercycle` で電源 cycle (warmreboot ではブートデバイスが反映されないことあり)
+
+> **重要**: `racreset soft` は最終手段。VirtualMedia の状態が消えるため、その後の
+> 全ての mount/boot-once 設定をやり直す必要がある。
+
+### subagent 運用注意 (Opus 必須・Monitor 禁止)
+
+通しテストを subagent で実行する場合の必須条件:
+
+1. **Opus 4.7 必須** — Sonnet 4.6 は tool_uses 制限 (~400-500回) で 1 trial 完走不能。
+   過去 18 trial 検証では Sonnet で全件途中停止し Opus 再起動が発生した。
+   Agent ツールの `subagent_type` には Opus を選び、明示的な model パラメータで
+   `claude-opus-4-7` を指定する。
+2. **Monitor ツール禁止** — subagent が `Monitor` で pause すると親への中間応答が
+   止まり、親が状態を把握できなくなる。長時間待機は `Bash(run_in_background=false)`
+   で foreground block するか、`sol-monitor.py` を foreground 実行する。
+3. **state リセットを明示指示** — subagent は「既存 install を success として判定」
+   する傾向がある。プロンプトに `find state/os-setup/<host> -mindepth 1 -delete` を
+   明記し、`/etc/machine-id` の mtime が今回の install 開始時刻より新しいことを
+   確認する手順を入れる。
+4. **machine-id mtime 検証必須** — Phase 6 ステップ 5 の「実インストール検証」を
+   subagent が省略しないよう、プロンプトで以下を明示する:
+   ```sh
+   ssh -F ssh/config root@<static_ip> stat -c %Y /etc/machine-id
+   # → 当該 trial の preseed start epoch (date +%s で記録) より新しいことを確認
+   ```
+
+subagent プロンプトのテンプレ:
+```
+- os-setup スキルを呼び出し、config/<host>.yml で Phase 1-8 を実行する
+- 着手前に `find state/os-setup/<host> -mindepth 1 -delete` で完全リセット
+- 開始時刻を `date +%s > tmp/<sid>/trial-start-epoch` に記録
+- sol-monitor.py には `--installer-syslog tmp/.../installer-syslog.log`,
+  `--static-ip <static_ip>`, `--preseed-start-epoch $(cat ...)` を渡す
+- 完了判定: ssh で /etc/machine-id mtime > trial-start-epoch を確認
+- 中間レポートを `report/attachment/<MAIN>/trial-N-s<X>.md` に保存
+- Monitor ツールは使わない、長時間待機は Bash foreground 実行
+```
+
+### `find-boot-entry "ATEN Virtual CDROM"` 失敗時のフォールバック
+
+X11DPU BIOS 4.0 (4-6 号機) では、`find-boot-entry "ATEN Virtual CDROM"` が
+**`Boot####` の動的列挙に失敗することがある** (trial-1-s4 で発生)。
+ATEN Virtual CDROM は UEFI POST 中に VirtualMedia を検出してから初めて
+BootOptions に出現するため、検出タイミングのズレで空リターンになる。
+
+フォールバック:
+```sh
+# 1. boot-override で UEFI モードの CDROM を直接指定 (BootOrder 操作なし)
+./scripts/bmc-power.sh boot-override <bmc_ip> <user> <pass> Cd UEFI
+
+# 2. ふつうの順序での power on
+./scripts/bmc-power.sh on <bmc_ip> <user> <pass>
+```
+
+`bmc-power.sh boot-override` の引数順序は **`<bmc_ip> <user> <pass> <target> <mode>`**
+で、`<target>` は `Cd` (CDROM), `Hdd` (HDD), `Pxe` (PXE)、`<mode>` は `UEFI` or `Legacy`。
+順序を間違えると Redfish の `Boot.BootSourceOverrideTarget` 未受理 (HTTP 400) になる。
+
+`boot-override-reset` 後の最初の起動で iPXE / 無効 BootEntry に落ちる場合は、
+`boot-override Hdd UEFI` で 1 回ディスク強制ブートを挟むと回復する (trial-1-s5/s6 で確認)。
+
+### R430 (PERC H730/H730P) 通しテスト前の preflight
+
+`report/attachment/2026-05-15_073531_18trial_regression_fix/trial-{1,2,3}-s14.md`
+で確定した R430 固有の preflight。OS install 直前に確認すること。
+
+#### 1. PERC のすべての PD を Ready (Raid mode) に戻す
+
+PERC が HBA mode に切り替わっていた、あるいは過去の trial で Bay 0 や Bay 2-5 が
+Non-Raid passthrough になっていると、partman の disk discovery で**前回 install の
+LVM/VG が表に出てきて duplicate VG dialog で stuck する**。
+
+```sh
+# 全 PD の状態を確認
+ssh -F ssh/config -i ssh/idrac_rsa root@10.10.10.34 \
+  racadm storage get pdisks -o
+
+# Non-Raid passthrough になっている PD を Ready に戻す
+ssh -F ssh/config -i ssh/idrac_rsa root@10.10.10.34 \
+  racadm storage converttoraid:Disk.Bay.0:Enclosure.Internal.0-1:RAID.Integrated.1-1
+ssh -F ssh/config -i ssh/idrac_rsa root@10.10.10.34 \
+  racadm jobqueue create RAID.Integrated.1-1 --realtime
+```
+
+OS install 対象は Bay 1+6 RAID-1 のみ。**それ以外のベイ (0, 2-5, 7) は
+Non-Raid passthrough にしないこと**。Ready 状態 (Raid mode、VD 不所属) が正解。
+
+#### 2. preseed-server14.cfg / preseed-server15.cfg の mirror セクションは CD-only
+
+R430 は mgmt-only NIC (eno2 → 10.0.0.0/8、internet 不可) で OS install する。
+debconf の preseed では、
+
+- `apt-setup/use_mirror=false` だけでは不十分
+- `mirror/country`, `mirror/http/hostname`, `mirror/http/directory`, `mirror/http/proxy`
+  が残っていると **choose-mirror が依然 wget で deb.debian.org に到達を試み**、
+  "Bad archive mirror" dialog で 30 分以上 stuck する (trial-3-s14 で確証)
+
+完全 CD-only にする条件 (server7-9.cfg と同等):
+
+```preseed
+### Mirror dialog skipped entirely (no mirror/* lines)
+d-i apt-setup/use_mirror boolean false
+d-i apt-setup/no_mirror boolean true
+d-i apt-setup/cdrom/set-first boolean true
+d-i apt-setup/cdrom/set-next boolean false
+d-i apt-setup/cdrom/set-double boolean false
+d-i apt-setup/cdrom/set-failed boolean false
+d-i apt-setup/non-free-firmware boolean true
+```
+
+> **重要**: `mirror/country string manual` が残っていると choose-mirror が
+> インタラクティブモードに落ちて入力待ちになる。**mirror/\* 行は完全削除**。
+> `cdrom/set-next=false` も必須 (true だと次 CD を待ち bouncer dialog)。
+
+#### 3. pkgsel / tasksel の罠
+
+netinst CD (mirror なし) で install するため、tasksel が install しようとするパッケージで
+失敗ループを起こすことがある (trial-4-s14 で確認)。
+
+- **`d-i pkgsel/include` から `curl` を削除**: netinst CD に curl の依存物が無い場合があり、
+  tasksel "Select and install software" が失敗ループに陥る。`openssh-server sudo wget gnupg` 程度に絞る。
+- **`d-i pkgsel/upgrade select none`** にすること: mirror なし環境で `full-upgrade` を選ぶと
+  upgrade 対象を mirror から fetch できず失敗。`none` で skip。
+- **`tasksel tasksel/first multiselect standard`** は残してよい (CD 内パッケージのみで完結する)。
+
+#### 4. partman/early_command で前回 install 残骸を消す
+
+複数 trial を回す場合、前回 install で書かれた **LVM PV/VG ヘッダ + GPT partition table が
+/dev/sda に残り、partman の `atomic` recipe が "No root file system is defined" dialog で
+stuck する** (trial-5-s14 で発生)。preseed に partman/early_command を入れて毎回 disk を
+wipe する:
+
+```preseed
+d-i partman/early_command string \
+  wipefs -a /dev/sda 2>/dev/null || true; \
+  dd if=/dev/zero of=/dev/sda bs=1M count=10 2>/dev/null || true; \
+  dd if=/dev/zero of=/dev/sda bs=1M seek=$(($(blockdev --getsz /dev/sda) / 2048 - 10)) count=10 2>/dev/null || true; \
+  partprobe /dev/sda 2>/dev/null || true; \
+  :
+```
+
+- `wipefs -a`: superblock 署名 (LVM/MD/GPT) を削除
+- `dd` (先頭 + 末尾): GPT primary table + GPT backup table の領域をゼロ埋め
+- `partprobe`: カーネルに変更を通知
+
+server7-9.cfg は `sgdisk --zap-all` を使う別パターン。R430 では `wipefs + dd` 方式で
+確認済み。
+
+#### 5. serial_unit / console option は config と一致させる
+
+R430 で `config/serverN.yml` の `serial_unit` が 0 のとき、preseed の
+`debian-installer/add-kernel-opts` は `console=ttyS0` でなければならない (trial 4 直前で
+ttyS1 のままだと SOL に installer 出力が流れず black-out)。
+config と preseed をペアで管理する場合は generate-preseed.sh の console_order を参照、
+手動管理 (preseed-serverN.cfg) の場合は config の serial_unit と整合確認すること。
