@@ -31,7 +31,7 @@ d-i preseed/early_command string \
 d-i netcfg/disable_autoconfig boolean %%NETCFG_DISABLE_AUTOCONFIG%%
 d-i netcfg/dhcp_failed note
 d-i netcfg/dhcp_options select Configure network manually
-d-i netcfg/choose_interface select auto
+d-i netcfg/choose_interface select %%CHOOSE_INTERFACE%%
 d-i netcfg/get_ipaddress string %%STATIC_IP%%
 d-i netcfg/get_netmask string %%STATIC_NETMASK_OCTET%%
 d-i netcfg/get_gateway string %%STATIC_GATEWAY%%
@@ -39,6 +39,11 @@ d-i netcfg/get_nameservers string 8.8.8.8 1.1.1.1
 d-i netcfg/confirm_static boolean true
 d-i netcfg/get_hostname string %%HOSTNAME%%
 d-i netcfg/get_domain string %%DOMAIN%%
+### Suppress "Continue without a default route?" and "Gateway unreachable" dialogs.
+### The management network (10.0.0.0/8) has no internet path, so default route
+### checking always fails. These directives auto-accept and continue.
+d-i netcfg/no_default_route boolean true
+d-i netcfg/gateway_unreachable boolean true
 
 ### Mirror
 ### When the host has no usable network during install (VLAN trunk on stock
@@ -124,6 +129,13 @@ d-i debian-installer/exit/poweroff boolean true
 ### startup.nsh provides a fallback path if UEFI boot order is misconfigured.
 ### SSH configuration: sets PermitRootLogin yes, installs project public key,
 ### sets up sudoers NOPASSWD for the debian user.
+### The "strip gateway" sed below removes the `gateway %%STATIC_GATEWAY%%` line
+### that d-i netcfg writes into /etc/network/interfaces from the static-IP
+### dialog answers (netcfg/get_gateway). The 10.0.0.0/8 management network has
+### no internet path, so leaving that line lets ifupdown re-evaluation install
+### default via 10.10.10.1 on every reboot — breaking apt during the
+### pve-setup-remote.sh post-reboot phase. The sed is a no-op on VLAN hosts
+### because %%LATE_NETWORK%% overwrites the file right after.
 ### The late_network block (substituted below) expands to either:
 ###   - non-VLAN hosts: a single auto/iface block APPENDED to the netcfg-written
 ###     interfaces file (preserves the existing static IP block).
@@ -142,6 +154,7 @@ d-i preseed/late_command string \
     in-target chmod 600 /root/.ssh/authorized_keys; \
     echo "%%USER_NAME%% ALL=(ALL) NOPASSWD: ALL" > /target/etc/sudoers.d/%%USER_NAME%%; \
     in-target chmod 0440 /etc/sudoers.d/%%USER_NAME%%; \
+    in-target sed -i "/^[[:space:]]*gateway[[:space:]]\\+%%STATIC_GATEWAY%%[[:space:]]*\$/d" /etc/network/interfaces; \
     %%LATE_NETWORK%% \
     true
 

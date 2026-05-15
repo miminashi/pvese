@@ -79,29 +79,37 @@ else
 fi
 
 # VLAN-aware vs legacy expansions for the template placeholders.
-# - VLAN host: overwrite /target/etc/network/interfaces from late_command with
-#   a fresh definition (lo + physical NIC manual + internet/internal VLAN
-#   subinterfaces). The overwrite is mandatory: d-i netcfg writes
-#   `iface <phy> inet static` from netcfg/get_ipaddress, and if late_command
-#   only appended the VLAN block the static IP would end up on both the
-#   untagged NIC and the VLAN sub — duplicate addresses break SSH on first
-#   boot (see report/2026-05-02_060639_server10_disk_first_boot_recovery.md
-#   Phase 6).
-# - Non-VLAN host: keep the original append behaviour (auto choose, single
-#   static line) so 4-9号機 generators stay byte-identical apart from the
-#   early_command + syslog-forward block (harmless on those hosts).
-# VLAN trunk hosts (10号機) cannot use d-i network configuration because the
-# stock initrd lacks the 8021q kernel module, so we install CD-only and bring
-# the VLAN bridge up at first boot via late_command + /etc/modules.
+# - VLAN host (server10-13): overwrite /target/etc/network/interfaces from
+#   late_command with a fresh definition (lo + physical NIC manual +
+#   internet/internal VLAN subinterfaces). VLAN trunk hosts cannot use d-i
+#   network configuration because the stock initrd lacks the 8021q kernel
+#   module, so we install CD-only and bring the VLAN bridge up at first boot
+#   via late_command + /etc/modules.
+# - Non-VLAN host (server4-6): the box has TWO usable NICs — eno1np0 on
+#   vmbr1 (192.168.39.0/24 DHCP, internet-capable) and eno2np1 on vmbr0
+#   (10.10.10.0/8 mgmt static, no internet). Let d-i auto-detect the
+#   internet-facing NIC (`choose_interface=auto` picks the carrier with
+#   DHCP), enable the apt mirror so the standard task installs cleanly, and
+#   write the mgmt static IP onto eno2np1 from late_command so SSH on
+#   10.10.10.x is available at first boot.
+#
+# Background on the 2026-05-14 regression
+# (report/2026-05-14_091100_os_setup_18trial_x10dpu_r320.md):
+# Previously the non-VLAN branch forced choose_interface=$static_iface (mgmt
+# NIC, no internet) and apt_use_mirror=false (CD-only). On x10dpu hosts this
+# left the installer trying to reach deb.debian.org over the mgmt VLAN and
+# hanging in choose-mirror for 20+ minutes. The recovery path was a manual
+# edit of every preseed-generated-s{4,5,6}.cfg to auto / true / false / true,
+# which got blown away whenever generate-preseed.sh was re-run.
 #
 # choose_interface / vlan_setup_cmd are unused once early VLAN setup was
 # abandoned, but preseed.cfg.template still references them — keep the
 # placeholder values in sync.
-choose_interface="auto"
 vlan_setup_cmd=":"
 NWFILE='/target/etc/network/interfaces'
 
 if [ -n "$vlan_iface" ] && [ -n "$internet_vlan_id" ] && [ -n "$internal_vlan_id" ]; then
+    choose_interface="$vlan_iface"
     netcfg_disable_autoconfig="true"
     apt_use_mirror="false"
     apt_no_mirror="true"
@@ -126,13 +134,26 @@ echo 'iface ${vlan_iface}.${internal_vlan_id} inet static' >> ${NWFILE}; \
 echo '    address ${static_ip}/${static_netmask}' >> ${NWFILE}; \
 echo '    vlan-raw-device ${vlan_iface}' >> ${NWFILE};"
 else
+    # Non-VLAN, dual-NIC mgmt host (server4-6): auto-detect the internet-
+    # facing NIC and use the apt mirror for a full standard install.
+    choose_interface="auto"
     netcfg_disable_autoconfig="false"
     apt_use_mirror="true"
     apt_no_mirror="false"
     tasksel_first="standard"
     pkgsel_include="openssh-server sudo curl wget gnupg"
-    pkgsel_upgrade="full-upgrade"
-    late_network="echo '' >> ${NWFILE}; \
+    pkgsel_upgrade="none"
+    # The mgmt static IP must end up on $static_iface (eno2np1 on X11DPU) so
+    # that SSH on 10.10.10.x is reachable at first boot. d-i netcfg only wrote
+    # config for the DHCP-up interface it auto-picked, so we OVERWRITE the
+    # whole interfaces file with: lo + DHCP block for the auto-picked NIC +
+    # static block for $static_iface. pre-pve-setup.sh / pve-setup-remote.sh
+    # convert these into vmbr0 / vmbr1 bridges at first boot.
+    late_network="echo 'source /etc/network/interfaces.d/*' > ${NWFILE}; \
+echo '' >> ${NWFILE}; \
+echo 'auto lo' >> ${NWFILE}; \
+echo 'iface lo inet loopback' >> ${NWFILE}; \
+echo '' >> ${NWFILE}; \
 echo 'auto ${static_iface}' >> ${NWFILE}; \
 echo 'iface ${static_iface} inet static' >> ${NWFILE}; \
 echo '    address ${static_ip}/${static_netmask}' >> ${NWFILE};"
