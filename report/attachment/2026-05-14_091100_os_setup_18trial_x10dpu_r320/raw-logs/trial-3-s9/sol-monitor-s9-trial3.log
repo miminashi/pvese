@@ -1,0 +1,43 @@
+[03:22:46] Deactivating any existing SOL session
+[03:22:48] Connecting SOL to 10.10.10.29
+[03:22:49] SOL connected, starting installer monitoring
+[03:22:49] Monitoring started (timeout=2699.9999928474426s, powerstate_interval=20s, initial_stage_idx=-1)
+[03:23:18] PowerState poll: On (0.3min, stages=0)
+[03:23:45] PowerState poll: On (0.7min, stages=0)
+[03:23:50] Stage observed: COUNT=0/9
+[03:24:05] PowerState poll: On (1.1min, stages=0)
+[03:24:25] PowerState poll: On (1.4min, stages=0)
+[03:24:48] PowerState poll: On (1.8min, stages=0)
+[03:24:53] Stage observed: COUNT=0/9
+[03:25:14] PowerState poll: On (2.2min, stages=0)
+[03:25:33] PowerState poll: On (2.6min, stages=0)
+[03:25:56] PowerState poll: On (3.0min, stages=0)
+[03:26:01] Stage observed: COUNT=0/9
+[03:26:39] PowerState poll: On (3.4min, stages=0)
+[03:26:59] PowerState poll: On (3.9min, stages=0)
+[03:27:04] Stage: LOADING_COMPONENTS (4.2min)
+[03:27:04] Stage observed: COUNT=1/9
+[03:27:20] PowerState poll: On (4.3min, stages=1)
+[03:27:25] Stage: DETECTING_NETWORK (4.5min)
+[03:27:25] Stage: CONFIGURING_APT (4.5min)
+[03:27:42] PowerState poll: On (4.6min, stages=5)
+[03:28:00] PowerState poll: On (5.0min, stages=5)
+[03:28:05] Stage observed: COUNT=5/9
+[03:28:31] PowerState poll: On (5.3min, stages=5)
+[03:28:50] PowerState poll: On (5.8min, stages=5)
+[03:29:17] PowerState poll: On (6.2min, stages=5)
+[03:29:22] Stage observed: COUNT=5/9
+[03:29:47] PowerState poll: On (6.5min, stages=5)
+[03:30:02] PowerState poll: On (7.1min, stages=5)
+[03:30:32] PowerState poll: On (7.5min, stages=5)
+[03:30:37] Stage: INSTALLING_SOFTWARE (7.7min)
+[03:30:37] Stage observed: COUNT=6/9
+[03:30:56] PowerState poll: On (7.9min, stages=6)
+[03:31:06] Stage: INSTALLING_GRUB (8.2min)
+[03:31:16] PowerState poll: On (8.3min, stages=7)
+[03:31:35] PowerState poll: On (8.6min, stages=7)
+[03:31:40] Stage observed: COUNT=7/9
+[03:31:50] Stage: POWER_DOWN (8.9min)
+[03:31:50] Power down detected, waiting 30s for shutdown...
+[03:32:28] PowerState after shutdown wait: Off
+[03:32:28] Installation completed successfully (PowerState Off, after 'Power down')

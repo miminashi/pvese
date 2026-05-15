@@ -1,0 +1,73 @@
+[23:18:18] Deactivating any existing SOL session
+[23:18:20] Connecting SOL to 10.10.10.24
+[23:18:20] SOL connected, starting installer monitoring
+[23:18:20] Monitoring started (timeout=2699.9999916553497s, powerstate_interval=20s, initial_stage_idx=-1)
+[23:18:42] PowerState poll: On (0.3min, stages=0)
+[23:19:04] PowerState poll: On (0.7min, stages=0)
+[23:19:24] Stage observed: COUNT=0/9
+[23:19:25] PowerState poll: On (1.1min, stages=0)
+[23:19:49] PowerState poll: On (1.4min, stages=0)
+[23:20:04] Stage: LOADING_COMPONENTS (1.6min)
+[23:20:11] PowerState poll: On (1.8min, stages=1)
+[23:20:21] Stage: CONFIGURING_APT (1.9min)
+[23:20:26] Stage observed: COUNT=5/9
+[23:20:33] PowerState poll: On (2.2min, stages=5)
+[23:20:55] PowerState poll: On (2.5min, stages=5)
+[23:21:17] PowerState poll: On (2.9min, stages=5)
+[23:21:27] Stage observed: COUNT=5/9
+[23:21:40] PowerState poll: On (3.3min, stages=5)
+[23:22:02] PowerState poll: On (3.7min, stages=5)
+[23:22:25] PowerState poll: On (4.0min, stages=5)
+[23:22:30] Stage observed: COUNT=5/9
+[23:22:47] PowerState poll: On (4.4min, stages=5)
+[23:23:09] PowerState poll: On (4.8min, stages=5)
+[23:23:19] Stage: INSTALLING_SOFTWARE (4.9min)
+[23:23:32] PowerState poll: On (5.2min, stages=6)
+[23:23:37] Stage observed: COUNT=6/9
+[23:23:54] PowerState poll: On (5.5min, stages=6)
+[23:24:09] Stage: INSTALLING_GRUB (5.7min)
+[23:24:16] PowerState poll: On (5.9min, stages=7)
+[23:24:38] PowerState poll: On (6.3min, stages=7)
+[23:24:43] Stage observed: COUNT=7/9
+[23:24:53] Stage: POWER_DOWN (6.5min)
+[23:24:53] Power down detected, waiting 30s for shutdown...
+[23:25:24] PowerState after shutdown wait: Off
+[23:25:24] Installation completed successfully (PowerState Off, after 'Power down')
+[23:31:41] Deactivating any existing SOL session
+[23:31:43] Connecting SOL to 10.10.10.24
+[23:31:46] Stage: DETECTING (timeout=180s)
+[23:31:46] Stage: DETECTING -> LOGIN_PROMPT
+[23:31:46] Sending 'root' username
+[23:31:46] Sending password
+[23:31:47] Login successful
+[23:31:47] Stage: LOGGED_IN
+[23:31:47] Executing 11 commands from /home/ubuntu/projects/pvese/tmp/e28df8d0/sol-commands-s4-r3.txt
+[23:31:47] [1/11] sed -i "s/^#PermitRootLogin.*/PermitRootLogin yes/" /etc/ssh/sshd_config
+[23:31:47] [2/11] systemctl restart sshd
+[23:31:48] [3/11] echo "debian ALL=(ALL) NOPASSWD: ALL" > /etc/sudoers.d/debian
+[23:31:48] [4/11] chmod 0440 /etc/sudoers.d/debian
+[23:31:49] [5/11] mkdir -p /root/.ssh
+[23:31:49] [6/11] chmod 700 /root/.ssh
+[23:31:50] [7/11] echo "c3NoLWVkMjU1MTkgQUFBQUMzTnphQzFsWkRJMU5URTVBQUFBSU5mVkxPVDYrK0UvTklxdWRaSnJCd2wvYTAvVFdGVll4WCsxMDBmeUFMTHkgYmVuY2gtdm0=" | base64 -d > /root/.ssh/authorized_keys
+[23:31:50] [8/11] chmod 600 /root/.ssh/authorized_keys
+[23:31:51] [9/11] ip link set eno1np0 up
+[23:31:51] [10/11] printf 'auto eno1np0\niface eno1np0 inet manual\n' >> /etc/network/interfaces
+[23:31:52] [11/11] ip -brief addr > /tmp/ipaddr.txt
+[23:31:55] All done
+[23:33:15] Deactivating any existing SOL session
+[23:33:17] Connecting SOL to 10.10.10.24
+[23:33:20] Stage: DETECTING (timeout=180s)
+[23:33:20] Stage: DETECTING -> LOGIN_PROMPT
+[23:33:20] Sending 'root' username
+[23:33:21] Sending password
+[23:33:21] Login successful
+[23:33:21] Stage: LOGGED_IN
+[23:33:21] Executing 7 commands from /home/ubuntu/projects/pvese/tmp/e28df8d0/sol-net-fix-s4.txt
+[23:33:21] [1/7] ip link set eno2np1 up
+[23:33:22] [2/7] ip addr show eno2np1 > /tmp/eno2.txt
+[23:33:22] [3/7] ip route show > /tmp/route.txt
+[23:33:23] [4/7] cat /etc/network/interfaces > /tmp/iface.txt
+[23:33:23] [5/7] ifdown eno2np1
+[23:33:24] [6/7] ifup eno2np1
+[23:33:24] [7/7] ip -brief addr > /tmp/ipaddr.txt
+[23:33:28] All done

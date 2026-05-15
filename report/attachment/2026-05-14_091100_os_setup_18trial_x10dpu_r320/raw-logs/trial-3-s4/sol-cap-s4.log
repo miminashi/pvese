@@ -1,0 +1,62 @@
+
+
+
+[SOL Session operational.  Use ~? for help]
+
+ayase-web-service-4 login: 
+ayase-web-service-4 login: root
+root
+Password: password
+
+Linux ayase-web-service-4 6.12.63+deb13-amd64 #1 SMP PREEMPT_DYNAMIC Debian 6.12.63-1 (2025-12-30) x86_64
+
+The programs included with the Debian GNU/Linux system are free software;
+the exact distribution terms for each program are described in the
+individual files in /usr/share/doc/*/copyright.
+
+Debian GNU/Linux comes with ABSOLUTELY NO WARRANTY, to the extent
+permitted by applicable law.
+[?2004hroot@ayase-web-service-4:~# ip -brief addr
+echo --route--
+ip route
+echo --iface--
+cat /etc/network/interfaces
+echo --ssh--
+systemctl is-active ssh sshd
+ss -tlnp
+echo --done--
+ip -brief addr
+[?2004l[36mlo               [0mUNKNOWN        [35m127.0.0.1[0m/8 [34m::1[0m/128 
+[36meno1np0          [0m[32mUP             [0m[34mfe80::ae1f:6bff:fe0b:b6ac[0m/64 
+[36meno2np1          [0m[32mUP             [0m[35m10.10.10.204[0m/8 [34mfe80::ae1f:6bff:fe0b:b6ad[0m/64 
+[36meno3np2          [0m[31mDOWN           [0m
+[36meno4np3          [0m[31mDOWN           [0m
+[?2004hroot@ayase-web-service-4:~# echo --route--
+[?2004l--route--
+[?2004hroot@ayase-web-service-4:~# ip route
+[?2004l[35m10.0.0.0/8 [0mdev [36meno2np1 [0mproto kernel scope link src [35m10.10.10.204 [0m
+[?2004hroot@ayase-web-service-4:~# echo --iface--
+[?2004l--iface--
+[?2004hroot@ayase-web-service-4:~# cat /etc/network/interfaces
+[?2004lsource /etc/network/interfaces.d/*
+
+auto lo
+iface lo inet loopback
+
+auto eno2np1
+iface eno2np1 inet static
+    address 10.10.10.204/8
+auto eno1np0
+iface eno1np0 inet manual
+[?2004hroot@ayase-web-service-4:~# echo --ssh--
+[?2004l--ssh--
+[?2004hroot@ayase-web-service-4:~# systemctl is-active ssh sshd
+[?2004lactive
+active
+[?2004hroot@ayase-web-service-4:~# ss -tlnp
+[?2004lState     Recv-Q    Send-Q       Local Address:Port        Peer Address:Port    Process                                                                         
+LISTEN    0         128                0.0.0.0:22               0.0.0.0:*        users:(("sshd",pid=1839,fd=6))                                                 
+LISTEN    0         128                   [::]:22                  [::]:*        users:(("sshd",pid=1839,fd=7))                                                 
+[?2004hroot@ayase-web-service-4:~# echo --done--
+[?2004l--done--
+[?2004hroot@ayase-web-service-4:~# exit

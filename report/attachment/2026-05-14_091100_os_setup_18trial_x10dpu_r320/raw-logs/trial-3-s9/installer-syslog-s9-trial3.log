@@ -1,0 +1,61 @@
+<13>May 14 17:44:17 grub-installer: info: architecture: amd64/efi
+<13>May 14 17:44:17 grub-installer: info: Bind mounting /run into /target
+<13>May 14 17:44:17 in-target:   libefivar1t64 libfreetype6 libfuse3-4 libpng16-16t64
+<13>May 14 17:44:17 in-target:   libefiboot1t64 libefivar1t64 libfreetype6 libfuse3-4 libpng16-16t64
+<13>May 14 17:44:18 in-target: Get:4 cdrom://[Debian GNU/Linux 13.3.0 _Trixie_ - Official amd64 NETINST with firmware 20260110-10:59] trixie/main amd64 libefivar1t64 amd64 38-3.1+b1 [58.5 kB]
+<13>May 14 17:44:20 in-target: Selecting previously unselected package libefivar1t64:amd64.
+<13>May 14 17:44:20 in-target: Preparing to unpack .../3-libefivar1t64_38-3.1+b1_amd64.deb ...
+<13>May 14 17:44:20 in-target: Unpacking libefivar1t64:amd64 (38-3.1+b1) ...
+<13>May 14 17:44:20 in-target: Setting up libefivar1t64:amd64 (38-3.1+b1) ...
+<13>May 14 17:44:32 grub-installer: info: Identified partition label for /dev/sda2: gpt
+<13>May 14 17:44:32 grub-installer: Success mounting /target/sys
+<13>May 14 17:44:32 grub-installer: Success mounting /target/sys/firmware/efi/efivars
+<13>May 14 17:44:32 grub-installer: info: Checking removable media path /target/boot/efi/EFI/BOOT/BOOTX64.EFI
+<13>May 14 17:44:32 grub-installer: info: Removable media path is empty
+<13>May 14 17:44:32 grub-installer: info: YES on force-efi-extra-removable
+<13>May 14 17:44:32 grub-installer: dpkg: warning: ignoring request to remove grub which isn't installed
+<13>May 14 17:44:32 grub-installer: dpkg: warning: ignoring request to remove grub-legacy which isn't installed
+<13>May 14 17:44:32 grub-installer: dpkg: warning: ignoring request to remove grub-pc-bin which isn't installed
+<13>May 14 17:44:32 grub-installer: dpkg: warning: ignoring request to remove grub-pc which isn't installed
+<13>May 14 17:44:37 grub-installer: info: initial os-prober call found the following OSes:
+<13>May 14 17:44:37 grub-installer: info: 
+<13>May 14 17:44:37 grub-installer: info: Found NO other OSes, triggering question about os-prober, default no
+<13>May 14 17:44:40 grub-installer: info: Additionally installing shim-signed to go with grub-efi-amd64
+<13>May 14 17:44:43 grub-installer: info: Installing grub on '/dev/sda'
+<13>May 14 17:44:43 grub-installer: info: Running chroot /target grub-install  --force-extra-removable --force "/dev/sda"
+<13>May 14 17:44:43 grub-installer: Installing for x86_64-efi platform.
+<13>May 14 17:44:44 grub-installer: Installation finished. No error reported.
+<13>May 14 17:44:44 grub-installer: info: grub-install ran successfully
+<13>May 14 17:44:47 preseed: running preseed command preseed/late_command: in-target update-grub || true; in-target grub-install --target=x86_64-efi --efi-directory=/boot/efi --bootloader-id=debian --no-nvram --force-extra-removable --recheck /dev/sda || true; in-target update-grub || true; in-target sh -c 'echo "fs0:\\efi\\boot\\bootx64.efi" > /boot/efi/startup.nsh' || true; true
+<13>May 14 18:30:43 in-target: 3072 SHA256:kMUdbKS6+FVam5G5WowqKT5XzASFHWQC96P9k2IAx8U root@ayase-web-service-9 (RSA)
+<13>May 14 18:30:43 in-target: 256 SHA256:Mcli/JhxvNxOGpGuxP6FOWmK9cSWhJwlyyNtrHfLylg root@ayase-web-service-9 (ECDSA)
+<13>May 14 18:30:43 in-target: 256 SHA256:WSIgi7RRYeN9aUAa/4S7KCXbyV6VonrYQDi3RHxuhfE root@ayase-web-service-9 (ED25519)
+<13>May 14 18:30:45 grub-installer: info: architecture: amd64/efi
+<13>May 14 18:30:45 grub-installer: info: Bind mounting /run into /target
+<13>May 14 18:30:45 in-target:   libefivar1t64 libfreetype6 libfuse3-4 libpng16-16t64
+<13>May 14 18:30:45 in-target:   libefiboot1t64 libefivar1t64 libfreetype6 libfuse3-4 libpng16-16t64
+<13>May 14 18:30:46 in-target: Get:4 cdrom://[Debian GNU/Linux 13.3.0 _Trixie_ - Official amd64 NETINST with firmware 20260110-10:59] trixie/main amd64 libefivar1t64 amd64 38-3.1+b1 [58.5 kB]
+<13>May 14 18:30:48 in-target: Selecting previously unselected package libefivar1t64:amd64.
+<13>May 14 18:30:48 in-target: Preparing to unpack .../3-libefivar1t64_38-3.1+b1_amd64.deb ...
+<13>May 14 18:30:48 in-target: Unpacking libefivar1t64:amd64 (38-3.1+b1) ...
+<13>May 14 18:30:49 in-target: Setting up libefivar1t64:amd64 (38-3.1+b1) ...
+<13>May 14 18:30:59 grub-installer: info: Identified partition label for /dev/sda2: gpt
+<13>May 14 18:30:59 grub-installer: Success mounting /target/sys
+<13>May 14 18:31:00 grub-installer: Success mounting /target/sys/firmware/efi/efivars
+<13>May 14 18:31:00 grub-installer: info: Checking removable media path /target/boot/efi/EFI/BOOT/BOOTX64.EFI
+<13>May 14 18:31:00 grub-installer: info: Removable media path is empty
+<13>May 14 18:31:00 grub-installer: info: YES on force-efi-extra-removable
+<13>May 14 18:31:00 grub-installer: dpkg: warning: ignoring request to remove grub which isn't installed
+<13>May 14 18:31:00 grub-installer: dpkg: warning: ignoring request to remove grub-legacy which isn't installed
+<13>May 14 18:31:00 grub-installer: dpkg: warning: ignoring request to remove grub-pc-bin which isn't installed
+<13>May 14 18:31:00 grub-installer: dpkg: warning: ignoring request to remove grub-pc which isn't installed
+<13>May 14 18:31:04 grub-installer: info: initial os-prober call found the following OSes:
+<13>May 14 18:31:04 grub-installer: info: 
+<13>May 14 18:31:04 grub-installer: info: Found NO other OSes, triggering question about os-prober, default no
+<13>May 14 18:31:08 grub-installer: info: Additionally installing shim-signed to go with grub-efi-amd64
+<13>May 14 18:31:12 grub-installer: info: Installing grub on '/dev/sda'
+<13>May 14 18:31:12 grub-installer: info: Running chroot /target grub-install  --force-extra-removable --force "/dev/sda"
+<13>May 14 18:31:12 grub-installer: Installing for x86_64-efi platform.
+<13>May 14 18:31:12 grub-installer: Installation finished. No error reported.
+<13>May 14 18:31:12 grub-installer: info: grub-install ran successfully
+<13>May 14 18:31:16 preseed: running preseed command preseed/late_command: in-target update-grub || true; in-target grub-install --target=x86_64-efi --efi-directory=/boot/efi --bootloader-id=debian --no-nvram --force-extra-removable --recheck /dev/sda || true; in-target update-grub || true; in-target sh -c 'echo "fs0:\\efi\\boot\\bootx64.efi" > /boot/efi/startup.nsh' || true; true

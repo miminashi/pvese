@@ -1,0 +1,12 @@
+sed -i "s/^#PermitRootLogin.*/PermitRootLogin yes/" /etc/ssh/sshd_config
+systemctl restart sshd
+echo "debian ALL=(ALL) NOPASSWD: ALL" > /etc/sudoers.d/debian
+chmod 0440 /etc/sudoers.d/debian
+mkdir -p /root/.ssh
+chmod 700 /root/.ssh
+echo "c3NoLWVkMjU1MTkgQUFBQUMzTnphQzFsWkRJMU5URTVBQUFBSU5mVkxPVDYrK0UvTklxdWRaSnJCd2wvYTAvVFdGVll4WCsxMDBmeUFMTHkgYmVuY2gtdm0=" | base64 -d > /root/.ssh/authorized_keys
+chmod 600 /root/.ssh/authorized_keys
+ip link set eno2 up
+printf "\nauto eno2\niface eno2 inet manual\n" >> /etc/network/interfaces
+ip -brief addr > /tmp/result.txt
+cat /tmp/result.txt

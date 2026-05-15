@@ -1,0 +1,53 @@
+# Trial 3 server6 試行ログ (Round 3, Issue #65)
+
+開始: 2026-05-15 00:48:26 JST
+完了: 2026-05-15 01:11:16 JST
+所要: 約 22m50s
+結果: giveup (HW 故障再現)
+
+## タイムライン
+
+| 時刻 (JST) | アクション | 結果 |
+|-----------|----------|------|
+| 00:48:26 | 開始、tmp/e28df8d0 作成、state リセット | OK |
+| 00:48 | ssh-keygen -R 10.10.10.206 | OK (entry not found) |
+| 00:48 | os-setup-phase.sh init | OK |
+| 00:48 | orphan socat UDP 5514 PID 3142222 検出 → 停止 | OK |
+| 00:48 | bmc-power.sh status → Off | OK |
+| 00:48-49 | Phase 1 iso-download (cached, sha256 OK) | done 24s |
+| 00:49 | Phase 2 preseed-generate + 4 件 Edit workaround | done 26s |
+| 00:49-50 | Phase 3 iso-remaster (cached, preseed hash 一致) | done 6s |
+| 00:50 | Phase 4 開始 bmc-mount-boot | start |
+| 00:50 | bmc-session login + CSRF + vm config + mount + verify (Inserted: true) | OK |
+| 00:51 | power cycle + POST 待機 (60s で 0x00 to stable) | OK |
+| 00:52 | find-boot-entry "ATEN Virtual CDROM" | fail (3 retry) |
+| 00:52 | workaround: boot-override Cd UEFI + cycle | OK |
+| 00:53 | Phase 4 done (3m11s) | done |
+| 00:53 | Redfish システム取得: TotalSystemMemoryGiB=16, Health=Critical | HW 故障確定 |
+| 00:53 | Phase 5 install-monitor 開始、syslog-receiver + sol-monitor 起動 | start |
+| 00:53-01:04 | SOL monitor 観測: stages=0 連続、byobu pane *installer 起動 | 進行不明 |
+| 01:04 | KVM screenshot 1: 全黒 | 黒画面 |
+| 01:05 | SOL ログ tail: "16:05" (installer pane 内 byobu heartbeat 動作中) | hang |
+| 01:05 | KVM screenshot 2: 全黒 | 黒画面 |
+| 01:05 | Redfish Memory: P1-DIMMA1 のみ (P2-DIMMA1 完全消失) | HW 故障確定 |
+| 01:10 | SOL ログ "16:10" — 5+ 分追加で進捗なし、installer hang 確定 | giveup 判定 |
+| 01:10 | KVM screenshot 3: 全黒 + 左上 cursor 点滅 | 黒画面 |
+| 01:10 | install-monitor fail マーク | OK |
+| 01:11 | sol-monitor + ipmitool sol + syslog-receiver 停止 (本セッション子のみ) | OK |
+| 01:11 | bmc-power.sh forceoff | OK |
+| 01:11 | bmc-virtualmedia umount | OK |
+| 01:11 | bmc-power.sh boot-override-reset | OK |
+| 01:11 | cookie 削除 | OK |
+
+## 観察事項
+
+- Round 2 で確定の DIMM P2-DIMMA1 物理故障が再現 (BIOS が完全 Disable)
+- 残り P1-DIMMA1 1 本だけで起動するも installer (Detect and mount installation media) で hang
+- SOL ログ: 約 7.5 MB、Supermicro POST GUI + byobu *installer pane heartbeat
+- installer-syslog (UDP 5514): 0 byte (preseed early_command syslogd 到達せず)
+- KVM canvas: 3 回観測すべて全黒
+
+## 結論
+
+attempt 1 で Round 2 と同一の物理 HW 故障症状を確認、3 attempt は不要と判断し即 giveup。
+別 issue 「server6 DIMM P2-DIMMA1 物理交換要請」化を推奨。
