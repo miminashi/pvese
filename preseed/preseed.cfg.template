@@ -64,10 +64,35 @@ d-i apt-setup/cdrom/set-failed boolean false
 ### (prevents "No kernel modules found" error when ISO kernel != archive kernel)
 d-i anna/no_kernel_modules boolean true
 
+### Force USB CD-ROM scanning during installation media detection
+### iRMC Virtual Media presents an emulated USB CD that requires explicit
+### cdrom-detect/try-usb=true to be re-scanned after the kernel boots.
+### Kernel cmdline carries the same hints (set in remaster-debian-iso.sh) so
+### detection works before preseed is loaded; these directives apply during
+### any later hw-detect re-run as belt-and-suspenders.
+###
+### TX1320 specifics (2026-05-18 #69 c-curried-puddle session): the physical
+### built-in DVD drive enumerates as /dev/sr0 (empty, no medium - "No medium
+### found"). The iRMC virtual CD-ROM enumerates as /dev/sr1 with the actual
+### installer ISO. cdrom-detect still scans /dev/sr0 first and fails before
+### trying /dev/sr1 — `cdrom-detect/scan=true` does NOT make d-i probe
+### subsequent sr devices. Setting `cdrom-detect/cdrom_device=/dev/sr1` via
+### preseed OR via cmdline triggers a warm-reset boot loop instead of using
+### the value. Root cause unresolved; left for next session pivot.
+d-i cdrom-detect/try-usb boolean true
+d-i cdrom-detect/scan boolean true
+d-i hw-detect/load_media boolean false
+
 ### Clock and time zone
 d-i clock-setup/utc boolean true
 d-i time/zone string Asia/Tokyo
 d-i clock-setup/ntp boolean true
+
+### Optional: partman/early_command for RAID setup before partitioning.
+### Expands to either an empty line (default) or a directive that runs
+### /cdrom/setup-raid10-storcli.sh before partman discovers disks.
+### Triggered by `generate-preseed.sh --with-raid10-storcli`.
+%%PARTMAN_EARLY_COMMAND%%
 
 ### Partitioning - use entire disk with LVM
 ### IMPORTANT: Always boot the installer in UEFI mode for NVMe targets.
