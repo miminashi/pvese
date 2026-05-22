@@ -70,6 +70,8 @@ docker run --rm --dns 8.8.8.8 \
     -e "SERIAL_UNIT=$SERIAL_UNIT" \
     -e "OUTPUT_BASENAME=$OUTPUT_BASENAME" \
     -e "INCLUDE_BASENAMES=$INCLUDE_BASENAMES" \
+    -e "EXTRA_CMDLINE=${EXTRA_CMDLINE:-}" \
+    -e "PVESE_PATCH_CDROM_DETECT=${PVESE_PATCH_CDROM_DETECT:-0}" \
     -v "$ORIG_ISO:/input.iso:ro" \
     -v "$PRESEED:/preseed.cfg:ro" \
     -v "$(dirname "$OUTPUT_ISO"):/output" \
@@ -99,9 +101,75 @@ xorriso -osirrox on -indev /input.iso \
     -extract /install.amd/initrd.gz "$WORK/irmod/initrd-orig.gz" 2>&1 | tail -1
 mkdir -p "$WORK/irmod/inject"
 cp /preseed.cfg "$WORK/irmod/inject/preseed.cfg"
+
+# pvese-patch v1: patch var/lib/dpkg/info/cdrom-detect.postinst to prefer
+# /dev/sr1 (iRMC OEM Virtual CDROM) over the empty physical /dev/sr0. Required
+# for TX1320 M3 because list-devices does not return /dev/sr1 as a CD (likely
+# udev removable= filter or SCSI ID quirk), so the main scan loop sees an
+# empty devices list and falls through to the "No installation media" dialog.
+# See report/2026-05-18_080521_tx1320_raid10_cdrom_patch.md (original design)
+# and report/2026-05-22_154033_tx1320_raid10_phase14_install_completed.md
+# (where this block was diagnosed end-to-end on real hardware).
+if [ "${PVESE_PATCH_CDROM_DETECT:-0}" = "1" ]; then
+    echo "--- pvese-patch v1: patching cdrom-detect.postinst (TX1320 /dev/sr1 priority) ---"
+    mkdir -p "$WORK/irmod/orig-extract"
+    (
+        cd "$WORK/irmod/orig-extract"
+        gunzip -c "$WORK/irmod/initrd-orig.gz" \
+            | cpio -idm --quiet var/lib/dpkg/info/cdrom-detect.postinst
+    )
+    if [ ! -f "$WORK/irmod/orig-extract/var/lib/dpkg/info/cdrom-detect.postinst" ]; then
+        echo "ERROR: cdrom-detect.postinst not found in original initrd" >&2
+        exit 1
+    fi
+    cat > "$WORK/irmod/patch.awk" << "AWKEND"
+BEGIN { inserted = 0 }
+/^while true; do$/ && !inserted {
+    print "# pvese-patch v1 - TX1320 /dev/sr1 priority"
+    print "# /dev/sr0 = physical empty DVD drive (always fails to open)"
+    print "# /dev/sr1 = iRMC OEM Virtual CDROM with the installer ISO"
+    print "# Safe no-op when /dev/sr1 does not exist (other hardware)."
+    print "if [ \"$OS\" = \"linux\" ]; then"
+    print "    for count in 1 2 3 4 5; do"
+    print "        [ -b /dev/sr1 ] && break"
+    print "        sleep 1"
+    print "    done"
+    print "    if [ -b /dev/sr1 ] && try_mount /dev/sr1 $CDFS; then"
+    print "        set_suite_and_codename"
+    print "        log \"pvese-patch v1: bypassed list-devices via /dev/sr1 direct mount\""
+    print "        pvese_skip_main_loop=1"
+    print "    fi"
+    print "fi"
+    print $0
+    print "\t[ \"${pvese_skip_main_loop:-0}\" = 1 ] && break  # pvese-patch v1"
+    inserted = 1
+    next
+}
+{ print }
+END {
+    if (!inserted) {
+        print "ERROR: insertion point \"while true; do\" not found" > "/dev/stderr"
+        exit 1
+    }
+}
+AWKEND
+    mkdir -p "$WORK/irmod/inject/var/lib/dpkg/info"
+    awk -f "$WORK/irmod/patch.awk" \
+        "$WORK/irmod/orig-extract/var/lib/dpkg/info/cdrom-detect.postinst" \
+        > "$WORK/irmod/inject/var/lib/dpkg/info/cdrom-detect.postinst"
+    chmod +x "$WORK/irmod/inject/var/lib/dpkg/info/cdrom-detect.postinst"
+    if ! sh -n "$WORK/irmod/inject/var/lib/dpkg/info/cdrom-detect.postinst"; then
+        echo "ERROR: patched cdrom-detect.postinst sh -n failed" >&2
+        exit 1
+    fi
+    PATCHED_LINES=$(wc -l < "$WORK/irmod/inject/var/lib/dpkg/info/cdrom-detect.postinst")
+    PATCHED_SIZE=$(stat -c%s "$WORK/irmod/inject/var/lib/dpkg/info/cdrom-detect.postinst")
+    echo "Patched postinst OK ($PATCHED_LINES lines, $PATCHED_SIZE bytes)"
+fi
+
 (
     cd "$WORK/irmod/inject"
-    echo preseed.cfg | cpio -o -H newc > "$WORK/irmod/extra.cpio"
+    find . -mindepth 1 -print | sed "s|^\./||" | cpio -o -H newc > "$WORK/irmod/extra.cpio"
 ) 2>&1 | tail -2
 gzip -9 -f "$WORK/irmod/extra.cpio"
 cat "$WORK/irmod/initrd-orig.gz" "$WORK/irmod/extra.cpio.gz" > "$WORK/irmod/initrd.gz"
@@ -120,7 +188,7 @@ terminal_output serial console
 search --file --set=root /install.amd/vmlinuz
 
 menuentry "Automated Install" {
-    linux /install.amd/vmlinuz vga=normal nomodeset auto=true priority=critical preseed/file=/preseed.cfg locale=en_US.UTF-8 keymap=us netcfg/choose_interface=auto cdrom-detect/try-usb=true cdrom-detect/scan=true hw-detect/load_media=false console=tty0 console=ttyS${SERIAL_UNIT},115200n8 --- quiet
+    linux /install.amd/vmlinuz auto=true priority=critical preseed/file=/preseed.cfg locale=en_US.UTF-8 keymap=us netcfg/choose_interface=auto cdrom-detect/try-usb=true cdrom-detect/scan=true hw-detect/load_media=false console=ttyS${SERIAL_UNIT},115200n8 earlyprintk=ttyS${SERIAL_UNIT},115200n8 loglevel=8 ignore_loglevel ${EXTRA_CMDLINE} ---
     initrd /install.amd/initrd.gz
 }
 GRUBCFG
@@ -130,11 +198,11 @@ default auto
 label auto
   menu label ^Automated Install
   kernel /install.amd/vmlinuz
-  append vga=normal nomodeset auto=true priority=critical preseed/file=/preseed.cfg locale=en_US.UTF-8 keymap=us netcfg/choose_interface=auto cdrom-detect/try-usb=true cdrom-detect/scan=true hw-detect/load_media=false console=tty0 console=ttyS${SERIAL_UNIT},115200n8 initrd=/install.amd/initrd.gz --- quiet
+  append auto=true priority=critical preseed/file=/preseed.cfg locale=en_US.UTF-8 keymap=us netcfg/choose_interface=auto cdrom-detect/try-usb=true cdrom-detect/scan=true hw-detect/load_media=false console=ttyS${SERIAL_UNIT},115200n8 earlyprintk=ttyS${SERIAL_UNIT},115200n8 loglevel=8 ignore_loglevel ${EXTRA_CMDLINE} initrd=/install.amd/initrd.gz ---
 label install
   menu label ^Install
   kernel /install.amd/vmlinuz
-  append vga=normal nomodeset initrd=/install.amd/initrd.gz --- quiet
+  append initrd=/install.amd/initrd.gz earlyprintk=ttyS${SERIAL_UNIT},115200n8 loglevel=8 ignore_loglevel ---
 TXTCFG
 
 cat > "$WORK/mod/isolinux.cfg" << ISOCFG
@@ -193,7 +261,7 @@ set timeout=3
 search --file --set=root /install.amd/vmlinuz
 
 menuentry "Automated Install" {
-    linux /install.amd/vmlinuz vga=normal nomodeset auto=true priority=critical preseed/file=/preseed.cfg locale=en_US.UTF-8 keymap=us netcfg/choose_interface=auto cdrom-detect/try-usb=true cdrom-detect/scan=true hw-detect/load_media=false console=tty0 console=ttyS${SERIAL_UNIT},115200n8 --- quiet
+    linux /install.amd/vmlinuz auto=true priority=critical preseed/file=/preseed.cfg locale=en_US.UTF-8 keymap=us netcfg/choose_interface=auto cdrom-detect/try-usb=true cdrom-detect/scan=true hw-detect/load_media=false console=ttyS${SERIAL_UNIT},115200n8 earlyprintk=ttyS${SERIAL_UNIT},115200n8 loglevel=8 ignore_loglevel ${EXTRA_CMDLINE} ---
     initrd /install.amd/initrd.gz
 }
 EMBEDCFG
