@@ -92,6 +92,17 @@ STORCLI_DEB_PATH=${STORCLI_DEB_PATH:-/var/samba/public/storcli64.deb}
 STORCLI_BIN_PATH=${STORCLI_BIN_PATH:-/var/samba/public/storcli64.bin}
 SKIP_STORCLI_FETCH=${SKIP_STORCLI_FETCH:-0}
 
+# Phase 17 F8: deploy-careful pad (105s) integrated into deploy().
+# Phase 16 (4a583656) で iRMC FW 9.08F の USB redirector が deploy ごとに
+# state degradation を蓄積することが実証され、 ForceOff → settle 30s →
+# Virtual Media config + mount → USB stabilize 60s → boot-override →
+# pre-power 15s → PowerOn の 105s pad パターンが effective と確定。
+# 既存の sleep 8 (Phase 16 以前) では PSU cold reset 直後でも BIOS Setup
+# 落ちや GRUB-stage triple-fault が頻発した。
+SETTLE_WAIT=${SETTLE_WAIT:-30}
+USB_STABILIZE_WAIT=${USB_STABILIZE_WAIT:-60}
+PRE_POWER_WAIT=${PRE_POWER_WAIT:-15}
+
 export BMC_CURL_OPTS="$BMC_CURL_OPTS_CFG"
 export BMC_PATCH_REQUIRES_ETAG=1
 export POWER_ON_RESET_TYPE=On
@@ -182,35 +193,45 @@ deploy() {
         exit 3
     fi
 
+    echo "[orchestrate] Phase 5a: ForceOff (deploy-careful pad start)"
+    "${SCRIPT_DIR}/bmc-power.sh" forceoff "$BMC_IP" "$BMC_USER" "$BMC_PASS" || true
+
+    echo "[orchestrate] Phase 5a.1: settle iRMC state (${SETTLE_WAIT}s)"
+    sleep "$SETTLE_WAIT"
+
     if [ "$VM_TYPE_CFG" = "nfs" ]; then
         if [ -z "$NFS_HOST" ] || [ -z "$NFS_EXPORT" ]; then
             echo "ERROR: virtual_media_type=nfs requires nfs_host and nfs_export_path in $CONFIG" >&2
             exit 4
         fi
-        echo "[orchestrate] Phase 5a: configure Virtual Media (NFS ${NFS_HOST}:${NFS_EXPORT})"
+        echo "[orchestrate] Phase 5b: configure Virtual Media (NFS ${NFS_HOST}:${NFS_EXPORT})"
         "${SCRIPT_DIR}/irmc-virtualmedia.sh" --share-type=NFS config \
             "$BMC_IP" "$BMC_USER" "$BMC_PASS" \
             "$NFS_HOST" "$NFS_EXPORT" "$OUTPUT_BASENAME"
-        echo "[orchestrate] Phase 5a: ConnectCD (NFS is not AutoAttached)"
+        echo "[orchestrate] Phase 5b: ConnectCD (NFS is not AutoAttached)"
         "${SCRIPT_DIR}/irmc-virtualmedia.sh" connect-cd "$BMC_IP" "$BMC_USER" "$BMC_PASS"
-        echo "[orchestrate] Phase 5a: wait for AllowableValues=DisconnectCD"
+        echo "[orchestrate] Phase 5b: wait for AllowableValues=DisconnectCD"
         "${SCRIPT_DIR}/irmc-virtualmedia.sh" --share-type=NFS mount "$BMC_IP" "$BMC_USER" "$BMC_PASS"
     else
-        echo "[orchestrate] Phase 5a: configure Virtual Media (smb_user=$SMB_USER)"
+        echo "[orchestrate] Phase 5b: configure Virtual Media (smb_user=$SMB_USER)"
         "${SCRIPT_DIR}/irmc-virtualmedia.sh" config "$BMC_IP" "$BMC_USER" "$BMC_PASS" \
             "$SMB_HOST" "$SMB_SHARE_BARE" "$OUTPUT_BASENAME" "$SMB_USER" "$SMB_PASS"
     fi
 
-    echo "[orchestrate] Phase 5b: boot-override Cd UEFI"
+    echo "[orchestrate] Phase 5b.1: USB redirector stabilization (${USB_STABILIZE_WAIT}s)"
+    sleep "$USB_STABILIZE_WAIT"
+
+    echo "[orchestrate] Phase 5c: boot-override Cd UEFI"
     BMC_BOOT_OVERRIDE_NO_DISABLED=1 \
         "${SCRIPT_DIR}/bmc-power.sh" boot-override "$BMC_IP" "$BMC_USER" "$BMC_PASS" Cd UEFI
 
-    echo "[orchestrate] Phase 5c: power cycle (ForceOff + On)"
-    "${SCRIPT_DIR}/bmc-power.sh" forceoff "$BMC_IP" "$BMC_USER" "$BMC_PASS" || true
-    sleep 8
+    echo "[orchestrate] Phase 5c.1: pre-power wait (${PRE_POWER_WAIT}s)"
+    sleep "$PRE_POWER_WAIT"
+
+    echo "[orchestrate] Phase 5d: PowerOn"
     "${SCRIPT_DIR}/bmc-power.sh" on "$BMC_IP" "$BMC_USER" "$BMC_PASS"
 
-    echo "[orchestrate] deploy OK — host is booting from CD UEFI"
+    echo "[orchestrate] deploy OK — host is booting from CD UEFI (pad total ~$((SETTLE_WAIT + USB_STABILIZE_WAIT + PRE_POWER_WAIT))s)"
     echo "[orchestrate] Monitor progress with: $0 monitor $CONFIG"
 }
 
