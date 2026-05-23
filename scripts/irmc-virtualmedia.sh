@@ -189,9 +189,13 @@ cmd_config() {
 }
 
 # POST OEM Action (FTSComputerSystem.VirtualMedia) with the given action token.
+# iRMC S4 FW 9.69F+ renamed the parameter "VirtualMediaAction" to the schema-
+# qualified "FTSVirtualMediaAction" (matches the OEM action namespace prefix
+# also visible in FTSResetType / FTSScreenshotType). FW 9.08F accepted the
+# unprefixed form; 9.69F rejects it with HTTP 400 "ActionParameterMissing".
 irmc_oem_action() {
     bmc_ip="$1"; bmc_user="$2"; bmc_pass="$3"; action="$4"
-    payload=$(printf '{"VirtualMediaAction":"%s"}' "$action")
+    payload=$(printf '{"FTSVirtualMediaAction":"%s"}' "$action")
     echo "POST OEM action payload: $payload"
     curl $IRMC_CURL_OPTS -u "${bmc_user}:${bmc_pass}" \
         -X POST "https://${bmc_ip}${IRMC_OEM_ACTION_PATH}" \
