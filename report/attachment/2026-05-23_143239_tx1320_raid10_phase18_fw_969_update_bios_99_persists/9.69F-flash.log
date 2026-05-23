@@ -1,0 +1,46 @@
+[12:33:29] === flash sequence start ===
+[12:33:29] BMC: 10.254.254.9, BIN: tmp/e828c12b/9.69F-bin/D3373-B1_09.69F_sdr03.18.bin, flashSelect=255
+[12:33:32] FirmwareVersion before: 9.21F
+[12:33:32] --- step 1: upload BIN ---
+[12:33:32] uploading tmp/e828c12b/9.69F-bin/D3373-B1_09.69F_sdr03.18.bin (31457416 bytes) → 10.254.254.9/irmcupdate?flashSelect=255
+[12:34:55] upload rc=0, meta:
+HTTP_STATUS=200
+TIME_TOTAL=83.490901
+[12:34:55] response body head:
+<?xml version="1.0" encoding="UTF-8"?>
+<Status>
+<Value>0</Value>
+<Severity>Information</Severity>
+<Message>No Error</Message>
+</Status>
+
+[12:34:55] upload accepted (HTTP 200)
+[12:34:55] --- step 2: wait for flash progress to idle (timeout 900s) ---
+[12:34:55] polling /irmcprogress every 30s, timeout 900s
+[12:34:58] t=0s: value=8 severity=Information message=FLASH programming in progress 2 Percent
+[12:35:31] t=30s: value=8 severity=Information message=FLASH programming in progress 16 Percent
+[12:36:04] t=60s: value=8 severity=Information message=FLASH programming in progress 32 Percent
+[12:36:37] t=90s: value=8 severity=Information message=FLASH programming in progress 46 Percent
+[12:37:10] t=120s: value=8 severity=Information message=FLASH programming in progress 61 Percent
+[12:37:43] t=150s: value=8 severity=Information message=FLASH programming in progress 75 Percent
+[12:38:16] t=180s: value=8 severity=Information message=FLASH programming in progress 90 Percent
+[12:38:48] t=210s: value=9 severity=Information message=FLASH successful. You may need to reboot
+[12:39:32] t=240s: progress fetch failed (rc=7); may be rebooting
+[12:40:06] t=270s: progress fetch failed (rc=7); may be rebooting
+[12:40:39] t=300s: progress fetch failed (rc=7); may be rebooting
+[12:41:09] t=330s: progress fetch failed (rc=7); may be rebooting
+[12:41:39] t=360s: progress fetch failed (rc=7); may be rebooting
+[12:42:10] t=390s: progress fetch failed (rc=7); may be rebooting
+[12:42:40] t=420s: progress fetch failed (rc=7); may be rebooting
+[12:43:11] t=450s: progress fetch failed (rc=7); may be rebooting
+[12:43:41] t=480s: progress fetch failed (rc=7); may be rebooting
+[12:44:13] t=510s: value=0 severity=Information message=No update in progress.
+[12:44:45] t=540s: value=0 severity=Information message=No update in progress.
+[12:44:45] idle confirmed (2 consecutive samples) at t=540s (saw_drop=1)
+[12:44:45] wait phase rc=0, summary line: WAIT_SAW_DROP=1
+[12:44:45] --- step 3: wait for BMC reboot cycle (timeout 300s, already-rebooted=1) ---
+[12:44:45] BMC reboot already observed by caller — confirming BMC responds with FW version
+[12:44:47] BMC reachable with FirmwareVersion=9.69F
+[12:44:47] --- step 4: post-update version check ---
+[12:44:54] FirmwareVersion after: 9.69F
+[12:44:54] === flash sequence end ===

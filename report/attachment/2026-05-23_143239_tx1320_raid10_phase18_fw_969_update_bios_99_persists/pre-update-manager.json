@@ -1,0 +1,151 @@
+{
+  "@odata.context":"\/redfish\/v1\/$metadata#Managers\/Members\/$entity(Oem,Id,Name,ManagerType,Links,ServiceEntryPointUUID,UUID,Model,DateTime,DateTimeLocalOffset,FirmwareVersion,SerialConsole,CommandShell,GraphicalConsole,Actions,Status,EthernetInterfaces,SerialInterfaces,NetworkProtocol,LogServices,VirtualMedia,Redundancy)",
+  "@odata.id":"\/redfish\/v1\/Managers\/iRMC",
+  "@odata.type":"#Manager.v1_0_4.Manager",
+  "Oem":{
+    "ts_fujitsu":{
+      "@odata.type":"http:\/\/ts.fujitsu.com\/redfish-schemas\/v1\/FTSSchema.v1_0_0#FTSManager.v1_0_0.FTSManager",
+      "iRMCConfiguration":{
+        "@odata.id":"\/redfish\/v1\/Managers\/iRMC\/Oem\/ts_fujitsu\/iRMCConfiguration"
+      }
+    }
+  },
+  "Id":"iRMC",
+  "Name":"Manager",
+  "ManagerType":"BMC",
+  "Links":{
+    "ManagerForServers@odata.count":1,
+    "ManagerForServers@odata.navigationLink":"iRMC\/Links\/ManagerForServers",
+    "ManagerForServers":[
+      {
+        "@odata.id":"\/redfish\/v1\/Systems\/0"
+      }
+    ],
+    "ManagerForChassis@odata.count":1,
+    "ManagerForChassis@odata.navigationLink":"iRMC\/Links\/ManagerForChassis",
+    "ManagerForChassis":[
+      {
+        "@odata.id":"\/redfish\/v1\/Chassis\/0"
+      }
+    ],
+    "Oem":{
+    }
+  },
+  "ServiceEntryPointUUID":"fa9cede6-adcb-4294-9e57-529cc6e62353",
+  "UUID":"fa9cede6-adcb-4294-9e57-529cc6e62353",
+  "Model":"iRMC S4",
+  "DateTime":"2026-05-23T12:18:19+00:00",
+  "DateTimeLocalOffset":"+00:00",
+  "FirmwareVersion":"9.08F",
+  "SerialConsole":{
+    "ServiceEnabled":false,
+    "MaxConcurrentSessions":4,
+    "ConnectTypesSupported":[
+      "SSH"
+    ]
+  },
+  "CommandShell":{
+    "ServiceEnabled":false,
+    "MaxConcurrentSessions":4,
+    "ConnectTypesSupported":[
+      "SSH"
+    ]
+  },
+  "GraphicalConsole":{
+    "ServiceEnabled":true,
+    "MaxConcurrentSessions":4,
+    "ConnectTypesSupported":[
+      "Oem"
+    ]
+  },
+  "Actions":{
+    "Oem":{
+      "http:\/\/ts.fujitsu.com\/redfish-schemas\/v1\/FTSSchema.v1_0_0#FTSManager.FWUpdate":{
+        "target":"\/redfish\/v1\/Managers\/iRMC\/Actions\/Oem\/FTSManager.FWUpdate",
+        "title":"Update iRMC firmware"
+      },
+      "http:\/\/ts.fujitsu.com\/redfish-schemas\/v1\/FTSSchema.v1_0_0#FTSManager.FWTFTPUpdate":{
+        "target":"\/redfish\/v1\/Managers\/iRMC\/Actions\/Oem\/FTSManager.FWTFTPUpdate",
+        "title":"Update iRMC firmware from TFTP server"
+      },
+      "http:\/\/ts.fujitsu.com\/redfish-schemas\/v1\/FTSSchema.v1_0_0#FTSManager.FWTFTPTest":{
+        "target":"\/redfish\/v1\/Managers\/iRMC\/Actions\/Oem\/FTSManager.FWTFTPTest",
+        "title":"Test TFTP server settings and connection"
+      },
+      "http:\/\/ts.fujitsu.com\/redfish-schemas\/v1\/FTSSchema.v1_0_0#FTSManager.AddLicense":{
+        "target":"\/redfish\/v1\/Managers\/iRMC\/Actions\/Oem\/FTSManager.AddLicense",
+        "title":"Add feature license to iRMC firmware"
+      },
+      "http:\/\/ts.fujitsu.com\/redfish-schemas\/v1\/FTSSchema.v1_0_0#FTSManager.VirtualMediaServiceRestart":{
+        "target":"\/redfish\/v1\/Managers\/iRMC\/Actions\/Oem\/FTSManager.VirtualMediaServiceRestart",
+        "title":"Restart Virtual Media Service",
+        "VirtualMediaType@Redfish.AllowableValues":[
+        ]
+      },
+      "http:\/\/ts.fujitsu.com\/redfish-schemas\/v1\/FTSSchema.v1_0_0#FTSManager.GetPowerHistory":{
+        "target":"\/redfish\/v1\/Managers\/iRMC\/Actions\/Oem\/FTSManager.GetPowerHistory",
+        "title":"Get power consumption history"
+      },
+      "http:\/\/ts.fujitsu.com\/redfish-schemas\/v1\/FTSSchema.v1_0_0#FTSManager.GetCpuHistory":{
+        "target":"\/redfish\/v1\/Managers\/iRMC\/Actions\/Oem\/FTSManager.GetCpuHistory",
+        "title":"Get CPU utilization history"
+      },
+      "http:\/\/ts.fujitsu.com\/redfish-schemas\/v1\/FTSSchema.v1_0_0#FTSManager.DeletePowerHistory":{
+        "target":"\/redfish\/v1\/Managers\/iRMC\/Actions\/Oem\/FTSManager.DeletePowerHistory",
+        "title":"Delete power consumption history"
+      },
+      "http:\/\/ts.fujitsu.com\/redfish-schemas\/v1\/FTSSchema.v1_0_0#FTSManager.DeleteCpuHistory":{
+        "target":"\/redfish\/v1\/Managers\/iRMC\/Actions\/Oem\/FTSManager.DeleteCpuHistory",
+        "title":"Delete CPU utilization history"
+      },
+      "http:\/\/ts.fujitsu.com\/redfish-schemas\/v1\/FTSSchema.v1_0_0#FTSManager.UpdateTimeFromNTP":{
+        "target":"\/redfish\/v1\/Managers\/iRMC\/Actions\/Oem\/FTSManager.UpdateTimeFromNTP",
+        "title":"Update iRMC time from NTP server (if enabled and configured)"
+      },
+      "http:\/\/ts.fujitsu.com\/redfish-schemas\/v1\/FTSSchema.v1_0_0#FTSManager.SaveFullConfiguration":{
+        "target":"\/redfish\/v1\/Managers\/iRMC\/Actions\/Oem\/FTSManager.SaveFullConfiguration",
+        "title":"Save all iRMC firmware settings in ServerView(R) WinSCU XML format"
+      },
+      "http:\/\/ts.fujitsu.com\/redfish-schemas\/v1\/FTSSchema.v1_0_0#FTSManager.SaveCustomConfiguration":{
+        "target":"\/redfish\/v1\/Managers\/iRMC\/Actions\/Oem\/FTSManager.SaveCustomConfiguration",
+        "title":"Save chosen iRMC firmware settings in ServerView(R) WinSCU XML format"
+      },
+      "http:\/\/ts.fujitsu.com\/redfish-schemas\/v1\/FTSSchema.v1_0_0#FTSManager.ImportConfiguration":{
+        "target":"\/redfish\/v1\/Managers\/iRMC\/Actions\/Oem\/FTSManager.ImportConfiguration",
+        "title":"Import iRMC firmware settings from file in ServerView(R) WinSCU XML format"
+      }
+    },
+    "#Manager.Reset":{
+      "title":"Reset iRMC",
+      "target":"\/redfish\/v1\/Managers\/iRMC\/Actions\/Manager.Reset"
+    }
+  },
+  "Status":{
+    "State":"Enabled",
+    "HealthRollup":"OK",
+    "Health":"OK",
+    "Oem":{
+    }
+  },
+  "EthernetInterfaces":{
+    "@odata.id":"\/redfish\/v1\/Managers\/iRMC\/EthernetInterfaces"
+  },
+  "SerialInterfaces":{
+    "@odata.id":"\/redfish\/v1\/Managers\/iRMC\/SerialInterfaces"
+  },
+  "NetworkProtocol":{
+    "@odata.id":"\/redfish\/v1\/Managers\/iRMC\/ManagerNetwork"
+  },
+  "LogServices":{
+    "@odata.id":"\/redfish\/v1\/Managers\/iRMC\/LogServices"
+  },
+  "VirtualMedia":{
+    "@odata.id":"\/redfish\/v1\/Managers\/iRMC\/VirtualMedia"
+  },
+  "Redundancy@odata.count":0,
+  "Redundancy@odata.navigationLink":"iRMC\/Redundancy",
+  "Redundancy":[
+  ],
+  "@Redfish.Copyright":"Copyright 2014-2017 Distributed Management Task Force, Inc. (DMTF). For the full DMTF copyright policy, see http:\/\/www.dmtf.org\/about\/policies\/copyright.",
+  "@odata.etag":"1779538699"
+}

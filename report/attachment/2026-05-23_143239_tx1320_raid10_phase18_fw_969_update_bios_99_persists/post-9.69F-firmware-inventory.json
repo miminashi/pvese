@@ -1,0 +1,34 @@
+{
+  "@odata.id":"\/redfish\/v1\/Systems\/0\/Oem\/ts_fujitsu\/FirmwareInventory",
+  "@odata.type":"#FTSFirmwareInventory.v1_0_2.FTSFirmwareInventory",
+  "SystemBIOS":"V5.0.0.11 R1.22.0 for D3373-B1x",
+  "BMCFirmware":"9.69F",
+  "BMCBaseFirmware":"9.69.F",
+  "BMCFirmwareBuildDate":"2022-08-24T16:42:01",
+  "BMCFirmwareRunning":"LowFWImage",
+  "SDRRVersion":"3.18",
+  "SDRRId":"0458 TX1320M3",
+  "NIC":{
+    "@odata.id":"\/redfish\/v1\/Systems\/0\/Oem\/ts_fujitsu\/FirmwareInventory\/NIC"
+  },
+  "iSCSI":{
+    "@odata.id":"\/redfish\/v1\/Systems\/0\/Oem\/ts_fujitsu\/FirmwareInventory\/iSCSI"
+  },
+  "RoCE":{
+    "@odata.id":"\/redfish\/v1\/Systems\/0\/Oem\/ts_fujitsu\/FirmwareInventory\/RoCE"
+  },
+  "FC":{
+    "@odata.id":"\/redfish\/v1\/Systems\/0\/Oem\/ts_fujitsu\/FirmwareInventory\/FC"
+  },
+  "FCoE":{
+    "@odata.id":"\/redfish\/v1\/Systems\/0\/Oem\/ts_fujitsu\/FirmwareInventory\/FCoE"
+  },
+  "IB":{
+    "@odata.id":"\/redfish\/v1\/Systems\/0\/Oem\/ts_fujitsu\/FirmwareInventory\/IB"
+  },
+  "Storage":{
+    "@odata.id":"\/redfish\/v1\/Systems\/0\/Oem\/ts_fujitsu\/FirmwareInventory\/Storage"
+  },
+  "@Redfish.Copyright":"Copyright 2017-2019 FUJITSU LIMITED",
+  "@odata.etag":"1779541010"
+}

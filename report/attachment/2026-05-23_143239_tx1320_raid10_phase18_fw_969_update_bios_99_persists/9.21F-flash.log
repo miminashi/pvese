@@ -1,0 +1,33 @@
+[12:23:10] === flash sequence start ===
+[12:23:10] BMC: 10.254.254.9, BIN: tmp/e828c12b/9.21F-bin/D3373-B1_09.21F_sdr03.17.bin, flashSelect=255
+[12:23:12] FirmwareVersion before: 9.08F
+[12:23:12] --- step 1: upload BIN ---
+[12:23:12] uploading tmp/e828c12b/9.21F-bin/D3373-B1_09.21F_sdr03.17.bin (31457408 bytes) → 10.254.254.9/irmcupdate?flashSelect=255
+[12:24:34] upload rc=0, meta:
+HTTP_STATUS=200
+TIME_TOTAL=81.252198
+[12:24:34] response body head:
+<?xml version="1.0" encoding="UTF-8"?>
+<Status>
+<Value>0</Value>
+<Severity>Information</Severity>
+<Message>No Error</Message>
+</Status>
+
+[12:24:34] upload accepted (HTTP 200)
+[12:24:34] --- step 2: wait for flash progress to idle (timeout 1500s) ---
+[12:24:34] polling /irmcprogress every 30s, timeout 1500s
+[12:24:36] t=0s: value=8 severity=Information message=FLASH programming in progress 2 Percent
+[12:25:09] t=30s: value=8 severity=Information message=FLASH programming in progress 16 Percent
+[12:25:42] t=60s: value=8 severity=Information message=FLASH programming in progress 30 Percent
+[12:26:14] t=90s: value=8 severity=Information message=FLASH programming in progress 43 Percent
+[12:26:48] t=120s: value=8 severity=Information message=FLASH programming in progress 57 Percent
+[12:27:22] t=150s: value=8 severity=Information message=FLASH programming in progress 73 Percent
+[12:27:55] t=180s: value=8 severity=Information message=FLASH programming in progress 87 Percent
+[12:28:28] t=210s: value=8 severity=Information message=FLASH programming in progress 100 Percent
+[12:29:13] t=240s: progress fetch failed (rc=28); may be rebooting
+[12:29:46] t=270s: progress fetch failed (rc=7); may be rebooting
+[12:30:16] t=300s: progress fetch failed (rc=7); may be rebooting
+[12:30:47] t=330s: progress fetch failed (rc=7); may be rebooting
+[12:31:20] t=360s: progress fetch failed (rc=7); may be rebooting
+[12:31:55] t=390s: value=0 severity=Information message=No update in progress.
