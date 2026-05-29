@@ -817,12 +817,12 @@ issues:
     description: ""
   - id: 72
     title: 'TX1320 M3 Phase 14: OS install 完遂 (Phase 13 引き継ぎ 4 課題解決)'
-    status: blocked
-    owner: "phase18-e828c12b"
+    status: done
+    owner: "phase19a"
     created: "2026-05-22T06:31:58Z"
-    updated: "2026-05-23T05:36:29Z"
-    blocked_by: "Phase 18 FW 9.08F→9.69F update 完遂したが BIOS POST 99 stuck 再現。 Phase 19 で F2 PXE pivot 着手予定"
-    report: ""
+    updated: "2026-05-29T20:12:41Z"
+    blocked_by: ""
+    report: "report/2026-05-30_050830_tx1320_raid10_phase19_pxe_autonomous_ssh.md"
     labels:
       - infra
     description: Phase 13 で console=tty0 削除で kernel boot 成功、 d-i installer 起動まで確認。 Phase 14 では 4 課題 (a) orchestrate build playground 同期、 (b) storcli64 binary 直接 inject + dpkg 経路廃止、 (c) console=tty0 を installed system からも削除、 (d) static_ip を conflict-free な 10.254.254.250 に変更、 を実装して preseed 完走 + RAID10 install + SSH login までの完遂を目指す
