@@ -124,6 +124,23 @@ Host pve15 10.10.10.215
   IdentityFile /home/ubuntu/projects/pvese/ssh/id_ed25519
   IdentitiesOnly yes
 
+# --- Playground (claude-playground 10.1.6.6, training-tx1320 用 NFS server) ---
+Host playground 10.1.6.6
+  HostName 10.1.6.6
+  User ubuntu
+  IdentityFile /home/ubuntu/projects/pvese/ssh/id_ed25519
+  IdentitiesOnly yes
+
+# --- training-tx1320 (Phase 19 PXE install 完遂、 Debian 13 + RAID10) ---
+# eno2 が dark-net (10.0.0.0/8) 側で DHCP 取得した IP。 DHCP のため再起動で変動しうる
+# (変動時は playground / local の `ip neigh | grep 4c:52:62:14:de:f0` で再特定)。
+# eno1 は 192.168.33.11 (site LAN、 OpenWrt NAT 背後で local からは不達)。
+Host training-tx1320
+  HostName 10.254.254.4
+  User root
+  IdentityFile /home/ubuntu/projects/pvese/ssh/id_ed25519
+  IdentitiesOnly yes
+
 # --- 全ホスト共通 ---
 Host *
   ConnectTimeout 10

@@ -6,12 +6,38 @@ PROJECT_DIR=$(cd "$SCRIPT_DIR/.." && pwd)
 YQ="${PROJECT_DIR}/bin/yq"
 
 usage() {
-    echo "Usage: generate-preseed.sh <config.yml> [output_file]"
+    echo "Usage: generate-preseed.sh [--with-raid10-storcli] [--pxe[=BASE_URL]] <config.yml> [output_file]"
     echo ""
     echo "Generate preseed.cfg from template using config values."
     echo "If output_file is omitted, writes to stdout."
+    echo ""
+    echo "Options:"
+    echo "  --with-raid10-storcli  Insert partman/early_command to run"
+    echo "                         /cdrom/setup-raid10-storcli.sh before partitioning."
+    echo "                         Requires the ISO to bundle setup-raid10-storcli.sh"
+    echo "                         and storcli64.deb (see scripts/remaster-debian-iso.sh)."
+    echo "  --pxe[=BASE_URL]       Generate preseed for PXE/netboot delivery."
+    echo "                         RAID10 storcli is fetched over HTTP from BASE_URL/firmware/"
+    echo "                         instead of /cdrom/. BASE_URL defaults to http://10.1.6.6."
+    echo "                         Implies --with-raid10-storcli (HTTP variant)."
     exit 1
 }
+
+WITH_RAID10_STORCLI=0
+PXE_MODE=0
+PXE_BASE_URL="http://10.1.6.6"
+POSITIONAL=""
+for arg in "$@"; do
+    case "$arg" in
+        --with-raid10-storcli) WITH_RAID10_STORCLI=1 ;;
+        --pxe) PXE_MODE=1; WITH_RAID10_STORCLI=1 ;;
+        --pxe=*) PXE_MODE=1; WITH_RAID10_STORCLI=1; PXE_BASE_URL="${arg#--pxe=}" ;;
+        -h|--help) usage ;;
+        *) POSITIONAL="${POSITIONAL:+$POSITIONAL }$arg" ;;
+    esac
+done
+# shellcheck disable=SC2086
+set -- $POSITIONAL
 
 if [ $# -lt 1 ]; then
     usage
@@ -45,6 +71,16 @@ user_password=$("$YQ" '.user_password' "$CONFIG")
 static_ip=$("$YQ" '.static_ip' "$CONFIG")
 static_netmask=$("$YQ" '.static_netmask' "$CONFIG")
 static_iface=$("$YQ" '.static_iface' "$CONFIG")
+# network_mode: "static" (default) writes a fixed address onto static_iface;
+# "dhcp" leaves static_iface on DHCP so the installed host obtains a routable
+# lease on whichever segment its LAN port is wired to. Used by hosts on
+# NAT'd/multi-segment LANs (e.g. training-tx1320) where a hard-coded address
+# would land on the wrong physical segment and be unreachable.
+network_mode=$("$YQ" '.network_mode' "$CONFIG")
+[ "$network_mode" = "null" ] || [ -z "$network_mode" ] && network_mode="static"
+# Optional second NIC to bring up via DHCP (allow-hotplug) in dhcp mode.
+dhcp_secondary_iface=$("$YQ" '.dhcp_secondary_iface' "$CONFIG")
+[ "$dhcp_secondary_iface" = "null" ] && dhcp_secondary_iface=""
 
 # Optional explicit gateway (defaults to the standard 10.0.0.0/8 GW). Used
 # only by the netcfg static-IP fallback prompt; the actual gateway routing
@@ -68,7 +104,49 @@ internal_vlan_id=$("$YQ" '.internal_vlan_id' "$CONFIG")
 [ "$internet_vlan_id" = "null" ] && internet_vlan_id=""
 [ "$internal_vlan_id" = "null" ] && internal_vlan_id=""
 
-console_order="console=tty0 console=ttyS1,115200n8"
+# Serial console unit: defaults to 1 (ttyS1) for backwards compatibility with
+# Supermicro X11DPU / X10DRT-P. Override via config `serial_unit:` for iDRAC
+# (typically 0 / ttyS0) and Fujitsu iRMC (0 / ttyS0 on TX1320 M3).
+serial_unit=$("$YQ" '.serial_unit' "$CONFIG")
+[ "$serial_unit" = "null" ] || [ -z "$serial_unit" ] && serial_unit=1
+console_order="console=ttyS${serial_unit},115200n8"
+
+if [ "$PXE_MODE" = "1" ]; then
+    # PXE/HTTP variant: fetch storcli binary + setup script from HTTP and
+    # invoke. d-i busybox initramfs has wget (HTTP only, no HTTPS — no
+    # ca-certificates).
+    partman_early_command="d-i partman/early_command string \\
+  echo \"pvese: partman/early_command start (PXE HTTP fetch)\" > /dev/kmsg 2>/dev/null || true; \\
+  wget -q -O /tmp/storcli64.bin ${PXE_BASE_URL}/firmware/storcli64.bin; \\
+  WR=\$?; \\
+  echo \"pvese: wget storcli64.bin rc=\$WR\" > /dev/kmsg 2>/dev/null || true; \\
+  wget -q -O /tmp/setup-raid10-storcli.sh ${PXE_BASE_URL}/firmware/setup-raid10-storcli.sh; \\
+  WR=\$?; \\
+  echo \"pvese: wget setup-raid10-storcli.sh rc=\$WR\" > /dev/kmsg 2>/dev/null || true; \\
+  chmod +x /tmp/setup-raid10-storcli.sh; \\
+  sh /tmp/setup-raid10-storcli.sh /tmp/storcli64.bin > /tmp/raid10-stdout.log 2> /tmp/raid10-stderr.log; \\
+  RC=\$?; \\
+  echo \"pvese: partman/early_command end (rc=\$RC)\" > /dev/kmsg 2>/dev/null || true; \\
+  head -5 /tmp/raid10-stderr.log 2>/dev/null | tr '\\n' '|' > /dev/kmsg; \\
+  head -5 /tmp/raid10-stdout.log 2>/dev/null | tr '\\n' '|' > /dev/kmsg"
+elif [ "$WITH_RAID10_STORCLI" = "1" ]; then
+    partman_early_command="d-i partman/early_command string \\
+  echo \"pvese: partman/early_command start\" > /dev/kmsg 2>/dev/null || true; \\
+  for p in /cdrom /media/cdrom /media/cdrom0 /hd-media; do \\
+    if [ -f \"\$p/setup-raid10-storcli.sh\" ]; then \\
+      echo \"pvese: found setup-raid10-storcli.sh at \$p\" > /dev/kmsg 2>/dev/null || true; \\
+      echo \"pvese: test sh \$( which sh ) -- date= \$( which date ) -- tee= \$( which tee )\" > /dev/kmsg 2>/dev/null || true; \\
+      sh \"\$p/setup-raid10-storcli.sh\" \"\$p/storcli64.bin\" > /tmp/raid10-stdout.log 2> /tmp/raid10-stderr.log; \\
+      RC=\$?; \\
+      echo \"pvese: partman/early_command end (rc=\$RC)\" > /dev/kmsg 2>/dev/null || true; \\
+      head -5 /tmp/raid10-stderr.log 2>/dev/null | tr '\\n' '|' > /dev/kmsg; \\
+      head -5 /tmp/raid10-stdout.log 2>/dev/null | tr '\\n' '|' > /dev/kmsg; \\
+      break; \\
+    fi; \\
+  done"
+else
+    partman_early_command=""
+fi
 
 SSH_PUBKEY_FILE="${PROJECT_DIR}/ssh/id_ed25519.pub"
 if [ -f "$SSH_PUBKEY_FILE" ]; then
@@ -149,7 +227,30 @@ else
     # whole interfaces file with: lo + DHCP block for the auto-picked NIC +
     # static block for $static_iface. pre-pve-setup.sh / pve-setup-remote.sh
     # convert these into vmbr0 / vmbr1 bridges at first boot.
-    late_network="echo 'source /etc/network/interfaces.d/*' > ${NWFILE}; \
+    if [ "$network_mode" = "dhcp" ]; then
+        late_network="echo 'source /etc/network/interfaces.d/*' > ${NWFILE}; \
+echo '' >> ${NWFILE}; \
+echo 'auto lo' >> ${NWFILE}; \
+echo 'iface lo inet loopback' >> ${NWFILE}; \
+echo '' >> ${NWFILE}; \
+echo 'auto ${static_iface}' >> ${NWFILE}; \
+echo 'iface ${static_iface} inet dhcp' >> ${NWFILE};"
+        if [ -n "$dhcp_secondary_iface" ]; then
+            # allow-hotplug (non-blocking): if this port has no carrier, boot is
+            # not delayed; if it has a lease (e.g. dark-net), it comes up too.
+            late_network="${late_network} \
+echo '' >> ${NWFILE}; \
+echo 'allow-hotplug ${dhcp_secondary_iface}' >> ${NWFILE}; \
+echo 'iface ${dhcp_secondary_iface} inet dhcp' >> ${NWFILE};"
+        fi
+        if [ "$PXE_MODE" = "1" ]; then
+            # First-boot phone-home: report obtained IPs to the playground HTTP
+            # server so the remote operator can discover the reachable lease.
+            late_network="${late_network} \
+in-target sh -c 'wget -q -O /tmp/phonehome-setup.sh ${PXE_BASE_URL}/firmware/phonehome-setup.sh && sh /tmp/phonehome-setup.sh' || true;"
+        fi
+    else
+        late_network="echo 'source /etc/network/interfaces.d/*' > ${NWFILE}; \
 echo '' >> ${NWFILE}; \
 echo 'auto lo' >> ${NWFILE}; \
 echo 'iface lo inet loopback' >> ${NWFILE}; \
@@ -157,6 +258,7 @@ echo '' >> ${NWFILE}; \
 echo 'auto ${static_iface}' >> ${NWFILE}; \
 echo 'iface ${static_iface} inet static' >> ${NWFILE}; \
 echo '    address ${static_ip}/${static_netmask}' >> ${NWFILE};"
+    fi
 fi
 
 # Pass values via ENVIRON[] so awk does NOT interpret backslash escapes
@@ -179,6 +281,7 @@ result=$(
     PV_TASKSEL_FIRST="$tasksel_first" \
     PV_PKGSEL_INCLUDE="$pkgsel_include" \
     PV_PKGSEL_UPGRADE="$pkgsel_upgrade" \
+    PV_PARTMAN_EARLY_COMMAND="$partman_early_command" \
     awk '
 # All replacement values are pure ASCII text (no backslashes), so escape is
 # only needed for awk gsub replacement metacharacters & and \.
@@ -209,6 +312,7 @@ function esc(s) {
     gsub(/%%TASKSEL_FIRST%%/,            esc(ENVIRON["PV_TASKSEL_FIRST"]));
     gsub(/%%PKGSEL_INCLUDE%%/,           esc(ENVIRON["PV_PKGSEL_INCLUDE"]));
     gsub(/%%PKGSEL_UPGRADE%%/,           esc(ENVIRON["PV_PKGSEL_UPGRADE"]));
+    gsub(/%%PARTMAN_EARLY_COMMAND%%/,    esc(ENVIRON["PV_PARTMAN_EARLY_COMMAND"]));
     print;
 }' "$TEMPLATE")
 

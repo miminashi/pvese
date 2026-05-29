@@ -13,8 +13,23 @@ domain: local
 # - 192.168.33.0/24 (DHCP, インターネット可) — DHCP server present but d-i did not get lease
 # - 10.254.254.0/24 (10.0.0.0/8 内サブネット, 管理用) — used for install-time static IP
 # 実 NIC 名は SOL log で igb 0000:03:00.0 (eth0) と 0000:04:00.0 (eth1) を確認済
-network_mode: static
-static_iface: eth0
+# Phase 19 (2026-05-29): training-tx1320 sits behind an OpenWrt NAT at a remote
+# site. Its LAN port draws DHCP from either 192.168.33.0/24 (site LAN, has
+# gateway) or the 10.0.0.0/8 wide-area "dark net" (no gateway). A hard-coded
+# static address (10.254.254.250) landed on the wrong physical segment and was
+# unreachable from everywhere, so the installed host uses DHCP to obtain a
+# routable lease on whichever segment its port is actually wired to.
+network_mode: dhcp
+# kernel/systemd predictable naming renames the onboard Intel I210 from eth0 to
+# eno1 (PCIe 0000:03:00.0). The installed-system network config must target
+# eno1, not eth0, or /etc/network/interfaces references a non-existent device.
+static_iface: eno1
+# Second onboard NIC (Intel I210, PCIe 0000:04:00.0). Brought up via DHCP
+# (allow-hotplug, non-blocking) in dhcp mode so that whichever port is wired to
+# the 10.0.0.0/8 dark-net obtains a lease reachable from the claude host. eno1
+# was observed on 192.168.33.x (site LAN, behind OpenWrt NAT, unreachable
+# remotely); eno2 is the dark-net candidate.
+dhcp_secondary_iface: eno2
 # Phase 14 (2026-05-22 linear-mountain): Phase 13 で使った 10.254.254.99 は
 # pvese ローカルマシン (ens19) と ARP 衝突するため SSH 到達不能だった。
 # 同 /24 内で conflict-free な 10.254.254.250 に変更 (gateway は変更不要)。
@@ -49,6 +64,10 @@ bios_settings:
     LaunchVideoOpRomPolicy: "UEFI only"     # Video OpROM を UEFI に
     SerialPort1: "Enabled"                  # SOL 用 (現状 Enabled、確認のみ)
     Csm: "Disabled"                          # CSM を Disabled (UEFI mode)
+    # Phase 19 (2026-05-29): PXE pivot に必須。NetworkStack=Disabled だと UEFI
+    # PXE boot option が生成されず boot-override Pxe が BIOS Setup に落ちる。
+    NetworkStack: "Enabled"                  # UEFI Network Stack を有効化 (UEFI PXE の前提)
+    IPv4PxeSupport: "Enabled"                # IPv4 PXE boot option を生成 (NetworkStack 依存)
 
 # BMC (Fujitsu iRMC S4)
 bmc_type: irmc
