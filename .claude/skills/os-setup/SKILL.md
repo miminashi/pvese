@@ -13,6 +13,7 @@ Debian + Proxmox VE のインストールを BMC VirtualMedia 経由で自動実
 1. 設定ファイルを引数で指定する（例: `config/server4.yml`, `config/server5.yml`）
    - 新規サーバの場合は `config/os-setup.example.yml` をコピーして `config/server<N>.yml` として編集
 2. 技術詳細は `reference.md` を参照
+3. **TX1320 M3 (Fujitsu) で HW RAID10 が必要な場合**: 通常の os-setup を始める前に `irmc-bios-raid` skill の `raid create-r10` 経路 (`scripts/tx1320-raid10-orchestrate.sh apply config/training_tx1320.yml`) で RAID10 VD を作成しておく。 RAID 作成 + Debian install を 1 ISO で完結する設計なので、 os-setup スキルとは独立して実行可能 (現状 iRMC SMB attach が blocker、 詳細→ irmc-bios-raid SKILL.md)
 
 ## スクリプト一覧
 
@@ -37,16 +38,18 @@ Debian + Proxmox VE のインストールを BMC VirtualMedia 経由で自動実
 
 config の `bmc_type` フィールドでプラットフォームを判別する。
 
-| 操作 | Supermicro (`bmc_type: supermicro`) | iDRAC (`bmc_type: idrac`) |
-|------|-------------------------------------|---------------------------|
-| VirtualMedia マウント | `bmc-session.sh` + `bmc-virtualmedia.sh` | `idrac-virtualmedia.sh mount` |
-| VirtualMedia アンマウント | `bmc-virtualmedia.sh umount` | `idrac-virtualmedia.sh umount` |
-| Boot 設定 | `bmc-power.sh boot-next` (UefiBootNext) | `idrac-virtualmedia.sh boot-once` (racadm legacy) |
-| Boot リセット | `bmc-power.sh boot-override-reset` | `idrac-virtualmedia.sh boot-reset` |
-| POST code 監視 | `bmc-power.sh postcode` | N/A (SOL / VNC で代替) |
-| KVM スクリーンショット | `bmc-kvm.sh screenshot` | `idrac-kvm-screenshot.py` (VNC primary + capconsole fallback) |
-| SOL serial unit | ttyS1 (COM2, `serial_unit: 1`) | ttyS0 (COM1, `serial_unit: 0`) |
-| pre-pve-setup | 不要 (内部 mgmt + 外部 DHCP は legacy bridge で同居) | 必要 (`pre-pve-setup.sh`) |
+| 操作 | Supermicro (`bmc_type: supermicro`) | iDRAC (`bmc_type: idrac`) | iRMC S4 (`bmc_type: irmc`、 training-tx1320) |
+|------|-------------------------------------|---------------------------|-------|
+| VirtualMedia マウント | `bmc-session.sh` + `bmc-virtualmedia.sh` | `idrac-virtualmedia.sh mount` | `irmc-virtualmedia.sh --share-type=NFS config + connect-cd + mount` |
+| VirtualMedia アンマウント | `bmc-virtualmedia.sh umount` | `idrac-virtualmedia.sh umount` | `irmc-virtualmedia.sh disconnect-cd` |
+| Boot 設定 | `bmc-power.sh boot-next` (UefiBootNext) | `idrac-virtualmedia.sh boot-once` (racadm legacy) | `bmc-power.sh boot-override Cd UEFI` (BMC_BOOT_OVERRIDE_NO_DISABLED=1) |
+| Boot リセット | `bmc-power.sh boot-override-reset` | `idrac-virtualmedia.sh boot-reset` | (Once 消費で自動 reset) |
+| POST code 監視 | `bmc-power.sh postcode` | N/A (SOL / VNC で代替) | N/A (SOL + KVM locator screenshot) |
+| KVM スクリーンショット | `bmc-kvm.sh screenshot` | `idrac-kvm-screenshot.py` (VNC primary + capconsole fallback) | **`scripts/irmc-kvm-interact.py screenshot --capture-mode=locator`** (legacy canvas mode は WebGL 黒画 artifact のため禁止) |
+| SOL serial unit | ttyS1 (COM2, `serial_unit: 1`) | ttyS0 (COM1, `serial_unit: 0`) | ttyS0 (`serial_unit: 0`) |
+| pre-pve-setup | 不要 (内部 mgmt + 外部 DHCP は legacy bridge で同居) | 必要 (`pre-pve-setup.sh`) | Phase 19 で完遂 (PXE pivot、 → `.claude/skills/pxe-deploy/`) |
+
+> 🎯 **iRMC S4 (TX1320) KVM screenshot の落とし穴**: legacy `scripts/irmc-kvm-screenshot.py` (canvas mode 固定) は WebGL `preserveDrawingBuffer:false` で黒画 artifact (全 PNG 11857 B 完全同 sha256) を出す。 2026-05-22 Phase 3 で「VGA 全黒」誤判定を起こした (Phase 4 で訂正)。 必ず `scripts/irmc-kvm-interact.py screenshot --capture-mode=locator` (default mode) を使うこと。 detail → `.claude/skills/irmc-bios-raid/SKILL.md` の Playwright KVM 解決セクション参照。
 
 > **VLAN trunk 環境** (10号機の例、別拠点): host LAN が 1本の VLAN trunk
 > (内部 mgmt + 外部 DHCP がタグ付き) で来る場合、`config/serverN.yml` に

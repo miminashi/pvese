@@ -605,7 +605,7 @@ s-snuggly-goblet で構築済 (`nfs-kernel-server` + `rpcbind`):
 | ConnectCD HTTP 204 だが AllowableValues 未遷移 | `/redfish/v1/Systems/0` を見ているか確認 (OEM VM endpoint には AllowableValues は無い)。 NFS server 側で `sudo tcpdump -i ens19 -nn 'host 10.254.254.9 and port 2049'` で packet 到達確認。 0 packet なら L2/route、 packet あって stuck なら export 権限 |
 | ConnectCD だけで Web UI 上は接続表示なし | 正常。 host が PowerState=Off の間は DMTF `/Managers/iRMC/VirtualMedia` の Members.count は 0 のまま。 host boot 時に USB redirector が device を expose する |
 | NFS export 範囲外 (10.0.0.0/8 以外から) | training-tx1320 (10.254.254.9) は 10.0.0.0/8 内。 別 server を使う場合は export 範囲を調整 |
-| **🚨 GRUB→kernel jump 後 SOL/VGA 完全沈黙 (2026-05-21 Phase 2 → 2026-05-22 Phase 3 で未解決)** | NFS attach + GRUB boot は正常で `Booting Automated Install` まで届く。 ところが直後の kernel printk が 0 行、 KVM VGA も完全黒で host 凍結。 Phase 3 で **`quiet` 除去でも `earlyprintk=ttyS0,115200n8,keep` 追加でも効かず**、 さらに NFS pcap で host からの READ packet が一切無いことを確認 (kernel が CD-ROM device を access していない = USB CD-ROM enumeration 以前で hang/panic)。 真因は kernel cmdline option では治らない。 次セッションは BIOS XML backup (`bios backup`) で Console Redirection / Secure Boot / Boot Mode を 2026-05-18 SMB session #6 当時と比較 + `git log --since=2026-05-15 -- scripts/remaster-debian-iso.sh` で cmdline diff 確認、 USB stick 等で NFS Virtual Media を bypass した切り分けが必要。 詳細 → `report/2026-05-22_004000_tx1320_raid10_kernel_silent_persist.md` + memory `training_tx1320_kernel_silent_post_grub.md` |
+| **✅ GRUB→kernel jump 後 SOL/VGA 完全沈黙 (2026-05-22 Phase 13 silly-rocket で真因確定・解消、 詳細は本 skill 末尾の Phase 13-19 セクション)** | NFS attach + GRUB boot は正常で `Booting Automated Install` まで届く。 ところが直後の kernel printk が 0 行、 KVM VGA も完全黒で host 凍結。 Phase 3 で **`quiet` 除去でも `earlyprintk=ttyS0,115200n8,keep` 追加でも効かず**、 さらに NFS pcap で host からの READ packet が一切無いことを確認 (kernel が CD-ROM device を access していない = USB CD-ROM enumeration 以前で hang/panic)。 真因は kernel cmdline option では治らない。 次セッションは BIOS XML backup (`bios backup`) で Console Redirection / Secure Boot / Boot Mode を 2026-05-18 SMB session #6 当時と比較 + `git log --since=2026-05-15 -- scripts/remaster-debian-iso.sh` で cmdline diff 確認、 USB stick 等で NFS Virtual Media を bypass した切り分けが必要。 詳細 → `report/2026-05-22_004000_tx1320_raid10_kernel_silent_persist.md` + memory `training_tx1320_kernel_silent_post_grub.md` |
 
 ### SMB フォールバック (緊急時のみ)
 
@@ -629,3 +629,56 @@ s-snuggly-goblet で構築済 (`nfs-kernel-server` + `rpcbind`):
 - ❌ **iRMC が SMB 経由で CDImage を実際に attach しない** — `/Managers/iRMC/VirtualMedia/Members` 0 のまま、 Samba 側にも接続痕跡なし、 ConnectCD OEM action 発行も無効
 - ❌ BIOS は boot-override Cd UEFI を消費したが、 attach されていない CD は boot 不可 → BIOS Setup に fallback
 - 次セッションへ: 上記フォールバック表の (b)〜(d) のいずれかで配信経路を解決すれば、 残りのワークフローは即実行可能
+
+---
+
+## Phase 13-19 で確定・解消した課題 + PXE 経路への pivot
+
+### 🎯 Phase 13 (2026-05-22 silly-rocket): kernel silent hang の真因 = `console=tty0`
+
+D3373 では cmdline に **`console=tty0` が含まれると kernel が VGA console init で hang** する (SOL printk ゼロ、 VGA も凍結)。 これが Phase 2-12 で「kernel hang」 「triple-fault」 と切り分けに苦労した silent 沈黙の真因。
+
+- 対策済: `scripts/remaster-debian-iso.sh` L124/L134/L197、 `scripts/generate-preseed.sh` (CONSOLE_ORDER) から `console=tty0` 削除済 (commit 履歴参照)
+- 検証手順: cmdline 変更後 ISO/preseed 再生成 → deploy → SOL に `Linux version` printk が出れば成功
+- 詳細: `report/2026-05-22_*_tx1320_raid10_phase13*.md`、 memory `training_tx1320_kernel_silent_post_grub.md`
+
+### ✅ Phase 15 (2026-05-23 bubbly-ripple): cdrom-detect sr0→sr1 patch
+
+cdrom-detect が物理空 DVD (`/dev/sr0`) を先に試して諦め、 iRMC 仮想 CD (`/dev/sr1`) をスキャンしない問題。 `remaster-debian-iso.sh` に `PVESE_PATCH_CDROM_DETECT=1` 環境変数 + awk in-place patch を実装、 `/dev/sr1` 優先 block 挿入で fall-through 化。 Phase 16 で実機検証済。
+
+### ⚠️ Phase 16-18 (2026-05-23): iRMC USB redirector 累積劣化は FW 9.69F でも解消しない
+
+- Phase 16-17: NFS Virtual Media + PSU cold reset で apt/partman 段階まで到達。 ただし install 中も USB redirector が累積劣化 → 3 deploy で BIOS POST 99 stuck
+- Phase 18: iRMC FW **9.08F → 9.21F → 9.69F** 段階 update を `scripts/irmc-fw-update.sh` (multipart field 名 = `"file"` empirical 検証、 `/irmcprogress` Value=0/8/9 解読、 flashSelect=255 で両 image 書込) で完遂。 ブリックなし、 auth/network/BIOS drift なし。 だが **BIOS POST 99 stuck は FW level では解消しない** (`config/training_tx1320.yml` に FW 9.69F 適用済)
+- **FW 9.69F の OEM Redfish API 破壊的変更**: `VirtualMediaAction` → **`FTSVirtualMediaAction`**、 `ResetType` (OEM Reset) → `FTSResetType`、 `ScreenshotType` → `FTSScreenshotType`。 FW 9.08F は両形式受容、 9.69F は schema-qualified のみ。 `scripts/irmc-virtualmedia.sh` 修正済 (commit `86f9f7e`)
+- **教訓**: iRMC USB redirector は長時間運用で累積劣化し、 FW update では回復しない HW level の現象。 install 経路は USB redirector を bypass する **PXE pivot** が決定打
+
+### 🎉 Phase 19 (2026-05-30 phase19a): PXE pivot で完遂 → `pxe-deploy` skill
+
+iRMC USB redirector を完全 bypass する **PXE/netboot** 経路を確立、 Debian 13 + HW RAID10 install + claude 自力 SSH 到達まで物理操作なしで達成。 詳細手順 + 9 つの壁 + 落とし穴は **`pxe-deploy` skill** に分離記録 (skill サイズ + 経路独立性のため)。
+
+#### PXE pivot に向けた **iRMC BIOS の事前準備** (本 skill の `bios apply-config` で実施)
+
+UEFI PXE boot option が生成されるよう、 `config/<host>.yml` の `bios_settings.supported` に追加:
+
+```yaml
+bios_settings:
+  supported:
+    # 既存 (UEFI 化)
+    BootOptionFilter: "UEFI only"
+    LaunchPxeOpRomPolicy: "UEFI only"
+    # …
+    # Phase 19 で必須 (PXE boot option 生成の前提)
+    NetworkStack: "Enabled"        # UEFI Network Stack を有効化
+    IPv4PxeSupport: "Enabled"      # IPv4 PXE boot option を生成 (NetworkStack 依存)
+```
+
+→ `bios apply-config` で BSPBR backup → 編集 → restore → cycle (boot phase で適用)。 これが Disabled だと boot-override Pxe が BIOS Setup に落ちる (Phase 19 壁 #1 で実証)。
+
+#### 関連知見 (本 skill にも記録すべきもの)
+
+- **SOL は read-only** (D3373 は Console Redirection 機能なし、 SOL stdin は host UART RX に届かない)。 console login 不可。 状態判断は `scripts/irmc-oem-screenshot.sh` (真の VGA capture) が一次情報、 KVM canvas は黒画 artifact なので使用禁止 (本 skill の Playwright KVM セクションでも既述)
+- **install 進捗の真の指標**: nginx access.log (preseed/storcli/phonehome fetch)。 sol-monitor の stage 検出は SOL ring buffer replay で誤検出する (前回 boot 内容を新しい install の進捗と誤認)
+- **闇ネット (10.0.0.0/8) 経由 SSH**: PXE install 後の installed host は eno1 (拠点 LAN、 NAT 背後で claude 不達) + eno2 (闇ネット、 gateway なし、 claude 到達可) の 2 NIC DHCP。 IP 特定は `ip neigh | grep <eno2-MAC>` (phone-home が cross-site 不達でも代替可能)
+
+詳細は `pxe-deploy` skill + `report/2026-05-30_050830_tx1320_raid10_phase19_pxe_autonomous_ssh.md` + 総括 `report/2026-05-30_053607_tx1320_raid10_overview_phase1-19_summary.md`。
