@@ -214,7 +214,18 @@ echo '    vlan-raw-device ${vlan_iface}' >> ${NWFILE};"
 else
     # Non-VLAN, dual-NIC mgmt host (server4-6): auto-detect the internet-
     # facing NIC and use the apt mirror for a full standard install.
-    choose_interface="auto"
+    # When a dhcp_secondary_iface is set (training-tx1320: eno1=site LAN,
+    # eno2=dark-net), pin netcfg to the primary NIC instead of "auto" so the
+    # installer ignores the second NIC's link-up and avoids the dual-NIC IPv6
+    # autoconfig timeout / DNS-dialog stall (#15). For the PXE path the kernel
+    # cmdline interface= is the actual lever (preseed is fetched after netcfg);
+    # this keeps the preseed value consistent and also fixes the virtual-media
+    # path where the preseed is local and read before netcfg.
+    if [ -n "$dhcp_secondary_iface" ]; then
+        choose_interface="$static_iface"
+    else
+        choose_interface="auto"
+    fi
     netcfg_disable_autoconfig="false"
     apt_use_mirror="true"
     apt_no_mirror="false"
@@ -236,18 +247,31 @@ echo '' >> ${NWFILE}; \
 echo 'auto ${static_iface}' >> ${NWFILE}; \
 echo 'iface ${static_iface} inet dhcp' >> ${NWFILE};"
         if [ -n "$dhcp_secondary_iface" ]; then
-            # allow-hotplug (non-blocking): if this port has no carrier, boot is
-            # not delayed; if it has a lease (e.g. dark-net), it comes up too.
+            # auto (brought up unconditionally at boot): allow-hotplug waits for
+            # a carrier link-up EVENT, which never fires if the cable is already
+            # connected at boot — that left the dark-net port without a lease for
+            # 15+ min (#14). This port (e.g. training-tx1320 eno2) is always
+            # cabled to the dark-net, so 'auto' obtains its DHCP lease at boot
+            # with no event dependency. (Use only for ports known to be wired;
+            # a dead 'auto' port would block ifupdown for the DHCP timeout.)
             late_network="${late_network} \
 echo '' >> ${NWFILE}; \
-echo 'allow-hotplug ${dhcp_secondary_iface}' >> ${NWFILE}; \
+echo 'auto ${dhcp_secondary_iface}' >> ${NWFILE}; \
 echo 'iface ${dhcp_secondary_iface} inet dhcp' >> ${NWFILE};"
         fi
         if [ "$PXE_MODE" = "1" ]; then
             # First-boot phone-home: report obtained IPs to the playground HTTP
             # server so the remote operator can discover the reachable lease.
+            # NOTE: use ';' not '&&' to chain the two commands. The awk esc()
+            # below does not correctly escape '&', so a literal '&&' here is
+            # interpreted by the outer gsub as the matched text and corrupts the
+            # phonehome line (it became "%%LATE_NETWORK%%%%LATE_NETWORK%%"), so
+            # the setup script was fetched but never executed. With ';' the
+            # script always runs in-target; a missing/empty file (wget failed)
+            # makes 'sh' a harmless no-op, and the trailing '|| true' keeps the
+            # late_command non-blocking. Avoid '&' in any late_network value.
             late_network="${late_network} \
-in-target sh -c 'wget -q -O /tmp/phonehome-setup.sh ${PXE_BASE_URL}/firmware/phonehome-setup.sh && sh /tmp/phonehome-setup.sh' || true;"
+in-target sh -c 'wget -q -O /tmp/phonehome-setup.sh ${PXE_BASE_URL}/firmware/phonehome-setup.sh; sh /tmp/phonehome-setup.sh' || true;"
         fi
     else
         late_network="echo 'source /etc/network/interfaces.d/*' > ${NWFILE}; \
