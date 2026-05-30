@@ -1,0 +1,21 @@
+[SOL Session operational.  Use ~? for help]
+
+
+--- SENDING 'c' (GRUB command-line entry) ---
+c
+
+--- SENDING ls (cd0)/install.amd/vmlinuz ---
+ls (cd0)/install.amd/vmlinuz
+
+--- SENDING ls (cd0)/install.amd/initrd.gz ---
+ls (cd0)/install.amd/initrd.gz
+
+--- SENDING ls (single, device list) ---
+ls
+
+--- SENDING cat (cd0)/install.amd/vmlinuz (60s observation) ---
+cat (cd0)/install.amd/vmlinuz
+
+--- DONE; sending ESC + ~. to deactivate ---
+
+~.

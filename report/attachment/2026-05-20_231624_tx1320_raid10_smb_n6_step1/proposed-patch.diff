@@ -1,0 +1,23 @@
+# Samba 4.19.5 typo bug fix proposal (s-quizzical-wozniak, 2026-05-20)
+# 影響: SMB1 SMB_QUERY_POSIX_FS_INFO (qfsinfo level=513/0x201)
+#       が永久に NT_STATUS_INVALID_LEVEL を返してしまう問題
+# 修正: SMB1SERVER → WITH_SMB1SERVER (1 文字追加)
+#
+# 適用方法 (次セッション):
+#   cd tmp/<sid>/samba-4.19.5
+#   patch -p1 < proposed-patch.diff
+#   または直接編集:
+#   sed -i 's|#if defined(SMB1SERVER)$|#if defined(WITH_SMB1SERVER)|' \
+#       source3/smbd/smb2_trans2.c
+
+--- a/source3/smbd/smb2_trans2.c
++++ b/source3/smbd/smb2_trans2.c
+@@ -2023,7 +2023,7 @@ static bool fsinfo_unix_valid_level(connection_struct *conn,
+ 			info_level == SMB2_FS_POSIX_INFORMATION_INTERNAL) {
+ 		return true;
+ 	}
+-#if defined(SMB1SERVER)
++#if defined(WITH_SMB1SERVER)
+ 	if (lp_smb1_unix_extensions() &&
+ 			info_level == SMB_QUERY_POSIX_FS_INFO) {
+ 		return true;

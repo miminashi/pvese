@@ -1,0 +1,1795 @@
+<?xml version="1.0" encoding="utf-8"?>
+<config>
+  <schemeVersion>0.04</schemeVersion>
+  <dateGen>12/18/2018</dateGen>
+  <genId>BIOS</genId>
+  <genRev>V5.0.0.11 R1.22.0 for D3373-B1x                   </genRev>
+  <formatRev>1.0</formatRev>
+  <sysId>TX1320M3F2</sysId>
+
+  <BootOrderApply>false</BootOrderApply>
+
+  <BootOrder>
+    <Device>
+      <DeviceName>UEFI: Fujitsu Virtual CDROM0 1.00</DeviceName>
+      <StructuredBootString>CD.InternalUSB.0.2.11</StructuredBootString>
+    </Device>
+  </BootOrder>
+
+  <BootOrderChangeStatus>0</BootOrderChangeStatus>
+
+  <settingDefinitions comment="setting definition part only, does not restore anything">
+    <setting>
+      <id>SerialPort1</id>
+      <name>Serial Port</name>
+      <token api="BSPBR">
+        <setupItemID>0x0001</setupItemID>
+        <possibleValues default="Enabled" current="Enabled">
+          <possibleValue val="Disabled">1</possibleValue>
+          <possibleValue val="Enabled">2</possibleValue>
+        </possibleValues>
+      </token>
+      <description>><![CDATA[Enable or Disable Serial Port (COM)]]></description>
+    </setting>
+    <setting>
+      <id>LAN</id>
+      <name>LAN 1 Controller</name>
+      <token api="BSPBR">
+        <setupItemID>0x0007</setupItemID>
+        <possibleValues default="Enabled" current="Enabled">
+          <possibleValue val="Disabled">1</possibleValue>
+          <possibleValue val="Enabled">2</possibleValue>
+        </possibleValues>
+      </token>
+      <description>><![CDATA[Enable/Disable Onboard LAN1 Contoller.]]></description>
+    </setting>
+    <setting>
+      <id>USBHostController</id>
+      <name>Onboard USB Controllers</name>
+      <token api="BSPBR">
+        <setupItemID>0x0009</setupItemID>
+        <possibleValues default="Enabled" current="Enabled">
+          <possibleValue val="Enabled">2</possibleValue>
+          <possibleValue val="Disabled">1</possibleValue>
+        </possibleValues>
+      </token>
+      <description>><![CDATA[[Enabled] Onboard USB controllers are enabled and work as configured.
+[Disabled] Onboard USB controllers are disabled. All connected USB devices are not available:
+- external keyboard and mouse
+- keyboard and mouse via IRMC
+- internally connected USB devices]]></description>
+    </setting>
+    <setting>
+      <id>USBLegacySupport</id>
+      <name>Legacy USB Support</name>
+      <token api="BSPBR">
+        <setupItemID>0x000B</setupItemID>
+        <possibleValues default="Enabled" current="Enabled">
+          <possibleValue val="Enabled">2</possibleValue>
+          <possibleValue val="Disabled">1</possibleValue>
+          <possibleValue val="Auto">3</possibleValue>
+        </possibleValues>
+      </token>
+      <description>><![CDATA[Enables Legacy USB support. AUTO option disables legacy support if no USB devices are connected. DISABLE option will keep USB devices available only for EFI applications.]]></description>
+    </setting>
+    <setting>
+      <id>LANRemoteBoot</id>
+      <name>Launch PXE OpROM Policy</name>
+      <token api="BSPBR">
+        <setupItemID>0x000D</setupItemID>
+        <possibleValues default="Legacy only" current="UEFI only">
+          <possibleValue val="Do not launch">222</possibleValue>
+          <possibleValue val="UEFI only">189</possibleValue>
+          <possibleValue val="Legacy only">190</possibleValue>
+        </possibleValues>
+      </token>
+      <description>><![CDATA[Controls the execution of UEFI and Legacy PXE OpROM.]]></description>
+    </setting>
+    <setting>
+      <id>FlashWrite</id>
+      <name>FLASH Write</name>
+      <token api="BSPBR">
+        <setupItemID>0x0010</setupItemID>
+        <possibleValues default="Enabled" current="Enabled">
+          <possibleValue val="Disabled">1</possibleValue>
+          <possibleValue val="Enabled">2</possibleValue>
+        </possibleValues>
+      </token>
+      <description>><![CDATA[Enable or Disable FLASH write on Legacy boots.]]></description>
+    </setting>
+    <setting>
+      <id>WakeupLAN</id>
+      <name>LAN</name>
+      <token api="BSPBR">
+        <setupItemID>0x0011</setupItemID>
+        <possibleValues default="Enabled" current="Enabled">
+          <possibleValue val="Disabled">1</possibleValue>
+          <possibleValue val="Enabled">2</possibleValue>
+        </possibleValues>
+      </token>
+      <description>><![CDATA[Allows the system to be switched on via a LAN wakeup.]]></description>
+    </setting>
+    <setting>
+      <id>OnAutomaticWakeupm</id>
+      <name>Skip Password on WOL</name>
+      <token api="BSPBR">
+        <setupItemID>0x0013</setupItemID>
+        <possibleValues default="Disabled" current="Disabled">
+          <possibleValue val="Disabled">1</possibleValue>
+          <possibleValue val="Enabled">2</possibleValue>
+        </possibleValues>
+      </token>
+      <description>><![CDATA[Password entry is not required on automatic Wakeup from LAN.]]></description>
+    </setting>
+    <setting>
+      <id>PasswordOnBoot</id>
+      <name>Password on Boot</name>
+      <token api="BSPBR">
+        <setupItemID>0x001A</setupItemID>
+        <possibleValues default="Disabled" current="Disabled">
+          <possibleValue val="On Every Boot">11</possibleValue>
+          <possibleValue val="On First Boot">10</possibleValue>
+          <possibleValue val="Disabled">1</possibleValue>
+        </possibleValues>
+      </token>
+      <description>><![CDATA[On Every Boot - The password prompt appears on every boot.
+
+On First Boot - The password prompt appears on cold boot only.
+
+Disabled - The password is always taken from NV storage and there is no password prompt displayed.]]></description>
+    </setting>
+    <setting>
+      <id>ForceLANBoot</id>
+      <name>  Wake On LAN boot</name>
+      <token api="BSPBR">
+        <setupItemID>0x001B</setupItemID>
+        <possibleValues default="Boot Sequence" current="Boot Sequence">
+          <possibleValue val="Boot Sequence">121</possibleValue>
+          <possibleValue val="Force LAN Boot">122</possibleValue>
+        </possibleValues>
+      </token>
+      <description>><![CDATA[[Boot Sequence]
+Use Boot Sequence order after Wake On LAN.
+[Force LAN Boot]
+Force LAN boot after Wake On LAN (Option "Launch PXE OpROM" must be enabled to actually force a network boot).]]></description>
+    </setting>
+    <setting>
+      <id>Numlock</id>
+      <name>Bootup NumLock State</name>
+      <token api="BSPBR">
+        <setupItemID>0x0024</setupItemID>
+        <possibleValues default="Off" current="On">
+          <possibleValue val="On">23</possibleValue>
+          <possibleValue val="Off">24</possibleValue>
+        </possibleValues>
+      </token>
+      <description>><![CDATA[Select the keyboard NumLock state]]></description>
+    </setting>
+    <setting>
+      <id>CoreProcessingMode</id>
+      <name>Active Processor Cores</name>
+      <token api="BSPBR">
+        <setupItemID>0x0032</setupItemID>
+        <possibleValues default="All" current="All">
+          <possibleValue val="All">53</possibleValue>
+          <possibleValue val="1">196</possibleValue>
+          <possibleValue val="2">197</possibleValue>
+          <possibleValue val="3">198</possibleValue>
+        </possibleValues>
+      </token>
+      <description>><![CDATA[Number of cores to enable in each processor package.]]></description>
+    </setting>
+    <setting>
+      <id>EnhancedSpeedStep</id>
+      <name>Enhanced SpeedStep</name>
+      <token api="BSPBR">
+        <setupItemID>0x0033</setupItemID>
+        <possibleValues default="Enabled" current="Enabled">
+          <possibleValue val="Disabled">1</possibleValue>
+          <possibleValue val="Enabled">2</possibleValue>
+        </possibleValues>
+      </token>
+      <description>><![CDATA[When enabled, OS sets CPU frequency according load. When disabled, CPU frequency is set at max non-turbo.]]></description>
+    </setting>
+    <setting>
+      <id>XDBitfunctionalityAndNXMemoryProtection</id>
+      <name>Execute Disable Bit</name>
+      <token api="BSPBR">
+        <setupItemID>0x0036</setupItemID>
+        <possibleValues default="Enabled" current="Enabled">
+          <possibleValue val="Disabled">1</possibleValue>
+          <possibleValue val="Enabled">2</possibleValue>
+        </possibleValues>
+      </token>
+      <description>><![CDATA[When disabled, forces the XD feature flag to always return 0.]]></description>
+    </setting>
+    <setting>
+      <id>VirtualizationTechnology</id>
+      <name>Intel Virtualization Technology</name>
+      <token api="BSPBR">
+        <setupItemID>0x0037</setupItemID>
+        <possibleValues default="Enabled" current="Enabled">
+          <possibleValue val="Disabled">1</possibleValue>
+          <possibleValue val="Enabled">2</possibleValue>
+        </possibleValues>
+      </token>
+      <description>><![CDATA[When enabled, a VMM can utilize the additional hardware capabilities provided by Vanderpool Technology.]]></description>
+    </setting>
+    <setting>
+      <id>BootfromRemovableMedia</id>
+      <name>Boot Removable Media</name>
+      <token api="BSPBR">
+        <setupItemID>0x0048</setupItemID>
+        <possibleValues default="Enabled" current="Enabled">
+          <possibleValue val="Disabled">1</possibleValue>
+          <possibleValue val="Enabled">2</possibleValue>
+        </possibleValues>
+      </token>
+      <description>><![CDATA[This option enables/disables support for booting to removable devices, such as USB flash drives.]]></description>
+    </setting>
+    <setting>
+      <id>HyperThreading</id>
+      <name>Hyper-Threading</name>
+      <token api="BSPBR">
+        <setupItemID>0x0057</setupItemID>
+        <possibleValues default="Enabled" current="Enabled">
+          <possibleValue val="Disabled">1</possibleValue>
+          <possibleValue val="Enabled">2</possibleValue>
+        </possibleValues>
+      </token>
+      <description>><![CDATA[Enables Hyper-Threading (Software Method to Enable/Disable logical Processor threads).]]></description>
+    </setting>
+    <setting>
+      <id>SecurityChip</id>
+      <name>  TPM Support</name>
+      <token api="BSPBR">
+        <setupItemID>0x005C</setupItemID>
+        <possibleValues default="Enabled" current="Enabled">
+          <possibleValue val="Disabled">1</possibleValue>
+          <possibleValue val="Enabled">2</possibleValue>
+        </possibleValues>
+      </token>
+      <description>><![CDATA[Enables or Disables TPM support. O.S. will not show TPM. Reset of platform is required.]]></description>
+    </setting>
+    <setting>
+      <id>ChangeTPMState</id>
+      <name>  TPM State</name>
+      <token api="BSPBR">
+        <setupItemID>0x005D</setupItemID>
+        <possibleValues default="Enabled" current="Enabled">
+          <possibleValue val="Disabled">1</possibleValue>
+          <possibleValue val="Enabled">2</possibleValue>
+        </possibleValues>
+      </token>
+      <description>><![CDATA[Turn TPM Enable/Disable. NOTE: Your Computer will reboot during restart in order to change State of TPM.]]></description>
+    </setting>
+    <setting>
+      <id>IntelVTd</id>
+      <name>VT-d</name>
+      <token api="BSPBR">
+        <setupItemID>0x0067</setupItemID>
+        <possibleValues default="Enabled" current="Enabled">
+          <possibleValue val="Enabled">2</possibleValue>
+          <possibleValue val="Disabled">1</possibleValue>
+        </possibleValues>
+      </token>
+      <description>><![CDATA[Enable/Disable Intel Virtualization Technology for Directed I/O (VT-d) by reporting the I/O device assignment to VMM through DMAR ACPI Tables.]]></description>
+    </setting>
+    <setting>
+      <id>Intel_TxT</id>
+      <name>Intel TXT(LT) Support</name>
+      <token api="BSPBR">
+        <setupItemID>0x0068</setupItemID>
+        <possibleValues default="Disabled" current="Disabled">
+          <possibleValue val="Disabled">1</possibleValue>
+          <possibleValue val="Enabled">2</possibleValue>
+        </possibleValues>
+      </token>
+      <description>><![CDATA[Enables or Disables Intel(R) TXT(LT) support.]]></description>
+    </setting>
+    <setting>
+      <id>QuietBoot</id>
+      <name>Quiet Boot</name>
+      <token api="BSPBR">
+        <setupItemID>0x0080</setupItemID>
+        <possibleValues default="Disabled" current="Disabled">
+          <possibleValue val="Disabled">1</possibleValue>
+          <possibleValue val="Enabled">2</possibleValue>
+        </possibleValues>
+      </token>
+      <description>><![CDATA[Enables or disables Quiet Boot option]]></description>
+    </setting>
+    <setting>
+      <id>TpmSkipPPI</id>
+      <name>Skip PPI during next Boot</name>
+      <token api="BSPBR">
+        <setupItemID>0x0082</setupItemID>
+        <possibleValues default="Disabled" current="Disabled">
+          <possibleValue val="Disabled">1</possibleValue>
+          <possibleValue val="Enabled">2</possibleValue>
+        </possibleValues>
+      </token>
+      <description>><![CDATA[Skip Physical Presence confirmation during the next Boot]]></description>
+    </setting>
+    <setting>
+      <id>SATAControllerModeSelection</id>
+      <name>SATA Mode Selection</name>
+      <token api="BSPBR">
+        <setupItemID>0x0087</setupItemID>
+        <possibleValues default="AHCI Mode" current="RAID Mode">
+          <possibleValue val="AHCI Mode">99</possibleValue>
+          <possibleValue val="RAID Mode">100</possibleValue>
+        </possibleValues>
+      </token>
+      <description>><![CDATA[Determines how SATA controller(s) operate.]]></description>
+    </setting>
+    <setting>
+      <id>PendingTPMOperation</id>
+      <name>  Pending TPM operation</name>
+      <token api="BSPBR">
+        <setupItemID>0x009A</setupItemID>
+        <possibleValues default="None" current="None">
+          <possibleValue val="None">12</possibleValue>
+          <possibleValue val="TPM Clear">111</possibleValue>
+        </possibleValues>
+      </token>
+      <description>><![CDATA[Schedule TPM operation. NOTE: Your Computer will reboot during restart in order to change State of TPM.]]></description>
+    </setting>
+    <setting>
+      <id>ECCMemoryErrorLogging</id>
+      <name>ECC Memory Error Logging</name>
+      <token api="BSPBR">
+        <setupItemID>0x009F</setupItemID>
+        <possibleValues default="Enabled" current="Enabled">
+          <possibleValue val="Enabled">2</possibleValue>
+          <possibleValue val="Multi-bit Errors Only">113</possibleValue>
+          <possibleValue val="Disabled">1</possibleValue>
+        </possibleValues>
+      </token>
+      <description>><![CDATA[Configure ECC Memory Error Logging Support.]]></description>
+    </setting>
+    <setting>
+      <id>PCIErrorLogging</id>
+      <name>PCI Error Logging</name>
+      <token api="BSPBR">
+        <setupItemID>0x00A0</setupItemID>
+        <possibleValues default="Enabled" current="Enabled">
+          <possibleValue val="Disabled">1</possibleValue>
+          <possibleValue val="Enabled">2</possibleValue>
+        </possibleValues>
+      </token>
+      <description>><![CDATA[Enable/Disable PCI Error Logging.]]></description>
+    </setting>
+    <setting>
+      <id>TurboMode</id>
+      <name>Turbo Mode</name>
+      <token api="BSPBR">
+        <setupItemID>0x00A6</setupItemID>
+        <possibleValues default="Enabled" current="Enabled">
+          <possibleValue val="Disabled">1</possibleValue>
+          <possibleValue val="Enabled">2</possibleValue>
+        </possibleValues>
+      </token>
+      <description>><![CDATA[Turbo mode allows a CPU logical processor to execute a higher frequency when enough power is available not exceed CPU defined limits.]]></description>
+    </setting>
+    <setting>
+      <id>BootErrorHandling</id>
+      <name>Boot error handling</name>
+      <token api="BSPBR">
+        <setupItemID>0x00B0</setupItemID>
+        <possibleValues default="Continue" current="Continue">
+          <possibleValue val="Continue">118</possibleValue>
+          <possibleValue val="Pause and wait for key">119</possibleValue>
+        </possibleValues>
+      </token>
+      <description>><![CDATA[Determines what to do on boot errors:
+Pause and wait for key OR
+continue.]]></description>
+    </setting>
+    <setting>
+      <id>PerrGeneration</id>
+      <name>PERR# Generation</name>
+      <token api="BSPBR">
+        <setupItemID>0x00B1</setupItemID>
+        <possibleValues default="Enabled" current="Enabled">
+          <possibleValue val="Disabled">1</possibleValue>
+          <possibleValue val="Enabled">2</possibleValue>
+        </possibleValues>
+      </token>
+      <description>><![CDATA[Enables or Disables PCI Device to Generate PERR#.]]></description>
+    </setting>
+    <setting>
+      <id>SerrGeneration</id>
+      <name>SERR# Generation</name>
+      <token api="BSPBR">
+        <setupItemID>0x00B2</setupItemID>
+        <possibleValues default="Enabled" current="Enabled">
+          <possibleValue val="Disabled">1</possibleValue>
+          <possibleValue val="Enabled">2</possibleValue>
+        </possibleValues>
+      </token>
+      <description>><![CDATA[Enables or Disables PCI Device to Generate SERR#.]]></description>
+    </setting>
+    <setting>
+      <id>Lan2</id>
+      <name>LAN 2 Controller</name>
+      <token api="BSPBR">
+        <setupItemID>0x00B3</setupItemID>
+        <possibleValues default="Enabled" current="Enabled">
+          <possibleValue val="Disabled">1</possibleValue>
+          <possibleValue val="Enabled">2</possibleValue>
+        </possibleValues>
+      </token>
+      <description>><![CDATA[Enable/Disable Onboard LAN2 Contoller.]]></description>
+    </setting>
+    <setting>
+      <id>UsbPortControl</id>
+      <name>USB Port Control</name>
+      <token api="BSPBR">
+        <setupItemID>0x00C5</setupItemID>
+        <possibleValues default="Enable all ports" current="Enable all ports">
+          <possibleValue val="Enable all ports">132</possibleValue>
+          <possibleValue val="Enable front and internal ports">134</possibleValue>
+          <possibleValue val="Enable rear and internal ports">135</possibleValue>
+          <possibleValue val="Enable internal ports only">136</possibleValue>
+        </possibleValues>
+      </token>
+      <description>><![CDATA[Configures how USB ports are enabled.
+[Enable all ports]
+All USB ports are enabled.
+[Disable all ports]
+All USB ports are disabled.
+[Enable front and internal ports]
+All rear USB ports are disabled.
+[Enable rear and internal ports]
+All front USB ports are disabled.
+[Enable internal ports only]
+All external USB ports are disabled.
+[Enable used ports]
+All unused USB ports are disabled.]]></description>
+    </setting>
+    <setting>
+      <id>UsbTransferTimeOut</id>
+      <name>USB transfer time-out</name>
+      <token api="BSPBR">
+        <setupItemID>0x00D3</setupItemID>
+        <possibleValues default="20 sec" current="20 sec">
+          <possibleValue val="1 sec">159</possibleValue>
+          <possibleValue val="5 sec">160</possibleValue>
+          <possibleValue val="10 sec">161</possibleValue>
+          <possibleValue val="20 sec">162</possibleValue>
+        </possibleValues>
+      </token>
+      <description>><![CDATA[The time-out value for Control, Bulk, and Interrupt transfers.]]></description>
+    </setting>
+    <setting>
+      <id>PrimaryDisplay</id>
+      <name>Primary Display</name>
+      <token api="BSPBR">
+        <setupItemID>0x00D7</setupItemID>
+        <possibleValues default="Auto" current="Auto">
+          <possibleValue val="Auto">3</possibleValue>
+          <possibleValue val="Internal Graphics">169</possibleValue>
+          <possibleValue val="PCI Express for Graphics (PEG)">170</possibleValue>
+          <possibleValue val="PCI Express (PCIE)">171</possibleValue>
+        </possibleValues>
+      </token>
+      <description>><![CDATA[Selects which graphics controller has connected the primary display.]]></description>
+    </setting>
+    <setting>
+      <id>InternalGraphics</id>
+      <name>Internal Graphics</name>
+      <token api="BSPBR">
+        <setupItemID>0x00D8</setupItemID>
+        <possibleValues default="Disabled" current="Disabled">
+          <possibleValue val="Auto">3</possibleValue>
+          <possibleValue val="Disabled">1</possibleValue>
+          <possibleValue val="Enabled">2</possibleValue>
+        </possibleValues>
+      </token>
+      <description>><![CDATA[The BIOS detects automatically if the internal graphics controller can be disabled, but it can manually be forced to enabled or disabled.]]></description>
+    </setting>
+    <setting>
+      <id>Lan1Oprom</id>
+      <name>LAN 1 Oprom</name>
+      <token api="BSPBR">
+        <setupItemID>0x00E0</setupItemID>
+        <possibleValues default="PXE" current="PXE">
+          <possibleValue val="Disabled">1</possibleValue>
+          <possibleValue val="PXE">187</possibleValue>
+          <possibleValue val="iSCSI">188</possibleValue>
+        </possibleValues>
+      </token>
+      <description>><![CDATA[Controls which OptionROM will be loaded for the respective onboard LAN port.
+[Disabled] No OptionROM is loaded.
+[PXE] Load the PXE OptionROM.
+[iSCSI] Load the iSCSI OptionROM.]]></description>
+    </setting>
+    <setting>
+      <id>Lan2Oprom</id>
+      <name>LAN 2 Oprom</name>
+      <token api="BSPBR">
+        <setupItemID>0x00E1</setupItemID>
+        <possibleValues default="Disabled" current="Disabled">
+          <possibleValue val="Disabled">1</possibleValue>
+          <possibleValue val="PXE">187</possibleValue>
+          <possibleValue val="iSCSI">188</possibleValue>
+        </possibleValues>
+      </token>
+      <description>><![CDATA[Controls which OptionROM will be loaded for the respective onboard LAN port.
+[Disabled] No OptionROM is loaded.
+[PXE] Load the PXE OptionROM.
+[iSCSI] Load the iSCSI OptionROM.]]></description>
+    </setting>
+    <setting>
+      <id>AspmSupport</id>
+      <name>ASPM Support</name>
+      <token api="BSPBR">
+        <setupItemID>0x00E2</setupItemID>
+        <possibleValues default="Disabled" current="Disabled">
+          <possibleValue val="Disabled">1</possibleValue>
+          <possibleValue val="Auto">3</possibleValue>
+          <possibleValue val="Force L0s">193</possibleValue>
+        </possibleValues>
+      </token>
+      <description>><![CDATA[Configures Active State Power Management (ASPM) energy saving.
+[Disabled]
+No energy saving. Best stability.
+[L1 Only]
+Tradeoff between stability and energy saving.]]></description>
+    </setting>
+    <setting>
+      <id>NetworkStack</id>
+      <name>Network Stack</name>
+      <token api="BSPBR">
+        <setupItemID>0x00E5</setupItemID>
+        <possibleValues default="Disabled" current="Disabled">
+          <possibleValue val="Disabled">1</possibleValue>
+          <possibleValue val="Enabled">2</possibleValue>
+        </possibleValues>
+      </token>
+      <description>><![CDATA[Enable/Disable UEFI Network Stack]]></description>
+    </setting>
+    <setting>
+      <id>IPv4PxeSupport</id>
+      <name>Ipv4 PXE Support</name>
+      <token api="BSPBR">
+        <setupItemID>0x00E6</setupItemID>
+        <possibleValues default="Enabled" current="Enabled">
+          <possibleValue val="Disabled">1</possibleValue>
+          <possibleValue val="Enabled">2</possibleValue>
+        </possibleValues>
+      </token>
+      <description>><![CDATA[Enable Ipv4 PXE Boot Support. If disabled IPV4 PXE boot option will not be created]]></description>
+    </setting>
+    <setting>
+      <id>IPv6PxeSupport</id>
+      <name>Ipv6 PXE Support</name>
+      <token api="BSPBR">
+        <setupItemID>0x00E7</setupItemID>
+        <possibleValues default="Enabled" current="Enabled">
+          <possibleValue val="Disabled">1</possibleValue>
+          <possibleValue val="Enabled">2</possibleValue>
+        </possibleValues>
+      </token>
+      <description>><![CDATA[Enable Ipv6 PXE Boot Support. If disabled IPV6 PXE boot option will not be created]]></description>
+    </setting>
+    <setting>
+      <id>SecureBoot</id>
+      <name>Secure Boot Control</name>
+      <token api="BSPBR">
+        <setupItemID>0x00E8</setupItemID>
+        <possibleValues default="Disabled" current="Disabled">
+          <possibleValue val="Disabled">1</possibleValue>
+          <possibleValue val="Enabled">2</possibleValue>
+        </possibleValues>
+      </token>
+      <description>><![CDATA[Secure Boot can be enabled if 1.System running in User mode with enrolled Platform Key(PK) 2.CSM function is disabled]]></description>
+    </setting>
+    <setting>
+      <id>DefaultKeyProvisioning</id>
+      <name>Factory Default Key Provision</name>
+      <token api="BSPBR">
+        <setupItemID>0x00E9</setupItemID>
+        <possibleValues default="Enabled" current="Enabled">
+          <possibleValue val="Disabled">1</possibleValue>
+          <possibleValue val="Enabled">2</possibleValue>
+        </possibleValues>
+      </token>
+      <description>><![CDATA[Provision factory default keys on next system re-boot while platform is in Setup Mode]]></description>
+    </setting>
+    <setting>
+      <id>Csm</id>
+      <name>Launch CSM</name>
+      <token api="BSPBR">
+        <setupItemID>0x00EA</setupItemID>
+        <possibleValues default="Disabled" current="Disabled">
+          <possibleValue val="Disabled">1</possibleValue>
+          <possibleValue val="Enabled">2</possibleValue>
+        </possibleValues>
+      </token>
+      <description>><![CDATA[This option controls if CSM will be launched.]]></description>
+    </setting>
+    <setting>
+      <id>LaunchSlot1Oprom</id>
+      <name>Launch Slot 1 OpROM</name>
+      <token api="BSPBR">
+        <setupItemID>0x00EC</setupItemID>
+        <possibleValues default="Disabled" current="Disabled">
+          <possibleValue val="Disabled">1</possibleValue>
+          <possibleValue val="Enabled">2</possibleValue>
+        </possibleValues>
+      </token>
+      <description>><![CDATA[Enable or disable option ROM execution for device in slot 1.]]></description>
+    </setting>
+    <setting>
+      <id>LaunchSlot2Oprom</id>
+      <name>Launch Slot 2 OpROM</name>
+      <token api="BSPBR">
+        <setupItemID>0x00ED</setupItemID>
+        <possibleValues default="Disabled" current="Disabled">
+          <possibleValue val="Disabled">1</possibleValue>
+          <possibleValue val="Enabled">2</possibleValue>
+        </possibleValues>
+      </token>
+      <description>><![CDATA[Enable or disable option ROM execution for device in slot 2.]]></description>
+    </setting>
+    <setting>
+      <id>LaunchSlot3Oprom</id>
+      <name>Launch Slot 3 OpROM</name>
+      <token api="BSPBR">
+        <setupItemID>0x00EE</setupItemID>
+        <possibleValues default="Disabled" current="Disabled">
+          <possibleValue val="Disabled">1</possibleValue>
+          <possibleValue val="Enabled">2</possibleValue>
+        </possibleValues>
+      </token>
+      <description>><![CDATA[Enable or disable option ROM execution for device in slot 3.]]></description>
+    </setting>
+    <setting>
+      <id>LaunchSlot4Oprom</id>
+      <name>Launch Slot 4 OpROM</name>
+      <token api="BSPBR">
+        <setupItemID>0x00EF</setupItemID>
+        <possibleValues default="Enabled" current="Enabled">
+          <possibleValue val="Disabled">1</possibleValue>
+          <possibleValue val="Enabled">2</possibleValue>
+        </possibleValues>
+      </token>
+      <description>><![CDATA[Enable or disable option ROM execution for device in slot 4.]]></description>
+    </setting>
+    <setting>
+      <id>PowerOnSource</id>
+      <name>Power-on Source</name>
+      <token api="BSPBR">
+        <setupItemID>0x00FF</setupItemID>
+        <possibleValues default="BIOS Controlled" current="BIOS Controlled">
+          <possibleValue val="BIOS Controlled">219</possibleValue>
+          <possibleValue val="ACPI Controlled">220</possibleValue>
+        </possibleValues>
+      </token>
+      <description>><![CDATA[[BIOS Controlled]
+Power-on sources are controlled by BIOS. Also valid for ACPI operating systems.
+[ACPI Controlled]
+Power-on sources are controlled by an ACPI operating system.]]></description>
+    </setting>
+    <setting>
+      <id>Above4GDecoding</id>
+      <name>Above 4G Decoding</name>
+      <token api="BSPBR">
+        <setupItemID>0x0101</setupItemID>
+        <possibleValues default="Disabled" current="Disabled">
+          <possibleValue val="Disabled">1</possibleValue>
+          <possibleValue val="Enabled">2</possibleValue>
+        </possibleValues>
+      </token>
+      <description>><![CDATA[Enables or Disables 64bit capable Devices to be Decoded in Above 4G Address Space (Only if System Supports 64 bit PCI Decoding).]]></description>
+    </setting>
+    <setting>
+      <id>KeepOrphanFwBootOption</id>
+      <name>Keep Void Boot Options</name>
+      <token api="BSPBR">
+        <setupItemID>0x0102</setupItemID>
+        <possibleValues default="Disabled" current="Disabled">
+          <possibleValue val="Disabled">1</possibleValue>
+          <possibleValue val="Enabled">2</possibleValue>
+        </possibleValues>
+      </token>
+      <description>><![CDATA[[Enabled] Keeps the FW boot options for devices no longer connected to the system. Useful to keep the position of the void boot options in the boot order list until next re-connection to a device.
+
+[Disabled] Remove the FW boot options for devices no longer connected to the system.]]></description>
+    </setting>
+    <setting>
+      <id>BootOptionFilter</id>
+      <name>Boot option filter</name>
+      <token api="BSPBR">
+        <setupItemID>0x0103</setupItemID>
+        <possibleValues default="Legacy only" current="UEFI only">
+          <possibleValue val="UEFI and Legacy">221</possibleValue>
+          <possibleValue val="Legacy only">190</possibleValue>
+          <possibleValue val="UEFI only">189</possibleValue>
+        </possibleValues>
+      </token>
+      <description>><![CDATA[This option controls what devices system can boot to.]]></description>
+    </setting>
+    <setting>
+      <id>LaunchPxeOpRomPolicy</id>
+      <name>Launch PXE OpROM Policy</name>
+      <token api="BSPBR">
+        <setupItemID>0x0104</setupItemID>
+        <possibleValues default="Legacy only" current="UEFI only">
+          <possibleValue val="Do not launch">222</possibleValue>
+          <possibleValue val="UEFI only">189</possibleValue>
+          <possibleValue val="Legacy only">190</possibleValue>
+        </possibleValues>
+      </token>
+      <description>><![CDATA[Controls the execution of UEFI and Legacy PXE OpROM.]]></description>
+    </setting>
+    <setting>
+      <id>LaunchStorageOpRomPolicy</id>
+      <name>Launch Storage OpROM policy</name>
+      <token api="BSPBR">
+        <setupItemID>0x0105</setupItemID>
+        <possibleValues default="Legacy only" current="UEFI only">
+          <possibleValue val="Do not launch">222</possibleValue>
+          <possibleValue val="UEFI only">189</possibleValue>
+          <possibleValue val="Legacy only">190</possibleValue>
+        </possibleValues>
+      </token>
+      <description>><![CDATA[Controls the execution of UEFI and Legacy Storage OpROM]]></description>
+    </setting>
+    <setting>
+      <id>LaunchVideoOpRomPolicy</id>
+      <name>Launch Video OpROM policy</name>
+      <token api="BSPBR">
+        <setupItemID>0x0106</setupItemID>
+        <possibleValues default="Legacy only" current="UEFI only">
+          <possibleValue val="Do not launch">222</possibleValue>
+          <possibleValue val="UEFI only">189</possibleValue>
+          <possibleValue val="Legacy only">190</possibleValue>
+        </possibleValues>
+      </token>
+      <description>><![CDATA[Controls the execution of UEFI and Legacy Video OpROM.]]></description>
+    </setting>
+    <setting>
+      <id>OtherPciDeviceRomPriority</id>
+      <name>Other PCI device ROM priority</name>
+      <token api="BSPBR">
+        <setupItemID>0x0107</setupItemID>
+        <possibleValues default="Legacy only" current="Legacy only">
+          <possibleValue val="Do not launch">222</possibleValue>
+          <possibleValue val="UEFI only">189</possibleValue>
+          <possibleValue val="Legacy only">190</possibleValue>
+        </possibleValues>
+      </token>
+      <description>><![CDATA[For PCI devices other than Network, Mass storage or Video defines which OpROM to launch.]]></description>
+    </setting>
+    <setting>
+      <id>PxeBootOptionRetry</id>
+      <name>PXE Boot Option Retry</name>
+      <token api="BSPBR">
+        <setupItemID>0x011D</setupItemID>
+        <possibleValues default="Disabled" current="Disabled">
+          <possibleValue val="Disabled">1</possibleValue>
+          <possibleValue val="Enabled">2</possibleValue>
+        </possibleValues>
+      </token>
+      <description>><![CDATA[This will continually retry NON-EFI based PXE boot options without waiting for user input.]]></description>
+    </setting>
+    <setting>
+      <id>HardwarePrefetcher</id>
+      <name>Hardware Prefetcher</name>
+      <token api="BSPBR">
+        <setupItemID>0x012E</setupItemID>
+        <possibleValues default="Enabled" current="Enabled">
+          <possibleValue val="Disabled">1</possibleValue>
+          <possibleValue val="Enabled">2</possibleValue>
+        </possibleValues>
+      </token>
+      <description>><![CDATA[To turn on/off the MLC streamer prefetcher.]]></description>
+    </setting>
+    <setting>
+      <id>AdjacentCacheLinePrefetch</id>
+      <name>Adjacent Cache Line Prefetch</name>
+      <token api="BSPBR">
+        <setupItemID>0x012F</setupItemID>
+        <possibleValues default="Enabled" current="Enabled">
+          <possibleValue val="Disabled">1</possibleValue>
+          <possibleValue val="Enabled">2</possibleValue>
+        </possibleValues>
+      </token>
+      <description>><![CDATA[To turn on/off prefetching of adjacent cache lines.]]></description>
+    </setting>
+    <setting>
+      <id>DcuStreamerPrefecher</id>
+      <name>DCU Streamer Prefetcher</name>
+      <token api="BSPBR">
+        <setupItemID>0x0130</setupItemID>
+        <possibleValues default="Enabled" current="Enabled">
+          <possibleValue val="Enabled">2</possibleValue>
+          <possibleValue val="Disabled">1</possibleValue>
+        </possibleValues>
+      </token>
+      <description>><![CDATA[Enable/Disable DCU Streamer Prefetcher.]]></description>
+    </setting>
+    <setting>
+      <id>PackageCStateLimit</id>
+      <name>Package C State limit</name>
+      <token api="BSPBR">
+        <setupItemID>0x0136</setupItemID>
+        <possibleValues default="C7" current="C7">
+          <possibleValue val="C0">251</possibleValue>
+          <possibleValue val="C2">253</possibleValue>
+          <possibleValue val="C3">313</possibleValue>
+          <possibleValue val="C6">254</possibleValue>
+          <possibleValue val="C7">255</possibleValue>
+          <possibleValue val="C7s">314</possibleValue>
+        </possibleValues>
+      </token>
+      <description>><![CDATA[Package C State limit]]></description>
+    </setting>
+    <setting>
+      <id>LimitCpuIdMaximum</id>
+      <name>Limit CPUID Maximum</name>
+      <token api="BSPBR">
+        <setupItemID>0x0140</setupItemID>
+        <possibleValues default="Disabled" current="Disabled">
+          <possibleValue val="Disabled">1</possibleValue>
+          <possibleValue val="Enabled">2</possibleValue>
+        </possibleValues>
+      </token>
+      <description>><![CDATA[This should be enabled in order to boot legacy OSes that cannot support CPUs with extended CPUID functions.]]></description>
+    </setting>
+    <setting>
+      <id>PxeBootWaitTime</id>
+      <name>PXE boot wait time</name>
+      <token api="BSPBR">
+        <setupItemID>0x014D</setupItemID>
+        <possibleValues default="0" current="0">
+          <possibleRange min="0" max="5"/>
+        </possibleValues>
+      </token>
+      <description>><![CDATA[Wait time to press ESC key to abort the PXE boot]]></description>
+    </setting>
+    <setting>
+      <id>CheckControllersHealthStatus</id>
+      <name>Check controllers health status</name>
+      <token api="BSPBR">
+        <setupItemID>0x014E</setupItemID>
+        <possibleValues default="Enabled" current="Enabled">
+          <possibleValue val="Disabled">1</possibleValue>
+          <possibleValue val="Enabled">2</possibleValue>
+        </possibleValues>
+      </token>
+      <description>><![CDATA[Enables or disables checking of health status of hardware components]]></description>
+    </setting>
+    <setting>
+      <id>PasswordSeverity</id>
+      <name>Password Severity</name>
+      <token api="BSPBR">
+        <setupItemID>0x0174</setupItemID>
+        <possibleValues default="Standard" current="Standard">
+          <possibleValue val="Standard">8</possibleValue>
+        </possibleValues>
+      </token>
+      <description>><![CDATA[Standard - Password skip jumper can be used to clear a lost password.
+
+Strong - Password skip jumper inoperable. In case of a lost password, unlocking only possible via service.]]></description>
+    </setting>
+    <setting>
+      <id>StatusPCISlot1</id>
+      <name>PCI Slot 1</name>
+      <token api="BSPBR">
+        <setupItemID>0x0196</setupItemID>
+        <possibleValues default="Enabled" current="Empty">
+          <possibleValue val="Enabled">2</possibleValue>
+          <possibleValue val="Failed">317</possibleValue>
+          <possibleValue val="Empty">318</possibleValue>
+        </possibleValues>
+      </token>
+      <description>><![CDATA[PCI Slot Control]]></description>
+    </setting>
+    <setting>
+      <id>StatusPCISlot2</id>
+      <name>PCI Slot 2</name>
+      <token api="BSPBR">
+        <setupItemID>0x0197</setupItemID>
+        <possibleValues default="Enabled" current="Empty">
+          <possibleValue val="Enabled">2</possibleValue>
+          <possibleValue val="Failed">317</possibleValue>
+          <possibleValue val="Empty">318</possibleValue>
+        </possibleValues>
+      </token>
+      <description>><![CDATA[PCI Slot Control]]></description>
+    </setting>
+    <setting>
+      <id>StatusPCISlot3</id>
+      <name>PCI Slot 3</name>
+      <token api="BSPBR">
+        <setupItemID>0x0198</setupItemID>
+        <possibleValues default="Enabled" current="Empty">
+          <possibleValue val="Enabled">2</possibleValue>
+          <possibleValue val="Failed">317</possibleValue>
+          <possibleValue val="Empty">318</possibleValue>
+        </possibleValues>
+      </token>
+      <description>><![CDATA[PCI Slot Control]]></description>
+    </setting>
+    <setting>
+      <id>StatusPCISlot4</id>
+      <name>PCI Slot 4</name>
+      <token api="BSPBR">
+        <setupItemID>0x0199</setupItemID>
+        <possibleValues default="Enabled" current="Enabled">
+          <possibleValue val="Enabled">2</possibleValue>
+          <possibleValue val="Failed">317</possibleValue>
+          <possibleValue val="Empty">318</possibleValue>
+        </possibleValues>
+      </token>
+      <description>><![CDATA[PCI Slot Control]]></description>
+    </setting>
+    <setting>
+      <id>ChangeSettingsSerialPort</id>
+      <name>Change Settings</name>
+      <token api="BSPBR">
+        <setupItemID>0x01AC</setupItemID>
+        <possibleValues default="Auto" current="Auto">
+          <possibleValue val="Auto">3</possibleValue>
+          <possibleValue val="IO=3F8h; IRQ=4;">319</possibleValue>
+          <possibleValue val="IO=3F8h; IRQ=3,4,5,6,7,9,10,11,12;">320</possibleValue>
+          <possibleValue val="IO=2F8h; IRQ=3,4,5,6,7,9,10,11,12;">321</possibleValue>
+          <possibleValue val="IO=3E8h; IRQ=3,4,5,6,7,9,10,11,12;">322</possibleValue>
+          <possibleValue val="IO=2E8h; IRQ=3,4,5,6,7,9,10,11,12;">323</possibleValue>
+        </possibleValues>
+      </token>
+      <description>><![CDATA[Select an optimal settings for Super IO Device]]></description>
+    </setting>
+    <setting>
+      <id>SecureBootMode</id>
+      <name>Secure Boot Mode</name>
+      <token api="BSPBR">
+        <setupItemID>0x01B0</setupItemID>
+        <possibleValues default="Standard" current="Custom">
+          <possibleValue val="Standard">8</possibleValue>
+          <possibleValue val="Custom">116</possibleValue>
+        </possibleValues>
+      </token>
+      <description>><![CDATA[Secure Boot mode selector. 'Custom' Mode allows for more flexibility changing Image Execution policy and Secure Boot Key management.]]></description>
+    </setting>
+    <setting>
+      <id>wBootOptionPolicy</id>
+      <name>New Boot Option Policy</name>
+      <token api="BSPBR">
+        <setupItemID>0x01BC</setupItemID>
+        <possibleValues default="Place First" current="Place First">
+          <possibleValue val="Default">340</possibleValue>
+          <possibleValue val="Place First">341</possibleValue>
+          <possibleValue val="Place Last">342</possibleValue>
+        </possibleValues>
+      </token>
+      <description>><![CDATA[Controls the placement of newly detected UEFI boot options, for non removable media]]></description>
+    </setting>
+    <setting>
+      <id>SwGuardExtensions_SGX</id>
+      <name>SW Guard Extensions (SGX)</name>
+      <token api="BSPBR">
+        <setupItemID>0x01BF</setupItemID>
+        <possibleValues default="Disabled" current="Disabled">
+          <possibleValue val="Disabled">1</possibleValue>
+          <possibleValue val="Enabled">2</possibleValue>
+          <possibleValue val="Software Controlled">343</possibleValue>
+        </possibleValues>
+      </token>
+      <description>><![CDATA[Enable/Disable Software Guard Extensions (SGX)]]></description>
+    </setting>
+    <setting>
+      <id>X2APIC_OptOut</id>
+      <name>X2APIC Opt Out</name>
+      <token api="BSPBR">
+        <setupItemID>0x01C0</setupItemID>
+        <possibleValues default="Disabled" current="Disabled">
+          <possibleValue val="Enabled">2</possibleValue>
+          <possibleValue val="Disabled">1</possibleValue>
+        </possibleValues>
+      </token>
+      <description>><![CDATA[Enable/Disable X2APIC_OPT_OUT bit]]></description>
+    </setting>
+    <setting>
+      <id>PowerLimit1Override</id>
+      <name>   Power Limit 1 Override</name>
+      <token api="BSPBR">
+        <setupItemID>0x01CB</setupItemID>
+        <possibleValues default="Disabled" current="Disabled">
+          <possibleValue val="Disabled">1</possibleValue>
+          <possibleValue val="Enabled">2</possibleValue>
+        </possibleValues>
+      </token>
+      <description>><![CDATA[Enable/Disable Power Limit 1 Override. If this option is disabled, BIOS will program the default values for Power Limit 1 and Power Limit 1 Time Window.]]></description>
+    </setting>
+    <setting>
+      <id>PowerLimit1Window</id>
+      <name>   Power Limit 1 Window</name>
+      <token api="BSPBR">
+        <setupItemID>0x01CD</setupItemID>
+        <possibleValues default="0" current="0">
+          <possibleValue val="0">357</possibleValue>
+          <possibleValue val="1">196</possibleValue>
+          <possibleValue val="2">197</possibleValue>
+          <possibleValue val="3">198</possibleValue>
+          <possibleValue val="4">199</possibleValue>
+          <possibleValue val="5">200</possibleValue>
+          <possibleValue val="6">201</possibleValue>
+          <possibleValue val="7">202</possibleValue>
+          <possibleValue val="8">203</possibleValue>
+          <possibleValue val="10">205</possibleValue>
+          <possibleValue val="12">207</possibleValue>
+          <possibleValue val="14">209</possibleValue>
+          <possibleValue val="16">211</possibleValue>
+          <possibleValue val="20">358</possibleValue>
+          <possibleValue val="24">359</possibleValue>
+          <possibleValue val="28">360</possibleValue>
+          <possibleValue val="32">361</possibleValue>
+          <possibleValue val="40">362</possibleValue>
+          <possibleValue val="48">363</possibleValue>
+          <possibleValue val="56">364</possibleValue>
+          <possibleValue val="64">365</possibleValue>
+          <possibleValue val="80">366</possibleValue>
+          <possibleValue val="96">367</possibleValue>
+          <possibleValue val="112">368</possibleValue>
+          <possibleValue val="128">369</possibleValue>
+        </possibleValues>
+      </token>
+      <description>><![CDATA[Power Limit 1 Time Window value in seconds. The value may vary from 0 to 128. If the value is 0, default values will be programmed (28 sec for Mobile and 1 sec for Desktop). Indicates the time window over which TDP value should be maintained.]]></description>
+    </setting>
+    <setting>
+      <id>PowerLimit2Override</id>
+      <name>   Power Limit 2 Override</name>
+      <token api="BSPBR">
+        <setupItemID>0x01CE</setupItemID>
+        <possibleValues default="Enabled" current="Enabled">
+          <possibleValue val="Disabled">1</possibleValue>
+          <possibleValue val="Enabled">2</possibleValue>
+        </possibleValues>
+      </token>
+      <description>><![CDATA[Enable/Disable Power Limit 2 Override. If this option is disabled, BIOS will program the default values for Power Limit 2.]]></description>
+    </setting>
+    <setting>
+      <id>PlatformPL1Enable</id>
+      <name>Platform PL1 Enable</name>
+      <token api="BSPBR">
+        <setupItemID>0x01D0</setupItemID>
+        <possibleValues default="Disabled" current="Disabled">
+          <possibleValue val="Disabled">1</possibleValue>
+          <possibleValue val="Enabled">2</possibleValue>
+        </possibleValues>
+      </token>
+      <description>><![CDATA[Enable/Disable Platform Power Limit 1 programming. If this option is enabled, it activates the PL1 value to be used by the processor to limit the average power of given time window.]]></description>
+    </setting>
+    <setting>
+      <id>PlatformPL1TimeWindow</id>
+      <name>Platform PL1 Time Window</name>
+      <token api="BSPBR">
+        <setupItemID>0x01D2</setupItemID>
+        <possibleValues default="0" current="0">
+          <possibleValue val="0">357</possibleValue>
+          <possibleValue val="1">196</possibleValue>
+          <possibleValue val="2">197</possibleValue>
+          <possibleValue val="3">198</possibleValue>
+          <possibleValue val="4">199</possibleValue>
+          <possibleValue val="5">200</possibleValue>
+          <possibleValue val="6">201</possibleValue>
+          <possibleValue val="7">202</possibleValue>
+          <possibleValue val="8">203</possibleValue>
+          <possibleValue val="10">205</possibleValue>
+          <possibleValue val="12">207</possibleValue>
+          <possibleValue val="14">209</possibleValue>
+          <possibleValue val="16">211</possibleValue>
+          <possibleValue val="20">358</possibleValue>
+          <possibleValue val="24">359</possibleValue>
+          <possibleValue val="28">360</possibleValue>
+          <possibleValue val="32">361</possibleValue>
+          <possibleValue val="40">362</possibleValue>
+          <possibleValue val="48">363</possibleValue>
+          <possibleValue val="56">364</possibleValue>
+          <possibleValue val="64">365</possibleValue>
+          <possibleValue val="80">366</possibleValue>
+          <possibleValue val="96">367</possibleValue>
+          <possibleValue val="112">368</possibleValue>
+          <possibleValue val="128">369</possibleValue>
+        </possibleValues>
+      </token>
+      <description>><![CDATA[Platform Power Limit 1 Time Window value in seconds. The value may vary from 0 to 128. If the value is 0,g default values will be programmed Indicates the time window over which Platform TDP value should be maintained.]]></description>
+    </setting>
+    <setting>
+      <id>PlatformPL2Enable</id>
+      <name>Platform PL2 Enable</name>
+      <token api="BSPBR">
+        <setupItemID>0x01D3</setupItemID>
+        <possibleValues default="Disabled" current="Disabled">
+          <possibleValue val="Disabled">1</possibleValue>
+          <possibleValue val="Enabled">2</possibleValue>
+        </possibleValues>
+      </token>
+      <description>><![CDATA[Enable/Disable Platform Power Limit 2 programming. If this option is disabled, BIOS will program the default values for Platform Power Limit 2.]]></description>
+    </setting>
+    <setting>
+      <id>PowerLimit3Override</id>
+      <name>Power Limit 3 Override </name>
+      <token api="BSPBR">
+        <setupItemID>0x01D5</setupItemID>
+        <possibleValues default="Disabled" current="Disabled">
+          <possibleValue val="Disabled">1</possibleValue>
+          <possibleValue val="Enabled">2</possibleValue>
+        </possibleValues>
+      </token>
+      <description>><![CDATA[Enable/DisablePower Limit 3 override. If this option is disabled, BIOS will leave the default values for Power Limit 3 and Power Limit 3 Time Window.]]></description>
+    </setting>
+    <setting>
+      <id>PowerLimit3TimeWindow</id>
+      <name>Power Limit 3 Time Window</name>
+      <token api="BSPBR">
+        <setupItemID>0x01D7</setupItemID>
+        <possibleValues default="0" current="0">
+          <possibleRange min="0" max="64"/>
+        </possibleValues>
+      </token>
+      <description>><![CDATA[Power Limit 3 Time Window value in Milli seconds. The value may vary from 3 to 64(max).Indicates the time window over which Power Limit 3 value should be maintained. If the value is 0, BIOS leaves default value]]></description>
+    </setting>
+    <setting>
+      <id>PowerLimit3DutyCycle</id>
+      <name>Powet Limit 3 Duty Cycle</name>
+      <token api="BSPBR">
+        <setupItemID>0x01D8</setupItemID>
+        <possibleValues default="0" current="0">
+          <possibleRange min="0" max="100"/>
+        </possibleValues>
+      </token>
+      <description>><![CDATA[Specify the duty cycle in percentage that the CPU is required to maintain over the configured Power Limit3 time windows.]]></description>
+    </setting>
+    <setting>
+      <id>PowerLimit4Override</id>
+      <name>Power Limit 4 Override</name>
+      <token api="BSPBR">
+        <setupItemID>0x01D9</setupItemID>
+        <possibleValues default="Disabled" current="Disabled">
+          <possibleValue val="Disabled">1</possibleValue>
+          <possibleValue val="Enabled">2</possibleValue>
+        </possibleValues>
+      </token>
+      <description>><![CDATA[Enable/Disable Power Limit 4 override. If this option is disabled, BIOS will leave the default values for Power Limit 4.]]></description>
+    </setting>
+    <setting>
+      <id>DVMTSharedMemorySize</id>
+      <name>  DVMT Shared Memory Size</name>
+      <token api="BSPBR">
+        <setupItemID>0x01DF</setupItemID>
+        <possibleValues default="32 MB" current="32 MB">
+          <possibleValue val="32 MB">56</possibleValue>
+          <possibleValue val="64 MB">57</possibleValue>
+          <possibleValue val="128 MB">58</possibleValue>
+          <possibleValue val="256 MB">60</possibleValue>
+          <possibleValue val="512 MB">354</possibleValue>
+          <possibleValue val="1024 MB">355</possibleValue>
+          <possibleValue val="1536 MB">356</possibleValue>
+        </possibleValues>
+      </token>
+      <description>><![CDATA[Select DVMT 5.0 pre-allocated (fixed) memory size used by the internal graphics controller.]]></description>
+    </setting>
+    <setting>
+      <id>DVMTTotalGraphicsMemorySize,</id>
+      <name>  DVMT Total Graphics Memory Size</name>
+      <token api="BSPBR">
+        <setupItemID>0x01E0</setupItemID>
+        <possibleValues default="256 MB" current="256 MB">
+          <possibleValue val="128 MB">58</possibleValue>
+          <possibleValue val="256 MB">60</possibleValue>
+          <possibleValue val="MAX">45</possibleValue>
+        </possibleValues>
+      </token>
+      <description>><![CDATA[Select DVMT 5.0 total memory size used by the internal graphics controller.]]></description>
+    </setting>
+    <setting>
+      <id>??? SetupVariableId unknown ???</id>
+      <name>CPU C states</name>
+      <token api="BSPBR">
+        <setupItemID>0x023B</setupItemID>
+        <possibleValues default="Enabled" current="Enabled">
+          <possibleValue val="Disabled">1</possibleValue>
+          <possibleValue val="Enabled">2</possibleValue>
+        </possibleValues>
+      </token>
+      <description>><![CDATA[Enable or disable CPU C states]]></description>
+    </setting>
+    <setting>
+      <id>Port61Bit4Emulation</id>
+      <name>Port 61h Bit-4 Emulation</name>
+      <token api="BSPBR">
+        <setupItemID>0x0255</setupItemID>
+        <possibleValues default="Enabled" current="Enabled">
+          <possibleValue val="Disabled">1</possibleValue>
+          <possibleValue val="Enabled">2</possibleValue>
+        </possibleValues>
+      </token>
+      <description>><![CDATA[Emulation of Port 61h bit-4 toggling in SMM]]></description>
+    </setting>
+    <setting>
+      <id>Port60h64hEmulation</id>
+      <name>Port 60/64 Emulation</name>
+      <token api="BSPBR">
+        <setupItemID>0x0257</setupItemID>
+        <possibleValues default="Enabled" current="Enabled">
+          <possibleValue val="Disabled">1</possibleValue>
+          <possibleValue val="Enabled">2</possibleValue>
+        </possibleValues>
+      </token>
+      <description>><![CDATA[Enables I/O port 60h/64h emulation support. This should be enabled for the complete USB keyboard legacy support for non-USB aware OSes.]]></description>
+    </setting>
+    <setting>
+      <id>PmSupport</id>
+      <name>PM Support</name>
+      <token api="BSPBR">
+        <setupItemID>0x0258</setupItemID>
+        <possibleValues default="Enabled" current="Enabled">
+          <possibleValue val="Enabled">2</possibleValue>
+          <possibleValue val="Disabled">1</possibleValue>
+        </possibleValues>
+      </token>
+      <description>><![CDATA[Enable/Disable PM Support]]></description>
+    </setting>
+  </settingDefinitions>
+
+  <configuration comment="current data for restore operation">
+    <token api="BSPBR"></token>
+
+    <supportedSetting>
+      <id>SerialPort1</id>
+      <name>Serial Port</name>
+        <setupItemID>0x0001</setupItemID>
+        <value>Enabled</value>
+    </supportedSetting>
+    <supportedSetting>
+      <id>LAN</id>
+      <name>LAN 1 Controller</name>
+        <setupItemID>0x0007</setupItemID>
+        <value>Enabled</value>
+    </supportedSetting>
+    <supportedSetting>
+      <id>USBHostController</id>
+      <name>Onboard USB Controllers</name>
+        <setupItemID>0x0009</setupItemID>
+        <value>Enabled</value>
+    </supportedSetting>
+    <supportedSetting>
+      <id>USBLegacySupport</id>
+      <name>Legacy USB Support</name>
+        <setupItemID>0x000B</setupItemID>
+        <value>Enabled</value>
+    </supportedSetting>
+    <supportedSetting>
+      <id>LANRemoteBoot</id>
+      <name>Launch PXE OpROM Policy</name>
+        <setupItemID>0x000D</setupItemID>
+        <value>UEFI only</value>
+    </supportedSetting>
+    <supportedSetting>
+      <id>FlashWrite</id>
+      <name>FLASH Write</name>
+        <setupItemID>0x0010</setupItemID>
+        <value>Enabled</value>
+    </supportedSetting>
+    <supportedSetting>
+      <id>WakeupLAN</id>
+      <name>LAN</name>
+        <setupItemID>0x0011</setupItemID>
+        <value>Enabled</value>
+    </supportedSetting>
+    <supportedSetting>
+      <id>OnAutomaticWakeupm</id>
+      <name>Skip Password on WOL</name>
+        <setupItemID>0x0013</setupItemID>
+        <value>Disabled</value>
+    </supportedSetting>
+    <supportedSetting>
+      <id>PasswordOnBoot</id>
+      <name>Password on Boot</name>
+        <setupItemID>0x001A</setupItemID>
+        <value>Disabled</value>
+    </supportedSetting>
+    <supportedSetting>
+      <id>ForceLANBoot</id>
+      <name>  Wake On LAN boot</name>
+        <setupItemID>0x001B</setupItemID>
+        <value>Boot Sequence</value>
+    </supportedSetting>
+    <supportedSetting>
+      <id>Numlock</id>
+      <name>Bootup NumLock State</name>
+        <setupItemID>0x0024</setupItemID>
+        <value>On</value>
+    </supportedSetting>
+    <supportedSetting>
+      <id>CoreProcessingMode</id>
+      <name>Active Processor Cores</name>
+        <setupItemID>0x0032</setupItemID>
+        <value>All</value>
+    </supportedSetting>
+    <supportedSetting>
+      <id>EnhancedSpeedStep</id>
+      <name>Enhanced SpeedStep</name>
+        <setupItemID>0x0033</setupItemID>
+        <value>Enabled</value>
+    </supportedSetting>
+    <supportedSetting>
+      <id>XDBitfunctionalityAndNXMemoryProtection</id>
+      <name>Execute Disable Bit</name>
+        <setupItemID>0x0036</setupItemID>
+        <value>Enabled</value>
+    </supportedSetting>
+    <supportedSetting>
+      <id>VirtualizationTechnology</id>
+      <name>Intel Virtualization Technology</name>
+        <setupItemID>0x0037</setupItemID>
+        <value>Enabled</value>
+    </supportedSetting>
+    <supportedSetting>
+      <id>BootfromRemovableMedia</id>
+      <name>Boot Removable Media</name>
+        <setupItemID>0x0048</setupItemID>
+        <value>Enabled</value>
+    </supportedSetting>
+    <supportedSetting>
+      <id>HyperThreading</id>
+      <name>Hyper-Threading</name>
+        <setupItemID>0x0057</setupItemID>
+        <value>Enabled</value>
+    </supportedSetting>
+    <supportedSetting>
+      <id>SecurityChip</id>
+      <name>  TPM Support</name>
+        <setupItemID>0x005C</setupItemID>
+        <value>Enabled</value>
+    </supportedSetting>
+    <supportedSetting>
+      <id>ChangeTPMState</id>
+      <name>  TPM State</name>
+        <setupItemID>0x005D</setupItemID>
+        <value>Enabled</value>
+    </supportedSetting>
+    <supportedSetting>
+      <id>IntelVTd</id>
+      <name>VT-d</name>
+        <setupItemID>0x0067</setupItemID>
+        <value>Enabled</value>
+    </supportedSetting>
+    <supportedSetting>
+      <id>Intel_TxT</id>
+      <name>Intel TXT(LT) Support</name>
+        <setupItemID>0x0068</setupItemID>
+        <value>Disabled</value>
+    </supportedSetting>
+    <supportedSetting>
+      <id>QuietBoot</id>
+      <name>Quiet Boot</name>
+        <setupItemID>0x0080</setupItemID>
+        <value>Disabled</value>
+    </supportedSetting>
+    <supportedSetting>
+      <id>TpmSkipPPI</id>
+      <name>Skip PPI during next Boot</name>
+        <setupItemID>0x0082</setupItemID>
+        <value>Disabled</value>
+    </supportedSetting>
+    <supportedSetting>
+      <id>SATAControllerModeSelection</id>
+      <name>SATA Mode Selection</name>
+        <setupItemID>0x0087</setupItemID>
+        <value>RAID Mode</value>
+    </supportedSetting>
+    <supportedSetting>
+      <id>PendingTPMOperation</id>
+      <name>  Pending TPM operation</name>
+        <setupItemID>0x009A</setupItemID>
+        <value>None</value>
+    </supportedSetting>
+    <supportedSetting>
+      <id>ECCMemoryErrorLogging</id>
+      <name>ECC Memory Error Logging</name>
+        <setupItemID>0x009F</setupItemID>
+        <value>Enabled</value>
+    </supportedSetting>
+    <supportedSetting>
+      <id>PCIErrorLogging</id>
+      <name>PCI Error Logging</name>
+        <setupItemID>0x00A0</setupItemID>
+        <value>Enabled</value>
+    </supportedSetting>
+    <supportedSetting>
+      <id>TurboMode</id>
+      <name>Turbo Mode</name>
+        <setupItemID>0x00A6</setupItemID>
+        <value>Enabled</value>
+    </supportedSetting>
+    <supportedSetting>
+      <id>BootErrorHandling</id>
+      <name>Boot error handling</name>
+        <setupItemID>0x00B0</setupItemID>
+        <value>Continue</value>
+    </supportedSetting>
+    <supportedSetting>
+      <id>PerrGeneration</id>
+      <name>PERR# Generation</name>
+        <setupItemID>0x00B1</setupItemID>
+        <value>Enabled</value>
+    </supportedSetting>
+    <supportedSetting>
+      <id>SerrGeneration</id>
+      <name>SERR# Generation</name>
+        <setupItemID>0x00B2</setupItemID>
+        <value>Enabled</value>
+    </supportedSetting>
+    <supportedSetting>
+      <id>Lan2</id>
+      <name>LAN 2 Controller</name>
+        <setupItemID>0x00B3</setupItemID>
+        <value>Enabled</value>
+    </supportedSetting>
+    <supportedSetting>
+      <id>UsbPortControl</id>
+      <name>USB Port Control</name>
+        <setupItemID>0x00C5</setupItemID>
+        <value>Enable all ports</value>
+    </supportedSetting>
+    <supportedSetting>
+      <id>UsbTransferTimeOut</id>
+      <name>USB transfer time-out</name>
+        <setupItemID>0x00D3</setupItemID>
+        <value>20 sec</value>
+    </supportedSetting>
+    <supportedSetting>
+      <id>PrimaryDisplay</id>
+      <name>Primary Display</name>
+        <setupItemID>0x00D7</setupItemID>
+        <value>Auto</value>
+    </supportedSetting>
+    <supportedSetting>
+      <id>InternalGraphics</id>
+      <name>Internal Graphics</name>
+        <setupItemID>0x00D8</setupItemID>
+        <value>Disabled</value>
+    </supportedSetting>
+    <supportedSetting>
+      <id>Lan1Oprom</id>
+      <name>LAN 1 Oprom</name>
+        <setupItemID>0x00E0</setupItemID>
+        <value>PXE</value>
+    </supportedSetting>
+    <supportedSetting>
+      <id>Lan2Oprom</id>
+      <name>LAN 2 Oprom</name>
+        <setupItemID>0x00E1</setupItemID>
+        <value>Disabled</value>
+    </supportedSetting>
+    <supportedSetting>
+      <id>AspmSupport</id>
+      <name>ASPM Support</name>
+        <setupItemID>0x00E2</setupItemID>
+        <value>Disabled</value>
+    </supportedSetting>
+    <supportedSetting>
+      <id>NetworkStack</id>
+      <name>Network Stack</name>
+        <setupItemID>0x00E5</setupItemID>
+        <value>Disabled</value>
+    </supportedSetting>
+    <supportedSetting>
+      <id>IPv4PxeSupport</id>
+      <name>Ipv4 PXE Support</name>
+        <setupItemID>0x00E6</setupItemID>
+        <value>Enabled</value>
+    </supportedSetting>
+    <supportedSetting>
+      <id>IPv6PxeSupport</id>
+      <name>Ipv6 PXE Support</name>
+        <setupItemID>0x00E7</setupItemID>
+        <value>Enabled</value>
+    </supportedSetting>
+    <supportedSetting>
+      <id>SecureBoot</id>
+      <name>Secure Boot Control</name>
+        <setupItemID>0x00E8</setupItemID>
+        <value>Disabled</value>
+    </supportedSetting>
+    <supportedSetting>
+      <id>DefaultKeyProvisioning</id>
+      <name>Factory Default Key Provision</name>
+        <setupItemID>0x00E9</setupItemID>
+        <value>Enabled</value>
+    </supportedSetting>
+    <supportedSetting>
+      <id>Csm</id>
+      <name>Launch CSM</name>
+        <setupItemID>0x00EA</setupItemID>
+        <value>Disabled</value>
+    </supportedSetting>
+    <supportedSetting>
+      <id>LaunchSlot1Oprom</id>
+      <name>Launch Slot 1 OpROM</name>
+        <setupItemID>0x00EC</setupItemID>
+        <value>Disabled</value>
+    </supportedSetting>
+    <supportedSetting>
+      <id>LaunchSlot2Oprom</id>
+      <name>Launch Slot 2 OpROM</name>
+        <setupItemID>0x00ED</setupItemID>
+        <value>Disabled</value>
+    </supportedSetting>
+    <supportedSetting>
+      <id>LaunchSlot3Oprom</id>
+      <name>Launch Slot 3 OpROM</name>
+        <setupItemID>0x00EE</setupItemID>
+        <value>Disabled</value>
+    </supportedSetting>
+    <supportedSetting>
+      <id>LaunchSlot4Oprom</id>
+      <name>Launch Slot 4 OpROM</name>
+        <setupItemID>0x00EF</setupItemID>
+        <value>Enabled</value>
+    </supportedSetting>
+    <supportedSetting>
+      <id>PowerOnSource</id>
+      <name>Power-on Source</name>
+        <setupItemID>0x00FF</setupItemID>
+        <value>BIOS Controlled</value>
+    </supportedSetting>
+    <supportedSetting>
+      <id>Above4GDecoding</id>
+      <name>Above 4G Decoding</name>
+        <setupItemID>0x0101</setupItemID>
+        <value>Disabled</value>
+    </supportedSetting>
+    <supportedSetting>
+      <id>KeepOrphanFwBootOption</id>
+      <name>Keep Void Boot Options</name>
+        <setupItemID>0x0102</setupItemID>
+        <value>Disabled</value>
+    </supportedSetting>
+    <supportedSetting>
+      <id>BootOptionFilter</id>
+      <name>Boot option filter</name>
+        <setupItemID>0x0103</setupItemID>
+        <value>UEFI only</value>
+    </supportedSetting>
+    <supportedSetting>
+      <id>LaunchPxeOpRomPolicy</id>
+      <name>Launch PXE OpROM Policy</name>
+        <setupItemID>0x0104</setupItemID>
+        <value>UEFI only</value>
+    </supportedSetting>
+    <supportedSetting>
+      <id>LaunchStorageOpRomPolicy</id>
+      <name>Launch Storage OpROM policy</name>
+        <setupItemID>0x0105</setupItemID>
+        <value>UEFI only</value>
+    </supportedSetting>
+    <supportedSetting>
+      <id>LaunchVideoOpRomPolicy</id>
+      <name>Launch Video OpROM policy</name>
+        <setupItemID>0x0106</setupItemID>
+        <value>UEFI only</value>
+    </supportedSetting>
+    <supportedSetting>
+      <id>OtherPciDeviceRomPriority</id>
+      <name>Other PCI device ROM priority</name>
+        <setupItemID>0x0107</setupItemID>
+        <value>Legacy only</value>
+    </supportedSetting>
+    <supportedSetting>
+      <id>PxeBootOptionRetry</id>
+      <name>PXE Boot Option Retry</name>
+        <setupItemID>0x011D</setupItemID>
+        <value>Disabled</value>
+    </supportedSetting>
+    <supportedSetting>
+      <id>HardwarePrefetcher</id>
+      <name>Hardware Prefetcher</name>
+        <setupItemID>0x012E</setupItemID>
+        <value>Enabled</value>
+    </supportedSetting>
+    <supportedSetting>
+      <id>AdjacentCacheLinePrefetch</id>
+      <name>Adjacent Cache Line Prefetch</name>
+        <setupItemID>0x012F</setupItemID>
+        <value>Enabled</value>
+    </supportedSetting>
+    <supportedSetting>
+      <id>DcuStreamerPrefecher</id>
+      <name>DCU Streamer Prefetcher</name>
+        <setupItemID>0x0130</setupItemID>
+        <value>Enabled</value>
+    </supportedSetting>
+    <supportedSetting>
+      <id>PackageCStateLimit</id>
+      <name>Package C State limit</name>
+        <setupItemID>0x0136</setupItemID>
+        <value>C7</value>
+    </supportedSetting>
+    <supportedSetting>
+      <id>LimitCpuIdMaximum</id>
+      <name>Limit CPUID Maximum</name>
+        <setupItemID>0x0140</setupItemID>
+        <value>Disabled</value>
+    </supportedSetting>
+    <supportedSetting>
+      <id>PxeBootWaitTime</id>
+      <name>PXE boot wait time</name>
+        <setupItemID>0x014D</setupItemID>
+        <value>0</value>
+    </supportedSetting>
+    <supportedSetting>
+      <id>CheckControllersHealthStatus</id>
+      <name>Check controllers health status</name>
+        <setupItemID>0x014E</setupItemID>
+        <value>Enabled</value>
+    </supportedSetting>
+    <supportedSetting>
+      <id>PasswordSeverity</id>
+      <name>Password Severity</name>
+        <setupItemID>0x0174</setupItemID>
+        <value>Standard</value>
+    </supportedSetting>
+    <supportedSetting>
+      <id>StatusPCISlot1</id>
+      <name>PCI Slot 1</name>
+        <setupItemID>0x0196</setupItemID>
+        <value>Empty</value>
+    </supportedSetting>
+    <supportedSetting>
+      <id>StatusPCISlot2</id>
+      <name>PCI Slot 2</name>
+        <setupItemID>0x0197</setupItemID>
+        <value>Empty</value>
+    </supportedSetting>
+    <supportedSetting>
+      <id>StatusPCISlot3</id>
+      <name>PCI Slot 3</name>
+        <setupItemID>0x0198</setupItemID>
+        <value>Empty</value>
+    </supportedSetting>
+    <supportedSetting>
+      <id>StatusPCISlot4</id>
+      <name>PCI Slot 4</name>
+        <setupItemID>0x0199</setupItemID>
+        <value>Enabled</value>
+    </supportedSetting>
+    <supportedSetting>
+      <id>ChangeSettingsSerialPort</id>
+      <name>Change Settings</name>
+        <setupItemID>0x01AC</setupItemID>
+        <value>Auto</value>
+    </supportedSetting>
+    <supportedSetting>
+      <id>SecureBootMode</id>
+      <name>Secure Boot Mode</name>
+        <setupItemID>0x01B0</setupItemID>
+        <value>Custom</value>
+    </supportedSetting>
+    <supportedSetting>
+      <id>wBootOptionPolicy</id>
+      <name>New Boot Option Policy</name>
+        <setupItemID>0x01BC</setupItemID>
+        <value>Place First</value>
+    </supportedSetting>
+    <supportedSetting>
+      <id>SwGuardExtensions_SGX</id>
+      <name>SW Guard Extensions (SGX)</name>
+        <setupItemID>0x01BF</setupItemID>
+        <value>Disabled</value>
+    </supportedSetting>
+    <supportedSetting>
+      <id>X2APIC_OptOut</id>
+      <name>X2APIC Opt Out</name>
+        <setupItemID>0x01C0</setupItemID>
+        <value>Disabled</value>
+    </supportedSetting>
+    <supportedSetting>
+      <id>PowerLimit1Override</id>
+      <name>   Power Limit 1 Override</name>
+        <setupItemID>0x01CB</setupItemID>
+        <value>Disabled</value>
+    </supportedSetting>
+    <supportedSetting>
+      <id>PowerLimit1Window</id>
+      <name>   Power Limit 1 Window</name>
+        <setupItemID>0x01CD</setupItemID>
+        <value>0</value>
+    </supportedSetting>
+    <supportedSetting>
+      <id>PowerLimit2Override</id>
+      <name>   Power Limit 2 Override</name>
+        <setupItemID>0x01CE</setupItemID>
+        <value>Enabled</value>
+    </supportedSetting>
+    <supportedSetting>
+      <id>PlatformPL1Enable</id>
+      <name>Platform PL1 Enable</name>
+        <setupItemID>0x01D0</setupItemID>
+        <value>Disabled</value>
+    </supportedSetting>
+    <supportedSetting>
+      <id>PlatformPL1TimeWindow</id>
+      <name>Platform PL1 Time Window</name>
+        <setupItemID>0x01D2</setupItemID>
+        <value>0</value>
+    </supportedSetting>
+    <supportedSetting>
+      <id>PlatformPL2Enable</id>
+      <name>Platform PL2 Enable</name>
+        <setupItemID>0x01D3</setupItemID>
+        <value>Disabled</value>
+    </supportedSetting>
+    <supportedSetting>
+      <id>PowerLimit3Override</id>
+      <name>Power Limit 3 Override </name>
+        <setupItemID>0x01D5</setupItemID>
+        <value>Disabled</value>
+    </supportedSetting>
+    <supportedSetting>
+      <id>PowerLimit3TimeWindow</id>
+      <name>Power Limit 3 Time Window</name>
+        <setupItemID>0x01D7</setupItemID>
+        <value>0</value>
+    </supportedSetting>
+    <supportedSetting>
+      <id>PowerLimit3DutyCycle</id>
+      <name>Powet Limit 3 Duty Cycle</name>
+        <setupItemID>0x01D8</setupItemID>
+        <value>0</value>
+    </supportedSetting>
+    <supportedSetting>
+      <id>PowerLimit4Override</id>
+      <name>Power Limit 4 Override</name>
+        <setupItemID>0x01D9</setupItemID>
+        <value>Disabled</value>
+    </supportedSetting>
+    <supportedSetting>
+      <id>DVMTSharedMemorySize</id>
+      <name>  DVMT Shared Memory Size</name>
+        <setupItemID>0x01DF</setupItemID>
+        <value>32 MB</value>
+    </supportedSetting>
+    <supportedSetting>
+      <id>DVMTTotalGraphicsMemorySize,</id>
+      <name>  DVMT Total Graphics Memory Size</name>
+        <setupItemID>0x01E0</setupItemID>
+        <value>256 MB</value>
+    </supportedSetting>
+    <supportedSetting>
+      <id>??? SetupVariableId unknown ???</id>
+      <name>CPU C states</name>
+        <setupItemID>0x023B</setupItemID>
+        <value>Enabled</value>
+    </supportedSetting>
+    <supportedSetting>
+      <id>Port61Bit4Emulation</id>
+      <name>Port 61h Bit-4 Emulation</name>
+        <setupItemID>0x0255</setupItemID>
+        <value>Enabled</value>
+    </supportedSetting>
+    <supportedSetting>
+      <id>Port60h64hEmulation</id>
+      <name>Port 60/64 Emulation</name>
+        <setupItemID>0x0257</setupItemID>
+        <value>Enabled</value>
+    </supportedSetting>
+    <supportedSetting>
+      <id>PmSupport</id>
+      <name>PM Support</name>
+        <setupItemID>0x0258</setupItemID>
+        <value>Enabled</value>
+    </supportedSetting>
+
+  </configuration>
+
+</config>
+
+  

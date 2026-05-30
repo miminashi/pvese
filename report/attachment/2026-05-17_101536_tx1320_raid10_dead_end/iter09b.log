@@ -1,0 +1,114 @@
+[10:05:58] ============================================================
+[10:05:58] iter_09b: explore Select RAID Level reach options
+[10:05:58] ============================================================
+[10:05:59] Login to 10.254.254.9 (attempt 1/3)
+[10:06:07] SID: C3DKj63e...
+[10:06:10] Warm-up 15s
+[10:06:32] [goto_avago_main] navigate_to_avago_main
+[10:06:32] safe_navigate_to_advanced_tab
+[10:06:32]   safe_esc[1] size=14440 state=main_menu_submenu_cfg_mgmt
+[10:06:34]   safe_esc[2] size=17735 state=avago_main_vds0
+[10:06:36]   safe_esc[3] size=18051 state=advanced_tab_item_14
+[10:06:36]     at top-level: advanced_tab_item_14
+[10:06:37]   pos check: size=18051 state=advanced_tab_item_14
+[10:06:48]   nav_y[goto_avago_main_to_avago_row/caret]: initial cursor_y=260 target=393
+[10:06:49]   nav_y[goto_avago_main_to_avago_row/caret][1/25]: cursor_y=273 target=393
+[10:06:50]   nav_y[goto_avago_main_to_avago_row/caret][2/25]: cursor_y=297 target=393
+[10:06:51]   nav_y[goto_avago_main_to_avago_row/caret][3/25]: cursor_y=311 target=393
+[10:06:51]   nav_y[goto_avago_main_to_avago_row/caret][4/25]: cursor_y=336 target=393
+[10:06:52]   nav_y[goto_avago_main_to_avago_row/caret][5/25]: cursor_y=374 target=393
+[10:06:53]   nav_y[goto_avago_main_to_avago_row/caret][6/25]: cursor_y=393 target=393
+[10:06:53]   -> reached target_y=393 at press 6
+[10:06:58] [goto_avago_main] AVAGO Main cursor_y=70 expected=70
+[10:06:58] Open Create VD form
+[10:07:02]   nav_y[ocvd_02_to_cfgmgmt/caret]: initial cursor_y=64 target=70
+[10:07:02]   -> already at target
+[10:07:10]   form_open: size=22065 highlight_y=88 (expected near 88)
+[10:07:10] === trial[t1_enter_save] ===
+[10:07:10]   before: size=22065
+[10:07:10]   T1: form_open + Enter on Save Config TOP
+[10:07:13]   after action: size=23280 delta=+1215
+[10:07:13]   image_diff: y=None sum=0
+[10:07:13]   T1 restore: Esc x2 (in case dialog opened)
+[10:07:16]     after Esc1: size=22065
+[10:07:16]   after T1+restore: size=22065 naive_y=88
+[10:07:16] === trial[t2_tab] ===
+[10:07:16]   before: size=22065
+[10:07:16]   T2: form_open + Tab
+[10:07:18]   after action: size=22065 delta=+0
+[10:07:18]   image_diff: y=None sum=0
+[10:07:21]   probe NumpadAdd: size=22052 delta=-13 diff_y=None diff_sum=618
+[10:07:23]   probe restore: size=22065 delta_to_after=+0
+[10:07:23] === trial[t3_shift_tab] ===
+[10:07:23]   before: size=22065
+[10:07:23]   T3: form_open + Shift+Tab
+[10:07:25]   after action: size=22065 delta=+0
+[10:07:25]   image_diff: y=None sum=0
+[10:07:28]   probe NumpadAdd: size=22052 delta=-13 diff_y=None diff_sum=618
+[10:07:30]   probe restore: size=22065 delta_to_after=+0
+[10:07:30] === trial[t_home] ===
+[10:07:30]   before: size=22065
+[10:07:30]   T_home: Home key
+[10:07:32]   after action: size=22065 delta=+0
+[10:07:32]   image_diff: y=None sum=0
+[10:07:35]   probe NumpadAdd: size=22052 delta=-13 diff_y=None diff_sum=618
+[10:07:37]   probe restore: size=22065 delta_to_after=+0
+[10:07:37] === trial[t_end] ===
+[10:07:37]   before: size=22065
+[10:07:37]   T_end: End key
+[10:07:39]   after action: size=17265 delta=-4800
+[10:07:39]   image_diff: y=91 sum=22848
+[10:07:42]   probe NumpadAdd: size=17268 delta=+3 diff_y=411 diff_sum=2266
+[10:07:44]   probe restore: size=17265 delta_to_after=+0
+[10:07:44] === trial[t_pageup] ===
+[10:07:44]   before: size=17265
+[10:07:44]   T_pageup: PageUp
+[10:07:46]   after action: size=22065 delta=+4800
+[10:07:46]   image_diff: y=91 sum=22848
+[10:07:49]   probe NumpadAdd: size=22052 delta=-13 diff_y=None diff_sum=618
+[10:07:51]   probe restore: size=22065 delta_to_after=+0
+[10:07:51] === trial[t_pagedown] ===
+[10:07:51]   before: size=22065
+[10:07:51]   T_pagedown: PageDown
+[10:07:53]   after action: size=17265 delta=-4800
+[10:07:53]   image_diff: y=91 sum=22848
+[10:07:55]   probe NumpadAdd: size=17268 delta=+3 diff_y=411 diff_sum=2266
+[10:07:58]   probe restore: size=17265 delta_to_after=+0
+[10:07:58] === trial[t_click_x50] ===
+[10:07:58]   before: size=17265
+[10:07:58]   click at (50, 128)
+[10:08:00]   after action: size=17265 delta=+0
+[10:08:00]   image_diff: y=None sum=0
+[10:08:02]   probe NumpadAdd: size=17268 delta=+3 diff_y=411 diff_sum=2266
+[10:08:05]   probe restore: size=17265 delta_to_after=+0
+[10:08:05] === trial[t_click_x200] ===
+[10:08:05]   before: size=17265
+[10:08:05]   click at (200, 128)
+[10:08:07]   after action: size=17265 delta=+0
+[10:08:07]   image_diff: y=None sum=0
+[10:08:09]   probe NumpadAdd: size=17268 delta=+3 diff_y=411 diff_sum=2266
+[10:08:12]   probe restore: size=17265 delta_to_after=+0
+[10:08:12] === trial[t_click_x300] ===
+[10:08:12]   before: size=17265
+[10:08:12]   click at (300, 128)
+[10:08:14]   after action: size=17265 delta=+0
+[10:08:14]   image_diff: y=None sum=0
+[10:08:16]   probe NumpadAdd: size=17268 delta=+3 diff_y=411 diff_sum=2266
+[10:08:19]   probe restore: size=17265 delta_to_after=+0
+[10:08:19] --- Cleanup ---
+[10:08:21]   emerg_esc[1]: size=10934 state=None
+[10:08:24]   emerg_esc[2]: size=14440 state=main_menu_submenu_cfg_mgmt
+[10:08:24]   emergency_esc_out -> main_menu_submenu_cfg_mgmt (safe)
+[10:08:24] ============================================================
+[10:08:24] RESULTS (probe diff_y per trial, expect y near 128 for success):
+[10:08:24]   T1_enter_save_top: y=None
+[10:08:24]   T2_tab: y=None
+[10:08:24]   T3_shift_tab: y=None
+[10:08:24]   T_home: y=None
+[10:08:24]   T_end: y=411
+[10:08:24]   T_pageup: y=91
+[10:08:24]   T_pagedown: y=411
+[10:08:24]   T_click_x50_y128: y=411
+[10:08:24]   T_click_x200_y128: y=411
+[10:08:24]   T_click_x300_y128: y=411
+[10:08:24] ============================================================

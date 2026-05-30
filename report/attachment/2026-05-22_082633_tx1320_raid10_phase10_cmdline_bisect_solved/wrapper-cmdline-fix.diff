@@ -1,0 +1,44 @@
+diff --git a/scripts/remaster-debian-iso.sh b/scripts/remaster-debian-iso.sh
+index 7210812..c639e6b 100755
+--- a/scripts/remaster-debian-iso.sh
++++ b/scripts/remaster-debian-iso.sh
+@@ -70,6 +70,7 @@ docker run --rm --dns 8.8.8.8 \
+     -e "SERIAL_UNIT=$SERIAL_UNIT" \
+     -e "OUTPUT_BASENAME=$OUTPUT_BASENAME" \
+     -e "INCLUDE_BASENAMES=$INCLUDE_BASENAMES" \
++    -e "EXTRA_CMDLINE=${EXTRA_CMDLINE:-}" \
+     -v "$ORIG_ISO:/input.iso:ro" \
+     -v "$PRESEED:/preseed.cfg:ro" \
+     -v "$(dirname "$OUTPUT_ISO"):/output" \
+@@ -120,7 +121,7 @@ terminal_output serial console
+ search --file --set=root /install.amd/vmlinuz
+ 
+ menuentry "Automated Install" {
+-    linux /install.amd/vmlinuz vga=normal nomodeset auto=true priority=critical preseed/file=/preseed.cfg locale=en_US.UTF-8 keymap=us netcfg/choose_interface=auto cdrom-detect/try-usb=true cdrom-detect/scan=true hw-detect/load_media=false console=tty0 console=ttyS${SERIAL_UNIT},115200n8 --- quiet
++    linux /install.amd/vmlinuz auto=true priority=critical preseed/file=/preseed.cfg locale=en_US.UTF-8 keymap=us netcfg/choose_interface=auto cdrom-detect/try-usb=true cdrom-detect/scan=true hw-detect/load_media=false console=tty0 console=ttyS${SERIAL_UNIT},115200n8 ${EXTRA_CMDLINE} --- quiet
+     initrd /install.amd/initrd.gz
+ }
+ GRUBCFG
+@@ -130,11 +131,11 @@ default auto
+ label auto
+   menu label ^Automated Install
+   kernel /install.amd/vmlinuz
+-  append vga=normal nomodeset auto=true priority=critical preseed/file=/preseed.cfg locale=en_US.UTF-8 keymap=us netcfg/choose_interface=auto cdrom-detect/try-usb=true cdrom-detect/scan=true hw-detect/load_media=false console=tty0 console=ttyS${SERIAL_UNIT},115200n8 initrd=/install.amd/initrd.gz --- quiet
++  append auto=true priority=critical preseed/file=/preseed.cfg locale=en_US.UTF-8 keymap=us netcfg/choose_interface=auto cdrom-detect/try-usb=true cdrom-detect/scan=true hw-detect/load_media=false console=tty0 console=ttyS${SERIAL_UNIT},115200n8 ${EXTRA_CMDLINE} initrd=/install.amd/initrd.gz --- quiet
+ label install
+   menu label ^Install
+   kernel /install.amd/vmlinuz
+-  append vga=normal nomodeset initrd=/install.amd/initrd.gz --- quiet
++  append initrd=/install.amd/initrd.gz --- quiet
+ TXTCFG
+ 
+ cat > "$WORK/mod/isolinux.cfg" << ISOCFG
+@@ -193,7 +194,7 @@ set timeout=3
+ search --file --set=root /install.amd/vmlinuz
+ 
+ menuentry "Automated Install" {
+-    linux /install.amd/vmlinuz vga=normal nomodeset auto=true priority=critical preseed/file=/preseed.cfg locale=en_US.UTF-8 keymap=us netcfg/choose_interface=auto cdrom-detect/try-usb=true cdrom-detect/scan=true hw-detect/load_media=false console=tty0 console=ttyS${SERIAL_UNIT},115200n8 --- quiet
++    linux /install.amd/vmlinuz auto=true priority=critical preseed/file=/preseed.cfg locale=en_US.UTF-8 keymap=us netcfg/choose_interface=auto cdrom-detect/try-usb=true cdrom-detect/scan=true hw-detect/load_media=false console=tty0 console=ttyS${SERIAL_UNIT},115200n8 ${EXTRA_CMDLINE} --- quiet
+     initrd /install.amd/initrd.gz
+ }
+ EMBEDCFG

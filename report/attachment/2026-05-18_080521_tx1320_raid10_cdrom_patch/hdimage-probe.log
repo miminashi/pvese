@@ -1,0 +1,55 @@
+# Phase 1: HDImage license block 検証ログ
+
+## 実施日時
+2026-05-18 (i-floofy-pretzel session, 6a031ae5)
+
+## Step 1: HDImage status 確認 (PATCH 前)
+
+```
+$ ./scripts/irmc-virtualmedia.sh --type=HD status 10.254.254.9 claude Claude123
+HDImage.Server=
+HDImage.ShareName=
+HDImage.ImageName=
+RemoteMountEnabled=true
+```
+
+→ Server/ShareName/ImageName 空、 OEM probe 出力と同じく `MaximumNumberOfDevices: 0`
+
+## Step 2: HDImage PATCH 試行
+
+```
+$ ./oplog.sh ./scripts/irmc-virtualmedia.sh --type=HD config 10.254.254.9 claude Claude123 \
+    10.1.6.1 public debian-training-tx1320-raid10.iso guest guest
+PATCH payload: {"HDImage":{"Server":"10.1.6.1","UserName":"guest","Password":"guest",
+   "UserDomain":"","ShareType":"SMB","ShareName":"public",
+   "ImageName":"debian-training-tx1320-raid10.iso"},"RemoteMountEnabled":true}
+...
+HTTP 200
+```
+
+→ **HTTP 200 + Server/ShareName/ImageName が応答 JSON に反映** (Server="10.1.6.1"、 ShareName="public" 等)
+→ ただし `"MaximumNumberOfDevices":0` は変わらず
+→ Plan で予想していた **(c) HTTP 200 + Server 反映** に該当
+
+## Step 3: Manager-level VirtualMedia Members 確認
+
+```
+$ curl ... /redfish/v1/Managers/iRMC/VirtualMedia
+"Members": [],
+"Members@odata.count": 0
+```
+
+→ HD PATCH 後も Manager VirtualMedia は空。 host への USB attach は実行されていない
+→ ただし PowerState=Off なので、 power on しないと真の attach 検証は不可
+
+## 結論
+
+- HDImage PATCH は API 層で **silent accept** (HTTP 200)
+- 内部 `MaximumNumberOfDevices: 0` は変わらず → HD スロット自体が iRMC ライセンス / FW で実装されていない
+- Manager VirtualMedia Members も増えず → USB redirector が HD device を生成しない
+- power on しての実機 host 側検証は本セッションではスキップ (Phase 2 cdrom-detect patch を優先)
+- **判定**: HDImage 経路は実機で動かない可能性が極めて高い。 Phase 2 (cdrom-detect.postinst patch) に進む
+
+## Restore
+
+HDImage 設定を空に戻し、 CDImage の SMB 設定 (debian-training-tx1320-raid10.iso) は維持。

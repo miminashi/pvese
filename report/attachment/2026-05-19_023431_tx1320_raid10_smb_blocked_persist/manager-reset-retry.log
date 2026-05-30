@@ -1,0 +1,73 @@
+=== Manager.Reset GracefulRestart ===
+HTTP 204
+=== Sleep 30s before polling ===
+=== Poll BMC up (10s × 30 = 5min max) ===
+[02:25:07] iter=1 BMC down
+[02:25:20] iter=2 BMC down
+[02:25:33] iter=3 BMC down
+[02:25:46] iter=4 BMC down
+[02:25:59] iter=5 BMC down
+[02:26:10] iter=6 BMC down
+[02:26:20] iter=7 BMC down
+[02:26:30] iter=8 BMC down
+[02:26:40] iter=9 BMC down
+[02:26:51] iter=10 BMC down
+[02:27:11] iter=11 BMC down
+[02:27:24] iter=12 BMC down
+[02:27:37] iter=13 BMC down
+[02:27:51] BMC up after iter=14 (140s+30s)
+=== Sleep 10s for full BMC init ===
+=== Status post-reset ===
+ERROR: failed to parse CDImage block
+{
+  "error":{
+    "@Message.ExtendedInfo":[
+      {
+        "@odata.type":"\/redfish\/v1\/$metadata#Message.1_0_0.Message",
+        "MessageId":"Base.1.0.ServiceTemporarilyUnavailable",
+        "Message":"The service is temporarily unavailable. Retry in 30 seconds.",
+        "Severity":"Critical",
+        "Resolution":"Wait for the indicated retry duration and retry the operation."
+      }
+    ],
+    "code":"Base.1.0.ServiceTemporarilyUnavailable",
+    "message":"The service is temporarily unavailable. Retry in 30 seconds."
+  }
+}
+=== AllowableValues post-reset ===
+=== ConnectCD post-reset ===
+{
+  "error":{
+    "@Message.ExtendedInfo":[
+      {
+        "@odata.type":"\/redfish\/v1\/$metadata#Message.1_0_0.Message",
+        "MessageId":"Base.1.0.ServiceTemporarilyUnavailable",
+        "Message":"The service is temporarily unavailable. Retry in 30 seconds.",
+        "Severity":"Critical",
+        "Resolution":"Wait for the indicated retry duration and retry the operation."
+      }
+    ],
+    "code":"Base.1.0.ServiceTemporarilyUnavailable",
+    "message":"The service is temporarily unavailable. Retry in 30 seconds."
+  }
+}
+HTTP 503
+=== Poll Members count (5s × 18 = 90s) ===
+[02:28:19] iter=1 Members=-1
+[02:28:27] iter=2 Members=-1
+[02:28:35] iter=3 Members=0
+[02:28:43] iter=4 Members=0
+[02:28:51] iter=5 Members=0
+[02:28:58] iter=6 Members=0
+[02:29:05] iter=7 Members=0
+[02:29:13] iter=8 Members=0
+[02:29:21] iter=9 Members=0
+[02:29:28] iter=10 Members=0
+[02:29:35] iter=11 Members=0
+[02:29:42] iter=12 Members=0
+[02:29:48] iter=13 Members=0
+[02:29:56] iter=14 Members=0
+[02:30:03] iter=15 Members=0
+[02:30:09] iter=16 Members=0
+[02:30:16] iter=17 Members=0
+[02:30:23] iter=18 Members=0

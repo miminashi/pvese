@@ -1,0 +1,72 @@
+=== B3 v2: DisconnectCD (clean stuck state if any) ===
+HTTP 204
+=== Sleep 15s ===
+=== Verify AllowableValues post-Disconnect ===
+AllowableValues: ['ConnectCD']
+=== Re-PATCH via irmc-virtualmedia.sh config ===
+PATCH payload: {"CDImage":{"Server":"10.1.6.1","UserName":"guest","Password":"guest","UserDomain":"","ShareType":"SMB","ShareName":"public","ImageName":"debian-training-tx1320-raid10.iso"},"RemoteMountEnabled":true}
+{
+  "@odata.context":"\/redfish\/v1\/$metadata#Systems\/Members\/0\/Oem\/ts_fujitsu\/VirtualMedia(Name,FDImage,CDImage,HDImage,RemoteMountEnabled,UsbAttachMode)",
+  "@odata.id":"\/redfish\/v1\/Systems\/0\/Oem\/ts_fujitsu\/VirtualMedia",
+  "@odata.type":"http:\/\/ts.fujitsu.com\/redfish-schemas\/v1\/FTSSchema.v1_0_0#FTSVirtualMedia.v1_0_0.FTSVirtualMedia",
+  "Name":"Virtual Media Configuration",
+  "FDImage":{
+    "Server":"",
+    "UserName":"",
+    "Password":null,
+    "UserDomain":"",
+    "ShareType":"SMB",
+    "ShareName":"",
+    "ImageName":"",
+    "MaximumNumberOfDevices":0
+  },
+  "CDImage":{
+    "Server":"10.1.6.1",
+    "UserName":"guest",
+    "Password":null,
+    "UserDomain":"",
+    "ShareType":"SMB",
+    "ShareName":"public",
+    "ImageName":"debian-training-tx1320-raid10.iso",
+    "MaximumNumberOfDevices":2
+  },
+  "HDImage":{
+    "Server":"",
+    "UserName":"",
+    "Password":null,
+    "UserDomain":"",
+    "ShareType":"SMB",
+    "ShareName":"",
+    "ImageName":"",
+    "MaximumNumberOfDevices":0
+  },
+  "RemoteMountEnabled":true,
+  "UsbAttachMode":"AutoAttach",
+  "@Redfish.Copyright":"Copyright 2017 FUJITSU LIMITED",
+  "@odata.etag":"1779158096"
+}
+
+HTTP 200
+=== Sleep 10s ===
+=== Status after re-PATCH ===
+CDImage.Server=10.1.6.1
+CDImage.ShareName=public
+CDImage.ImageName=debian-training-tx1320-raid10.iso
+RemoteMountEnabled=true
+=== AllowableValues after re-PATCH ===
+AllowableValues: ['ConnectCD']
+=== ConnectCD (in case auto-attach did not occur) ===
+HTTP 204
+=== Poll Members count (5s × 12 = 60s) ===
+[02:21:48] iter=1 Members=0
+[02:21:55] iter=2 Members=0
+[02:22:02] iter=3 Members=0
+[02:22:09] iter=4 Members=0
+[02:22:16] iter=5 Members=0
+[02:22:22] iter=6 Members=0
+[02:22:30] iter=7 Members=0
+[02:22:37] iter=8 Members=0
+[02:22:44] iter=9 Members=0
+[02:22:50] iter=10 Members=0
+[02:22:57] iter=11 Members=0
+[02:23:04] iter=12 Members=0

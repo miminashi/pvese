@@ -1,0 +1,135 @@
+# N6 step 1: Samba 4.19.5 source grep results (s-quizzical-wozniak, 2026-05-20)
+
+## 1. case 513 / 0x201 in smb1_trans2.c (source3/smbd/)
+
+$ grep -nE 'case 513|case 0x201|level *== *513|level *== *0x201' \
+    tmp/3577cabb/samba-4.19.5/source3/smbd/smb1_trans2.c
+(0 matches — case label 不在を確認)
+
+## 2. case 513 / 0x201 broadly across source3/ and libcli/smb/
+
+$ grep -rnE 'case 513\b|case 0x201\b' \
+    tmp/3577cabb/samba-4.19.5/source3/ tmp/3577cabb/samba-4.19.5/libcli/smb/
+(0 matches)
+
+## 3. 0x201 constant references
+
+$ grep -rnE '\b0x0201\b|\b0x201\b' \
+    tmp/3577cabb/samba-4.19.5/source3/ tmp/3577cabb/samba-4.19.5/libcli/smb/
+
+tmp/3577cabb/samba-4.19.5/libcli/smb/smb_unix_ext.h:134:#define SMB_QUERY_FILE_UNIX_LINK       0x201
+tmp/3577cabb/samba-4.19.5/libcli/smb/smb_unix_ext.h:135:#define SMB_SET_FILE_UNIX_LINK         0x201
+tmp/3577cabb/samba-4.19.5/libcli/smb/smb_unix_ext.h:218:#define SMB_QUERY_POSIX_FS_INFO     0x201
+
+★ 0x201 は context (qfsinfo / qpathinfo / setpathinfo) で 3 つの意味を持つ
+★ qfsinfo (TRANS2_QFSINFO, iRMC が要求) では SMB_QUERY_POSIX_FS_INFO
+
+## 4. qfsinfo flow in source3/smbd/smb1_trans2.c
+
+$ grep -nE 'smbd_do_qfsinfo|call_trans2qfsinfo|SMB_QUERY_POSIX_FS_INFO' \
+    tmp/3577cabb/samba-4.19.5/source3/smbd/smb1_trans2.c
+
+1647:static void call_trans2qfsinfo(connection_struct *conn,
+1668:			DEBUG(0,("call_trans2qfsinfo: encryption required "
+1676:	DEBUG(3,("call_trans2qfsinfo: level = %d\n", info_level));
+1678:	status = smbd_do_qfsinfo(req->xconn, conn, req,
+5244:		call_trans2qfsinfo(conn, req,
+
+★ call_trans2qfsinfo は単に info_level を抽出して smbd_do_qfsinfo に渡すだけ
+★ smbd_do_qfsinfo の実装は smb2_trans2.c (SMB1/SMB2 共通)
+
+## 5. smbd_do_qfsinfo 実装 (smb2_trans2.c)
+
+$ grep -rn 'smbd_do_qfsinfo' tmp/3577cabb/samba-4.19.5/source3/smbd/
+
+tmp/3577cabb/samba-4.19.5/source3/smbd/smb1_trans2.c:1678:	status = smbd_do_qfsinfo(req->xconn, conn, req,
+tmp/3577cabb/samba-4.19.5/source3/smbd/smb2_getinfo.c:471:		status = smbd_do_qfsinfo(smb2req->xconn, conn, state,
+tmp/3577cabb/samba-4.19.5/source3/smbd/globals.h:151:NTSTATUS smbd_do_qfsinfo(struct smbXsrv_connection *xconn,
+tmp/3577cabb/samba-4.19.5/source3/smbd/smb2_trans2.c:2035:NTSTATUS smbd_do_qfsinfo(struct smbXsrv_connection *xconn,
+tmp/3577cabb/samba-4.19.5/source3/smbd/smb2_trans2.c:2071:			DEBUG(0,("smbd_do_qfsinfo: not an allowed "
+tmp/3577cabb/samba-4.19.5/source3/smbd/smb2_trans2.c:2078:	DEBUG(3,("smbd_do_qfsinfo: level = %d\n", info_level));
+tmp/3577cabb/samba-4.19.5/source3/smbd/smb2_trans2.c:2554:	DEBUG(5,("smbd_do_qfsinfo : SMB_QUERY_POSIX_FS_INFO succsessful\n"));
+
+## 6. SMB_QUERY_POSIX_FS_INFO 周辺 (smb2_trans2.c)
+
+$ grep -nE 'SMB_QUERY_POSIX_FS_INFO|SMB2_FS_POSIX_INFORMATION|fsinfo_unix_valid_level' \
+    tmp/3577cabb/samba-4.19.5/source3/smbd/smb2_trans2.c
+
+2018:static bool fsinfo_unix_valid_level(connection_struct *conn,
+2023:			info_level == SMB2_FS_POSIX_INFORMATION_INTERNAL) {
+2028:			info_level == SMB_QUERY_POSIX_FS_INFO) {
+2532:		case SMB_QUERY_POSIX_FS_INFO:
+2533:		case SMB2_FS_POSIX_INFORMATION_INTERNAL:
+2538:			if (!fsinfo_unix_valid_level(conn, info_level)) {
+
+★ case SMB_QUERY_POSIX_FS_INFO (line 2532) は存在する
+★ ただし fsinfo_unix_valid_level (line 2538) が false なら INVALID_LEVEL を返す
+
+## 7. fsinfo_unix_valid_level の実装 (smb2_trans2.c lines 2018-2033)
+
+static bool fsinfo_unix_valid_level(connection_struct *conn,
+				    uint16_t info_level)
+{
+	if (conn->sconn->using_smb2 &&
+			lp_smb3_unix_extensions() &&
+			info_level == SMB2_FS_POSIX_INFORMATION_INTERNAL) {
+		return true;
+	}
+#if defined(SMB1SERVER)             ← ★★★ TYPO BUG ★★★
+	if (lp_smb1_unix_extensions() &&
+			info_level == SMB_QUERY_POSIX_FS_INFO) {
+		return true;
+	}
+#endif
+	return false;
+}
+
+★ #if defined(SMB1SERVER) — typo
+★ Samba ビルドは WITH_SMB1SERVER (with WITH_ prefix) を define する
+★ SMB1SERVER (without WITH_) は何処にも define されていない
+
+## 8. SMB1SERVER vs WITH_SMB1SERVER の定義箇所
+
+$ grep -rnE 'DEFINE\(.SMB1SERVER.|#define[[:space:]]+SMB1SERVER' \
+    tmp/3577cabb/samba-4.19.5/
+(0 matches — SMB1SERVER は何処にも定義されていない)
+
+$ grep -rn 'WITH_SMB1SERVER' tmp/3577cabb/samba-4.19.5/wscript \
+    tmp/3577cabb/samba-4.19.5/source3/wscript_build \
+    tmp/3577cabb/samba-4.19.5/source3/wscript
+
+tmp/3577cabb/samba-4.19.5/wscript:421:        conf.DEFINE('WITH_SMB1SERVER', '1')
+tmp/3577cabb/samba-4.19.5/source3/wscript_build:599:if bld.CONFIG_SET('WITH_SMB1SERVER'):
+
+★ build 時に WITH_SMB1SERVER のみ define
+★ コード側で SMB1SERVER をチェックしているのは fsinfo_unix_valid_level だけ
+★ 他は全て WITH_SMB1SERVER を使用 (例: smb2_trans2.c:2477, smb2_process.c の多数箇所)
+
+## 9. case SMB_QUERY_CIFS_UNIX_INFO (0x200) との対比 (line 2477-2530)
+
+#if defined(WITH_SMB1SERVER)        ← ★ 正しい macro (WITH_ あり)
+		/*
+		 * Query the version and capabilities of the CIFS UNIX extensions
+		 * in use.
+		 */
+		case SMB_QUERY_CIFS_UNIX_INFO:
+		{
+			...
+		}
+#endif
+
+★ こちらは WITH_SMB1SERVER で正しく gate されている
+★ SMB1 で接続したクライアントが level=0x200 (CIFS_UNIX_INFO) を要求すれば OK が返る
+
+## 10. 結論
+
+(a) Samba 4.19.5 の source3/smbd/smb2_trans2.c:2026 に typo bug:
+    #if defined(SMB1SERVER)  → 正: #if defined(WITH_SMB1SERVER)
+
+(b) この typo により fsinfo_unix_valid_level は SMB1 SMB_QUERY_POSIX_FS_INFO に対して
+    永久に false を返し、smbd_do_qfsinfo は NT_STATUS_INVALID_LEVEL を返す
+
+(c) iRMC FW 9.08F は qfsinfo level=513 (POSIX_FS_INFO) を要求し、
+    INVALID_LEVEL を受けると USB device 生成段階で abort する (60s retry 継続)
+
+(d) 修正は 1 文字追加 (SMB1SERVER → WITH_SMB1SERVER) のみで完了する見込み

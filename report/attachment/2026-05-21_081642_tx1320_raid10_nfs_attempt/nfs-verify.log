@@ -1,0 +1,48 @@
+=== service status (rpcbind nfs-server) ===
+active
+active
+=== showmount -e 10.1.6.6 ===
+Export list for 10.1.6.6:
+/var/samba/public 10.0.0.0/8
+=== rpcinfo -p 10.1.6.6 ===
+   program vers proto   port  service
+    100000    4   tcp    111  portmapper
+    100000    3   tcp    111  portmapper
+    100000    2   tcp    111  portmapper
+    100000    4   udp    111  portmapper
+    100000    3   udp    111  portmapper
+    100000    2   udp    111  portmapper
+    100024    1   udp  41997  status
+    100024    1   tcp  43957  status
+    100005    1   udp  43238  mountd
+    100005    1   tcp  35029  mountd
+    100005    2   udp  46623  mountd
+    100005    2   tcp  46911  mountd
+    100005    3   udp  48768  mountd
+    100005    3   tcp  46219  mountd
+    100003    3   tcp   2049  nfs
+    100003    4   tcp   2049  nfs
+    100227    3   tcp   2049  nfs_acl
+    100021    1   udp  37905  nlockmgr
+    100021    3   udp  37905  nlockmgr
+    100021    4   udp  37905  nlockmgr
+    100021    1   tcp  43195  nlockmgr
+    100021    3   tcp  43195  nlockmgr
+    100021    4   tcp  43195  nlockmgr
+=== mount test from ens19 (10.1.6.6 -> 10.1.6.6) ===
+total 8
+drwxr-xr-x 2 root root      4096 May 20 19:28 .
+drwxr-xr-x 3 root root      4096 May 20 23:05 ..
+-rw-r--r-- 1 root root 734003200 May 20 19:28 debian-preseed-tx1320.iso
+=== ufw status ===
+Status: inactive
+=== ip a (ens19) ===
+lo               UNKNOWN        127.0.0.1/8 ::1/128 
+ens18            UP             192.168.39.163/24 metric 100 fe80::be24:11ff:fe75:7fba/64 
+ens19            UP             10.1.6.6/8 fe80::be24:11ff:fe98:1203/64 
+=== iso file ===
+total 8
+drwxr-xr-x 2 root root      4096 May 20 19:28 .
+drwxr-xr-x 3 root root      4096 May 20 19:26 ..
+-rw-r--r-- 1 root root 734003200 May 20 19:28 debian-preseed-tx1320.iso
+=== DONE ===

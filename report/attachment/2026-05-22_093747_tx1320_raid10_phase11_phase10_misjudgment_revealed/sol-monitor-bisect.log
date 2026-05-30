@@ -1,0 +1,33 @@
+[09:02:28] Deactivating any existing SOL session
+[09:02:32] Connecting SOL to 10.254.254.9
+[09:02:35] SOL connected, starting installer monitoring
+[09:02:35] Monitoring started (timeout=599.9999833106995s, powerstate_interval=30s, initial_stage_idx=-1)
+[09:03:06] PowerState poll: None (0.5min, stages=0)
+[09:03:36] Stage observed: COUNT=0/9
+[09:03:38] PowerState poll: None (1.0min, stages=0)
+[09:04:10] PowerState poll: None (1.6min, stages=0)
+[09:04:40] Stage observed: COUNT=0/9
+[09:04:42] PowerState poll: None (2.1min, stages=0)
+[09:05:14] PowerState poll: None (2.6min, stages=0)
+[09:05:44] Stage observed: COUNT=0/9
+[09:05:45] PowerState poll: None (3.1min, stages=0)
+[09:06:16] PowerState poll: None (3.7min, stages=0)
+[09:06:46] Stage observed: COUNT=0/9
+[09:06:47] PowerState poll: None (4.2min, stages=0)
+[09:07:19] PowerState poll: None (4.7min, stages=0)
+[09:07:49] Stage observed: COUNT=0/9
+[09:07:50] PowerState poll: None (5.2min, stages=0)
+[09:08:21] PowerState poll: None (5.8min, stages=0)
+[09:08:51] Stage observed: COUNT=0/9
+[09:08:54] PowerState poll: None (6.3min, stages=0)
+[09:09:26] PowerState poll: None (6.8min, stages=0)
+[09:09:56] Stage observed: COUNT=0/9
+[09:09:57] PowerState poll: None (7.4min, stages=0)
+[09:10:28] PowerState poll: None (7.9min, stages=0)
+[09:10:58] Stage observed: COUNT=0/9
+[09:10:59] PowerState poll: None (8.4min, stages=0)
+[09:11:31] PowerState poll: None (8.9min, stages=0)
+[09:12:01] Stage observed: COUNT=0/9
+[09:12:02] PowerState poll: None (9.4min, stages=0)
+[09:12:33] PowerState poll: None (10.0min, stages=0)
+[09:12:38] Timeout reached (599.9999833106995s)

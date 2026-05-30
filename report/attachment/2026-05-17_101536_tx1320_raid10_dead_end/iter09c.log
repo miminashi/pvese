@@ -1,0 +1,61 @@
+[10:10:21] ============================================================
+[10:10:21] iter_09c: Profile-Based VD path exploration
+[10:10:21] ============================================================
+[10:10:22] Login to 10.254.254.9 (attempt 1/3)
+[10:10:59] SID: RwJIMa3e...
+[10:11:02] Warm-up 15s
+[10:11:24] [goto_avago_main] navigate_to_avago_main
+[10:11:24] safe_navigate_to_advanced_tab
+[10:11:24]   safe_esc[1] size=14440 state=main_menu_submenu_cfg_mgmt
+[10:11:26]   safe_esc[2] size=17735 state=avago_main_vds0
+[10:11:29]   safe_esc[3] size=18051 state=advanced_tab_item_14
+[10:11:29]     at top-level: advanced_tab_item_14
+[10:11:29]   pos check: size=18051 state=advanced_tab_item_14
+[10:11:40]   nav_y[goto_avago_main_to_avago_row/caret]: initial cursor_y=260 target=393
+[10:11:41]   nav_y[goto_avago_main_to_avago_row/caret][1/25]: cursor_y=273 target=393
+[10:11:42]   nav_y[goto_avago_main_to_avago_row/caret][2/25]: cursor_y=297 target=393
+[10:11:43]   nav_y[goto_avago_main_to_avago_row/caret][3/25]: cursor_y=311 target=393
+[10:11:44]   nav_y[goto_avago_main_to_avago_row/caret][4/25]: cursor_y=336 target=393
+[10:11:44]   nav_y[goto_avago_main_to_avago_row/caret][5/25]: cursor_y=374 target=393
+[10:11:45]   nav_y[goto_avago_main_to_avago_row/caret][6/25]: cursor_y=393 target=393
+[10:11:45]   -> reached target_y=393 at press 6
+[10:11:50] [goto_avago_main] AVAGO Main cursor_y=70 expected=70
+[10:11:50] Open Main Menu
+[10:11:54]   Main Menu y=64 expected=70
+[10:11:54] Nav to Configuration Mgmt (y=70)
+[10:11:57]   Cfg Mgmt: size=10934 y=64
+[10:11:57] Nav from create_virtual_drive (y=70) to create_profile_based_vd (y=83)
+[10:11:57]   nav_y[03_to_profile/caret]: initial cursor_y=64 target=83
+[10:11:58]   nav_y[03_to_profile/caret][1/5]: cursor_y=83 target=83
+[10:11:58]   -> reached target_y=83 at press 1
+[10:11:58]   nav result: 1
+[10:11:58] Enter Create Profile-Based VD
+[10:12:03]   Profile-based VD: size=11503 naive_y=71
+[10:12:03] ArrowDown x10 to scout profile items
+[10:12:05]   down[1]: size=13401 highlight_y=90
+[10:12:07]   down[2]: size=12849 highlight_y=109
+[10:12:10]   down[3]: size=14230 highlight_y=128
+[10:12:12]   down[4]: size=11503 highlight_y=71
+[10:12:14]   down[5]: size=13401 highlight_y=90
+[10:12:16]   down[6]: size=12849 highlight_y=109
+[10:12:19]   down[7]: size=14230 highlight_y=128
+[10:12:21]   down[8]: size=11503 highlight_y=71
+[10:12:23]   down[9]: size=13401 highlight_y=90
+[10:12:25]   down[10]: size=12849 highlight_y=109
+[10:12:25] --- Backout: Esc x4 ---
+[10:12:28]   esc[1]: size=12842 state=None
+[10:12:30]   esc[2]: size=14440 state=main_menu_submenu_cfg_mgmt
+[10:12:32]   esc[3]: size=17735 state=avago_main_vds0
+[10:12:34]   esc[4]: size=18051 state=advanced_tab_item_14
+[10:12:34] --- Cleanup ---
+[10:12:37]   emerg_esc[1]: size=18494 state=advanced_tab_item_06
+[10:12:39]   emerg_esc[2]: size=18051 state=advanced_tab_item_14
+[10:12:42]   emerg_esc[3]: size=18494 state=advanced_tab_item_06
+[10:12:45]   emerg_esc[4]: size=18051 state=advanced_tab_item_14
+[10:12:47]   emerg_esc[5]: size=18494 state=advanced_tab_item_06
+[10:12:50]   emerg_esc[6]: size=18051 state=advanced_tab_item_14
+[10:12:52]   emerg_esc[7]: size=18494 state=advanced_tab_item_06
+[10:12:55]   emerg_esc[8]: size=18051 state=advanced_tab_item_14
+[10:12:58]   emerg_esc[9]: size=18494 state=advanced_tab_item_06
+[10:13:00]   emerg_esc[10]: size=18051 state=advanced_tab_item_14
+[10:13:00]   emergency_esc_out: could not reach safe state after 10 Esc

@@ -1,0 +1,35 @@
+PING 10.254.254.9 (10.254.254.9) 56(84) bytes of data.
+64 bytes from 10.254.254.9: icmp_seq=1 ttl=64 time=252 ms
+64 bytes from 10.254.254.9: icmp_seq=2 ttl=64 time=211 ms
+64 bytes from 10.254.254.9: icmp_seq=3 ttl=64 time=170 ms
+64 bytes from 10.254.254.9: icmp_seq=4 ttl=64 time=129 ms
+64 bytes from 10.254.254.9: icmp_seq=5 ttl=64 time=86.8 ms
+64 bytes from 10.254.254.9: icmp_seq=6 ttl=64 time=365 ms
+64 bytes from 10.254.254.9: icmp_seq=7 ttl=64 time=92.2 ms
+64 bytes from 10.254.254.9: icmp_seq=8 ttl=64 time=283 ms
+64 bytes from 10.254.254.9: icmp_seq=9 ttl=64 time=242 ms
+64 bytes from 10.254.254.9: icmp_seq=10 ttl=64 time=201 ms
+64 bytes from 10.254.254.9: icmp_seq=11 ttl=64 time=159 ms
+64 bytes from 10.254.254.9: icmp_seq=12 ttl=64 time=118 ms
+64 bytes from 10.254.254.9: icmp_seq=13 ttl=64 time=77.3 ms
+64 bytes from 10.254.254.9: icmp_seq=14 ttl=64 time=355 ms
+64 bytes from 10.254.254.9: icmp_seq=15 ttl=64 time=315 ms
+64 bytes from 10.254.254.9: icmp_seq=16 ttl=64 time=275 ms
+64 bytes from 10.254.254.9: icmp_seq=17 ttl=64 time=235 ms
+64 bytes from 10.254.254.9: icmp_seq=18 ttl=64 time=193 ms
+64 bytes from 10.254.254.9: icmp_seq=19 ttl=64 time=151 ms
+64 bytes from 10.254.254.9: icmp_seq=20 ttl=64 time=110 ms
+64 bytes from 10.254.254.9: icmp_seq=21 ttl=64 time=387 ms
+64 bytes from 10.254.254.9: icmp_seq=22 ttl=64 time=348 ms
+64 bytes from 10.254.254.9: icmp_seq=23 ttl=64 time=307 ms
+64 bytes from 10.254.254.9: icmp_seq=24 ttl=64 time=267 ms
+64 bytes from 10.254.254.9: icmp_seq=25 ttl=64 time=225 ms
+64 bytes from 10.254.254.9: icmp_seq=26 ttl=64 time=186 ms
+64 bytes from 10.254.254.9: icmp_seq=27 ttl=64 time=142 ms
+64 bytes from 10.254.254.9: icmp_seq=28 ttl=64 time=101 ms
+64 bytes from 10.254.254.9: icmp_seq=29 ttl=64 time=378 ms
+64 bytes from 10.254.254.9: icmp_seq=30 ttl=64 time=338 ms
+
+--- 10.254.254.9 ping statistics ---
+30 packets transmitted, 30 received, 0% packet loss, time 29033ms
+rtt min/avg/max/mdev = 77.300/223.268/387.460/94.606 ms

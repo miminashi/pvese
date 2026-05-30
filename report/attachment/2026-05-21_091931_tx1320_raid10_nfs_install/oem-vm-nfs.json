@@ -1,0 +1,40 @@
+{
+  "@odata.context":"\/redfish\/v1\/$metadata#Systems\/Members\/0\/Oem\/ts_fujitsu\/VirtualMedia(Name,FDImage,CDImage,HDImage,RemoteMountEnabled,UsbAttachMode)",
+  "@odata.id":"\/redfish\/v1\/Systems\/0\/Oem\/ts_fujitsu\/VirtualMedia",
+  "@odata.type":"http:\/\/ts.fujitsu.com\/redfish-schemas\/v1\/FTSSchema.v1_0_0#FTSVirtualMedia.v1_0_0.FTSVirtualMedia",
+  "Name":"Virtual Media Configuration",
+  "FDImage":{
+    "Server":"",
+    "UserName":"",
+    "Password":null,
+    "UserDomain":"",
+    "ShareType":"SMB",
+    "ShareName":"",
+    "ImageName":"",
+    "MaximumNumberOfDevices":0
+  },
+  "CDImage":{
+    "Server":"10.1.6.6",
+    "UserName":"",
+    "Password":null,
+    "UserDomain":"",
+    "ShareType":"NFS",
+    "ShareName":"\/var\/samba\/public",
+    "ImageName":"debian-training-tx1320-raid10.iso",
+    "MaximumNumberOfDevices":2
+  },
+  "HDImage":{
+    "Server":"",
+    "UserName":"",
+    "Password":null,
+    "UserDomain":"",
+    "ShareType":"SMB",
+    "ShareName":"",
+    "ImageName":"",
+    "MaximumNumberOfDevices":0
+  },
+  "RemoteMountEnabled":true,
+  "UsbAttachMode":"AutoAttach",
+  "@Redfish.Copyright":"Copyright 2017 FUJITSU LIMITED",
+  "@odata.etag":"1779354694"
+}

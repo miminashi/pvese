@@ -1,0 +1,61 @@
+=== Phase 5 start: 09:11:00 ===
+=== Create unix guest user ===
+Created guest user (uid=999)
+=== Add to Samba passdb (smbpasswd -as guest) ===
+Added user guest.
+=== Verify in passdb ===
+guest:999:
+=== smbclient verify (as ubuntu) ===
+lpcfg_do_global_parameter: WARNING: The "lanman auth" option is deprecated
+
+	Sharename       Type      Comment
+	---------       ----      -------
+	public          Disk      Public Share
+	IPC$            IPC       IPC Service (aws-mmns-generic server (Samba, Ubuntu))
+Reconnecting with SMB1 for workgroup listing.
+
+	Server               Comment
+	---------            -------
+
+	Workgroup            Master
+	---------            -------
+	WORKGROUP            AWS-MMNS-GENERIC
+=== Truncate per-machine log ===
+=== DisconnectCD ===
+HTTP 204
+=== ConnectCD ===
+HTTP 204
+=== Poll Members count (24 iter * 5s = 120s, exit early on attach) ===
+[09:11:21] iter=1 Members=0
+[09:11:28] iter=2 Members=0
+[09:11:36] iter=3 Members=0
+[09:11:43] iter=4 Members=0
+[09:11:49] iter=5 Members=0
+[09:11:57] iter=6 Members=0
+[09:12:03] iter=7 Members=0
+[09:12:10] iter=8 Members=0
+[09:12:17] iter=9 Members=0
+[09:12:24] iter=10 Members=0
+[09:12:30] iter=11 Members=0
+[09:12:40] iter=12 Members=0
+[09:12:47] iter=13 Members=0
+[09:12:54] iter=14 Members=0
+[09:13:01] iter=15 Members=0
+[09:13:07] iter=16 Members=0
+[09:13:14] iter=17 Members=0
+[09:13:21] iter=18 Members=0
+[09:13:28] iter=19 Members=0
+[09:13:35] iter=20 Members=0
+[09:13:42] iter=21 Members=0
+[09:13:49] iter=22 Members=0
+[09:13:56] iter=23 Members=0
+[09:14:03] iter=24 Members=0
+=== Capture per-machine log ===
+0 /home/ubuntu/projects/pvese/tmp/3bace1bf/samba-machine-phase5.log
+=== Result ===
+ATTACHED=0
+=== Cleanup: remove guest user (attach failed) ===
+Deleted user guest.
+userdel: user guest is currently used by process 3902048
+guest user removed
+=== Phase 5 done: 09:14:10 ===

@@ -1,0 +1,46 @@
+=== Phase 2 start: 08:41:14 ===
+=== Backup live smb.conf ===
+=== Pre-state Samba log sizes ===
+-rw-r--r-- 1 root root    0  5月 17 11:33 /var/log/samba/log.10.254.254.9
+-rw-r--r-- 1 root root 2737  5月 13 06:39 /var/log/samba/log.smbd
+=== Apply test config (log level = 10) ===
+Reloaded
+=== Truncate per-machine log ===
+-rw-r--r-- 1 root root 0  5月 19 08:41 /var/log/samba/log.10.254.254.9
+=== DisconnectCD ===
+HTTP 204
+=== ConnectCD ===
+HTTP 204
+=== Poll Members count (24 iter * 5s = 120s) ===
+[08:41:38] iter=1 Members=0
+[08:41:45] iter=2 Members=0
+[08:41:52] iter=3 Members=0
+[08:42:00] iter=4 Members=0
+[08:42:07] iter=5 Members=0
+[08:42:14] iter=6 Members=0
+[08:42:21] iter=7 Members=0
+[08:42:27] iter=8 Members=0
+[08:42:37] iter=9 Members=0
+[08:42:45] iter=10 Members=0
+[08:42:52] iter=11 Members=0
+[08:42:59] iter=12 Members=0
+[08:43:05] iter=13 Members=0
+[08:43:12] iter=14 Members=0
+[08:43:20] iter=15 Members=0
+[08:43:27] iter=16 Members=0
+[08:43:34] iter=17 Members=0
+[08:43:41] iter=18 Members=0
+[08:43:47] iter=19 Members=0
+[08:43:55] iter=20 Members=0
+[08:44:02] iter=21 Members=0
+[08:44:09] iter=22 Members=0
+[08:44:16] iter=23 Members=0
+[08:44:22] iter=24 Members=0
+=== Capture per-machine log ===
+1574 /home/ubuntu/projects/pvese/tmp/3bace1bf/samba-machine.log
+=== Capture daemon log tail (300 lines) ===
+300 /home/ubuntu/projects/pvese/tmp/3bace1bf/samba-daemon-tail.log
+=== Restore original smb.conf ===
+smb.conf == backup (OK)
+=== Fix ownership for ubuntu ===
+=== Phase 2 done: 08:44:33 ===

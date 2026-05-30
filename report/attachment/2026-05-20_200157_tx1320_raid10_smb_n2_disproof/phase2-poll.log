@@ -1,0 +1,27 @@
+==== Phase 2: Members polling (24 iter * 5s = 120s) ====
+Start: 17:08:58
+[iter=1] 17:08:58 members=0
+[iter=2] 17:09:05 members=0
+[iter=3] 17:09:13 members=0
+[iter=4] 17:09:19 members=0
+[iter=5] 17:09:26 members=0
+[iter=6] 17:09:33 members=0
+[iter=7] 17:09:40 members=0
+[iter=8] 17:09:48 members=0
+[iter=9] 17:09:55 members=0
+[iter=10] 17:10:01 members=0
+[iter=11] 17:10:08 members=0
+[iter=12] 17:10:15 members=0
+[iter=13] 17:10:22 members=0
+[iter=14] 17:10:29 members=0
+[iter=15] 17:10:36 members=0
+[iter=16] 17:10:43 members=0
+[iter=17] 17:10:50 members=0
+[iter=18] 17:10:57 members=0
+[iter=19] 17:11:03 members=0
+[iter=20] 17:11:10 members=0
+[iter=21] 17:11:17 members=0
+[iter=22] 17:11:24 members=0
+[iter=23] 17:11:30 members=0
+[iter=24] 17:11:38 members=0
+End: 17:11:45

@@ -1,0 +1,31 @@
+[1] PATCH iRMC -> 10.1.6.6
+}
+
+HTTP 200
+    config done at 06:55:00
+
+[2] synchronous tcpdump on 10.1.6.6 (4 min — first 30 packets max shown inline)
+
+[3] Members polling every 30s (8 iters)
+tcpdump: data link type LINUX_SLL2
+tcpdump: listening on any, link-type LINUX_SLL2 (Linux cooked v2), snapshot length 262144 bytes
+[t=30s] Members=0 pcap_bytes=0 smbd_log_bytes=0
+[t=60s] Members=0 pcap_bytes=0 smbd_log_bytes=0
+[t=90s] Members=0 pcap_bytes=0 smbd_log_bytes=0
+[t=120s] Members=0 pcap_bytes=0 smbd_log_bytes=0
+[t=150s] Members=0 pcap_bytes=0 smbd_log_bytes=0
+[t=180s] Members=0 pcap_bytes=0 smbd_log_bytes=0
+[t=210s] Members=0 pcap_bytes=0 smbd_log_bytes=0
+0 packets captured
+1 packet received by filter
+0 packets dropped by kernel
+[t=240s] Members=0 pcap_bytes=24 smbd_log_bytes=0
+
+[4] tcpdump packet count + first packets
+---packet count---
+0
+
+[5] Samba log grep
+---non-empty log files---
+/var/log/samba/log.nmbd
+---level/INVALID grep---

@@ -1,0 +1,46 @@
+[1] boot override Cd UEFI
+}
+
+Boot override set: target=Cd mode=UEFI (once)
+
+[2] clear Samba log + restart smbd to ensure debug 10
+PID 45125: all:10 tdb:10 printdrivers:10 lanman:10 smb:10 rpc_parse:10 rpc_srv:10 rpc_cli:10 passdb:10 sam:10 auth:10 winbind:10 vfs:10 idmap:10 quota:10 acls:10 locking:10 msdfs:10 dmapi:10 registry:10 scavenger:10 dns:10 ldb:10 tevent:10 auth_audit:10 auth_json_audit:10 kerberos:10 drs_repl:10 smb2:10 smb2_credits:10 dsdb_audit:10 dsdb_json_audit:10 dsdb_password_audit:10 dsdb_password_json_audit:10 dsdb_transaction_audit:10 dsdb_transaction_json_audit:10 dsdb_group_audit:10 dsdb_group_json_audit:10
+
+[3] start synchronous tcpdump on 10.1.6.6 (8 min capture, 500 packets max)
+tcpdump: data link type LINUX_SLL2
+tcpdump: listening on any, link-type LINUX_SLL2 (Linux cooked v2), snapshot length 262144 bytes
+
+[4] forceoff + on
+
+ForceOff requested
+
+Power On requested (ResetType=On)
+    power on at 07:00:46
+
+[5] monitor for up to 7 min (28x15s) — every 30s show Members + pcap size
+[t=30s] Members=0 pcap_bytes=0 smbd_log_bytes=536
+[t=60s] Members=0 pcap_bytes=0 smbd_log_bytes=536
+[t=90s] Members=0 pcap_bytes=0 smbd_log_bytes=536
+[t=120s] Members=0 pcap_bytes=0 smbd_log_bytes=536
+[t=150s] Members=0 pcap_bytes=0 smbd_log_bytes=536
+[t=180s] Members=0 pcap_bytes=0 smbd_log_bytes=536
+[t=210s] Members=0 pcap_bytes=0 smbd_log_bytes=536
+[t=240s] Members=0 pcap_bytes=0 smbd_log_bytes=536
+[t=270s] Members=0 pcap_bytes=0 smbd_log_bytes=536
+[t=300s] Members=0 pcap_bytes=0 smbd_log_bytes=536
+[t=330s] Members=0 pcap_bytes=0 smbd_log_bytes=536
+[t=360s] Members=0 pcap_bytes=0 smbd_log_bytes=536
+[t=390s] Members=0 pcap_bytes=0 smbd_log_bytes=536
+0 packets captured
+1 packet received by filter
+0 packets dropped by kernel
+[t=420s] Members=0 pcap_bytes=24 smbd_log_bytes=536
+
+[6] final tcpdump dump
+---packets---
+---packet count---
+0
+---Samba log non-empty---
+/var/log/samba/log.smbd
+/var/log/samba/log.nmbd
+---grep level/INVALID/qfsinfo---

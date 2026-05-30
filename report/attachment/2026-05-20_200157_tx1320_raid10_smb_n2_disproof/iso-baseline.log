@@ -1,0 +1,12 @@
+==== /var/samba/public/ ISO files ====
+-rw-rw-r-- 1 ubuntu ubuntu 790626304  2月 22 02:05 /var/samba/public/debian-13.3.0-amd64-netinst.iso   # N2 検証用 (新)
+-rw-r--r-- 1 root   root   800391168  5月 18 10:07 /var/samba/public/debian-training-tx1320-raid10.iso  # 元 ISO (Phase 5 で戻す)
+
+==== VirtualMedia status (Phase 0 開始時) ====
+CDImage.Server=10.1.6.1
+CDImage.ShareName=public
+CDImage.ImageName=debian-training-tx1320-raid10.iso   # 前セッション Phase 5 で復元済
+RemoteMountEnabled=true
+
+==== BMC PowerState ====
+Off

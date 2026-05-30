@@ -1,0 +1,6 @@
+# Version 1.1
+# Path Client(Flags) # IPs
+/var/samba/public	10.0.0.0/8(ro,insecure,root_squash,all_squash,sync,wdelay,no_subtree_check,uuid=b880eafd:ff6f40fe:8b7dddae:02a2ba0e,sec=1)
+/	10.0.0.0/8(ro,insecure,no_root_squash,sync,no_wdelay,no_subtree_check,v4root,fsid=0,sec=1)
+/var/samba	10.0.0.0/8(ro,insecure,no_root_squash,sync,no_wdelay,no_subtree_check,v4root,uuid=dae750d7:86a557c6:acc6cc64:1631c538,sec=1)
+/var	10.0.0.0/8(ro,insecure,no_root_squash,sync,no_wdelay,no_subtree_check,v4root,uuid=7a7bba7b:77e35fc4:9e8bbc7b:56921903,sec=1)

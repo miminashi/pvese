@@ -1,0 +1,19 @@
+{
+  "_endpoint": "https://10.254.254.9/redfish/v1/Managers/iRMC/VirtualMedia",
+  "_observation": "Members@odata.count=0 even with CDImage already attached via ConnectCD. Manager-level Members collection is not populated by iRMC S4 FW 9.08F (FTS Schema only exposes count, navigationLink follow returns ResourceUnavailable).",
+  "@odata.context": "/redfish/v1/$metadata#Managers/Members/iRMC/VirtualMedia(Name,Members,Oem)",
+  "@odata.id": "/redfish/v1/Managers/iRMC/VirtualMedia",
+  "@odata.type": "#VirtualMediaCollection.VirtualMediaCollection",
+  "Name": "Virtual Media Collection",
+  "Members@odata.navigationLink": "VirtualMedia/Members",
+  "Members": [],
+  "Members@odata.count": 0,
+  "Oem": {},
+  "@Redfish.Copyright": "Copyright 2014-2017 DMTF",
+  "@odata.etag": "1779346630",
+  "_followup_navigation_error": {
+    "endpoint": "https://10.254.254.9/redfish/v1/Managers/iRMC/VirtualMedia/Members",
+    "code": "Fujitsu.1.0.ResourceUnavailable",
+    "message": "The requested URI does not refer to a valid resource."
+  }
+}

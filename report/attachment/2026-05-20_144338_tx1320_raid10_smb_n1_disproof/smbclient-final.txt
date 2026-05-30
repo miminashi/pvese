@@ -1,0 +1,13 @@
+
+	Sharename       Type      Comment
+	---------       ----      -------
+	public          Disk      Public Share
+	IPC$            IPC       IPC Service (aws-mmns-generic server (Samba, Ubuntu))
+Reconnecting with SMB1 for workgroup listing.
+
+	Server               Comment
+	---------            -------
+
+	Workgroup            Master
+	---------            -------
+	WORKGROUP            AWS-MMNS-GENERIC

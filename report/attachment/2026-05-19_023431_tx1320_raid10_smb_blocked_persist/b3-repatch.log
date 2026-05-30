@@ -1,0 +1,39 @@
+=== B3: DisconnectCD ===
+HTTP 204
+=== Sleep 10s ===
+=== B3: re-PATCH CDImage (RemoteMountEnabled=false → true cycle) ===
+etag=
+{
+  "error":{
+    "@Message.ExtendedInfo":[
+      {
+        "@odata.type":"\/redfish\/v1\/$metadata#Message.1_0_0.Message",
+        "MessageId":"Fujitsu.1.0.ResourceUnavailable",
+        "Message":"The requested URI does not refer to a valid resource.",
+        "Severity":"Critical",
+        "Resolution":""
+      }
+    ],
+    "code":"Fujitsu.1.0.ResourceUnavailable",
+    "message":"The requested URI does not refer to a valid resource."
+  }
+}
+HTTP 404
+=== Verify CDImage ===
+Server: None ImageName: None RemoteMountEnabled: None
+=== Sleep 5s ===
+=== B3: ConnectCD ===
+HTTP 204
+=== Poll Members count (5s × 12 = 60s) ===
+[02:18:52] iter=1 Members=0
+[02:18:58] iter=2 Members=0
+[02:19:05] iter=3 Members=0
+[02:19:13] iter=4 Members=0
+[02:19:20] iter=5 Members=0
+[02:19:26] iter=6 Members=0
+[02:19:33] iter=7 Members=0
+[02:19:40] iter=8 Members=0
+[02:19:47] iter=9 Members=0
+[02:19:54] iter=10 Members=0
+[02:20:01] iter=11 Members=0
+[02:20:08] iter=12 Members=0

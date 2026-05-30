@@ -1,0 +1,15 @@
+==== Phase 1: BMC recovery polling ====
+Start: 16:20:22
+[iter=1] 16:20:22 rc=0 state=[]
+[iter=2] 16:20:29 rc=0 state=[]
+[iter=3] 16:20:34 rc=0 state=[]
+[iter=4] 16:20:39 rc=0 state=[]
+[iter=5] 16:20:45 rc=0 state=[]
+[iter=6] 16:20:50 rc=0 state=[]
+[iter=7] 16:20:56 rc=0 state=[]
+[iter=8] 16:21:01 rc=0 state=[]
+[iter=9] 16:21:07 rc=0 state=[]
+[iter=10] 16:22:26 rc=0 state=[]
+[iter=11] 16:22:40 rc=0 state=[]
+[iter=12] 16:22:51 rc=0 state=[Off]
+BMC back online at iter=12 state=Off

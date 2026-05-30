@@ -1,0 +1,520 @@
+[13:48:12] session=run1 dir=/home/ubuntu/projects/pvese/tmp/biosraid/run1 continue_from=S2
+[13:48:12] S1 skipped (continue-from=S2)
+[13:48:12] S2: ForceOff → boot-override BiosSetup UEFI → on
+[13:48:19] S2: pre PowerState=Off
+{
+  "@odata.context":"\/redfish\/v1\/$metadata#Systems\/Members\/$entity(Oem,Id,Description,Name,SystemType,Links,AssetTag,Manufacturer,Model,SerialNumber,PartNumber,UUID,HostName,IndicatorLED,PowerState,Boot,BiosVersion,ProcessorSummary,MemorySummary,Actions,Status,Processors,EthernetInterfaces,SimpleStorage,LogServices,TrustedModules,SecureBoot,Bios,Memory,Storage,HostingRoles,HostedServices,PCIeDevices,PCIeFunctions,NetworkInterfaces)",
+  "@odata.id":"\/redfish\/v1\/Systems\/0",
+  "@odata.type":"#ComputerSystem.v1_3_1.ComputerSystem",
+  "Oem":{
+    "ts_fujitsu":{
+      "@odata.type":"http:\/\/ts.fujitsu.com\/redfish-schemas\/v1\/FTSSchema.v1_0_0#FTSComputerSystem.v1_1_0.FTSComputerSystem",
+      "FirmwareInventory":{
+        "@odata.id":"\/redfish\/v1\/Systems\/0\/Oem\/ts_fujitsu\/FirmwareInventory"
+      },
+      "MainBoard":{
+        "Manufacturer":"FUJITSU",
+        "Model":"D3373",
+        "SerialNumber":"57662941",
+        "PartNumber":"S26361-D3373-B12",
+        "Version":"WGS03 GS03"
+      },
+      "DriverMonitor":{
+        "DriverMonitorStatus":"NotAvailable",
+        "MonitoredComponents":[
+        ]
+      },
+      "PowerOnOff":{
+        "@odata.id":"\/redfish\/v1\/Systems\/0\/Oem\/ts_fujitsu\/PowerOnOff"
+      },
+      "BootConfig":{
+        "@odata.id":"\/redfish\/v1\/Systems\/0\/Oem\/ts_fujitsu\/BootConfig"
+      },
+      "System":{
+        "@odata.id":"\/redfish\/v1\/Systems\/0\/Oem\/ts_fujitsu\/System"
+      },
+      "VirtualMedia":{
+        "@odata.id":"\/redfish\/v1\/Systems\/0\/Oem\/ts_fujitsu\/VirtualMedia"
+      },
+      "VIOMStatus":null
+    }
+  },
+  "Id":"0",
+  "Description":"Server",
+  "Name":"DAYNETGROUP",
+  "SystemType":"Physical",
+  "Links":{
+    "Oem":{
+    },
+    "Chassis@odata.count":1,
+    "Chassis@odata.navigationLink":"0\/Links\/Chassis",
+    "Chassis":[
+      {
+        "@odata.id":"\/redfish\/v1\/Chassis\/0"
+      }
+    ],
+    "ManagedBy@odata.count":1,
+    "ManagedBy@odata.navigationLink":"0\/Links\/ManagedBy",
+    "ManagedBy":[
+      {
+        "@odata.id":"\/redfish\/v1\/Managers\/iRMC"
+      }
+    ],
+    "PoweredBy@odata.count":1,
+    "PoweredBy@odata.navigationLink":"0\/Links\/PoweredBy",
+    "PoweredBy":[
+      {
+        "@odata.id":"\/redfish\/v1\/Chassis\/0\/Power#\/PowerSupplies\/0"
+      }
+    ],
+    "CooledBy@odata.count":4,
+    "CooledBy@odata.navigationLink":"0\/Links\/CooledBy",
+    "CooledBy":[
+      {
+        "@odata.id":"\/redfish\/v1\/Chassis\/0\/Thermal#\/Fans\/0"
+      },
+      {
+        "@odata.id":"\/redfish\/v1\/Chassis\/0\/Thermal#\/Fans\/1"
+      },
+      {
+        "@odata.id":"\/redfish\/v1\/Chassis\/0\/Thermal#\/Fans\/2"
+      },
+      {
+        "@odata.id":"\/redfish\/v1\/Chassis\/0\/Thermal#\/Fans\/3"
+      }
+    ],
+    "Endpoints@odata.count":0,
+    "Endpoints@odata.navigationLink":"0\/Links\/Endpoints",
+    "Endpoints":[
+    ]
+  },
+  "AssetTag":"System Asset Tag",
+  "Manufacturer":"FUJITSU",
+  "Model":"PRIMERGY TX1320 M3",
+  "SerialNumber":"MABK035229",
+  "PartNumber":"S26361-K1591-Vxxx",
+  "UUID":"80e0f000-c0c9-4222-a774-ba264f9ec23c",
+  "HostName":"DAYNETGROUP",
+  "IndicatorLED":"Off",
+  "IndicatorLED@Redfish.AllowableValues":[
+    "Off",
+    "Lit",
+    "Blinking"
+  ],
+  "PowerState":"Off",
+  "Boot":{
+    "BootSourceOverrideTarget":"BiosSetup",
+    "BootSourceOverrideTarget@Redfish.AllowableValues":[
+      "None",
+      "Pxe",
+      "Floppy",
+      "Cd",
+      "Hdd",
+      "BiosSetup"
+    ],
+    "BootSourceOverrideEnabled":"Once",
+    "BootSourceOverrideEnabled@Redfish.AllowableValues":[
+      "Once",
+      "Continuous"
+    ],
+    "BootSourceOverrideMode":"UEFI"
+  },
+  "BiosVersion":"V5.0.0.11 R1.22.0 for D3373-B1x",
+  "ProcessorSummary":{
+    "Count":1,
+    "Model":null,
+    "Status":{
+      "State":"Disabled",
+      "Health":"OK",
+      "Oem":{
+      }
+    }
+  },
+  "MemorySummary":{
+    "TotalSystemMemoryGiB":24,
+    "Status":{
+      "State":"Enabled",
+      "Health":"OK",
+      "Oem":{
+      }
+    }
+  },
+  "Actions":{
+    "Oem":{
+      "http:\/\/ts.fujitsu.com\/redfish-schemas\/v1\/FTSSchema.v1_0_0#FTSComputerSystem.Reset":{
+        "target":"\/redfish\/v1\/Systems\/0\/Actions\/Oem\/FTSComputerSystem.Reset",
+        "title":"Reset system",
+        "FTSResetType@Redfish.AllowableValues":[
+          "PowerOn"
+        ]
+      },
+      "http:\/\/ts.fujitsu.com\/redfish-schemas\/v1\/FTSSchema.v1_0_0#FTSComputerSystem.Screenshot":{
+        "target":"\/redfish\/v1\/Systems\/0\/Actions\/Oem\/FTSComputerSystem.Screenshot",
+        "title":"Make screenshot",
+        "FTSScreenshotType@Redfish.AllowableValues":[
+        ]
+      },
+      "http:\/\/ts.fujitsu.com\/redfish-schemas\/v1\/FTSSchema.v1_0_0#FTSComputerSystem.VirtualMedia":{
+        "target":"\/redfish\/v1\/Systems\/0\/Actions\/Oem\/FTSComputerSystem.VirtualMedia",
+        "title":"",
+        "VirtualMediaAction@Redfish.AllowableValues":[
+        ]
+      },
+      "http:\/\/ts.fujitsu.com\/redfish-schemas\/v1\/FTSSchema.v1_0_0#FTSComputerSystem.DriverMonitorStatusReset":{
+        "target":"\/redfish\/v1\/Systems\/0\/Actions\/Oem\/FTSComputerSystem.DriverMonitorStatusReset",
+        "title":"Reset Driver Monitor status"
+      },
+      "http:\/\/ts.fujitsu.com\/redfish-schemas\/v1\/FTSSchema.v1_0_0#FTSComputerSystem.DisableVIOM":{
+        "target":"\/redfish\/v1\/Systems\/0\/Actions\/Oem\/FTSComputerSystem.DisableVIOM",
+        "title":"Disable Virtual-IO Manager (VIOM)"
+      },
+      "http:\/\/ts.fujitsu.com\/redfish-schemas\/v1\/FTSSchema.v1_0_0#FTSComputerSystem.SystemReportGenerate":{
+        "target":"\/redfish\/v1\/Systems\/0\/Actions\/Oem\/FTSComputerSystem.SystemReportGenerate",
+        "title":"Generate System Report in ServerView(R) WinSCU XML format"
+      },
+      "http:\/\/ts.fujitsu.com\/redfish-schemas\/v1\/FTSSchema.v1_0_0#FTSComputerSystem.SystemReportDownload":{
+        "target":"\/redfish\/v1\/Systems\/0\/Actions\/Oem\/FTSComputerSystem.SystemReportDownload",
+        "title":"Download previously generated System Report in ServerView(R) WinSCU XML format"
+      }
+    },
+    "#ComputerSystem.Reset":{
+      "target":"\/redfish\/v1\/Systems\/0\/Actions\/ComputerSystem.Reset",
+      "title":"Reset system",
+      "ResetType@Redfish.AllowableValues":[
+        "On"
+      ]
+    }
+  },
+  "Status":{
+    "State":"Disabled",
+    "Health":"OK",
+    "HealthRollup":"OK",
+    "Oem":{
+    }
+  },
+  "Processors":{
+    "@odata.id":"\/redfish\/v1\/Systems\/0\/Processors"
+  },
+  "EthernetInterfaces":{
+    "@odata.id":"\/redfish\/v1\/Systems\/0\/EthernetInterfaces"
+  },
+  "SimpleStorage":{
+    "@odata.id":"\/redfish\/v1\/Systems\/0\/SimpleStorage"
+  },
+  "LogServices":{
+    "@odata.id":"\/redfish\/v1\/Managers\/iRMC\/LogServices"
+  },
+  "TrustedModules":[
+  ],
+  "SecureBoot":{
+    "@odata.id":"\/redfish\/v1\/Systems\/0\/SecureBoot"
+  },
+  "Bios":{
+    "@odata.id":"\/redfish\/v1\/Systems\/0\/Bios"
+  },
+  "Memory":{
+    "@odata.id":"\/redfish\/v1\/Systems\/0\/Memory"
+  },
+  "Storage":{
+    "@odata.id":"\/redfish\/v1\/Systems\/0\/Storage"
+  },
+  "HostingRoles":[
+    "ApplicationServer"
+  ],
+  "HostedServices":{
+    "Oem":{
+    },
+    "StorageServices":{
+      "@odata.id":"\/redfish\/v1\/Systems\/0\/HostedServices\/StorageServices"
+    }
+  },
+  "PCIeDevices@odata.count":0,
+  "PCIeDevices@odata.navigationLink":"0\/PCIeDevices",
+  "PCIeDevices":[
+  ],
+  "PCIeFunctions@odata.count":0,
+  "PCIeFunctions@odata.navigationLink":"0\/PCIeFunctions",
+  "PCIeFunctions":[
+  ],
+  "NetworkInterfaces":{
+    "@odata.id":"\/redfish\/v1\/Systems\/0\/NetworkInterfaces"
+  },
+  "@Redfish.Copyright":"Copyright 2014-2017 Distributed Management Task Force, Inc. (DMTF). For the full DMTF copyright policy, see http:\/\/www.dmtf.org\/about\/policies\/copyright.",
+  "@odata.etag":"1778940116"
+}
+
+Boot override set: target=BiosSetup mode=UEFI (once)
+
+Power On requested (ResetType=On)
+[13:48:31] S2: powered on, waiting 90s for POST → BIOS Setup...
+[13:50:01] S3: KVM session + assert-canvas (640x480 → 800x600)
+[13:50:20] S3: 2 assert-canvas attempts in log
+[13:50:20] S4: BIOS Main → Advanced タブ移動 (ArrowRight x3)
+[13:50:55] S4: screenshots saved (S4_advanced.png expected to show Advanced tab)
+[13:50:55] S5: Advanced 内 AVAGO MegaRAID Utility 発見的探索 (ArrowDown x12 + screenshot each)
+[13:51:22] S5: shots in /home/ubuntu/projects/pvese/tmp/biosraid/run1/S5_NNN_*.png — inspect manually to locate AVAGO row
+[13:51:22] S6: Enter AVAGO MegaRAID → Main Menu → Configuration Management → Create Virtual Drive
+[13:51:22] S6: SKIPPED — raid_setup.{avago,cfgmgmt,createvd}_arrowdown not set in config
+[13:51:22] S6: inspect S5_*.png, identify down counts, set in config/training_tx1320.yml
+[13:51:22] S7: RAID Level=RAID10, select 4 drives, Apply Changes
+[13:51:22] S7: SKIPPED — raid_setup.{raid10_arrowdown,drives_tab,apply_tab} not set in config
+[13:51:22] S8: Save Configuration → Confirm Yes
+[13:51:22] S8: SKIPPED — raid_setup.save_tab not set
+[13:51:22] S9: Save & Exit BIOS (Escape x5 + F4 + Enter) then cycle
+[13:51:58] S9: BIOS exit sent, waiting 30s for host to settle
+[13:52:28] S10: verify VD0 creation — re-enter BIOS Setup HII and screenshot Virtual Drives list
+{
+  "@odata.context":"\/redfish\/v1\/$metadata#Systems\/Members\/$entity(Oem,Id,Description,Name,SystemType,Links,AssetTag,Manufacturer,Model,SerialNumber,PartNumber,UUID,HostName,IndicatorLED,PowerState,Boot,BiosVersion,ProcessorSummary,MemorySummary,Actions,Status,Processors,EthernetInterfaces,SimpleStorage,LogServices,TrustedModules,SecureBoot,Bios,Memory,Storage,HostingRoles,HostedServices,PCIeDevices,PCIeFunctions,NetworkInterfaces)",
+  "@odata.id":"\/redfish\/v1\/Systems\/0",
+  "@odata.type":"#ComputerSystem.v1_3_1.ComputerSystem",
+  "Oem":{
+    "ts_fujitsu":{
+      "@odata.type":"http:\/\/ts.fujitsu.com\/redfish-schemas\/v1\/FTSSchema.v1_0_0#FTSComputerSystem.v1_1_0.FTSComputerSystem",
+      "FirmwareInventory":{
+        "@odata.id":"\/redfish\/v1\/Systems\/0\/Oem\/ts_fujitsu\/FirmwareInventory"
+      },
+      "MainBoard":{
+        "Manufacturer":"FUJITSU",
+        "Model":"D3373",
+        "SerialNumber":"57662941",
+        "PartNumber":"S26361-D3373-B12",
+        "Version":"WGS03 GS03"
+      },
+      "DriverMonitor":{
+        "DriverMonitorStatus":"NotAvailable",
+        "MonitoredComponents":[
+        ]
+      },
+      "PowerOnOff":{
+        "@odata.id":"\/redfish\/v1\/Systems\/0\/Oem\/ts_fujitsu\/PowerOnOff"
+      },
+      "BootConfig":{
+        "@odata.id":"\/redfish\/v1\/Systems\/0\/Oem\/ts_fujitsu\/BootConfig"
+      },
+      "System":{
+        "@odata.id":"\/redfish\/v1\/Systems\/0\/Oem\/ts_fujitsu\/System"
+      },
+      "VirtualMedia":{
+        "@odata.id":"\/redfish\/v1\/Systems\/0\/Oem\/ts_fujitsu\/VirtualMedia"
+      },
+      "VIOMStatus":null
+    }
+  },
+  "Id":"0",
+  "Description":"Server",
+  "Name":"DAYNETGROUP",
+  "SystemType":"Physical",
+  "Links":{
+    "Oem":{
+    },
+    "Chassis@odata.count":1,
+    "Chassis@odata.navigationLink":"0\/Links\/Chassis",
+    "Chassis":[
+      {
+        "@odata.id":"\/redfish\/v1\/Chassis\/0"
+      }
+    ],
+    "ManagedBy@odata.count":1,
+    "ManagedBy@odata.navigationLink":"0\/Links\/ManagedBy",
+    "ManagedBy":[
+      {
+        "@odata.id":"\/redfish\/v1\/Managers\/iRMC"
+      }
+    ],
+    "PoweredBy@odata.count":1,
+    "PoweredBy@odata.navigationLink":"0\/Links\/PoweredBy",
+    "PoweredBy":[
+      {
+        "@odata.id":"\/redfish\/v1\/Chassis\/0\/Power#\/PowerSupplies\/0"
+      }
+    ],
+    "CooledBy@odata.count":3,
+    "CooledBy@odata.navigationLink":"0\/Links\/CooledBy",
+    "CooledBy":[
+      {
+        "@odata.id":"\/redfish\/v1\/Chassis\/0\/Thermal#\/Fans\/0"
+      },
+      {
+        "@odata.id":"\/redfish\/v1\/Chassis\/0\/Thermal#\/Fans\/1"
+      },
+      {
+        "@odata.id":"\/redfish\/v1\/Chassis\/0\/Thermal#\/Fans\/2"
+      }
+    ],
+    "Endpoints@odata.count":0,
+    "Endpoints@odata.navigationLink":"0\/Links\/Endpoints",
+    "Endpoints":[
+    ]
+  },
+  "AssetTag":"System Asset Tag",
+  "Manufacturer":"FUJITSU",
+  "Model":"PRIMERGY TX1320 M3",
+  "SerialNumber":"MABK035229",
+  "PartNumber":"S26361-K1591-Vxxx",
+  "UUID":"80e0f000-c0c9-4222-a774-ba264f9ec23c",
+  "HostName":"DAYNETGROUP",
+  "IndicatorLED":"Off",
+  "IndicatorLED@Redfish.AllowableValues":[
+    "Off",
+    "Lit",
+    "Blinking"
+  ],
+  "PowerState":"On",
+  "Boot":{
+    "BootSourceOverrideTarget":"BiosSetup",
+    "BootSourceOverrideTarget@Redfish.AllowableValues":[
+      "None",
+      "Pxe",
+      "Floppy",
+      "Cd",
+      "Hdd",
+      "BiosSetup"
+    ],
+    "BootSourceOverrideEnabled":"Once",
+    "BootSourceOverrideEnabled@Redfish.AllowableValues":[
+      "Once",
+      "Continuous"
+    ],
+    "BootSourceOverrideMode":"UEFI"
+  },
+  "BiosVersion":"V5.0.0.11 R1.22.0 for D3373-B1x",
+  "ProcessorSummary":{
+    "Count":1,
+    "Model":null,
+    "Status":{
+      "State":"Disabled",
+      "Health":"OK",
+      "Oem":{
+      }
+    }
+  },
+  "MemorySummary":{
+    "TotalSystemMemoryGiB":24,
+    "Status":{
+      "State":"Enabled",
+      "Health":"OK",
+      "Oem":{
+      }
+    }
+  },
+  "Actions":{
+    "Oem":{
+      "http:\/\/ts.fujitsu.com\/redfish-schemas\/v1\/FTSSchema.v1_0_0#FTSComputerSystem.Reset":{
+        "target":"\/redfish\/v1\/Systems\/0\/Actions\/Oem\/FTSComputerSystem.Reset",
+        "title":"Reset system",
+        "FTSResetType@Redfish.AllowableValues":[
+          "PowerOff",
+          "PowerCycle",
+          "ImmediateReset",
+          "PulseNmi",
+          "PressPowerButton"
+        ]
+      },
+      "http:\/\/ts.fujitsu.com\/redfish-schemas\/v1\/FTSSchema.v1_0_0#FTSComputerSystem.Screenshot":{
+        "target":"\/redfish\/v1\/Systems\/0\/Actions\/Oem\/FTSComputerSystem.Screenshot",
+        "title":"Make screenshot",
+        "FTSScreenshotType@Redfish.AllowableValues":[
+          "Make"
+        ]
+      },
+      "http:\/\/ts.fujitsu.com\/redfish-schemas\/v1\/FTSSchema.v1_0_0#FTSComputerSystem.VirtualMedia":{
+        "target":"\/redfish\/v1\/Systems\/0\/Actions\/Oem\/FTSComputerSystem.VirtualMedia",
+        "title":"",
+        "VirtualMediaAction@Redfish.AllowableValues":[
+        ]
+      },
+      "http:\/\/ts.fujitsu.com\/redfish-schemas\/v1\/FTSSchema.v1_0_0#FTSComputerSystem.DriverMonitorStatusReset":{
+        "target":"\/redfish\/v1\/Systems\/0\/Actions\/Oem\/FTSComputerSystem.DriverMonitorStatusReset",
+        "title":"Reset Driver Monitor status"
+      },
+      "http:\/\/ts.fujitsu.com\/redfish-schemas\/v1\/FTSSchema.v1_0_0#FTSComputerSystem.DisableVIOM":{
+        "target":"\/redfish\/v1\/Systems\/0\/Actions\/Oem\/FTSComputerSystem.DisableVIOM",
+        "title":"Disable Virtual-IO Manager (VIOM)"
+      },
+      "http:\/\/ts.fujitsu.com\/redfish-schemas\/v1\/FTSSchema.v1_0_0#FTSComputerSystem.SystemReportGenerate":{
+        "target":"\/redfish\/v1\/Systems\/0\/Actions\/Oem\/FTSComputerSystem.SystemReportGenerate",
+        "title":"Generate System Report in ServerView(R) WinSCU XML format"
+      },
+      "http:\/\/ts.fujitsu.com\/redfish-schemas\/v1\/FTSSchema.v1_0_0#FTSComputerSystem.SystemReportDownload":{
+        "target":"\/redfish\/v1\/Systems\/0\/Actions\/Oem\/FTSComputerSystem.SystemReportDownload",
+        "title":"Download previously generated System Report in ServerView(R) WinSCU XML format"
+      }
+    },
+    "#ComputerSystem.Reset":{
+      "target":"\/redfish\/v1\/Systems\/0\/Actions\/ComputerSystem.Reset",
+      "title":"Reset system",
+      "ResetType@Redfish.AllowableValues":[
+        "ForceOff",
+        "ForceRestart",
+        "Nmi",
+        "PushPowerButton"
+      ]
+    }
+  },
+  "Status":{
+    "State":"Enabled",
+    "Health":"OK",
+    "HealthRollup":"OK",
+    "Oem":{
+    }
+  },
+  "Processors":{
+    "@odata.id":"\/redfish\/v1\/Systems\/0\/Processors"
+  },
+  "EthernetInterfaces":{
+    "@odata.id":"\/redfish\/v1\/Systems\/0\/EthernetInterfaces"
+  },
+  "SimpleStorage":{
+    "@odata.id":"\/redfish\/v1\/Systems\/0\/SimpleStorage"
+  },
+  "LogServices":{
+    "@odata.id":"\/redfish\/v1\/Managers\/iRMC\/LogServices"
+  },
+  "TrustedModules":[
+  ],
+  "SecureBoot":{
+    "@odata.id":"\/redfish\/v1\/Systems\/0\/SecureBoot"
+  },
+  "Bios":{
+    "@odata.id":"\/redfish\/v1\/Systems\/0\/Bios"
+  },
+  "Memory":{
+    "@odata.id":"\/redfish\/v1\/Systems\/0\/Memory"
+  },
+  "Storage":{
+    "@odata.id":"\/redfish\/v1\/Systems\/0\/Storage"
+  },
+  "HostingRoles":[
+    "ApplicationServer"
+  ],
+  "HostedServices":{
+    "Oem":{
+    },
+    "StorageServices":{
+      "@odata.id":"\/redfish\/v1\/Systems\/0\/HostedServices\/StorageServices"
+    }
+  },
+  "PCIeDevices@odata.count":0,
+  "PCIeDevices@odata.navigationLink":"0\/PCIeDevices",
+  "PCIeDevices":[
+  ],
+  "PCIeFunctions@odata.count":0,
+  "PCIeFunctions@odata.navigationLink":"0\/PCIeFunctions",
+  "PCIeFunctions":[
+  ],
+  "NetworkInterfaces":{
+    "@odata.id":"\/redfish\/v1\/Systems\/0\/NetworkInterfaces"
+  },
+  "@Redfish.Copyright":"Copyright 2014-2017 Distributed Management Task Force, Inc. (DMTF). For the full DMTF copyright policy, see http:\/\/www.dmtf.org\/about\/policies\/copyright.",
+  "@odata.etag":"1778940369"
+}
+
+Boot override set: target=BiosSetup mode=UEFI (once)
+ForceOff...
+
+Waiting 25s...
+Power On...
+
+Power cycle complete (ResetType=On)
+[13:54:42] S10: skipped verify nav (raid_setup vdlist_arrowdown not set); take manual screenshot
+[13:54:44] setup-raid10 done; review /home/ubuntu/projects/pvese/tmp/biosraid/run1

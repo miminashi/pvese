@@ -1,0 +1,15 @@
+PING 10.254.254.9 (10.254.254.9) 56(84) bytes of data.
+64 bytes from 10.254.254.9: icmp_seq=1 ttl=64 time=314 ms
+64 bytes from 10.254.254.9: icmp_seq=2 ttl=64 time=272 ms
+64 bytes from 10.254.254.9: icmp_seq=3 ttl=64 time=231 ms
+64 bytes from 10.254.254.9: icmp_seq=4 ttl=64 time=190 ms
+64 bytes from 10.254.254.9: icmp_seq=5 ttl=64 time=148 ms
+64 bytes from 10.254.254.9: icmp_seq=6 ttl=64 time=107 ms
+64 bytes from 10.254.254.9: icmp_seq=7 ttl=64 time=87.8 ms
+64 bytes from 10.254.254.9: icmp_seq=8 ttl=64 time=344 ms
+64 bytes from 10.254.254.9: icmp_seq=9 ttl=64 time=303 ms
+64 bytes from 10.254.254.9: icmp_seq=10 ttl=64 time=262 ms
+
+--- 10.254.254.9 ping statistics ---
+10 packets transmitted, 10 received, 0% packet loss, time 9012ms
+rtt min/avg/max/mdev = 87.820/226.007/344.111/84.615 ms

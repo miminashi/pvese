@@ -1,0 +1,138 @@
+diff --git a/scripts/remaster-debian-iso.sh b/scripts/remaster-debian-iso.sh
+index 9d54091..7210812 100755
+--- a/scripts/remaster-debian-iso.sh
++++ b/scripts/remaster-debian-iso.sh
+@@ -6,11 +6,16 @@ PROJECT_DIR=$(cd "$SCRIPT_DIR/.." && pwd)
+ 
+ LEGACY_ONLY=false
+ SERIAL_UNIT=1
++INCLUDE_FILES=""
+ POSITIONAL=""
+ for arg in "$@"; do
+     case "$arg" in
+         --legacy-only) LEGACY_ONLY=true ;;
+         --serial-unit=*) SERIAL_UNIT="${arg#--serial-unit=}" ;;
++        --include=*)
++            inc="${arg#--include=}"
++            INCLUDE_FILES="${INCLUDE_FILES:+$INCLUDE_FILES }$inc"
++            ;;
+         *) POSITIONAL="${POSITIONAL:+$POSITIONAL }$arg" ;;
+     esac
+ done
+@@ -43,13 +48,32 @@ if [ "$LEGACY_ONLY" = true ]; then
+ fi
+ 
+ OUTPUT_BASENAME=$(basename "$OUTPUT_ISO")
++
++INCLUDE_VOLS=""
++INCLUDE_BASENAMES=""
++if [ -n "$INCLUDE_FILES" ]; then
++    for f in $INCLUDE_FILES; do
++        case "$f" in /*) ;; *) f="$(cd "$(dirname "$f")" && pwd)/$(basename "$f")" ;; esac
++        if [ ! -f "$f" ]; then
++            echo "ERROR: --include file not found: $f" >&2
++            exit 1
++        fi
++        bn=$(basename "$f")
++        INCLUDE_VOLS="$INCLUDE_VOLS -v $f:/include/$bn:ro"
++        INCLUDE_BASENAMES="${INCLUDE_BASENAMES:+$INCLUDE_BASENAMES }$bn"
++        echo "Include:    $f -> /$bn"
++    done
++fi
++
+ docker run --rm --dns 8.8.8.8 \
+     -e "LEGACY_ONLY=$LEGACY_ONLY" \
+     -e "SERIAL_UNIT=$SERIAL_UNIT" \
+     -e "OUTPUT_BASENAME=$OUTPUT_BASENAME" \
++    -e "INCLUDE_BASENAMES=$INCLUDE_BASENAMES" \
+     -v "$ORIG_ISO:/input.iso:ro" \
+     -v "$PRESEED:/preseed.cfg:ro" \
+     -v "$(dirname "$OUTPUT_ISO"):/output" \
++    $INCLUDE_VOLS \
+     debian:trixie sh -c '
+ set -eu
+ 
+@@ -59,7 +83,30 @@ apt-get install -y -qq xorriso cpio gzip mtools > /dev/null 2>&1
+ WORK=/tmp/isowork
+ mkdir -p "$WORK/irmod" "$WORK/mod" "$WORK/efi"
+ 
+-echo "--- Skipping initrd modification (using preseed/file from CD instead) ---"
++# Inject /preseed.cfg into install.amd/initrd.gz so debian-installer auto-loads
++# preseed BEFORE cdrom-detect runs. Required for cdrom-detect-skip via
++# preseed/early_command (chicken-and-egg with /cdrom/preseed.cfg path).
++# See report/2026-05-18_025914_tx1320_raid10_cdrom_detect_cmdline_failed.md.
++#
++# Method: Linux kernel initramfs supports CONCATENATED gzipped cpio archives
++# (each stream processed in turn, later files override earlier). Build a tiny
++# cpio with just preseed.cfg, gzip -9 it, and append to the original initrd.gz
++# byte-for-byte. Avoids mutating the original archive internal trailer or
++# padding, which can produce subtly-malformed initrds that crash kernel boot
++# (observed 2026-05-18 followup, cpio -A approach: GRUB boot loops).
++echo "--- Injecting /preseed.cfg into install.amd/initrd.gz (concatenated archive) ---"
++xorriso -osirrox on -indev /input.iso \
++    -extract /install.amd/initrd.gz "$WORK/irmod/initrd-orig.gz" 2>&1 | tail -1
++mkdir -p "$WORK/irmod/inject"
++cp /preseed.cfg "$WORK/irmod/inject/preseed.cfg"
++(
++    cd "$WORK/irmod/inject"
++    echo preseed.cfg | cpio -o -H newc > "$WORK/irmod/extra.cpio"
++) 2>&1 | tail -2
++gzip -9 -f "$WORK/irmod/extra.cpio"
++cat "$WORK/irmod/initrd-orig.gz" "$WORK/irmod/extra.cpio.gz" > "$WORK/irmod/initrd.gz"
++INITRD_UPDATE_ARGS="-update $WORK/irmod/initrd.gz /install.amd/initrd.gz"
++echo "Initrd patched, orig=$(stat -c%s "$WORK/irmod/initrd-orig.gz") extra=$(stat -c%s "$WORK/irmod/extra.cpio.gz") total=$(stat -c%s "$WORK/irmod/initrd.gz") bytes"
+ 
+ echo "--- Preparing modified config files ---"
+ cat > "$WORK/mod/grub.cfg" << GRUBCFG
+@@ -73,7 +120,7 @@ terminal_output serial console
+ search --file --set=root /install.amd/vmlinuz
+ 
+ menuentry "Automated Install" {
+-    linux /install.amd/vmlinuz vga=normal nomodeset auto=true priority=critical preseed/file=/cdrom/preseed.cfg locale=en_US.UTF-8 keymap=us netcfg/choose_interface=auto console=tty0 console=ttyS${SERIAL_UNIT},115200n8 --- quiet
++    linux /install.amd/vmlinuz vga=normal nomodeset auto=true priority=critical preseed/file=/preseed.cfg locale=en_US.UTF-8 keymap=us netcfg/choose_interface=auto cdrom-detect/try-usb=true cdrom-detect/scan=true hw-detect/load_media=false console=tty0 console=ttyS${SERIAL_UNIT},115200n8 --- quiet
+     initrd /install.amd/initrd.gz
+ }
+ GRUBCFG
+@@ -83,7 +130,7 @@ default auto
+ label auto
+   menu label ^Automated Install
+   kernel /install.amd/vmlinuz
+-  append vga=normal nomodeset auto=true priority=critical preseed/file=/cdrom/preseed.cfg locale=en_US.UTF-8 keymap=us netcfg/choose_interface=auto console=tty0 console=ttyS${SERIAL_UNIT},115200n8 initrd=/install.amd/initrd.gz --- quiet
++  append vga=normal nomodeset auto=true priority=critical preseed/file=/preseed.cfg locale=en_US.UTF-8 keymap=us netcfg/choose_interface=auto cdrom-detect/try-usb=true cdrom-detect/scan=true hw-detect/load_media=false console=tty0 console=ttyS${SERIAL_UNIT},115200n8 initrd=/install.amd/initrd.gz --- quiet
+ label install
+   menu label ^Install
+   kernel /install.amd/vmlinuz
+@@ -146,7 +193,7 @@ set timeout=3
+ search --file --set=root /install.amd/vmlinuz
+ 
+ menuentry "Automated Install" {
+-    linux /install.amd/vmlinuz vga=normal nomodeset auto=true priority=critical preseed/file=/cdrom/preseed.cfg locale=en_US.UTF-8 keymap=us netcfg/choose_interface=auto console=tty0 console=ttyS${SERIAL_UNIT},115200n8 --- quiet
++    linux /install.amd/vmlinuz vga=normal nomodeset auto=true priority=critical preseed/file=/preseed.cfg locale=en_US.UTF-8 keymap=us netcfg/choose_interface=auto cdrom-detect/try-usb=true cdrom-detect/scan=true hw-detect/load_media=false console=tty0 console=ttyS${SERIAL_UNIT},115200n8 --- quiet
+     initrd /install.amd/initrd.gz
+ }
+ EMBEDCFG
+@@ -179,6 +226,14 @@ EMBEDCFG
+     EFI_UPDATE_ARGS="-update $WORK/efi/efi.img /boot/grub/efi.img"
+ fi
+ 
++INCLUDE_MAP_ARGS=""
++if [ -n "${INCLUDE_BASENAMES:-}" ]; then
++    for bn in $INCLUDE_BASENAMES; do
++        INCLUDE_MAP_ARGS="$INCLUDE_MAP_ARGS -map /include/$bn /$bn"
++        echo "ISO include: /$bn"
++    done
++fi
++
+ echo "--- Rebuilding ISO (preserving original boot structure) ---"
+ rm -f "/output/$OUTPUT_BASENAME"
+ xorriso -indev /input.iso \
+@@ -189,7 +244,9 @@ xorriso -indev /input.iso \
+     -update "$WORK/mod/txt.cfg" /isolinux/txt.cfg \
+     -update "$WORK/mod/isolinux.cfg" /isolinux/isolinux.cfg \
+     $EFI_UPDATE_ARGS \
++    $INITRD_UPDATE_ARGS \
+     -map "$WORK/mod/preseed.cfg" /preseed.cfg \
++    $INCLUDE_MAP_ARGS \
+     2>&1
+ 
+ echo "--- Done ---"

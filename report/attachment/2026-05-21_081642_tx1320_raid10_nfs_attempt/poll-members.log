@@ -1,0 +1,40 @@
+[08:10:57] iter=0 Members.count=0 AllowableValues=[          "DisconnectCD"        ]
+[08:11:09] iter=1 Members.count=0 AllowableValues=[          "DisconnectCD"        ]
+[08:11:18] iter=2 Members.count=0 AllowableValues=[          "DisconnectCD"        ]
+[08:11:29] iter=3 Members.count=0 AllowableValues=[          "DisconnectCD"        ]
+[08:11:39] iter=4 Members.count=0 AllowableValues=[          "DisconnectCD"        ]
+[08:11:49] iter=5 Members.count=0 AllowableValues=[          "DisconnectCD"        ]
+[08:11:59] iter=6 Members.count=0 AllowableValues=[          "DisconnectCD"        ]
+[08:12:10] iter=7 Members.count=0 AllowableValues=[          "DisconnectCD"        ]
+[08:12:21] iter=8 Members.count=0 AllowableValues=[          "DisconnectCD"        ]
+[08:12:31] iter=9 Members.count=0 AllowableValues=[          "DisconnectCD"        ]
+[08:12:41] iter=10 Members.count=0 AllowableValues=[          "DisconnectCD"        ]
+[08:12:51] iter=11 Members.count=0 AllowableValues=[          "DisconnectCD"        ]
+[08:13:02] iter=12 Members.count=0 AllowableValues=[          "DisconnectCD"        ]
+[08:13:12] iter=13 Members.count=0 AllowableValues=[          "DisconnectCD"        ]
+[08:13:21] iter=14 Members.count=0 AllowableValues=[          "DisconnectCD"        ]
+[08:13:32] iter=15 Members.count=0 AllowableValues=[          "DisconnectCD"        ]
+[08:13:41] iter=16 Members.count=0 AllowableValues=[          "DisconnectCD"        ]
+[08:13:50] iter=17 Members.count=0 AllowableValues=[          "DisconnectCD"        ]
+[08:14:00] iter=18 Members.count=0 AllowableValues=[          "DisconnectCD"        ]
+[08:14:12] iter=19 Members.count=0 AllowableValues=[          "DisconnectCD"        ]
+[08:14:21] iter=20 Members.count=0 AllowableValues=[          "DisconnectCD"        ]
+[08:14:31] iter=21 Members.count=0 AllowableValues=[          "DisconnectCD"        ]
+[08:14:40] iter=22 Members.count=0 AllowableValues=[          "DisconnectCD"        ]
+[08:14:51] iter=23 Members.count=0 AllowableValues=[          "DisconnectCD"        ]
+=== final Members ===
+{
+  "@odata.context":"\/redfish\/v1\/$metadata#Managers\/Members\/iRMC\/VirtualMedia(Name,Members,Oem)",
+  "@odata.id":"\/redfish\/v1\/Managers\/iRMC\/VirtualMedia",
+  "@odata.type":"#VirtualMediaCollection.VirtualMediaCollection",
+  "Name":"Virtual Media Collection",
+  "Members@odata.navigationLink":"VirtualMedia\/Members",
+  "Members":[
+  ],
+  "Members@odata.count":0,
+  "Oem":{
+  },
+  "@Redfish.Copyright":"Copyright 2014-2017 Distributed Management Task Force, Inc. (DMTF). For the full DMTF copyright policy, see http:\/\/www.dmtf.org\/about\/policies\/copyright.",
+  "@odata.etag":"1779346630"
+}
+Members links: [  ]

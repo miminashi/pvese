@@ -1,0 +1,4 @@
+CDImage.Server=10.1.6.1
+CDImage.ShareName=public
+CDImage.ImageName=debian-training-tx1320-raid10.iso
+RemoteMountEnabled=true

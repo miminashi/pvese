@@ -1,0 +1,4 @@
+SerialPort1                              | Serial Port                              | Enabled
+SecureBoot                               | Secure Boot Control                      | Disabled
+ChangeSettingsSerialPort                 | Change Settings                          | Auto
+SecureBootMode                           | Secure Boot Mode                         | Custom

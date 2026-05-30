@@ -1,0 +1,40 @@
+=== Phase 2 v4 (after Manager.Reset): wait for iRMC, then re-attach ===
+[1/7] poll iRMC liveness (max 5 min)
+    iRMC alive at t=165s
+[2/7] start tcpdump (5 min, full capture from iRMC)
+[3/7] verify iRMC OEM VirtualMedia state
+    "Server":""
+    "ShareName":""
+    "ImageName":""
+    "Server":"10.1.6.6"
+    "ShareName":"public"
+    "ImageName":"debian-preseed-tx1320.iso"
+    "Server":""
+    "ShareName":""
+    "ImageName":""
+  "RemoteMountEnabled":true
+[4/7] re-PATCH config to 10.1.6.6
+}
+
+HTTP 200
+[5/7] monitor for 5 min
+[t=30s] Members=0 pcap_bytes=24 smbd_log_bytes=0
+[t=60s] Members=0 pcap_bytes=24 smbd_log_bytes=0
+[t=90s] Members=0 pcap_bytes=24 smbd_log_bytes=0
+[t=120s] Members=0 pcap_bytes=24 smbd_log_bytes=0
+[t=150s] Members=0 pcap_bytes=24 smbd_log_bytes=0
+[t=180s] Members=0 pcap_bytes=24 smbd_log_bytes=0
+[t=210s] Members=0 pcap_bytes=24 smbd_log_bytes=0
+[t=240s] Members=0 pcap_bytes=24 smbd_log_bytes=0
+[t=270s] Members=0 pcap_bytes=24 smbd_log_bytes=0
+[t=300s] Members=0 pcap_bytes=24 smbd_log_bytes=0
+[6/7] stop tcpdump
+-rw-r--r-- 1 tcpdump tcpdump 24 May 20 20:08 /tmp/smb-irmc-v4.pcap
+[7/7] grep + tcpdump packet summary
+---grep level/INVALID---
+---log sizes---
+/var/log/samba/log.nmbd
+---tcpdump summary---
+---packet count---
+0
+=== Phase 2 v4 done ===

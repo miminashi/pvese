@@ -1,0 +1,45 @@
+=== Phase 5d start: 16:34:36 ===
+=== chown nobody:nogroup ISO ===
+-rw-r--r-- 1 nobody nogroup 800391168  5月 18 10:07 /var/samba/public/debian-training-tx1320-raid10.iso
+=== Apply smb.conf.test3 (force user=nobody on [public]) ===
+=== Truncate Samba logs ===
+=== Reload config (also disconnects iRMC session) ===
+=== Status before DisconnectCD/ConnectCD ===
+AllowableValues: ['DisconnectCD']
+=== DisconnectCD ===
+HTTP 204
+=== ConnectCD ===
+HTTP 204
+=== Poll Members count (24 iter * 5s = 120s, exit early on attach) ===
+[16:35:02] iter=1 Members=0 sock=10.1.6.1:445 10.254.254.9:46626
+[16:35:09] iter=2 Members=0 sock=10.1.6.1:445 10.254.254.9:46626
+[16:35:17] iter=3 Members=0 sock=10.1.6.1:445 10.254.254.9:46626
+[16:35:24] iter=4 Members=0 sock=10.1.6.1:445 10.254.254.9:46626
+[16:35:32] iter=5 Members=0 sock=10.1.6.1:445 10.254.254.9:46626
+[16:35:39] iter=6 Members=0 sock=10.1.6.1:445 10.254.254.9:46626
+[16:35:46] iter=7 Members=0 sock=10.1.6.1:445 10.254.254.9:46626
+[16:35:54] iter=8 Members=0 sock=10.1.6.1:445 10.254.254.9:46626
+[16:36:02] iter=9 Members=0 sock=10.1.6.1:445 10.254.254.9:46626
+[16:36:09] iter=10 Members=0 sock=10.1.6.1:445 10.254.254.9:46626
+[16:36:17] iter=11 Members=0 sock=10.1.6.1:445 10.254.254.9:46626
+[16:36:25] iter=12 Members=0 sock=10.1.6.1:445 10.254.254.9:46626
+[16:36:32] iter=13 Members=0 sock=10.1.6.1:445 10.254.254.9:46626
+[16:36:39] iter=14 Members=0 sock=10.1.6.1:445 10.254.254.9:46626
+[16:36:46] iter=15 Members=0 sock=10.1.6.1:445 10.254.254.9:46626
+[16:36:54] iter=16 Members=0 sock=10.1.6.1:445 10.254.254.9:46626
+[16:37:02] iter=17 Members=0 sock=10.1.6.1:445 10.254.254.9:46626
+[16:37:09] iter=18 Members=0 sock=10.1.6.1:445 10.254.254.9:46626
+[16:37:16] iter=19 Members=0 sock=10.1.6.1:445 10.254.254.9:46626
+[16:37:23] iter=20 Members=0 sock=10.1.6.1:445 10.254.254.9:46626
+[16:37:31] iter=21 Members=0 sock=10.1.6.1:445 10.254.254.9:46626
+[16:37:39] iter=22 Members=0 sock=10.1.6.1:445 10.254.254.9:46626
+[16:37:46] iter=23 Members=0 sock=10.1.6.1:445 10.254.254.9:46626
+[16:37:53] iter=24 Members=0 sock=10.1.6.1:445 10.254.254.9:46626
+=== Capture Samba logs ===
+0 /home/ubuntu/projects/pvese/tmp/3bace1bf/samba-machine-phase5d.log
+0 /home/ubuntu/projects/pvese/tmp/3bace1bf/samba-empty-phase5d.log
+=== Result: ATTACHED=0 ===
+=== Restore smb.conf + revert ISO ownership ===
+-rw-r--r-- 1 root root 800391168  5月 18 10:07 /var/samba/public/debian-training-tx1320-raid10.iso
+smb.conf == backup (OK)
+=== Phase 5d done: 16:38:00 ===

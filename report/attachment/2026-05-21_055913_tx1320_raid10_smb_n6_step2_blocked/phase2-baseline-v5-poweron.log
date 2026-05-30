@@ -1,0 +1,55 @@
+=== Phase 2 v5: power-on host with unpatched Samba on 10.1.6.6 ===
+[1/8] check current PowerState
+    PowerState=Off
+[2/8] verify CD config still points to 10.1.6.6
+CDImage.Server=10.1.6.6
+CDImage.ShareName=public
+CDImage.ImageName=debian-preseed-tx1320.iso
+RemoteMountEnabled=true
+[3/8] start tcpdump on 10.1.6.6 (8 min capture)
+[4/8] clear Samba log + restart smbd to ensure debug=10 is in effect
+[5/8] set boot override Cd UEFI
+  "@Redfish.Copyright":"Copyright 2014-2017 Distributed Management Task Force, Inc. (DMTF). For the full DMTF copyright policy, see http:\/\/www.dmtf.org\/about\/policies\/copyright.",
+  "@odata.etag":"1779341872"
+}
+
+Boot override set: target=Cd mode=UEFI (once)
+[6/8] force-off + on
+
+ForceOff requested
+
+Power On requested (ResetType=On)
+    powered on at 05:24:33
+[7/8] monitor 6 min during boot (24x15s)
+[t=15s] Members=0 pcap_bytes=24 smbd_log_bytes=0
+[t=30s] Members=0 pcap_bytes=24 smbd_log_bytes=0
+[t=45s] Members=0 pcap_bytes=24 smbd_log_bytes=0
+[t=60s] Members=0 pcap_bytes=24 smbd_log_bytes=0
+[t=75s] Members=0 pcap_bytes=24 smbd_log_bytes=0
+[t=90s] Members=0 pcap_bytes=24 smbd_log_bytes=0
+[t=105s] Members=0 pcap_bytes=24 smbd_log_bytes=0
+[t=120s] Members=0 pcap_bytes=24 smbd_log_bytes=0
+[t=135s] Members=0 pcap_bytes=24 smbd_log_bytes=0
+[t=150s] Members=0 pcap_bytes=24 smbd_log_bytes=0
+[t=165s] Members=0 pcap_bytes=24 smbd_log_bytes=0
+[t=180s] Members=0 pcap_bytes=24 smbd_log_bytes=0
+[t=195s] Members=0 pcap_bytes=24 smbd_log_bytes=0
+[t=210s] Members=0 pcap_bytes=24 smbd_log_bytes=0
+[t=225s] Members=0 pcap_bytes=24 smbd_log_bytes=0
+[t=240s] Members=0 pcap_bytes=24 smbd_log_bytes=0
+[t=255s] Members=0 pcap_bytes=24 smbd_log_bytes=0
+[t=270s] Members=0 pcap_bytes=24 smbd_log_bytes=0
+[t=285s] Members=0 pcap_bytes=24 smbd_log_bytes=0
+[t=300s] Members=0 pcap_bytes=24 smbd_log_bytes=0
+[t=315s] Members=0 pcap_bytes=24 smbd_log_bytes=0
+[t=330s] Members=0 pcap_bytes=24 smbd_log_bytes=0
+[t=345s] Members=0 pcap_bytes=24 smbd_log_bytes=0
+[t=360s] Members=0 pcap_bytes=24 smbd_log_bytes=0
+[8/8] stop tcpdump + collect results
+--- packet count ---
+0
+--- first 30 packets ---
+--- Samba log INVALID_LEVEL grep ---
+--- log file sizes ---
+-rw-r--r-- 1 root root 170005 May 20 20:32 /var/log/samba/log.nmbd
+=== Phase 2 v5 done ===

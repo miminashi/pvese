@@ -1,0 +1,2 @@
+f96d47b Add initrd preseed injection + cdrom-detect cmdline hints for TX1320
+a87564c Fix generate-preseed.sh non-VLAN regression: x10dpu installer hang

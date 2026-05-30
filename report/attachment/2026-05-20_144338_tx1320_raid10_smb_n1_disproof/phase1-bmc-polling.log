@@ -1,0 +1,97 @@
+iter=1  ts=10:39:24  rc=7  out=
+iter=2  ts=10:39:42  rc=7  out=
+iter=3  ts=10:39:53  rc=7  out=
+iter=4  ts=10:40:04  rc=7  out=
+iter=5  ts=10:40:15  rc=7  out=
+iter=6  ts=10:40:21  rc=7  out=
+iter=7  ts=10:40:27  rc=7  out=
+iter=8  ts=10:40:32  rc=7  out=
+iter=9  ts=10:40:38  rc=7  out=
+iter=10  ts=10:40:43  rc=7  out=
+iter=11  ts=10:40:49  rc=7  out=
+iter=12  ts=10:40:54  rc=7  out=
+iter=13  ts=10:40:59  rc=28  out=
+iter=14  ts=10:41:24  rc=7  out=
+iter=15  ts=10:41:36  rc=7  out=
+iter=16  ts=10:41:47  rc=1  out=ERROR: Could not get PowerState
+{
+  "error":{
+    "@Message.ExtendedInfo":[
+      {
+        "@odata.type":"\/redfish\/v1\/$metadata#Message.1_0_0.Message",
+        "MessageId":"Base.1.0.ServiceTemporarilyUnavailable",
+        "Message":"The service is temporarily unavailable. Retry in 30 seconds.",
+        "Severity":"Critical",
+        "Resolution":"Wait for the indicated retry duration and retry the operation."
+      }
+    ],
+    "code":"Base.1.0.ServiceTemporarilyUnavailable",
+    "message":"The service is temporarily unavailable. Retry in 30 seconds."
+  }
+}
+iter=17  ts=10:41:59  rc=1  out=ERROR: Could not get PowerState
+{
+  "error":{
+    "@Message.ExtendedInfo":[
+      {
+        "@odata.type":"\/redfish\/v1\/$metadata#Message.1_0_0.Message",
+        "MessageId":"Base.1.0.ServiceTemporarilyUnavailable",
+        "Message":"The service is temporarily unavailable. Retry in 30 seconds.",
+        "Severity":"Critical",
+        "Resolution":"Wait for the indicated retry duration and retry the operation."
+      }
+    ],
+    "code":"Base.1.0.ServiceTemporarilyUnavailable",
+    "message":"The service is temporarily unavailable. Retry in 30 seconds."
+  }
+}
+iter=18  ts=10:42:12  rc=1  out=ERROR: Could not get PowerState
+{
+  "error":{
+    "@Message.ExtendedInfo":[
+      {
+        "@odata.type":"\/redfish\/v1\/$metadata#Message.1_0_0.Message",
+        "MessageId":"Base.1.0.ServiceTemporarilyUnavailable",
+        "Message":"The service is temporarily unavailable. Retry in 30 seconds.",
+        "Severity":"Critical",
+        "Resolution":"Wait for the indicated retry duration and retry the operation."
+      }
+    ],
+    "code":"Base.1.0.ServiceTemporarilyUnavailable",
+    "message":"The service is temporarily unavailable. Retry in 30 seconds."
+  }
+}
+iter=19  ts=10:42:23  rc=1  out=ERROR: Could not get PowerState
+{
+  "error":{
+    "@Message.ExtendedInfo":[
+      {
+        "@odata.type":"\/redfish\/v1\/$metadata#Message.1_0_0.Message",
+        "MessageId":"Base.1.0.ServiceTemporarilyUnavailable",
+        "Message":"The service is temporarily unavailable. Retry in 30 seconds.",
+        "Severity":"Critical",
+        "Resolution":"Wait for the indicated retry duration and retry the operation."
+      }
+    ],
+    "code":"Base.1.0.ServiceTemporarilyUnavailable",
+    "message":"The service is temporarily unavailable. Retry in 30 seconds."
+  }
+}
+iter=20  ts=10:42:36  rc=1  out=ERROR: Could not get PowerState
+{
+  "error":{
+    "@Message.ExtendedInfo":[
+      {
+        "@odata.type":"\/redfish\/v1\/$metadata#Message.1_0_0.Message",
+        "MessageId":"Base.1.0.ServiceTemporarilyUnavailable",
+        "Message":"The service is temporarily unavailable. Retry in 30 seconds.",
+        "Severity":"Critical",
+        "Resolution":"Wait for the indicated retry duration and retry the operation."
+      }
+    ],
+    "code":"Base.1.0.ServiceTemporarilyUnavailable",
+    "message":"The service is temporarily unavailable. Retry in 30 seconds."
+  }
+}
+iter=21  ts=10:42:47  rc=0  out=Off
+BMC recovered at iter=21 (105s after polling start). state=Off

@@ -1,0 +1,22 @@
+=== Test: tcpdump on 10.1.6.6 for 60s while pinging iRMC from 10.1.6.6 ===
+    starting ping from 10.1.6.6 to 10.254.254.9 (15 packets)
+64 bytes from 10.254.254.9: icmp_seq=15 ttl=64 time=116 ms
+
+--- 10.254.254.9 ping statistics ---
+15 packets transmitted, 15 received, 0% packet loss, time 14020ms
+rtt min/avg/max/mdev = 90.197/232.829/372.586/88.399 ms
+    nc test 10.1.6.6 -> iRMC:443 (Redfish)
+Connection to 10.254.254.9 443 port [tcp/https] succeeded!
+    nc test 10.1.6.6 -> iRMC:22 (SSH)
+Connection to 10.254.254.9 22 port [tcp/ssh] succeeded!
+    wait remaining tcpdump time
+===
+0
+
+=== Now: reverse direction unsolicited — listen on 10.1.6.6 for 90s with NO ping ===
+    re-PATCH iRMC config to 10.1.6.6 to force a fresh SMB attempt
+    config done, waiting 80s
+    tcpdump summary (iRMC → 10.1.6.6 unsolicited)
+===
+0
+=== done ===

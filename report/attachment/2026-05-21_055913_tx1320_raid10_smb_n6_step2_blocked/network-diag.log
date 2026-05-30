@@ -1,0 +1,121 @@
+=== A. PowerState now ===
+"PowerState":"On"
+
+=== B. iRMC OEM VirtualMedia OEM block ===
+{
+  "@odata.context":"\/redfish\/v1\/$metadata#Systems\/Members\/0\/Oem\/ts_fujitsu\/VirtualMedia(Name,
+FDImage,
+CDImage,
+HDImage,
+RemoteMountEnabled,
+UsbAttachMode)",
+
+  "@odata.id":"\/redfish\/v1\/Systems\/0\/Oem\/ts_fujitsu\/VirtualMedia",
+
+  "@odata.type":"http:\/\/ts.fujitsu.com\/redfish-schemas\/v1\/FTSSchema.v1_0_0#FTSVirtualMedia.v1_0_0.FTSVirtualMedia",
+
+  "Name":"Virtual Media Configuration",
+
+  "FDImage":{
+    "Server":"",
+
+    "UserName":"",
+
+    "Password":null,
+
+    "UserDomain":"",
+
+    "ShareType":"SMB",
+
+    "ShareName":"",
+
+    "ImageName":"",
+
+    "MaximumNumberOfDevices":0
+  },
+
+  "CDImage":{
+    "Server":"10.1.6.6",
+
+    "UserName":"guest",
+
+    "Password":null,
+
+    "UserDomain":"",
+
+    "ShareType":"SMB",
+
+    "ShareName":"public",
+
+    "ImageName":"debian-preseed-tx1320.iso",
+
+    "MaximumNumberOfDevices":2
+  },
+
+  "HDImage":{
+    "Server":"",
+
+    "UserName":"",
+
+    "Password":null,
+
+    "UserDomain":"",
+
+    "ShareType":"SMB",
+
+=== C. Std Redfish VirtualMedia collection ===
+{
+  "@odata.context":"\/redfish\/v1\/$metadata#Managers\/Members\/iRMC\/VirtualMedia(Name,
+Members,
+Oem)",
+
+  "@odata.id":"\/redfish\/v1\/Managers\/iRMC\/VirtualMedia",
+
+  "@odata.type":"#VirtualMediaCollection.VirtualMediaCollection",
+
+  "Name":"Virtual Media Collection",
+
+  "Members@odata.navigationLink":"VirtualMedia\/Members",
+
+  "Members":[
+  ],
+
+  "Members@odata.count":0,
+
+  "Oem":{
+  },
+
+  "@Redfish.Copyright":"Copyright 2014-2017 Distributed Management Task Force,
+ Inc. (DMTF). For the full DMTF copyright policy,
+ see http:\/\/www.dmtf.org\/about\/policies\/copyright.",
+
+  "@odata.etag":"1779340565"
+}
+
+=== D. tcpdump on 10.1.6.6 ALL traffic from iRMC for 60s + revert to 10.1.6.1 ===
+    starting tcpdump...
+    PATCH config back to 10.1.6.1
+    wait 50s for iRMC to potentially retry against 10.1.6.1
+    [t=10s] pcap_bytes=24
+    [t=20s] pcap_bytes=24
+    [t=30s] pcap_bytes=24
+    [t=40s] pcap_bytes=24
+    [t=50s] pcap_bytes=24
+
+=== E. Captured packets summary ===
+===packet count===
+0
+
+=== F. Reverse: from 10.1.6.6 ping iRMC + telnet test ===
+64 bytes from 10.254.254.9: icmp_seq=3 ttl=64 time=391 ms
+
+--- 10.254.254.9 ping statistics ---
+3 packets transmitted, 3 received, 0% packet loss, time 2001ms
+rtt min/avg/max/mdev = 111.935/324.787/471.848/154.122 ms
+---
+Connection to 10.254.254.9 22 port [tcp/ssh] succeeded!
+Connection to 10.254.254.9 443 port [tcp/https] succeeded!
+
+=== G. From local 10.1.6.1 — does local samba see iRMC traffic? ===
+    log.smbd recent activity:
+=== diag done ===

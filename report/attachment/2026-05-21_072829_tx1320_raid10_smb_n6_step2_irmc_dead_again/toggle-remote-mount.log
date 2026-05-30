@@ -1,0 +1,59 @@
+[1] Get current etag
+    etag=1779348312
+[2] PATCH RemoteMountEnabled=false
+}
+
+HTTP 200
+[3] Sleep 10s
+[4] Get fresh etag
+    etag=1779348644
+[5] PATCH Server=10.1.6.1 + ImageName=debian-toggle-test-1779315440.iso + RemoteMountEnabled=true
+}
+
+HTTP 200
+
+[6] Verify
+    "Server":""
+    "ImageName":""
+    "Server":"10.1.6.1"
+    "ImageName":"debian-toggle-test-1779315440.iso"
+    "Server":""
+    "ImageName":""
+  "RemoteMountEnabled":true
+  "UsbAttachMode":"AutoAttach"
+
+[7] monitor local samba log 4 min for new conns
+[t=15s] log_lines=2878 new_conns=0
+0 Members=0
+[t=30s] log_lines=2878 new_conns=0
+0 Members=0
+[t=45s] log_lines=2878 new_conns=0
+0 Members=0
+[t=60s] log_lines=2878 new_conns=0
+0 Members=0
+[t=75s] log_lines=2878 new_conns=0
+0 Members=0
+[t=90s] log_lines=2878 new_conns=0
+0 Members=0
+[t=105s] log_lines=2878 new_conns=0
+0 Members=0
+[t=120s] log_lines=2878 new_conns=0
+0 Members=0
+[t=135s] log_lines=2878 new_conns=0
+0 Members=0
+[t=150s] log_lines=2878 new_conns=0
+0 Members=0
+[t=165s] log_lines=2878 new_conns=0
+0 Members=0
+[t=180s] log_lines=2878 new_conns=0
+0 Members=0
+[t=195s] log_lines=2878 new_conns=0
+0 Members=0
+[t=210s] log_lines=2878 new_conns=0
+0 Members=0
+[t=225s] log_lines=2878 new_conns=0
+0 Members=0
+[t=240s] log_lines=2878 new_conns=0
+0 Members=0
+
+[8] all new log entries from iRMC after PATCH

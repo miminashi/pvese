@@ -1,0 +1,20 @@
+[02:00:55] modes: capture=locator focus=hittest key=playwright
+[02:00:56] Logging in to iRMC at 10.254.254.9
+[02:01:09] Login successful (SID: AV8+gq3e...)
+[02:01:09] Opening viewer: https://10.254.254.9/viewer.html?ms=0&lang=0&sid=AV8+gq3evbdjHtmt
+[02:01:17] Canvas: 800x600 alive=True
+[02:01:18] step: wait('25')
+[02:01:43] step: screenshot('tmp/phase5a01/kvm-iter4-t030.png')
+[02:01:44] Saved tmp/phase5a01/kvm-iter4-t030.png (12850 bytes, locator)
+[02:01:44] step: wait('30')
+[02:02:14] step: screenshot('tmp/phase5a01/kvm-iter4-t060.png')
+[02:02:14] Saved tmp/phase5a01/kvm-iter4-t060.png (12833 bytes, locator)
+[02:02:14] step: wait('60')
+[02:03:14] step: screenshot('tmp/phase5a01/kvm-iter4-t120.png')
+[02:03:14] Saved tmp/phase5a01/kvm-iter4-t120.png (12833 bytes, locator)
+[02:03:14] step: wait('60')
+[02:04:14] step: screenshot('tmp/phase5a01/kvm-iter4-t180.png')
+[02:04:14] Saved tmp/phase5a01/kvm-iter4-t180.png (4478 bytes, locator)
+[02:04:14] step: wait('120')
+[02:06:14] step: screenshot('tmp/phase5a01/kvm-iter4-t300.png')
+[02:06:14] Saved tmp/phase5a01/kvm-iter4-t300.png (4478 bytes, locator)

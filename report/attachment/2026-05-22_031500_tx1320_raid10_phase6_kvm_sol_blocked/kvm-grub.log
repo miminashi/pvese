@@ -1,0 +1,49 @@
+[03:00:30] modes: capture=locator focus=hittest key=playwright
+[03:00:31] Logging in to iRMC at 10.254.254.9
+[03:00:44] Login successful (SID: OKSP163e...)
+[03:00:44] Opening viewer: https://10.254.254.9/viewer.html?ms=0&lang=0&sid=OKSP163ev7fROGHJ
+[03:00:53] Canvas: 800x600 alive=True
+[03:00:54] step: wait('140')
+[03:03:14] step: screenshot('tmp/phase6a01/kvm-grub-pre.png')
+[03:03:14] Saved tmp/phase6a01/kvm-grub-pre.png (7372 bytes, locator)
+[03:03:14] step: wait('30')
+[03:03:44] step: screenshot('tmp/phase6a01/kvm-grub-menu.png')
+[03:03:44] Saved tmp/phase6a01/kvm-grub-menu.png (7369 bytes, locator)
+[03:03:44] step: sendkeys('c')
+[03:03:44] [1/1] press 'c'
+[03:03:44] step: wait('3')
+[03:03:47] step: screenshot('tmp/phase6a01/kvm-grub-shell.png')
+[03:03:47] Saved tmp/phase6a01/kvm-grub-shell.png (7538 bytes, locator)
+[03:03:47] step: type('ls')
+[03:03:48] step: sendkeys('Enter')
+[03:03:48] [1/1] press 'Enter'
+[03:03:48] step: wait('3')
+[03:03:51] step: screenshot('tmp/phase6a01/kvm-grub-ls-devices.png')
+[03:03:51] Saved tmp/phase6a01/kvm-grub-ls-devices.png (7525 bytes, locator)
+[03:03:51] step: type('ls (cd0)/install.amd/')
+[03:03:53] step: sendkeys('Enter')
+[03:03:53] [1/1] press 'Enter'
+[03:03:53] step: wait('5')
+[03:03:58] step: screenshot('tmp/phase6a01/kvm-grub-ls-amd.png')
+[03:03:58] Saved tmp/phase6a01/kvm-grub-ls-amd.png (7526 bytes, locator)
+[03:03:58] step: type('ls (cd0)/install.amd/vmlinuz')
+[03:03:59] step: sendkeys('Enter')
+[03:04:00] [1/1] press 'Enter'
+[03:04:00] step: wait('5')
+[03:04:05] step: screenshot('tmp/phase6a01/kvm-grub-ls-vmlinuz.png')
+[03:04:05] Saved tmp/phase6a01/kvm-grub-ls-vmlinuz.png (7516 bytes, locator)
+[03:04:05] step: type('ls (cd0)/install.amd/initrd.gz')
+[03:04:06] step: sendkeys('Enter')
+[03:04:07] [1/1] press 'Enter'
+[03:04:07] step: wait('5')
+[03:04:12] step: screenshot('tmp/phase6a01/kvm-grub-ls-initrd.png')
+[03:04:12] Saved tmp/phase6a01/kvm-grub-ls-initrd.png (7525 bytes, locator)
+[03:04:12] step: type('cat (cd0)/install.amd/vmlinuz')
+[03:04:13] step: sendkeys('Enter')
+[03:04:14] [1/1] press 'Enter'
+[03:04:14] step: wait('60')
+[03:05:14] step: screenshot('tmp/phase6a01/kvm-grub-cat-mid.png')
+[03:05:14] Saved tmp/phase6a01/kvm-grub-cat-mid.png (7513 bytes, locator)
+[03:05:14] step: wait('60')
+[03:06:14] step: screenshot('tmp/phase6a01/kvm-grub-cat-late.png')
+[03:06:14] Saved tmp/phase6a01/kvm-grub-cat-late.png (7515 bytes, locator)

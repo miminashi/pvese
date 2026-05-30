@@ -1,0 +1,5 @@
+HDImage.Server=10.1.6.6
+HDImage.ShareName=/var/samba/public
+HDImage.ImageName=debian-training-tx1320-raid10.iso
+RemoteMountEnabled=true
+HDImage.MaximumNumberOfDevices=0  # from config-response.json (key observation)

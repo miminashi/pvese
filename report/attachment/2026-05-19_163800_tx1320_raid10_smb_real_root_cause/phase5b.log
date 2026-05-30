@@ -1,0 +1,43 @@
+=== Phase 5b start: 15:37:20 ===
+=== Current ISO ownership ===
+-rw-r--r-- 1 root root 800391168  5月 18 10:07 /var/samba/public/debian-training-tx1320-raid10.iso
+=== chown nobody:nogroup ISO ===
+-rw-r--r-- 1 nobody nogroup 800391168  5月 18 10:07 /var/samba/public/debian-training-tx1320-raid10.iso
+=== Truncate per-machine + empty Samba logs ===
+=== Close existing share connections (forces iRMC reconnect) ===
+=== DisconnectCD ===
+HTTP 204
+=== ConnectCD ===
+HTTP 204
+=== Poll Members count (24 iter * 5s = 120s, exit early on attach) ===
+[15:37:44] iter=1 Members=0
+[15:37:50] iter=2 Members=0
+[15:37:57] iter=3 Members=0
+[15:38:04] iter=4 Members=0
+[15:38:12] iter=5 Members=0
+[15:38:19] iter=6 Members=0
+[15:38:25] iter=7 Members=0
+[15:38:32] iter=8 Members=0
+[15:38:39] iter=9 Members=0
+[15:38:46] iter=10 Members=0
+[15:38:53] iter=11 Members=0
+[15:39:00] iter=12 Members=0
+[15:39:07] iter=13 Members=0
+[15:39:13] iter=14 Members=0
+[15:39:20] iter=15 Members=0
+[15:39:27] iter=16 Members=0
+[15:39:35] iter=17 Members=0
+[15:39:42] iter=18 Members=0
+[15:39:49] iter=19 Members=0
+[15:39:56] iter=20 Members=0
+[15:40:03] iter=21 Members=0
+[15:40:09] iter=22 Members=0
+[15:40:16] iter=23 Members=0
+[15:40:23] iter=24 Members=0
+=== Capture Samba logs ===
+0 /home/ubuntu/projects/pvese/tmp/3bace1bf/samba-machine-phase5b.log
+0 /home/ubuntu/projects/pvese/tmp/3bace1bf/samba-empty-phase5b.log
+=== Result: ATTACHED=0 ===
+=== Hypothesis A failed: chown nobody did not help. Revert ISO ownership. ===
+-rw-r--r-- 1 root root 800391168  5月 18 10:07 /var/samba/public/debian-training-tx1320-raid10.iso
+=== Phase 5b done: 15:40:30 ===

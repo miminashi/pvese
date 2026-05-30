@@ -1,0 +1,109 @@
+[orchestrate] Phase 1: storcli64.deb present (/var/samba/public/storcli64.deb, 2062694 bytes)
+[orchestrate] Phase 3: generate preseed -> /home/ubuntu/projects/pvese/tmp/training-tx1320-preseed-raid10.cfg
+Generated: /home/ubuntu/projects/pvese/tmp/training-tx1320-preseed-raid10.cfg
+[orchestrate] Phase 4: remaster ISO -> /var/samba/public/debian-training-tx1320-raid10.iso
+=== Debian ISO Remaster (boot_image replay) ===
+Source ISO: /var/samba/public/debian-13.3.0-amd64-netinst.iso
+Preseed:    /home/ubuntu/projects/pvese/tmp/training-tx1320-preseed-raid10.cfg
+Output ISO: /var/samba/public/debian-training-tx1320-raid10.iso
+Include:    /var/samba/public/storcli64.deb -> /storcli64.deb
+Include:    /home/ubuntu/projects/pvese/scripts/setup-raid10-storcli.sh -> /setup-raid10-storcli.sh
+--- Injecting /preseed.cfg into install.amd/initrd.gz (concatenated archive) ---
+Extracted from ISO image: file '/install.amd/initrd.gz'='/tmp/isowork/irmod/initrd-orig.gz'
+21 blocks
+Initrd patched, orig=24217472 extra=4131 total=24221603 bytes
+--- Preparing modified config files ---
+--- Patching efi.img for serial console (Option A: mtools) ---
+Extracted from ISO image: file '/boot/grub/efi.img'='/tmp/isowork/efi/efi.img'
+ Volume in drive : has no label
+ Volume Serial Number is DEB0-0001
+Directory for ::/EFI/boot
+
+.            <DIR>     2026-01-10  11:02 
+..           <DIR>     2026-01-10  11:02 
+bootx64  efi    957136 2026-01-10  11:02 
+grubx64  efi   2684352 2026-01-10  11:02 
+        4 files           3 641 488 bytes
+                             10 240 bytes free
+
+No grub.cfg in efi.img, need Option B (rebuild with grub-mkstandalone)...
+--- Option B: Rebuilding efi.img with grub-mkstandalone ---
+EFI standalone size: 11255808B, FAT image: 11504KB
+mkfs.fat 4.2 (2021-01-31)
+Option B succeeded: efi.img rebuilt with serial console
+ISO include: /storcli64.deb
+ISO include: /setup-raid10-storcli.sh
+--- Rebuilding ISO (preserving original boot structure) ---
+xorriso 1.5.6 : RockRidge filesystem manipulator, libburnia project.
+
+xorriso : NOTE : Loading ISO image tree from LBA 0
+xorriso : UPDATE :    1501 nodes read in 1 seconds
+xorriso : NOTE : Detected El-Torito boot information which currently is set to be discarded
+Drive current: -indev '/input.iso'
+Media current: stdio file, overwriteable
+Media status : is written , is appendable
+Boot record  : El Torito , MBR isohybrid cyl-align-on GPT APM
+Media summary: 1 session, 386048 data blocks,  754m data,  968g free
+Volume id    : 'Debian 13.3.0 amd64 n'
+Drive current: -outdev '/output/debian-training-tx1320-raid10.iso'
+Media current: stdio file, overwriteable
+Media status : is blank
+Media summary: 0 sessions, 0 data blocks, 0 data,  968g free
+xorriso : WARNING : -volid text problematic as automatic mount point name
+xorriso : WARNING : -volid text does not comply to ISO 9660 / ECMA 119 rules
+xorriso : NOTE : Replayed 23 boot related commands
+Updating '/tmp/isowork/mod/grub.cfg' to '/boot/grub/grub.cfg'
+xorriso : UPDATE : Added/overwrote '/boot/grub/grub.cfg'  (533)
+Differences detected and updated. (runtime 0.0 s)
+Updating '/tmp/isowork/mod/txt.cfg' to '/isolinux/txt.cfg'
+xorriso : UPDATE : Added/overwrote '/isolinux/txt.cfg'  (475)
+Differences detected and updated. (runtime 0.0 s)
+Updating '/tmp/isowork/mod/isolinux.cfg' to '/isolinux/isolinux.cfg'
+xorriso : UPDATE : Added/overwrote '/isolinux/isolinux.cfg'  (56)
+Differences detected and updated. (runtime 0.0 s)
+Updating '/tmp/isowork/efi/efi.img' to '/boot/grub/efi.img'
+xorriso : UPDATE : Added/overwrote '/boot/grub/efi.img'  (11m)
+Differences detected and updated. (runtime 0.0 s)
+Updating '/tmp/isowork/irmod/initrd.gz' to '/install.amd/initrd.gz'
+xorriso : UPDATE : Added/overwrote '/install.amd/initrd.gz'  (23m)
+Differences detected and updated. (runtime 0.1 s)
+xorriso : UPDATE :       1 files added in 1 seconds
+Added to ISO image: file '/preseed.cfg'='/tmp/isowork/mod/preseed.cfg'
+xorriso : UPDATE :       1 files added in 1 seconds
+Added to ISO image: file '/storcli64.deb'='/include/storcli64.deb'
+xorriso : UPDATE :       1 files added in 1 seconds
+Added to ISO image: file '/setup-raid10-storcli.sh'='/include/setup-raid10-storcli.sh'
+xorriso : NOTE : Copying to System Area: 32768 bytes from file '--interval:imported_iso:0s-15s:zero_mbrpt,zero_gpt,zero_apm:/input.iso'
+libisofs: WARNING : Cannot add /debian to Joliet tree. Symlinks can only be added to a Rock Ridge tree.
+libisofs: WARNING : More symbolic links were omitted from Joliet tree.
+libisofs: NOTE : Aligned image size to cylinder size by 9 blocks
+libisofs: WARNING : Number of symbolic links omitted from Joliet tree: 19
+xorriso : UPDATE : Writing:       8192s    2.1%   fifo 100%  buf  50%
+xorriso : UPDATE : Writing:      22032s    5.6%   fifo  99%  buf  50%   34.1xD 
+xorriso : UPDATE : Writing:      40960s   10.5%   fifo 100%  buf  50%   31.1xD 
+xorriso : UPDATE : Writing:      65536s   16.8%   fifo 100%  buf  50%   36.3xD 
+xorriso : UPDATE : Writing:      81920s   21.0%   fifo 100%  buf  50%   24.2xD 
+xorriso : UPDATE : Writing:     106496s   27.3%   fifo 100%  buf  50%   36.3xD 
+xorriso : UPDATE : Writing:     131072s   33.5%   fifo 100%  buf  50%   36.3xD 
+xorriso : UPDATE : Writing:     147456s   37.7%   fifo 100%  buf  50%   24.2xD 
+xorriso : UPDATE : Writing:     172032s   44.0%   fifo 100%  buf  50%   36.3xD 
+xorriso : UPDATE : Writing:     196608s   50.3%   fifo 100%  buf  50%   36.3xD 
+xorriso : UPDATE : Writing:     212992s   54.5%   fifo 100%  buf  50%   24.2xD 
+xorriso : UPDATE : Writing:     237568s   60.8%   fifo 100%  buf  50%   36.3xD 
+xorriso : UPDATE : Writing:     253952s   65.0%   fifo 100%  buf  50%   24.2xD 
+xorriso : UPDATE : Writing:     262144s   67.1%   fifo 100%  buf  50%   12.1xD 
+xorriso : UPDATE : Writing:     286720s   73.4%   fifo 100%  buf  50%   36.3xD 
+xorriso : UPDATE : Writing:     303104s   77.6%   fifo 100%  buf  50%   24.2xD 
+xorriso : UPDATE : Writing:     327680s   83.9%   fifo 100%  buf  50%   36.3xD 
+xorriso : UPDATE : Writing:     344064s   88.0%   fifo 100%  buf  50%   24.2xD 
+xorriso : UPDATE : Writing:     368640s   94.3%   fifo 100%  buf  50%   36.3xD 
+xorriso : UPDATE : Writing:     385024s   98.5%   fifo 100%  buf  50%   24.2xD 
+ISO image produced: 390624 sectors
+Written to medium : 390784 sectors at LBA 32
+Writing to '/output/debian-training-tx1320-raid10.iso' completed successfully.
+
+--- Done ---
+-rw-r--r-- 1 root root 764M May 21 23:51 /output/debian-training-tx1320-raid10.iso
+=== Output: /var/samba/public/debian-training-tx1320-raid10.iso ===
+-rw-r--r-- 1 root root 764M  5月 22 08:51 /var/samba/public/debian-training-tx1320-raid10.iso
+[orchestrate] build OK: /var/samba/public/debian-training-tx1320-raid10.iso

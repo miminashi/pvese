@@ -1,0 +1,14 @@
+[1] re-PATCH config to 10.1.6.6 to (re)provoke SMB
+    config done at 05:46:59
+[2] synchronous tcpdump on 10.1.6.6 — 4 min watching iRMC SMB
+tcpdump: data link type LINUX_SLL2
+tcpdump: verbose output suppressed, use -v[v]... for full protocol decode
+listening on any, link-type LINUX_SLL2 (Linux cooked v2), snapshot length 262144 bytes
+
+0 packets captured
+1 packet received by filter
+0 packets dropped by kernel
+[3] Samba log on 10.1.6.6
+--- log files non-empty ---
+/var/log/samba/log.nmbd
+--- INVALID_LEVEL grep ---

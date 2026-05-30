@@ -1,0 +1,1576 @@
+[2026/05/20 14:25:10.421948,  5, pid=4000687, effective(0, 0), real(0, 0)] lib/util/debug.c:931(debug_dump_status)
+  INFO: Current debug levels:
+    all: 10
+    tdb: 10
+    printdrivers: 10
+    lanman: 10
+    smb: 10
+    rpc_parse: 10
+    rpc_srv: 10
+    rpc_cli: 10
+    passdb: 10
+    sam: 10
+    auth: 10
+    winbind: 10
+    vfs: 10
+    idmap: 10
+    quota: 10
+    acls: 10
+    locking: 10
+    msdfs: 10
+    dmapi: 10
+    registry: 10
+    scavenger: 10
+    dns: 10
+    ldb: 10
+    tevent: 10
+    auth_audit: 10
+    auth_json_audit: 10
+    kerberos: 10
+    drs_repl: 10
+    smb2: 10
+    smb2_credits: 10
+    dsdb_audit: 10
+    dsdb_json_audit: 10
+    dsdb_password_audit: 10
+    dsdb_password_json_audit: 10
+    dsdb_transaction_audit: 10
+    dsdb_transaction_json_audit: 10
+    dsdb_group_audit: 10
+    dsdb_group_json_audit: 10
+[2026/05/20 14:25:10.422172,  6, pid=4000687, effective(0, 0), real(0, 0)] source3/param/loadparm.c:2398(lp_file_list_changed)
+  lp_file_list_changed()
+  file /etc/samba/smb.conf -> /etc/samba/smb.conf  last mod_time: 2026-05-20 14:24:50.916139075
+[2026/05/20 14:25:10.422230,  3, pid=4000687, effective(0, 0), real(0, 0), class=locking] source3/smbd/smb2_oplock.c:1408(init_oplocks)
+  init_oplocks: initializing messages.
+[2026/05/20 14:25:10.422248,  5, pid=4000687, effective(0, 0), real(0, 0)] source3/lib/messages.c:711(messaging_register)
+  Registering messaging pointer for type 774 - private_data=0x6087dc15b590
+[2026/05/20 14:25:10.422268,  5, pid=4000687, effective(0, 0), real(0, 0)] source3/lib/messages.c:711(messaging_register)
+  Registering messaging pointer for type 778 - private_data=0x6087dc15b590
+[2026/05/20 14:25:10.422285,  5, pid=4000687, effective(0, 0), real(0, 0)] source3/lib/messages.c:711(messaging_register)
+  Registering messaging pointer for type 770 - private_data=0x6087dc15b590
+[2026/05/20 14:25:10.422303,  5, pid=4000687, effective(0, 0), real(0, 0)] source3/lib/messages.c:711(messaging_register)
+  Registering messaging pointer for type 801 - private_data=0x6087dc15b590
+[2026/05/20 14:25:10.422320,  5, pid=4000687, effective(0, 0), real(0, 0)] source3/lib/messages.c:711(messaging_register)
+  Registering messaging pointer for type 787 - private_data=0x6087dc15b590
+[2026/05/20 14:25:10.422337,  5, pid=4000687, effective(0, 0), real(0, 0)] source3/lib/messages.c:711(messaging_register)
+  Registering messaging pointer for type 779 - private_data=0x6087dc15b590
+[2026/05/20 14:25:10.422355,  5, pid=4000687, effective(0, 0), real(0, 0)] source3/lib/messages.c:711(messaging_register)
+  Registering messaging pointer for type 15 - private_data=(nil)
+[2026/05/20 14:25:10.422372,  5, pid=4000687, effective(0, 0), real(0, 0)] source3/lib/messages.c:727(messaging_register)
+  Overriding messaging pointer for type 15 - private_data=(nil)
+[2026/05/20 14:25:10.422389,  5, pid=4000687, effective(0, 0), real(0, 0)] source3/lib/messages.c:759(messaging_deregister)
+  Deregistering messaging pointer for type 16 - private_data=(nil)
+[2026/05/20 14:25:10.422406,  5, pid=4000687, effective(0, 0), real(0, 0)] source3/lib/messages.c:711(messaging_register)
+  Registering messaging pointer for type 16 - private_data=0x6087dc15b590
+[2026/05/20 14:25:10.422423,  5, pid=4000687, effective(0, 0), real(0, 0)] source3/lib/messages.c:759(messaging_deregister)
+  Deregistering messaging pointer for type 33 - private_data=0x6087dc15d5b0
+[2026/05/20 14:25:10.422440,  5, pid=4000687, effective(0, 0), real(0, 0)] source3/lib/messages.c:711(messaging_register)
+  Registering messaging pointer for type 33 - private_data=0x6087dc15b590
+[2026/05/20 14:25:10.422457,  5, pid=4000687, effective(0, 0), real(0, 0)] source3/lib/messages.c:759(messaging_deregister)
+  Deregistering messaging pointer for type 790 - private_data=(nil)
+[2026/05/20 14:25:10.422475,  5, pid=4000687, effective(0, 0), real(0, 0)] source3/lib/messages.c:711(messaging_register)
+  Registering messaging pointer for type 790 - private_data=0x6087dc15b590
+[2026/05/20 14:25:10.422492,  5, pid=4000687, effective(0, 0), real(0, 0)] source3/lib/messages.c:759(messaging_deregister)
+  Deregistering messaging pointer for type 791 - private_data=(nil)
+[2026/05/20 14:25:10.422517,  5, pid=4000687, effective(0, 0), real(0, 0)] source3/lib/messages.c:759(messaging_deregister)
+  Deregistering messaging pointer for type 1 - private_data=(nil)
+[2026/05/20 14:25:10.422534,  5, pid=4000687, effective(0, 0), real(0, 0)] source3/lib/messages.c:711(messaging_register)
+  Registering messaging pointer for type 1 - private_data=(nil)
+[2026/05/20 14:25:10.422554, 10, pid=4000687, effective(0, 0), real(0, 0)] source3/lib/util_event.c:100(event_add_idle)
+  event_add_idle: idle_evt(keepalive) 0x6087dc161660
+[2026/05/20 14:25:10.422572, 10, pid=4000687, effective(0, 0), real(0, 0)] source3/lib/util_event.c:100(event_add_idle)
+  event_add_idle: idle_evt(deadtime) 0x6087dc1621b0
+[2026/05/20 14:25:10.422590, 10, pid=4000687, effective(0, 0), real(0, 0)] source3/lib/util_event.c:100(event_add_idle)
+  event_add_idle: idle_evt(housekeeping) 0x6087dc173390
+[2026/05/20 14:25:10.422679, 10, pid=4000687, effective(0, 0), real(0, 0)] source3/lib/util_sock.c:180(read_smb_length_return_keepalive)
+  got smb length of 47
+[2026/05/20 14:25:10.422704,  6, pid=4000687, effective(0, 0), real(0, 0)] source3/smbd/smb2_process.c:574(process_smb)
+  got message type 0x0 of len 0x2f
+[2026/05/20 14:25:10.422722,  3, pid=4000687, effective(0, 0), real(0, 0)] source3/smbd/smb2_process.c:576(process_smb)
+  Transaction 0 of length 51 (0 toread)
+[2026/05/20 14:25:10.422753,  5, pid=4000687, effective(0, 0), real(0, 0)] source3/lib/util.c:150(show_msg)
+  size=47
+  smb_com=0x72
+  smb_rcls=0
+  smb_reh=0
+  smb_err=0
+  smb_flg=0
+  smb_flg2=51201
+  smb_tid=0
+  smb_pid=16882
+  smb_uid=0
+  smb_mid=1
+  smt_wct=0
+  smb_bcc=12
+[2026/05/20 14:25:10.422807, 10, pid=4000687, effective(0, 0), real(0, 0)] lib/util/util.c:578(dump_data)
+  [0000] 02 4E 54 20 4C 4D 20 30   2E 31 32 00               .NT LM 0 .12.
+[2026/05/20 14:25:10.422920,  3, pid=4000687, effective(0, 0), real(0, 0)] source3/smbd/smb1_process.c:1112(switch_message)
+  switch message SMBnegprot (pid 4000687) conn 0x0
+[2026/05/20 14:25:10.422978,  4, pid=4000687, effective(0, 0), real(0, 0)] source3/smbd/sec_ctx.c:317(set_sec_ctx_internal)
+  setting sec ctx (0, 0) - sec_ctx_stack_ndx = 0
+[2026/05/20 14:25:10.423018,  5, pid=4000687, effective(0, 0), real(0, 0)] libcli/security/security_token.c:49(security_token_debug)
+  Security token: (NULL)
+[2026/05/20 14:25:10.423056,  5, pid=4000687, effective(0, 0), real(0, 0)] source3/auth/token_util.c:873(debug_unix_user_token)
+  UNIX token of user 0
+  Primary group is 0 and contains 0 supplementary groups
+[2026/05/20 14:25:10.423122,  5, pid=4000687, effective(0, 0), real(0, 0)] source3/smbd/uid.c:494(smbd_change_to_root_user)
+  change_to_root_user: now uid=(0,0) gid=(0,0)
+[2026/05/20 14:25:10.424749,  3, pid=4000687, effective(0, 0), real(0, 0)] source3/smbd/smb1_negprot.c:545(reply_negprot)
+  Requested protocol [NT LM 0.12]
+[2026/05/20 14:25:10.424795, 10, pid=4000687, effective(0, 0), real(0, 0)] source3/lib/util.c:1082(set_remote_arch)
+  set_remote_arch: Client arch is 'CIFSFS'
+[2026/05/20 14:25:10.424845,  5, pid=4000687, effective(0, 0), real(0, 0)] lib/util/debug.c:931(debug_dump_status)
+  INFO: Current debug levels:
+    all: 10
+    tdb: 10
+    printdrivers: 10
+    lanman: 10
+    smb: 10
+    rpc_parse: 10
+    rpc_srv: 10
+    rpc_cli: 10
+    passdb: 10
+    sam: 10
+    auth: 10
+    winbind: 10
+    vfs: 10
+    idmap: 10
+    quota: 10
+    acls: 10
+    locking: 10
+    msdfs: 10
+    dmapi: 10
+    registry: 10
+    scavenger: 10
+    dns: 10
+    ldb: 10
+    tevent: 10
+    auth_audit: 10
+    auth_json_audit: 10
+    kerberos: 10
+    drs_repl: 10
+    smb2: 10
+    smb2_credits: 10
+    dsdb_audit: 10
+    dsdb_json_audit: 10
+    dsdb_password_audit: 10
+    dsdb_password_json_audit: 10
+    dsdb_transaction_audit: 10
+    dsdb_transaction_json_audit: 10
+    dsdb_group_audit: 10
+    dsdb_group_json_audit: 10
+[2026/05/20 14:25:10.425053,  6, pid=4000687, effective(0, 0), real(0, 0)] source3/param/loadparm.c:2398(lp_file_list_changed)
+  lp_file_list_changed()
+  file /etc/samba/smb.conf -> /etc/samba/smb.conf  last mod_time: 2026-05-20 14:24:50.916139075
+[2026/05/20 14:25:10.425134,  5, pid=4000687, effective(0, 0), real(0, 0)] lib/util/debug.c:931(debug_dump_status)
+  INFO: Current debug levels:
+    all: 10
+    tdb: 10
+    printdrivers: 10
+    lanman: 10
+    smb: 10
+    rpc_parse: 10
+    rpc_srv: 10
+    rpc_cli: 10
+    passdb: 10
+    sam: 10
+    auth: 10
+    winbind: 10
+    vfs: 10
+    idmap: 10
+    quota: 10
+    acls: 10
+    locking: 10
+    msdfs: 10
+    dmapi: 10
+    registry: 10
+    scavenger: 10
+    dns: 10
+    ldb: 10
+    tevent: 10
+    auth_audit: 10
+    auth_json_audit: 10
+    kerberos: 10
+    drs_repl: 10
+    smb2: 10
+    smb2_credits: 10
+    dsdb_audit: 10
+    dsdb_json_audit: 10
+    dsdb_password_audit: 10
+    dsdb_password_json_audit: 10
+    dsdb_transaction_audit: 10
+    dsdb_transaction_json_audit: 10
+    dsdb_group_audit: 10
+    dsdb_group_json_audit: 10
+[2026/05/20 14:25:10.425307,  6, pid=4000687, effective(0, 0), real(0, 0)] source3/param/loadparm.c:2398(lp_file_list_changed)
+  lp_file_list_changed()
+  file /etc/samba/smb.conf -> /etc/samba/smb.conf  last mod_time: 2026-05-20 14:24:50.916139075
+[2026/05/20 14:25:10.425436,  5, pid=4000687, effective(0, 0), real(0, 0), class=auth] source3/auth/auth.c:575(make_auth3_context_for_ntlm)
+  make_auth3_context_for_ntlm: Making default auth method list for server role = 'standalone server', encrypt passwords = yes
+[2026/05/20 14:25:10.425482,  5, pid=4000687, effective(0, 0), real(0, 0), class=auth] source3/auth/auth.c:52(smb_register_auth)
+  Attempting to register auth backend anonymous
+[2026/05/20 14:25:10.425512,  5, pid=4000687, effective(0, 0), real(0, 0), class=auth] source3/auth/auth.c:64(smb_register_auth)
+  Successfully added auth method 'anonymous'
+[2026/05/20 14:25:10.425531,  5, pid=4000687, effective(0, 0), real(0, 0), class=auth] source3/auth/auth.c:52(smb_register_auth)
+  Attempting to register auth backend sam
+[2026/05/20 14:25:10.425548,  5, pid=4000687, effective(0, 0), real(0, 0), class=auth] source3/auth/auth.c:64(smb_register_auth)
+  Successfully added auth method 'sam'
+[2026/05/20 14:25:10.425565,  5, pid=4000687, effective(0, 0), real(0, 0), class=auth] source3/auth/auth.c:52(smb_register_auth)
+  Attempting to register auth backend sam_ignoredomain
+[2026/05/20 14:25:10.425595,  5, pid=4000687, effective(0, 0), real(0, 0), class=auth] source3/auth/auth.c:64(smb_register_auth)
+  Successfully added auth method 'sam_ignoredomain'
+[2026/05/20 14:25:10.425613,  5, pid=4000687, effective(0, 0), real(0, 0), class=auth] source3/auth/auth.c:52(smb_register_auth)
+  Attempting to register auth backend sam_netlogon3
+[2026/05/20 14:25:10.425631,  5, pid=4000687, effective(0, 0), real(0, 0), class=auth] source3/auth/auth.c:64(smb_register_auth)
+  Successfully added auth method 'sam_netlogon3'
+[2026/05/20 14:25:10.425647,  5, pid=4000687, effective(0, 0), real(0, 0), class=auth] source3/auth/auth.c:52(smb_register_auth)
+  Attempting to register auth backend winbind
+[2026/05/20 14:25:10.425665,  5, pid=4000687, effective(0, 0), real(0, 0), class=auth] source3/auth/auth.c:64(smb_register_auth)
+  Successfully added auth method 'winbind'
+[2026/05/20 14:25:10.425681,  5, pid=4000687, effective(0, 0), real(0, 0), class=auth] source3/auth/auth.c:52(smb_register_auth)
+  Attempting to register auth backend unix
+[2026/05/20 14:25:10.425698,  5, pid=4000687, effective(0, 0), real(0, 0), class=auth] source3/auth/auth.c:64(smb_register_auth)
+  Successfully added auth method 'unix'
+[2026/05/20 14:25:10.425715,  5, pid=4000687, effective(0, 0), real(0, 0), class=auth] source3/auth/auth.c:436(load_auth_module)
+  load_auth_module: Attempting to find an auth method to match anonymous
+[2026/05/20 14:25:10.425733,  5, pid=4000687, effective(0, 0), real(0, 0), class=auth] source3/auth/auth.c:461(load_auth_module)
+  load_auth_module: auth method anonymous has a valid init
+[2026/05/20 14:25:10.425750,  5, pid=4000687, effective(0, 0), real(0, 0), class=auth] source3/auth/auth.c:436(load_auth_module)
+  load_auth_module: Attempting to find an auth method to match sam_ignoredomain
+[2026/05/20 14:25:10.425774,  5, pid=4000687, effective(0, 0), real(0, 0), class=auth] source3/auth/auth.c:461(load_auth_module)
+  load_auth_module: auth method sam_ignoredomain has a valid init
+[2026/05/20 14:25:10.428339,  3, pid=4000687, effective(0, 0), real(0, 0), class=auth] auth/gensec/gensec_start.c:1083(gensec_register)
+  GENSEC backend 'gssapi_spnego' registered
+[2026/05/20 14:25:10.428377,  3, pid=4000687, effective(0, 0), real(0, 0), class=auth] auth/gensec/gensec_start.c:1083(gensec_register)
+  GENSEC backend 'gssapi_krb5' registered
+[2026/05/20 14:25:10.428396,  3, pid=4000687, effective(0, 0), real(0, 0), class=auth] auth/gensec/gensec_start.c:1083(gensec_register)
+  GENSEC backend 'gssapi_krb5_sasl' registered
+[2026/05/20 14:25:10.428414,  3, pid=4000687, effective(0, 0), real(0, 0), class=auth] auth/gensec/gensec_start.c:1083(gensec_register)
+  GENSEC backend 'spnego' registered
+[2026/05/20 14:25:10.428436,  3, pid=4000687, effective(0, 0), real(0, 0), class=auth] auth/gensec/gensec_start.c:1083(gensec_register)
+  GENSEC backend 'schannel' registered
+[2026/05/20 14:25:10.428454,  3, pid=4000687, effective(0, 0), real(0, 0), class=auth] auth/gensec/gensec_start.c:1083(gensec_register)
+  GENSEC backend 'ncalrpc_as_system' registered
+[2026/05/20 14:25:10.428473,  3, pid=4000687, effective(0, 0), real(0, 0), class=auth] auth/gensec/gensec_start.c:1083(gensec_register)
+  GENSEC backend 'sasl-EXTERNAL' registered
+[2026/05/20 14:25:10.428490,  3, pid=4000687, effective(0, 0), real(0, 0), class=auth] auth/gensec/gensec_start.c:1083(gensec_register)
+  GENSEC backend 'ntlmssp' registered
+[2026/05/20 14:25:10.428508,  3, pid=4000687, effective(0, 0), real(0, 0), class=auth] auth/gensec/gensec_start.c:1083(gensec_register)
+  GENSEC backend 'ntlmssp_resume_ccache' registered
+[2026/05/20 14:25:10.428526,  3, pid=4000687, effective(0, 0), real(0, 0), class=auth] auth/gensec/gensec_start.c:1083(gensec_register)
+  GENSEC backend 'http_basic' registered
+[2026/05/20 14:25:10.428544,  3, pid=4000687, effective(0, 0), real(0, 0), class=auth] auth/gensec/gensec_start.c:1083(gensec_register)
+  GENSEC backend 'http_ntlm' registered
+[2026/05/20 14:25:10.428561,  3, pid=4000687, effective(0, 0), real(0, 0), class=auth] auth/gensec/gensec_start.c:1083(gensec_register)
+  GENSEC backend 'http_negotiate' registered
+[2026/05/20 14:25:10.428583,  3, pid=4000687, effective(0, 0), real(0, 0), class=auth] auth/gensec/gensec_start.c:1083(gensec_register)
+  GENSEC backend 'krb5' registered
+[2026/05/20 14:25:10.428601,  3, pid=4000687, effective(0, 0), real(0, 0), class=auth] auth/gensec/gensec_start.c:1083(gensec_register)
+  GENSEC backend 'fake_gssapi_krb5' registered
+[2026/05/20 14:25:10.428931,  5, pid=4000687, effective(0, 0), real(0, 0), class=auth] auth/gensec/gensec_start.c:844(gensec_start_mech)
+  Starting GENSEC mechanism spnego
+[2026/05/20 14:25:10.429003,  5, pid=4000687, effective(0, 0), real(0, 0), class=auth] auth/gensec/gensec_start.c:844(gensec_start_mech)
+  Starting GENSEC submechanism ntlmssp
+[2026/05/20 14:25:10.429064, 10, pid=4000687, effective(0, 0), real(0, 0), class=auth] auth/gensec/gensec.c:457(gensec_update_send)
+  gensec_update_send: spnego[0x6087dc17d290]: subreq: 0x6087dc1899d0
+[2026/05/20 14:25:10.429104, 10, pid=4000687, effective(0, 0), real(0, 0), class=auth] auth/gensec/gensec.c:549(gensec_update_done)
+  gensec_update_done: spnego[0x6087dc17d290]: NT_STATUS_MORE_PROCESSING_REQUIRED tevent_req[0x6087dc1899d0/auth/gensec/spnego.c:1631]: state[2] error[0 (0x0)]  state[struct gensec_spnego_update_state (0x6087dc189bb0)] timer[(nil)] finish[auth/gensec/spnego.c:2116]
+[2026/05/20 14:25:10.429163,  3, pid=4000687, effective(0, 0), real(0, 0)] source3/smbd/smb1_negprot.c:336(reply_nt1)
+  using SPNEGO
+[2026/05/20 14:25:10.429186,  3, pid=4000687, effective(0, 0), real(0, 0)] source3/smbd/smb1_negprot.c:684(reply_negprot)
+  Selected protocol NT LM 0.12
+[2026/05/20 14:25:10.429203,  5, pid=4000687, effective(0, 0), real(0, 0)] source3/smbd/smb1_negprot.c:686(reply_negprot)
+  reply_negprot: negprot index=0
+[2026/05/20 14:25:10.429243,  5, pid=4000687, effective(0, 0), real(0, 0)] source3/lib/util.c:150(show_msg)
+  size=159
+  smb_com=0x72
+  smb_rcls=0
+  smb_reh=0
+  smb_err=0
+  smb_flg=128
+  smb_flg2=51201
+  smb_tid=0
+  smb_pid=16882
+  smb_uid=0
+  smb_mid=1
+  smt_wct=17
+  smb_vwv[ 0]=    0 (0x0)
+  smb_vwv[ 1]=12803 (0x3203)
+  smb_vwv[ 2]=  256 (0x100)
+  smb_vwv[ 3]= 1024 (0x400)
+  smb_vwv[ 4]=   65 (0x41)
+  smb_vwv[ 5]=    0 (0x0)
+  smb_vwv[ 6]=  256 (0x100)
+  smb_vwv[ 7]=44800 (0xAF00)
+  smb_vwv[ 8]=15627 (0x3D0B)
+  smb_vwv[ 9]=64768 (0xFD00)
+  smb_vwv[10]=33011 (0x80F3)
+  smb_vwv[11]=35456 (0x8A80)
+  smb_vwv[12]= 2792 (0xAE8)
+  smb_vwv[13]= 6407 (0x1907)
+  smb_vwv[14]=56552 (0xDCE8)
+  smb_vwv[15]=58369 (0xE401)
+  smb_vwv[16]=  253 (0xFD)
+  smb_bcc=90
+[2026/05/20 14:25:10.429367, 10, pid=4000687, effective(0, 0), real(0, 0)] lib/util/util.c:578(dump_data)
+  [0000] 61 77 73 2D 6D 6D 6E 73   2D 67 65 6E 65 72 69 00   aws-mmns -generi.
+  [0010] 60 48 06 06 2B 06 01 05   05 02 A0 3E 30 3C A0 0E   `H..+... ...>0<..
+  [0020] 30 0C 06 0A 2B 06 01 04   01 82 37 02 02 0A A3 2A   0...+... ..7....*
+  [0030] 30 28 A0 26 1B 24 6E 6F   74 5F 64 65 66 69 6E 65   0(.&.$no t_define
+  [0040] 64 5F 69 6E 5F 52 46 43   34 31 37 38 40 70 6C 65   d_in_RFC 4178@ple
+  [0050] 61 73 65 5F 69 67 6E 6F   72 65                     ase_igno re
+[2026/05/20 14:25:10.738002, 10, pid=4000687, effective(0, 0), real(0, 0)] source3/lib/util_sock.c:180(read_smb_length_return_keepalive)
+  got smb length of 196
+[2026/05/20 14:25:10.738055,  6, pid=4000687, effective(0, 0), real(0, 0)] source3/smbd/smb2_process.c:574(process_smb)
+  got message type 0x0 of len 0xc4
+[2026/05/20 14:25:10.738073,  3, pid=4000687, effective(0, 0), real(0, 0)] source3/smbd/smb2_process.c:576(process_smb)
+  Transaction 1 of length 200 (0 toread)
+[2026/05/20 14:25:10.738114,  5, pid=4000687, effective(0, 0), real(0, 0)] source3/lib/util.c:150(show_msg)
+  size=196
+  smb_com=0x73
+  smb_rcls=0
+  smb_reh=0
+  smb_err=0
+  smb_flg=0
+  smb_flg2=55297
+  smb_tid=0
+  smb_pid=16882
+  smb_uid=0
+  smb_mid=2
+  smt_wct=12
+  smb_vwv[ 0]=  255 (0xFF)
+  smb_vwv[ 1]=    0 (0x0)
+  smb_vwv[ 2]=16468 (0x4054)
+  smb_vwv[ 3]=   50 (0x32)
+  smb_vwv[ 4]=    1 (0x1)
+  smb_vwv[ 5]=    0 (0x0)
+  smb_vwv[ 6]=    0 (0x0)
+  smb_vwv[ 7]=   32 (0x20)
+  smb_vwv[ 8]=    0 (0x0)
+  smb_vwv[ 9]=    0 (0x0)
+  smb_vwv[10]=53468 (0xD0DC)
+  smb_vwv[11]=32896 (0x8080)
+  smb_bcc=137
+[2026/05/20 14:25:10.738223, 10, pid=4000687, effective(0, 0), real(0, 0)] lib/util/util.c:578(dump_data)
+  [0000] 4E 54 4C 4D 53 53 50 00   01 00 00 00 05 02 08 A0   NTLMSSP. ........
+  [0010] 00 00 00 00 00 00 00 00   00 00 00 00 00 00 00 00   ........ ........
+  [0020] 00 4C 00 69 00 6E 00 75   00 78 00 20 00 76 00 65   .L.i.n.u .x. .v.e
+  [0030] 00 72 00 73 00 69 00 6F   00 6E 00 20 00 33 00 2E   .r.s.i.o .n. .3..
+  [0040] 00 31 00 34 00 2E 00 31   00 37 00 2D 00 61 00 6D   .1.4...1 .7.-.a.m
+  [0050] 00 69 00 00 00 43 00 49   00 46 00 53 00 20 00 56   .i...C.I .F.S. .V
+  [0060] 00 46 00 53 00 20 00 43   00 6C 00 69 00 65 00 6E   .F.S. .C .l.i.e.n
+  [0070] 00 74 00 20 00 66 00 6F   00 72 00 20 00 4C 00 69   .t. .f.o .r. .L.i
+  [0080] 00 6E 00 75 00 78 00 00   00                        .n.u.x.. .
+[2026/05/20 14:25:10.738414,  3, pid=4000687, effective(0, 0), real(0, 0)] source3/smbd/smb1_process.c:1112(switch_message)
+  switch message SMBsesssetupX (pid 4000687) conn 0x0
+[2026/05/20 14:25:10.738437,  4, pid=4000687, effective(0, 0), real(0, 0)] source3/smbd/sec_ctx.c:317(set_sec_ctx_internal)
+  setting sec ctx (0, 0) - sec_ctx_stack_ndx = 0
+[2026/05/20 14:25:10.738456,  5, pid=4000687, effective(0, 0), real(0, 0)] libcli/security/security_token.c:49(security_token_debug)
+  Security token: (NULL)
+[2026/05/20 14:25:10.738474,  5, pid=4000687, effective(0, 0), real(0, 0)] source3/auth/token_util.c:873(debug_unix_user_token)
+  UNIX token of user 0
+  Primary group is 0 and contains 0 supplementary groups
+[2026/05/20 14:25:10.738512,  5, pid=4000687, effective(0, 0), real(0, 0)] source3/smbd/uid.c:494(smbd_change_to_root_user)
+  change_to_root_user: now uid=(0,0) gid=(0,0)
+[2026/05/20 14:25:10.738555,  3, pid=4000687, effective(0, 0), real(0, 0)] source3/smbd/smb1_sesssetup.c:605(reply_sesssetup_and_X)
+  wct=12 flg2=0xd801
+[2026/05/20 14:25:10.738602,  3, pid=4000687, effective(0, 0), real(0, 0)] source3/smbd/smb1_sesssetup.c:107(reply_sesssetup_and_X_spnego)
+  Doing spnego session setup
+[2026/05/20 14:25:10.738633,  3, pid=4000687, effective(0, 0), real(0, 0)] source3/smbd/smb1_sesssetup.c:147(reply_sesssetup_and_X_spnego)
+  NativeOS=[Linux version 3.14.17-ami] NativeLanMan=[CIFS VFS Client for Linux] PrimaryDomain=[]
+[2026/05/20 14:25:10.738686,  5, pid=4000687, effective(0, 0), real(0, 0)] lib/dbwrap/dbwrap.c:172(dbwrap_lock_order_lock)
+  dbwrap_lock_order_lock: check lock order 1 for /run/samba/smbXsrv_session_global.tdb
+[2026/05/20 14:25:10.738719, 10, pid=4000687, effective(0, 0), real(0, 0)] lib/dbwrap/dbwrap.c:157(debug_lock_order)
+  lock order:  1:/run/samba/smbXsrv_session_global.tdb 2:<none> 3:<none> 4:<none>
+[2026/05/20 14:25:10.738757, 10, pid=4000687, effective(0, 0), real(0, 0)] lib/dbwrap/dbwrap_tdb.c:60(db_tdb_log_key)
+  db_tdb_log_key: Locking key 89B2A959
+[2026/05/20 14:25:10.738806, 10, pid=4000687, effective(0, 0), real(0, 0)] lib/dbwrap/dbwrap_tdb.c:153(db_tdb_fetch_locked_internal)
+  db_tdb_fetch_locked_internal: Allocated locked data 0x6087dc18a520
+[2026/05/20 14:25:10.738945, 10, pid=4000687, effective(0, 0), real(0, 0)] source3/lib/dbwrap/dbwrap_watch.c:507(dbwrap_watched_record_prepare_wakeup)
+  dbwrap_watched_record_prepare_wakeup: No watchers
+[2026/05/20 14:25:10.739042, 10, pid=4000687, effective(0, 0), real(0, 0)] source3/smbd/smbXsrv_session.c:974(smbXsrv_session_global_store)
+  smbXsrv_session_global_store: smbXsrv_session_global_store: key '89B2A959' stored
+[2026/05/20 14:25:10.739077,  1, pid=4000687, effective(0, 0), real(0, 0), class=rpc_parse] source3/smbd/smbXsrv_session.c:976(smbXsrv_session_global_store)
+       &global_blob: struct smbXsrv_session_globalB
+          version                  : SMBXSRV_VERSION_0 (0)
+          seqnum                   : 0x00000001 (1)
+          info                     : union smbXsrv_session_globalU(case 0)
+          info0                    : *
+              info0: struct smbXsrv_session_global0
+                  db_rec                   : *
+                  session_global_id        : 0x89b2a959 (2310187353)
+                  session_wire_id          : 0x000000000000ab35 (43829)
+                  creation_time            : Wed May 20 02:25:11 PM 2026 JST
+                  expiration_time          : Thu Sep 14 11:48:05 AM 30828 JST
+                  auth_time                : NTTIME(0)
+                  auth_session_info_seqnum : 0x00000000 (0)
+                  auth_session_info        : NULL
+                  connection_dialect       : 0x0000 (0)
+                  signing_flags            : 0x00 (0)
+                         0: SMBXSRV_SIGNING_REQUIRED 
+                         0: SMBXSRV_PROCESSED_SIGNED_PACKET
+                         0: SMBXSRV_PROCESSED_UNSIGNED_PACKET
+                  signing_algo             : 0x0000 (0)
+                  encryption_flags         : 0x00 (0)
+                         0: SMBXSRV_ENCRYPTION_REQUIRED
+                         0: SMBXSRV_ENCRYPTION_DESIRED
+                         0: SMBXSRV_PROCESSED_ENCRYPTED_PACKET
+                         0: SMBXSRV_PROCESSED_UNENCRYPTED_PACKET
+                  encryption_cipher        : 0x0000 (0)
+                  signing_key              : NULL
+                  encryption_key           : NULL
+                  decryption_key           : NULL
+                  application_key          : NULL
+                  num_channels             : 0x00000001 (1)
+                  channels: ARRAY(1)
+                      channels: struct smbXsrv_channel_global0
+                          server_id: struct server_id
+                              pid                      : 0x00000000003d0baf (4000687)
+                              task_id                  : 0x00000000 (0)
+                              vnn                      : 0xffffffff (4294967295)
+                              unique_id                : 0x3f9493830e290ceb (4581448912030207211)
+                          channel_id               : 0x0000000000000001 (1)
+                          creation_time            : Wed May 20 02:25:11 PM 2026 JST
+                          local_address            : 'ipv4:10.1.6.1:445'
+                          remote_address           : 'ipv4:10.254.254.9:47642'
+                          remote_name              : '10.254.254.9'
+                          signing_key              : NULL
+                          auth_session_info_seqnum : 0x00000000 (0)
+                          connection               : *
+                          signing_algo             : 0x0000 (0)
+                          encryption_cipher        : 0x0000 (0)
+[2026/05/20 14:25:10.739443,  5, pid=4000687, effective(0, 0), real(0, 0)] lib/dbwrap/dbwrap.c:204(dbwrap_lock_order_unlock)
+  dbwrap_lock_order_unlock: release lock order 1 for /run/samba/smbXsrv_session_global.tdb
+[2026/05/20 14:25:10.739463, 10, pid=4000687, effective(0, 0), real(0, 0)] lib/dbwrap/dbwrap_tdb.c:60(db_tdb_log_key)
+  db_tdb_log_key: Unlocking key 89B2A959
+[2026/05/20 14:25:10.739481, 10, pid=4000687, effective(0, 0), real(0, 0)] source3/lib/dbwrap/dbwrap_watch.c:550(dbwrap_watched_trigger_wakeup)
+  dbwrap_watched_trigger_wakeup: No one to wakeup
+[2026/05/20 14:25:10.739512, 10, pid=4000687, effective(0, 0), real(0, 0)] source3/smbd/smbXsrv_session.c:1403(smbXsrv_session_create)
+  smbXsrv_session_create: smbXsrv_session_create: global_id (0x89b2a959) stored
+[2026/05/20 14:25:10.739530,  1, pid=4000687, effective(0, 0), real(0, 0), class=rpc_parse] source3/smbd/smbXsrv_session.c:1405(smbXsrv_session_create)
+       &session_blob: struct smbXsrv_sessionB
+          version                  : SMBXSRV_VERSION_0 (0)
+          reserved                 : 0x00000000 (0)
+          info                     : union smbXsrv_sessionU(case 0)
+          info0                    : *
+              info0: struct smbXsrv_session
+                  table                    : *
+                  db_rec                   : NULL
+                  client                   : *
+                  local_id                 : 0x0000ab35 (43829)
+                  global                   : *
+                      global: struct smbXsrv_session_global0
+                          db_rec                   : NULL
+                          session_global_id        : 0x89b2a959 (2310187353)
+                          session_wire_id          : 0x000000000000ab35 (43829)
+                          creation_time            : Wed May 20 02:25:11 PM 2026 JST
+                          expiration_time          : Thu Sep 14 11:48:05 AM 30828 JST
+                          auth_time                : NTTIME(0)
+                          auth_session_info_seqnum : 0x00000000 (0)
+                          auth_session_info        : NULL
+                          connection_dialect       : 0x0000 (0)
+                          signing_flags            : 0x00 (0)
+                                 0: SMBXSRV_SIGNING_REQUIRED 
+                                 0: SMBXSRV_PROCESSED_SIGNED_PACKET
+                                 0: SMBXSRV_PROCESSED_UNSIGNED_PACKET
+                          signing_algo             : 0x0000 (0)
+                          encryption_flags         : 0x00 (0)
+                                 0: SMBXSRV_ENCRYPTION_REQUIRED
+                                 0: SMBXSRV_ENCRYPTION_DESIRED
+                                 0: SMBXSRV_PROCESSED_ENCRYPTED_PACKET
+                                 0: SMBXSRV_PROCESSED_UNENCRYPTED_PACKET
+                          encryption_cipher        : 0x0000 (0)
+                          signing_key              : NULL
+                          encryption_key           : NULL
+                          decryption_key           : NULL
+                          application_key          : NULL
+                          num_channels             : 0x00000001 (1)
+                          channels: ARRAY(1)
+                              channels: struct smbXsrv_channel_global0
+                                  server_id: struct server_id
+                                      pid                      : 0x00000000003d0baf (4000687)
+                                      task_id                  : 0x00000000 (0)
+                                      vnn                      : 0xffffffff (4294967295)
+                                      unique_id                : 0x3f9493830e290ceb (4581448912030207211)
+                                  channel_id               : 0x0000000000000001 (1)
+                                  creation_time            : Wed May 20 02:25:11 PM 2026 JST
+                                  local_address            : 'ipv4:10.1.6.1:445'
+                                  remote_address           : 'ipv4:10.254.254.9:47642'
+                                  remote_name              : '10.254.254.9'
+                                  signing_key              : NULL
+                                  auth_session_info_seqnum : 0x00000000 (0)
+                                  connection               : *
+                                  signing_algo             : 0x0000 (0)
+                                  encryption_cipher        : 0x0000 (0)
+                  status                   : NT_STATUS_MORE_PROCESSING_REQUIRED
+                  idle_time                : Wed May 20 02:25:11 PM 2026 JST
+                  nonce_high_random        : 0x0000000000000000 (0)
+                  nonce_high_max           : 0x0000000000000000 (0)
+                  nonce_high               : 0x0000000000000000 (0)
+                  nonce_low                : 0x0000000000000000 (0)
+                  tcon_table               : NULL
+                  homes_snum               : 0xffffffff (4294967295)
+                  pending_auth             : NULL
+[2026/05/20 14:25:10.739975,  5, pid=4000687, effective(0, 0), real(0, 0), class=auth] source3/auth/auth.c:575(make_auth3_context_for_ntlm)
+  make_auth3_context_for_ntlm: Making default auth method list for server role = 'standalone server', encrypt passwords = yes
+[2026/05/20 14:25:10.739998,  5, pid=4000687, effective(0, 0), real(0, 0), class=auth] source3/auth/auth.c:436(load_auth_module)
+  load_auth_module: Attempting to find an auth method to match anonymous
+[2026/05/20 14:25:10.740017,  5, pid=4000687, effective(0, 0), real(0, 0), class=auth] source3/auth/auth.c:461(load_auth_module)
+  load_auth_module: auth method anonymous has a valid init
+[2026/05/20 14:25:10.740034,  5, pid=4000687, effective(0, 0), real(0, 0), class=auth] source3/auth/auth.c:436(load_auth_module)
+  load_auth_module: Attempting to find an auth method to match sam_ignoredomain
+[2026/05/20 14:25:10.740052,  5, pid=4000687, effective(0, 0), real(0, 0), class=auth] source3/auth/auth.c:461(load_auth_module)
+  load_auth_module: auth method sam_ignoredomain has a valid init
+[2026/05/20 14:25:10.740160,  5, pid=4000687, effective(0, 0), real(0, 0), class=auth] auth/gensec/gensec_start.c:844(gensec_start_mech)
+  Starting GENSEC mechanism spnego
+[2026/05/20 14:25:10.740183,  4, pid=4000687, effective(0, 0), real(0, 0)] source3/smbd/sec_ctx.c:206(push_sec_ctx)
+  push_sec_ctx(0, 0) : sec_ctx_stack_ndx = 1
+[2026/05/20 14:25:10.740213,  4, pid=4000687, effective(0, 0), real(0, 0)] source3/smbd/uid.c:566(push_conn_ctx)
+  push_conn_ctx(0) : conn_ctx_stack_ndx = 0
+[2026/05/20 14:25:10.740233,  4, pid=4000687, effective(0, 0), real(0, 0)] source3/smbd/sec_ctx.c:317(set_sec_ctx_internal)
+  setting sec ctx (0, 0) - sec_ctx_stack_ndx = 1
+[2026/05/20 14:25:10.740250,  5, pid=4000687, effective(0, 0), real(0, 0)] libcli/security/security_token.c:49(security_token_debug)
+  Security token: (NULL)
+[2026/05/20 14:25:10.740267,  5, pid=4000687, effective(0, 0), real(0, 0)] source3/auth/token_util.c:873(debug_unix_user_token)
+  UNIX token of user 0
+  Primary group is 0 and contains 0 supplementary groups
+[2026/05/20 14:25:10.740319,  5, pid=4000687, effective(0, 0), real(0, 0), class=auth] auth/gensec/gensec_start.c:844(gensec_start_mech)
+  Starting GENSEC submechanism ntlmssp
+[2026/05/20 14:25:10.740395,  3, pid=4000687, effective(0, 0), real(0, 0), class=auth] auth/ntlmssp/ntlmssp_util.c:72(debug_ntlmssp_flags)
+  Got NTLMSSP neg_flags=0xa0080205
+    NTLMSSP_NEGOTIATE_UNICODE
+    NTLMSSP_REQUEST_TARGET
+    NTLMSSP_NEGOTIATE_NTLM
+    NTLMSSP_NEGOTIATE_EXTENDED_SESSIONSECURITY
+    NTLMSSP_NEGOTIATE_128
+    NTLMSSP_NEGOTIATE_56
+[2026/05/20 14:25:10.740495,  1, pid=4000687, effective(0, 0), real(0, 0), class=rpc_parse] auth/ntlmssp/ntlmssp_server.c:151(gensec_ntlmssp_server_negotiate)
+       negotiate: struct NEGOTIATE_MESSAGE
+          Signature                : 'NTLMSSP'
+          MessageType              : NtLmNegotiate (1)
+          NegotiateFlags           : 0xa0080205 (2684879365)
+                 1: NTLMSSP_NEGOTIATE_UNICODE
+                 0: NTLMSSP_NEGOTIATE_OEM    
+                 1: NTLMSSP_REQUEST_TARGET   
+                 0: NTLMSSP_NEGOTIATE_SIGN   
+                 0: NTLMSSP_NEGOTIATE_SEAL   
+                 0: NTLMSSP_NEGOTIATE_DATAGRAM
+                 0: NTLMSSP_NEGOTIATE_LM_KEY 
+                 0: NTLMSSP_NEGOTIATE_NETWARE
+                 1: NTLMSSP_NEGOTIATE_NTLM   
+                 0: NTLMSSP_NEGOTIATE_NT_ONLY
+                 0: NTLMSSP_ANONYMOUS        
+                 0: NTLMSSP_NEGOTIATE_OEM_DOMAIN_SUPPLIED
+                 0: NTLMSSP_NEGOTIATE_OEM_WORKSTATION_SUPPLIED
+                 0: NTLMSSP_NEGOTIATE_THIS_IS_LOCAL_CALL
+                 0: NTLMSSP_NEGOTIATE_ALWAYS_SIGN
+                 0: NTLMSSP_TARGET_TYPE_DOMAIN
+                 0: NTLMSSP_TARGET_TYPE_SERVER
+                 0: NTLMSSP_TARGET_TYPE_SHARE
+                 1: NTLMSSP_NEGOTIATE_EXTENDED_SESSIONSECURITY
+                 0: NTLMSSP_NEGOTIATE_IDENTIFY
+                 0: NTLMSSP_REQUEST_NON_NT_SESSION_KEY
+                 0: NTLMSSP_NEGOTIATE_TARGET_INFO
+                 0: NTLMSSP_NEGOTIATE_VERSION
+                 1: NTLMSSP_NEGOTIATE_128    
+                 0: NTLMSSP_NEGOTIATE_KEY_EXCH
+                 1: NTLMSSP_NEGOTIATE_56     
+          DomainNameLen            : 0x0000 (0)
+          DomainNameMaxLen         : 0x0000 (0)
+          DomainName               : NULL
+          WorkstationLen           : 0x0000 (0)
+          WorkstationMaxLen        : 0x0000 (0)
+          Workstation              : NULL
+[2026/05/20 14:25:10.740767,  1, pid=4000687, effective(0, 0), real(0, 0), class=rpc_parse] auth/ntlmssp/ntlmssp_server.c:277(gensec_ntlmssp_server_negotiate)
+       challenge: struct CHALLENGE_MESSAGE
+          Signature                : 'NTLMSSP'
+          MessageType              : NtLmChallenge (0x2)
+          TargetNameLen            : 0x0020 (32)
+          TargetNameMaxLen         : 0x0020 (32)
+          TargetName               : *
+              TargetName               : 'AWS-MMNS-GENERIC'
+          NegotiateFlags           : 0xa28a0205 (2726953477)
+                 1: NTLMSSP_NEGOTIATE_UNICODE
+                 0: NTLMSSP_NEGOTIATE_OEM    
+                 1: NTLMSSP_REQUEST_TARGET   
+                 0: NTLMSSP_NEGOTIATE_SIGN   
+                 0: NTLMSSP_NEGOTIATE_SEAL   
+                 0: NTLMSSP_NEGOTIATE_DATAGRAM
+                 0: NTLMSSP_NEGOTIATE_LM_KEY 
+                 0: NTLMSSP_NEGOTIATE_NETWARE
+                 1: NTLMSSP_NEGOTIATE_NTLM   
+                 0: NTLMSSP_NEGOTIATE_NT_ONLY
+                 0: NTLMSSP_ANONYMOUS        
+                 0: NTLMSSP_NEGOTIATE_OEM_DOMAIN_SUPPLIED
+                 0: NTLMSSP_NEGOTIATE_OEM_WORKSTATION_SUPPLIED
+                 0: NTLMSSP_NEGOTIATE_THIS_IS_LOCAL_CALL
+                 0: NTLMSSP_NEGOTIATE_ALWAYS_SIGN
+                 0: NTLMSSP_TARGET_TYPE_DOMAIN
+                 1: NTLMSSP_TARGET_TYPE_SERVER
+                 0: NTLMSSP_TARGET_TYPE_SHARE
+                 1: NTLMSSP_NEGOTIATE_EXTENDED_SESSIONSECURITY
+                 0: NTLMSSP_NEGOTIATE_IDENTIFY
+                 0: NTLMSSP_REQUEST_NON_NT_SESSION_KEY
+                 1: NTLMSSP_NEGOTIATE_TARGET_INFO
+                 1: NTLMSSP_NEGOTIATE_VERSION
+                 1: NTLMSSP_NEGOTIATE_128    
+                 0: NTLMSSP_NEGOTIATE_KEY_EXCH
+                 1: NTLMSSP_NEGOTIATE_56     
+          ServerChallenge          : bb07b6f3ebd5cae8
+          Reserved                 : 0000000000000000
+          TargetInfoLen            : 0x0080 (128)
+          TargetInfoMaxLen         : 0x0080 (128)
+          TargetInfo               : *
+              TargetInfo: struct AV_PAIR_LIST
+                  count                    : 0x00000006 (6)
+                  pair: ARRAY(6)
+                      pair: struct AV_PAIR
+                          AvId                     : MsvAvNbDomainName (0x2)
+                          AvLen                    : 0x0020 (32)
+                          Value                    : union ntlmssp_AvValue(case 0x2)
+                          AvNbDomainName           : 'AWS-MMNS-GENERIC'
+                      pair: struct AV_PAIR
+                          AvId                     : MsvAvNbComputerName (0x1)
+                          AvLen                    : 0x0020 (32)
+                          Value                    : union ntlmssp_AvValue(case 0x1)
+                          AvNbComputerName         : 'AWS-MMNS-GENERIC'
+                      pair: struct AV_PAIR
+                          AvId                     : MsvAvDnsDomainName (0x4)
+                          AvLen                    : 0x0000 (0)
+                          Value                    : union ntlmssp_AvValue(case 0x4)
+                          AvDnsDomainName          : ''
+                      pair: struct AV_PAIR
+                          AvId                     : MsvAvDnsComputerName (0x3)
+                          AvLen                    : 0x0020 (32)
+                          Value                    : union ntlmssp_AvValue(case 0x3)
+                          AvDnsComputerName        : 'aws-mmns-generic'
+                      pair: struct AV_PAIR
+                          AvId                     : MsvAvTimestamp (0x7)
+                          AvLen                    : 0x0008 (8)
+                          Value                    : union ntlmssp_AvValue(case 0x7)
+                          AvTimestamp              : Wed May 20 02:25:11 PM 2026 JST
+                      pair: struct AV_PAIR
+                          AvId                     : MsvAvEOL (0x0)
+                          AvLen                    : 0x0000 (0)
+                          Value                    : union ntlmssp_AvValue(case 0x0)
+          Version: struct ntlmssp_VERSION
+              ProductMajorVersion      : NTLMSSP_WINDOWS_MAJOR_VERSION_6 (0x6)
+              ProductMinorVersion      : NTLMSSP_WINDOWS_MINOR_VERSION_1 (0x1)
+              ProductBuild             : 0x0000 (0)
+              Reserved                 : 000000
+              NTLMRevisionCurrent      : NTLMSSP_REVISION_W2K3 (0xF)
+[2026/05/20 14:25:10.741251, 10, pid=4000687, effective(0, 0), real(0, 0), class=auth] auth/gensec/gensec.c:457(gensec_update_send)
+  gensec_update_send: ntlmssp[0x6087dc18ae40]: subreq: 0x6087dc14b2a0
+[2026/05/20 14:25:10.741269, 10, pid=4000687, effective(0, 0), real(0, 0), class=auth] auth/gensec/gensec.c:457(gensec_update_send)
+  gensec_update_send: spnego[0x6087dc189d40]: subreq: 0x6087dc18aa10
+[2026/05/20 14:25:10.741293, 10, pid=4000687, effective(0, 0), real(0, 0), class=auth] auth/gensec/gensec.c:549(gensec_update_done)
+  gensec_update_done: ntlmssp[0x6087dc18ae40]: NT_STATUS_MORE_PROCESSING_REQUIRED tevent_req[0x6087dc14b2a0/auth/ntlmssp/ntlmssp.c:180]: state[2] error[0 (0x0)]  state[struct gensec_ntlmssp_update_state (0x6087dc14b480)] timer[(nil)] finish[auth/ntlmssp/ntlmssp.c:215]
+[2026/05/20 14:25:10.741319, 10, pid=4000687, effective(0, 0), real(0, 0), class=auth] auth/gensec/gensec.c:549(gensec_update_done)
+  gensec_update_done: spnego[0x6087dc189d40]: NT_STATUS_MORE_PROCESSING_REQUIRED tevent_req[0x6087dc18aa10/auth/gensec/spnego.c:1631]: state[2] error[0 (0x0)]  state[struct gensec_spnego_update_state (0x6087dc18abf0)] timer[(nil)] finish[auth/gensec/spnego.c:2116]
+[2026/05/20 14:25:10.741357,  4, pid=4000687, effective(0, 0), real(0, 0)] source3/smbd/sec_ctx.c:443(pop_sec_ctx)
+  pop_sec_ctx (0, 0) - sec_ctx_stack_ndx = 0
+[2026/05/20 14:25:10.741429,  5, pid=4000687, effective(0, 0), real(0, 0)] source3/lib/util.c:150(show_msg)
+  size=344
+  smb_com=0x73
+  smb_rcls=22
+  smb_reh=0
+  smb_err=49152
+  smb_flg=128
+  smb_flg2=51203
+  smb_tid=0
+  smb_pid=16882
+  smb_uid=43829
+  smb_mid=2
+  smt_wct=4
+  smb_vwv[ 0]=  255 (0xFF)
+  smb_vwv[ 1]=    0 (0x0)
+  smb_vwv[ 2]=    0 (0x0)
+  smb_vwv[ 3]=  216 (0xD8)
+  smb_bcc=301
+[2026/05/20 14:25:10.741501, 10, pid=4000687, effective(0, 0), real(0, 0)] lib/util/util.c:578(dump_data)
+  [0000] 4E 54 4C 4D 53 53 50 00   02 00 00 00 20 00 20 00   NTLMSSP. .... . .
+  [0010] 38 00 00 00 05 02 8A A2   BB 07 B6 F3 EB D5 CA E8   8....... ........
+  [0020] 00 00 00 00 00 00 00 00   80 00 80 00 58 00 00 00   ........ ....X...
+  [0030] 06 01 00 00 00 00 00 0F   41 00 57 00 53 00 2D 00   ........ A.W.S.-.
+  [0040] 4D 00 4D 00 4E 00 53 00   2D 00 47 00 45 00 4E 00   M.M.N.S. -.G.E.N.
+  [0050] 45 00 52 00 49 00 43 00   02 00 20 00 41 00 57 00   E.R.I.C. .. .A.W.
+  [0060] 53 00 2D 00 4D 00 4D 00   4E 00 53 00 2D 00 47 00   S.-.M.M. N.S.-.G.
+  [0070] 45 00 4E 00 45 00 52 00   49 00 43 00 01 00 20 00   E.N.E.R. I.C... .
+  [0080] 41 00 57 00 53 00 2D 00   4D 00 4D 00 4E 00 53 00   A.W.S.-. M.M.N.S.
+  [0090] 2D 00 47 00 45 00 4E 00   45 00 52 00 49 00 43 00   -.G.E.N. E.R.I.C.
+  [00A0] 04 00 00 00 03 00 20 00   61 00 77 00 73 00 2D 00   ...... . a.w.s.-.
+  [00B0] 6D 00 6D 00 6E 00 73 00   2D 00 67 00 65 00 6E 00   m.m.n.s. -.g.e.n.
+  [00C0] 65 00 72 00 69 00 63 00   07 00 08 00 A4 F8 3A 07   e.r.i.c. ......:.
+  [00D0] 19 E8 DC 01 00 00 00 00   00 57 00 69 00 6E 00 64   ........ .W.i.n.d
+  [00E0] 00 6F 00 77 00 73 00 20   00 36 00 2E 00 31 00 00   .o.w.s.  .6...1..
+  [00F0] 00 53 00 61 00 6D 00 62   00 61 00 20 00 34 00 2E   .S.a.m.b .a. .4..
+  [0100] 00 31 00 39 00 2E 00 35   00 2D 00 55 00 62 00 75   .1.9...5 .-.U.b.u
+  [0110] 00 6E 00 74 00 75 00 00   00 57 00 4F 00 52 00 4B   .n.t.u.. .W.O.R.K
+  [0120] 00 47 00 52 00 4F 00 55   00 50 00 00 00            .G.R.O.U .P...
+[2026/05/20 14:25:11.057591, 10, pid=4000687, effective(0, 0), real(0, 0)] source3/lib/util_sock.c:180(read_smb_length_return_keepalive)
+  got smb length of 460
+[2026/05/20 14:25:11.057667,  6, pid=4000687, effective(0, 0), real(0, 0)] source3/smbd/smb2_process.c:574(process_smb)
+  got message type 0x0 of len 0x1cc
+[2026/05/20 14:25:11.057686,  3, pid=4000687, effective(0, 0), real(0, 0)] source3/smbd/smb2_process.c:576(process_smb)
+  Transaction 2 of length 464 (0 toread)
+[2026/05/20 14:25:11.057717,  5, pid=4000687, effective(0, 0), real(0, 0)] source3/lib/util.c:150(show_msg)
+  size=460
+  smb_com=0x73
+  smb_rcls=0
+  smb_reh=0
+  smb_err=0
+  smb_flg=0
+  smb_flg2=55297
+  smb_tid=0
+  smb_pid=16882
+  smb_uid=43829
+  smb_mid=3
+  smt_wct=12
+  smb_vwv[ 0]=  255 (0xFF)
+  smb_vwv[ 1]=    0 (0x0)
+  smb_vwv[ 2]=16468 (0x4054)
+  smb_vwv[ 3]=   50 (0x32)
+  smb_vwv[ 4]=    1 (0x1)
+  smb_vwv[ 5]=    0 (0x0)
+  smb_vwv[ 6]=    0 (0x0)
+  smb_vwv[ 7]=  296 (0x128)
+  smb_vwv[ 8]=    0 (0x0)
+  smb_vwv[ 9]=    0 (0x0)
+  smb_vwv[10]=53468 (0xD0DC)
+  smb_vwv[11]=32896 (0x8080)
+  smb_bcc=401
+[2026/05/20 14:25:11.057822, 10, pid=4000687, effective(0, 0), real(0, 0)] lib/util/util.c:578(dump_data)
+  [0000] 4E 54 4C 4D 53 53 50 00   03 00 00 00 00 00 00 00   NTLMSSP. ........
+  [0010] 40 00 00 00 AC 00 AC 00   40 00 00 00 20 00 20 00   @....... @... . .
+  [0020] EC 00 00 00 0A 00 0A 00   0C 01 00 00 00 00 00 00   ........ ........
+  [0030] 16 01 00 00 10 00 10 00   18 01 00 00 05 02 88 A0   ........ ........
+  [0040] A1 4E D0 61 23 13 2C B6   2A 47 DD 25 42 08 2B 63   .N.a#.,. *G.%B.+c
+  [0050] 01 01 00 00 00 00 00 00   80 2A B6 5D 66 E8 DC 01   ........ .*.]f...
+  [0060] 79 EE 6E C6 07 F4 67 44   00 00 00 00 02 00 20 00   y.n...gD ...... .
+  [0070] 41 00 57 00 53 00 2D 00   4D 00 4D 00 4E 00 53 00   A.W.S.-. M.M.N.S.
+  [0080] 2D 00 47 00 45 00 4E 00   45 00 52 00 49 00 43 00   -.G.E.N. E.R.I.C.
+  [0090] 01 00 20 00 41 00 57 00   53 00 2D 00 4D 00 4D 00   .. .A.W. S.-.M.M.
+  [00A0] 4E 00 53 00 2D 00 47 00   45 00 4E 00 45 00 52 00   N.S.-.G. E.N.E.R.
+  [00B0] 49 00 43 00 04 00 00 00   03 00 20 00 61 00 77 00   I.C..... .. .a.w.
+  [00C0] 73 00 2D 00 6D 00 6D 00   6E 00 73 00 2D 00 67 00   s.-.m.m. n.s.-.g.
+  [00D0] 65 00 6E 00 65 00 72 00   69 00 63 00 07 00 08 00   e.n.e.r. i.c.....
+  [00E0] A4 F8 3A 07 19 E8 DC 01   00 00 00 00 41 00 57 00   ..:..... ....A.W.
+  [00F0] 53 00 2D 00 4D 00 4D 00   4E 00 53 00 2D 00 47 00   S.-.M.M. N.S.-.G.
+  [0100] 45 00 4E 00 45 00 52 00   49 00 43 00 67 00 75 00   E.N.E.R. I.C.g.u.
+  [0110] 65 00 73 00 74 00 00 00   4B 93 9D 84 BF A3 3B B7   e.s.t... K.....;.
+  [0120] 32 FD E9 2A 51 3A 36 9E   00 4C 00 69 00 6E 00 75   2..*Q:6. .L.i.n.u
+  [0130] 00 78 00 20 00 76 00 65   00 72 00 73 00 69 00 6F   .x. .v.e .r.s.i.o
+  [0140] 00 6E 00 20 00 33 00 2E   00 31 00 34 00 2E 00 31   .n. .3.. .1.4...1
+  [0150] 00 37 00 2D 00 61 00 6D   00 69 00 00 00 43 00 49   .7.-.a.m .i...C.I
+  [0160] 00 46 00 53 00 20 00 56   00 46 00 53 00 20 00 43   .F.S. .V .F.S. .C
+  [0170] 00 6C 00 69 00 65 00 6E   00 74 00 20 00 66 00 6F   .l.i.e.n .t. .f.o
+  [0180] 00 72 00 20 00 4C 00 69   00 6E 00 75 00 78 00 00   .r. .L.i .n.u.x..
+  [0190] 00                                                  .
+[2026/05/20 14:25:11.058403,  3, pid=4000687, effective(0, 0), real(0, 0)] source3/smbd/smb1_process.c:1112(switch_message)
+  switch message SMBsesssetupX (pid 4000687) conn 0x0
+[2026/05/20 14:25:11.058452,  4, pid=4000687, effective(0, 0), real(0, 0)] source3/smbd/sec_ctx.c:317(set_sec_ctx_internal)
+  setting sec ctx (0, 0) - sec_ctx_stack_ndx = 0
+[2026/05/20 14:25:11.058472,  5, pid=4000687, effective(0, 0), real(0, 0)] libcli/security/security_token.c:49(security_token_debug)
+  Security token: (NULL)
+[2026/05/20 14:25:11.058491,  5, pid=4000687, effective(0, 0), real(0, 0)] source3/auth/token_util.c:873(debug_unix_user_token)
+  UNIX token of user 0
+  Primary group is 0 and contains 0 supplementary groups
+[2026/05/20 14:25:11.058530,  5, pid=4000687, effective(0, 0), real(0, 0)] source3/smbd/uid.c:494(smbd_change_to_root_user)
+  change_to_root_user: now uid=(0,0) gid=(0,0)
+[2026/05/20 14:25:11.058554,  5, pid=4000687, effective(0, 0), real(0, 0)] lib/dbwrap/dbwrap.c:172(dbwrap_lock_order_lock)
+  dbwrap_lock_order_lock: check lock order 1 for /run/samba/smbXsrv_session_global.tdb
+[2026/05/20 14:25:11.058572, 10, pid=4000687, effective(0, 0), real(0, 0)] lib/dbwrap/dbwrap.c:157(debug_lock_order)
+  lock order:  1:/run/samba/smbXsrv_session_global.tdb 2:<none> 3:<none> 4:<none>
+[2026/05/20 14:25:11.058595, 10, pid=4000687, effective(0, 0), real(0, 0)] lib/dbwrap/dbwrap_tdb.c:60(db_tdb_log_key)
+  db_tdb_log_key: Locking key 89B2A959
+[2026/05/20 14:25:11.058619, 10, pid=4000687, effective(0, 0), real(0, 0)] lib/dbwrap/dbwrap_tdb.c:153(db_tdb_fetch_locked_internal)
+  db_tdb_fetch_locked_internal: Allocated locked data 0x6087dc148590
+[2026/05/20 14:25:11.058655, 10, pid=4000687, effective(0, 0), real(0, 0)] source3/lib/dbwrap/dbwrap_watch.c:507(dbwrap_watched_record_prepare_wakeup)
+  dbwrap_watched_record_prepare_wakeup: No watchers
+[2026/05/20 14:25:11.058689, 10, pid=4000687, effective(0, 0), real(0, 0)] source3/smbd/smbXsrv_session.c:974(smbXsrv_session_global_store)
+  smbXsrv_session_global_store: smbXsrv_session_global_store: key '89B2A959' stored
+[2026/05/20 14:25:11.058709,  1, pid=4000687, effective(0, 0), real(0, 0), class=rpc_parse] source3/smbd/smbXsrv_session.c:976(smbXsrv_session_global_store)
+       &global_blob: struct smbXsrv_session_globalB
+          version                  : SMBXSRV_VERSION_0 (0)
+          seqnum                   : 0x00000002 (2)
+          info                     : union smbXsrv_session_globalU(case 0)
+          info0                    : *
+              info0: struct smbXsrv_session_global0
+                  db_rec                   : *
+                  session_global_id        : 0x89b2a959 (2310187353)
+                  session_wire_id          : 0x000000000000ab35 (43829)
+                  creation_time            : Wed May 20 02:25:11 PM 2026 JST
+                  expiration_time          : Thu Sep 14 11:48:05 AM 30828 JST
+                  auth_time                : NTTIME(0)
+                  auth_session_info_seqnum : 0x00000000 (0)
+                  auth_session_info        : NULL
+                  connection_dialect       : 0x0000 (0)
+                  signing_flags            : 0x00 (0)
+                         0: SMBXSRV_SIGNING_REQUIRED 
+                         0: SMBXSRV_PROCESSED_SIGNED_PACKET
+                         0: SMBXSRV_PROCESSED_UNSIGNED_PACKET
+                  signing_algo             : 0x0000 (0)
+                  encryption_flags         : 0x08 (8)
+                         0: SMBXSRV_ENCRYPTION_REQUIRED
+                         0: SMBXSRV_ENCRYPTION_DESIRED
+                         0: SMBXSRV_PROCESSED_ENCRYPTED_PACKET
+                         1: SMBXSRV_PROCESSED_UNENCRYPTED_PACKET
+                  encryption_cipher        : 0x0000 (0)
+                  signing_key              : NULL
+                  encryption_key           : NULL
+                  decryption_key           : NULL
+                  application_key          : NULL
+                  num_channels             : 0x00000001 (1)
+                  channels: ARRAY(1)
+                      channels: struct smbXsrv_channel_global0
+                          server_id: struct server_id
+                              pid                      : 0x00000000003d0baf (4000687)
+                              task_id                  : 0x00000000 (0)
+                              vnn                      : 0xffffffff (4294967295)
+                              unique_id                : 0x3f9493830e290ceb (4581448912030207211)
+                          channel_id               : 0x0000000000000001 (1)
+                          creation_time            : Wed May 20 02:25:11 PM 2026 JST
+                          local_address            : 'ipv4:10.1.6.1:445'
+                          remote_address           : 'ipv4:10.254.254.9:47642'
+                          remote_name              : '10.254.254.9'
+                          signing_key              : NULL
+                          auth_session_info_seqnum : 0x00000000 (0)
+                          connection               : *
+                          signing_algo             : 0x0000 (0)
+                          encryption_cipher        : 0x8000 (32768)
+[2026/05/20 14:25:11.059058,  5, pid=4000687, effective(0, 0), real(0, 0)] lib/dbwrap/dbwrap.c:204(dbwrap_lock_order_unlock)
+  dbwrap_lock_order_unlock: release lock order 1 for /run/samba/smbXsrv_session_global.tdb
+[2026/05/20 14:25:11.059077, 10, pid=4000687, effective(0, 0), real(0, 0)] lib/dbwrap/dbwrap_tdb.c:60(db_tdb_log_key)
+  db_tdb_log_key: Unlocking key 89B2A959
+[2026/05/20 14:25:11.059104, 10, pid=4000687, effective(0, 0), real(0, 0)] source3/lib/dbwrap/dbwrap_watch.c:550(dbwrap_watched_trigger_wakeup)
+  dbwrap_watched_trigger_wakeup: No one to wakeup
+[2026/05/20 14:25:11.059135, 10, pid=4000687, effective(0, 0), real(0, 0)] source3/smbd/smbXsrv_session.c:1507(smbXsrv_session_update)
+  smbXsrv_session_update: smbXsrv_session_update: global_id (0x89b2a959) stored
+[2026/05/20 14:25:11.059152,  1, pid=4000687, effective(0, 0), real(0, 0), class=rpc_parse] source3/smbd/smbXsrv_session.c:1509(smbXsrv_session_update)
+       &session_blob: struct smbXsrv_sessionB
+          version                  : SMBXSRV_VERSION_0 (0)
+          reserved                 : 0x00000000 (0)
+          info                     : union smbXsrv_sessionU(case 0)
+          info0                    : *
+              info0: struct smbXsrv_session
+                  table                    : *
+                  db_rec                   : NULL
+                  client                   : *
+                  local_id                 : 0x0000ab35 (43829)
+                  global                   : *
+                      global: struct smbXsrv_session_global0
+                          db_rec                   : NULL
+                          session_global_id        : 0x89b2a959 (2310187353)
+                          session_wire_id          : 0x000000000000ab35 (43829)
+                          creation_time            : Wed May 20 02:25:11 PM 2026 JST
+                          expiration_time          : Thu Sep 14 11:48:05 AM 30828 JST
+                          auth_time                : NTTIME(0)
+                          auth_session_info_seqnum : 0x00000000 (0)
+                          auth_session_info        : NULL
+                          connection_dialect       : 0x0000 (0)
+                          signing_flags            : 0x00 (0)
+                                 0: SMBXSRV_SIGNING_REQUIRED 
+                                 0: SMBXSRV_PROCESSED_SIGNED_PACKET
+                                 0: SMBXSRV_PROCESSED_UNSIGNED_PACKET
+                          signing_algo             : 0x0000 (0)
+                          encryption_flags         : 0x08 (8)
+                                 0: SMBXSRV_ENCRYPTION_REQUIRED
+                                 0: SMBXSRV_ENCRYPTION_DESIRED
+                                 0: SMBXSRV_PROCESSED_ENCRYPTED_PACKET
+                                 1: SMBXSRV_PROCESSED_UNENCRYPTED_PACKET
+                          encryption_cipher        : 0x0000 (0)
+                          signing_key              : NULL
+                          encryption_key           : NULL
+                          decryption_key           : NULL
+                          application_key          : NULL
+                          num_channels             : 0x00000001 (1)
+                          channels: ARRAY(1)
+                              channels: struct smbXsrv_channel_global0
+                                  server_id: struct server_id
+                                      pid                      : 0x00000000003d0baf (4000687)
+                                      task_id                  : 0x00000000 (0)
+                                      vnn                      : 0xffffffff (4294967295)
+                                      unique_id                : 0x3f9493830e290ceb (4581448912030207211)
+                                  channel_id               : 0x0000000000000001 (1)
+                                  creation_time            : Wed May 20 02:25:11 PM 2026 JST
+                                  local_address            : 'ipv4:10.1.6.1:445'
+                                  remote_address           : 'ipv4:10.254.254.9:47642'
+                                  remote_name              : '10.254.254.9'
+                                  signing_key              : NULL
+                                  auth_session_info_seqnum : 0x00000000 (0)
+                                  connection               : *
+                                  signing_algo             : 0x0000 (0)
+                                  encryption_cipher        : 0x8000 (32768)
+                  status                   : NT_STATUS_MORE_PROCESSING_REQUIRED
+                  idle_time                : Wed May 20 02:25:11 PM 2026 JST
+                  nonce_high_random        : 0x0000000000000000 (0)
+                  nonce_high_max           : 0x0000000000000000 (0)
+                  nonce_high               : 0x0000000000000000 (0)
+                  nonce_low                : 0x0000000000000000 (0)
+                  tcon_table               : NULL
+                  homes_snum               : 0xffffffff (4294967295)
+                  pending_auth             : *
+                      pending_auth: struct smbXsrv_session_auth0
+                          prev                     : *
+                          next                     : NULL
+                          session                  : *
+                          connection               : *
+                          gensec                   : *
+                          preauth                  : NULL
+                          in_flags                 : 0x00 (0)
+                          in_security_mode         : 0x00 (0)
+                          creation_time            : Wed May 20 02:25:11 PM 2026 JST
+                          idle_time                : Wed May 20 02:25:11 PM 2026 JST
+                          channel_id               : 0x0000000000000001 (1)
+[2026/05/20 14:25:11.059658,  3, pid=4000687, effective(0, 0), real(0, 0)] source3/smbd/smb1_sesssetup.c:605(reply_sesssetup_and_X)
+  wct=12 flg2=0xd801
+[2026/05/20 14:25:11.059678,  3, pid=4000687, effective(0, 0), real(0, 0)] source3/smbd/smb1_sesssetup.c:107(reply_sesssetup_and_X_spnego)
+  Doing spnego session setup
+[2026/05/20 14:25:11.059698,  3, pid=4000687, effective(0, 0), real(0, 0)] source3/smbd/smb1_sesssetup.c:147(reply_sesssetup_and_X_spnego)
+  NativeOS=[Linux version 3.14.17-ami] NativeLanMan=[CIFS VFS Client for Linux] PrimaryDomain=[]
+[2026/05/20 14:25:11.059719,  4, pid=4000687, effective(0, 0), real(0, 0)] source3/smbd/sec_ctx.c:206(push_sec_ctx)
+  push_sec_ctx(0, 0) : sec_ctx_stack_ndx = 1
+[2026/05/20 14:25:11.059739,  4, pid=4000687, effective(0, 0), real(0, 0)] source3/smbd/uid.c:566(push_conn_ctx)
+  push_conn_ctx(0) : conn_ctx_stack_ndx = 0
+[2026/05/20 14:25:11.059757,  4, pid=4000687, effective(0, 0), real(0, 0)] source3/smbd/sec_ctx.c:317(set_sec_ctx_internal)
+  setting sec ctx (0, 0) - sec_ctx_stack_ndx = 1
+[2026/05/20 14:25:11.059774,  5, pid=4000687, effective(0, 0), real(0, 0)] libcli/security/security_token.c:49(security_token_debug)
+  Security token: (NULL)
+[2026/05/20 14:25:11.059790,  5, pid=4000687, effective(0, 0), real(0, 0)] source3/auth/token_util.c:873(debug_unix_user_token)
+  UNIX token of user 0
+  Primary group is 0 and contains 0 supplementary groups
+[2026/05/20 14:25:11.059889,  1, pid=4000687, effective(0, 0), real(0, 0), class=rpc_parse] auth/ntlmssp/ntlmssp_server.c:502(ntlmssp_server_preauth)
+       authenticate: struct AUTHENTICATE_MESSAGE
+          Signature                : 'NTLMSSP'
+          MessageType              : NtLmAuthenticate (3)
+          LmChallengeResponseLen   : 0x0000 (0)
+          LmChallengeResponseMaxLen: 0x0000 (0)
+          LmChallengeResponse      : *
+              LmChallengeResponse      : union ntlmssp_LM_RESPONSE_with_len(case 0)
+          NtChallengeResponseLen   : 0x00ac (172)
+          NtChallengeResponseMaxLen: 0x00ac (172)
+          NtChallengeResponse      : *
+              NtChallengeResponse      : union ntlmssp_NTLM_RESPONSE_with_len(case 172)
+              v2: struct NTLMv2_RESPONSE
+                  Response                 : a14ed06123132cb62a47dd2542082b63
+                  Challenge: struct NTLMv2_CLIENT_CHALLENGE
+                      RespType                 : 0x01 (1)
+                      HiRespType               : 0x01 (1)
+                      Reserved1                : 0x0000 (0)
+                      Reserved2                : 0x00000000 (0)
+                      TimeStamp                : Wed May 20 11:38:47 PM 2026 JST
+                      ChallengeFromClient      : 79ee6ec607f46744
+                      Reserved3                : 0x00000000 (0)
+                      AvPairs: struct AV_PAIR_LIST
+                          count                    : 0x00000006 (6)
+                          pair: ARRAY(6)
+                              pair: struct AV_PAIR
+                                  AvId                     : MsvAvNbDomainName (0x2)
+                                  AvLen                    : 0x0020 (32)
+                                  Value                    : union ntlmssp_AvValue(case 0x2)
+                                  AvNbDomainName           : 'AWS-MMNS-GENERIC'
+                              pair: struct AV_PAIR
+                                  AvId                     : MsvAvNbComputerName (0x1)
+                                  AvLen                    : 0x0020 (32)
+                                  Value                    : union ntlmssp_AvValue(case 0x1)
+                                  AvNbComputerName         : 'AWS-MMNS-GENERIC'
+                              pair: struct AV_PAIR
+                                  AvId                     : MsvAvDnsDomainName (0x4)
+                                  AvLen                    : 0x0000 (0)
+                                  Value                    : union ntlmssp_AvValue(case 0x4)
+                                  AvDnsDomainName          : ''
+                              pair: struct AV_PAIR
+                                  AvId                     : MsvAvDnsComputerName (0x3)
+                                  AvLen                    : 0x0020 (32)
+                                  Value                    : union ntlmssp_AvValue(case 0x3)
+                                  AvDnsComputerName        : 'aws-mmns-generic'
+                              pair: struct AV_PAIR
+                                  AvId                     : MsvAvTimestamp (0x7)
+                                  AvLen                    : 0x0008 (8)
+                                  Value                    : union ntlmssp_AvValue(case 0x7)
+                                  AvTimestamp              : Wed May 20 02:25:11 PM 2026 JST
+                              pair: struct AV_PAIR
+                                  AvId                     : MsvAvEOL (0x0)
+                                  AvLen                    : 0x0000 (0)
+                                  Value                    : union ntlmssp_AvValue(case 0x0)
+          DomainNameLen            : 0x0020 (32)
+          DomainNameMaxLen         : 0x0020 (32)
+          DomainName               : *
+              DomainName               : 'AWS-MMNS-GENERIC'
+          UserNameLen              : 0x000a (10)
+          UserNameMaxLen           : 0x000a (10)
+          UserName                 : *
+              UserName                 : 'guest'
+          WorkstationLen           : 0x0000 (0)
+          WorkstationMaxLen        : 0x0000 (0)
+          Workstation              : *
+              Workstation              : ''
+          EncryptedRandomSessionKeyLen: 0x0010 (16)
+          EncryptedRandomSessionKeyMaxLen: 0x0010 (16)
+          EncryptedRandomSessionKey: *
+              EncryptedRandomSessionKey: DATA_BLOB length=16
+  [0000] 4B 93 9D 84 BF A3 3B B7   32 FD E9 2A 51 3A 36 9E   K.....;. 2..*Q:6.
+          NegotiateFlags           : 0xa0880205 (2693267973)
+                 1: NTLMSSP_NEGOTIATE_UNICODE
+                 0: NTLMSSP_NEGOTIATE_OEM    
+                 1: NTLMSSP_REQUEST_TARGET   
+                 0: NTLMSSP_NEGOTIATE_SIGN   
+                 0: NTLMSSP_NEGOTIATE_SEAL   
+                 0: NTLMSSP_NEGOTIATE_DATAGRAM
+                 0: NTLMSSP_NEGOTIATE_LM_KEY 
+                 0: NTLMSSP_NEGOTIATE_NETWARE
+                 1: NTLMSSP_NEGOTIATE_NTLM   
+                 0: NTLMSSP_NEGOTIATE_NT_ONLY
+                 0: NTLMSSP_ANONYMOUS        
+                 0: NTLMSSP_NEGOTIATE_OEM_DOMAIN_SUPPLIED
+                 0: NTLMSSP_NEGOTIATE_OEM_WORKSTATION_SUPPLIED
+                 0: NTLMSSP_NEGOTIATE_THIS_IS_LOCAL_CALL
+                 0: NTLMSSP_NEGOTIATE_ALWAYS_SIGN
+                 0: NTLMSSP_TARGET_TYPE_DOMAIN
+                 0: NTLMSSP_TARGET_TYPE_SERVER
+                 0: NTLMSSP_TARGET_TYPE_SHARE
+                 1: NTLMSSP_NEGOTIATE_EXTENDED_SESSIONSECURITY
+                 0: NTLMSSP_NEGOTIATE_IDENTIFY
+                 0: NTLMSSP_REQUEST_NON_NT_SESSION_KEY
+                 1: NTLMSSP_NEGOTIATE_TARGET_INFO
+                 0: NTLMSSP_NEGOTIATE_VERSION
+                 1: NTLMSSP_NEGOTIATE_128    
+                 0: NTLMSSP_NEGOTIATE_KEY_EXCH
+                 1: NTLMSSP_NEGOTIATE_56     
+[2026/05/20 14:25:11.060510,  3, pid=4000687, effective(0, 0), real(0, 0), class=auth] auth/ntlmssp/ntlmssp_server.c:509(ntlmssp_server_preauth)
+  Got user=[guest] domain=[AWS-MMNS-GENERIC] workstation=[] len1=0 len2=172
+[2026/05/20 14:25:11.060549,  1, pid=4000687, effective(0, 0), real(0, 0), class=rpc_parse] auth/ntlmssp/ntlmssp_server.c:553(ntlmssp_server_preauth)
+       &v2_resp: struct NTLMv2_RESPONSE
+          Response                 : a14ed06123132cb62a47dd2542082b63
+          Challenge: struct NTLMv2_CLIENT_CHALLENGE
+              RespType                 : 0x01 (1)
+              HiRespType               : 0x01 (1)
+              Reserved1                : 0x0000 (0)
+              Reserved2                : 0x00000000 (0)
+              TimeStamp                : Wed May 20 11:38:47 PM 2026 JST
+              ChallengeFromClient      : 79ee6ec607f46744
+              Reserved3                : 0x00000000 (0)
+              AvPairs: struct AV_PAIR_LIST
+                  count                    : 0x00000006 (6)
+                  pair: ARRAY(6)
+                      pair: struct AV_PAIR
+                          AvId                     : MsvAvNbDomainName (0x2)
+                          AvLen                    : 0x0020 (32)
+                          Value                    : union ntlmssp_AvValue(case 0x2)
+                          AvNbDomainName           : 'AWS-MMNS-GENERIC'
+                      pair: struct AV_PAIR
+                          AvId                     : MsvAvNbComputerName (0x1)
+                          AvLen                    : 0x0020 (32)
+                          Value                    : union ntlmssp_AvValue(case 0x1)
+                          AvNbComputerName         : 'AWS-MMNS-GENERIC'
+                      pair: struct AV_PAIR
+                          AvId                     : MsvAvDnsDomainName (0x4)
+                          AvLen                    : 0x0000 (0)
+                          Value                    : union ntlmssp_AvValue(case 0x4)
+                          AvDnsDomainName          : ''
+                      pair: struct AV_PAIR
+                          AvId                     : MsvAvDnsComputerName (0x3)
+                          AvLen                    : 0x0020 (32)
+                          Value                    : union ntlmssp_AvValue(case 0x3)
+                          AvDnsComputerName        : 'aws-mmns-generic'
+                      pair: struct AV_PAIR
+                          AvId                     : MsvAvTimestamp (0x7)
+                          AvLen                    : 0x0008 (8)
+                          Value                    : union ntlmssp_AvValue(case 0x7)
+                          AvTimestamp              : Wed May 20 02:25:11 PM 2026 JST
+                      pair: struct AV_PAIR
+                          AvId                     : MsvAvEOL (0x0)
+                          AvLen                    : 0x0000 (0)
+                          Value                    : union ntlmssp_AvValue(case 0x0)
+[2026/05/20 14:25:11.060834,  5, pid=4000687, effective(0, 0), real(0, 0), class=auth] source3/auth/auth_util.c:125(make_user_info_map)
+  Mapping user [AWS-MMNS-GENERIC]\[guest] from workstation []
+[2026/05/20 14:25:11.060853,  5, pid=4000687, effective(0, 0), real(0, 0), class=auth] source3/auth/user_info.c:64(make_user_info)
+  attempting to make a user_info for guest (guest)
+[2026/05/20 14:25:11.060884,  5, pid=4000687, effective(0, 0), real(0, 0), class=auth] source3/auth/user_info.c:72(make_user_info)
+  making strings for guest's user_info struct
+[2026/05/20 14:25:11.060906,  5, pid=4000687, effective(0, 0), real(0, 0), class=auth] source3/auth/user_info.c:117(make_user_info)
+  making blobs for guest's user_info struct
+[2026/05/20 14:25:11.060923, 10, pid=4000687, effective(0, 0), real(0, 0), class=auth] source3/auth/user_info.c:163(make_user_info)
+  made a user_info for guest (guest)
+[2026/05/20 14:25:11.060941,  3, pid=4000687, effective(0, 0), real(0, 0), class=auth] source3/auth/auth.c:202(auth_check_ntlm_password)
+  auth_check_ntlm_password: check_ntlm_password:  Checking password for unmapped user [AWS-MMNS-GENERIC]\[guest]@[] with the new password interface
+[2026/05/20 14:25:11.060960,  3, pid=4000687, effective(0, 0), real(0, 0), class=auth] source3/auth/auth.c:208(auth_check_ntlm_password)
+  auth_check_ntlm_password: check_ntlm_password:  mapped user is: [AWS-MMNS-GENERIC]\[guest]@[]
+[2026/05/20 14:25:11.060977, 10, pid=4000687, effective(0, 0), real(0, 0), class=auth] source3/auth/auth.c:220(auth_check_ntlm_password)
+  check_ntlm_password: auth_context challenge created by random
+[2026/05/20 14:25:11.060994, 10, pid=4000687, effective(0, 0), real(0, 0), class=auth] source3/auth/auth.c:223(auth_check_ntlm_password)
+  challenge is: 
+[2026/05/20 14:25:11.061011,  5, pid=4000687, effective(0, 0), real(0, 0)] lib/util/util.c:578(dump_data)
+  [0000] BB 07 B6 F3 EB D5 CA E8                             ........
+[2026/05/20 14:25:11.061043, 10, pid=4000687, effective(0, 0), real(0, 0), class=auth] source3/auth/auth_builtin.c:42(check_anonymous_security)
+  Check auth for: [guest]
+[2026/05/20 14:25:11.061061, 10, pid=4000687, effective(0, 0), real(0, 0), class=auth] source3/auth/auth.c:256(auth_check_ntlm_password)
+  auth_check_ntlm_password: anonymous had nothing to say
+[2026/05/20 14:25:11.061086, 10, pid=4000687, effective(0, 0), real(0, 0), class=auth] source3/auth/auth_sam.c:46(auth_sam_ignoredomain_auth)
+  auth_sam_ignoredomain_auth: Check auth for: [AWS-MMNS-GENERIC]\[guest]
+[2026/05/20 14:25:11.061129,  4, pid=4000687, effective(0, 0), real(0, 0)] source3/smbd/sec_ctx.c:206(push_sec_ctx)
+  push_sec_ctx(0, 0) : sec_ctx_stack_ndx = 2
+[2026/05/20 14:25:11.061148,  4, pid=4000687, effective(0, 0), real(0, 0)] source3/smbd/uid.c:566(push_conn_ctx)
+  push_conn_ctx(0) : conn_ctx_stack_ndx = 1
+[2026/05/20 14:25:11.061165,  4, pid=4000687, effective(0, 0), real(0, 0)] source3/smbd/sec_ctx.c:317(set_sec_ctx_internal)
+  setting sec ctx (0, 0) - sec_ctx_stack_ndx = 2
+[2026/05/20 14:25:11.061182,  5, pid=4000687, effective(0, 0), real(0, 0)] libcli/security/security_token.c:49(security_token_debug)
+  Security token: (NULL)
+[2026/05/20 14:25:11.061198,  5, pid=4000687, effective(0, 0), real(0, 0)] source3/auth/token_util.c:873(debug_unix_user_token)
+  UNIX token of user 0
+  Primary group is 0 and contains 0 supplementary groups
+[2026/05/20 14:25:11.061255,  5, pid=4000687, effective(0, 0), real(0, 0), class=passdb] source3/passdb/pdb_tdb.c:602(tdbsam_getsampwnam)
+  pdb_getsampwnam (TDB): error fetching database.
+   Key: USER_guest
+[2026/05/20 14:25:11.061285,  4, pid=4000687, effective(0, 0), real(0, 0)] source3/smbd/sec_ctx.c:443(pop_sec_ctx)
+  pop_sec_ctx (0, 0) - sec_ctx_stack_ndx = 1
+[2026/05/20 14:25:11.061305,  3, pid=4000687, effective(0, 0), real(0, 0), class=auth] source3/auth/check_samsec.c:408(check_sam_security)
+  check_sam_security: Couldn't find user 'guest' in passdb.
+[2026/05/20 14:25:11.061324,  5, pid=4000687, effective(0, 0), real(0, 0), class=auth] source3/auth/auth.c:265(auth_check_ntlm_password)
+  auth_check_ntlm_password: sam_ignoredomain authentication for user [guest] FAILED with error NT_STATUS_NO_SUCH_USER, authoritative=1
+[2026/05/20 14:25:11.061366,  2, pid=4000687, effective(0, 0), real(0, 0), class=auth] source3/auth/auth.c:353(auth_check_ntlm_password)
+  check_ntlm_password:  Authentication for user [guest] -> [guest] FAILED with error NT_STATUS_NO_SUCH_USER, authoritative=1
+[2026/05/20 14:25:11.061453,  2, pid=4000687, effective(0, 0), real(0, 0), class=auth_audit] auth/auth_log.c:858(log_authentication_event_human_readable)
+  Auth: [SMB,(null)] user [AWS-MMNS-GENERIC]\[guest] at [Wed, 20 May 2026 14:25:11.061434 JST] with [NTLMv2] status [NT_STATUS_NO_SUCH_USER] workstation [] remote host [ipv4:10.254.254.9:47642] mapped to [AWS-MMNS-GENERIC]\[guest]. local host [ipv4:10.1.6.1:445] 
+  {"timestamp": "2026-05-20T14:25:11.061618+0900", "type": "Authentication", "Authentication": {"version": {"major": 1, "minor": 3}, "eventId": 4625, "logonId": "0", "logonType": 3, "status": "NT_STATUS_NO_SUCH_USER", "localAddress": "ipv4:10.1.6.1:445", "remoteAddress": "ipv4:10.254.254.9:47642", "serviceDescription": "SMB", "authDescription": null, "clientDomain": "AWS-MMNS-GENERIC", "clientAccount": "guest", "workstation": "", "becameAccount": null, "becameDomain": null, "becameSid": null, "mappedAccount": "guest", "mappedDomain": "AWS-MMNS-GENERIC", "netlogonComputer": null, "netlogonTrustAccount": null, "netlogonNegotiateFlags": "0x00000000", "netlogonSecureChannelType": 0, "netlogonTrustAccountSid": null, "passwordType": "NTLMv2", "clientPolicyAccessCheck": null, "serverPolicyAccessCheck": null, "duration": 321631}}
+[2026/05/20 14:25:11.061683,  5, pid=4000687, effective(0, 0), real(0, 0)] source3/auth/auth_ntlmssp.c:213(auth3_check_password_send)
+  auth3_check_password_send: Checking NTLMSSP password for AWS-MMNS-GENERIC\guest failed: NT_STATUS_NO_SUCH_USER, authoritative=1
+[2026/05/20 14:25:11.061704,  3, pid=4000687, effective(0, 0), real(0, 0), class=auth] source3/auth/auth_util.c:2327(do_map_to_guest_server_info)
+  No such user guest [AWS-MMNS-GENERIC] - using guest account
+[2026/05/20 14:25:11.061741,  3, pid=4000687, effective(0, 0), real(0, 0)] source3/param/loadparm.c:3997(lp_load_ex)
+  lp_load_ex: refreshing parameters
+[2026/05/20 14:25:11.061762,  5, pid=4000687, effective(0, 0), real(0, 0)] source3/param/loadparm.c:1406(free_param_opts)
+  Freeing parametrics:
+[2026/05/20 14:25:11.061847,  3, pid=4000687, effective(0, 0), real(0, 0)] source3/param/loadparm.c:559(init_globals)
+  Initialising global parameters
+[2026/05/20 14:25:11.062015,  3, pid=4000687, effective(0, 0), real(0, 0)] source3/param/loadparm.c:2899(lp_do_section)
+  Processing section "[global]"
+  doing parameter workgroup = WORKGROUP
+  doing parameter server string = %h server (Samba, Ubuntu)
+  doing parameter server min protocol = NT1
+  doing parameter client min protocol = NT1
+  doing parameter ntlm auth = ntlmv1-permitted
+  doing parameter lanman auth = yes
+[2026/05/20 14:25:11.062207,  1, pid=4000687, effective(0, 0), real(0, 0)] lib/param/loadparm.c:1909(lpcfg_do_global_parameter)
+  lpcfg_do_global_parameter: WARNING: The "lanman auth" option is deprecated
+  doing parameter log file = /var/log/samba/log.%m
+  doing parameter max log size = 1000
+  doing parameter logging = file
+  doing parameter log level = 10
+[2026/05/20 14:25:11.062316,  5, pid=4000687, effective(0, 0), real(0, 0)] lib/util/debug.c:931(debug_dump_status)
+  INFO: Current debug levels:
+    all: 10
+    tdb: 10
+    printdrivers: 10
+    lanman: 10
+    smb: 10
+    rpc_parse: 10
+    rpc_srv: 10
+    rpc_cli: 10
+    passdb: 10
+    sam: 10
+    auth: 10
+    winbind: 10
+    vfs: 10
+    idmap: 10
+    quota: 10
+    acls: 10
+    locking: 10
+    msdfs: 10
+    dmapi: 10
+    registry: 10
+    scavenger: 10
+    dns: 10
+    ldb: 10
+    tevent: 10
+    auth_audit: 10
+    auth_json_audit: 10
+    kerberos: 10
+    drs_repl: 10
+    smb2: 10
+    smb2_credits: 10
+    dsdb_audit: 10
+    dsdb_json_audit: 10
+    dsdb_password_audit: 10
+    dsdb_password_json_audit: 10
+    dsdb_transaction_audit: 10
+    dsdb_transaction_json_audit: 10
+    dsdb_group_audit: 10
+    dsdb_group_json_audit: 10
+  doing parameter panic action = /usr/share/samba/panic-action %d
+  doing parameter server role = standalone server
+  doing parameter obey pam restrictions = yes
+  doing parameter unix password sync = yes
+  doing parameter passwd program = /usr/bin/passwd %u
+  doing parameter passwd chat = *Enter\snew\s*\spassword:* %n\n *Retype\snew\s*\spassword:* %n\n *password\supdated\ssuccessfully* .
+  doing parameter pam password change = yes
+  doing parameter map to guest = bad user
+  doing parameter guest account = nobody
+  doing parameter guest ok = yes
+  doing parameter usershare allow guests = yes
+[2026/05/20 14:25:11.062895,  2, pid=4000687, effective(0, 0), real(0, 0)] source3/param/loadparm.c:2916(lp_do_section)
+  Processing section "[public]"
+  doing parameter comment = Public Share
+  doing parameter path = /var/samba/public
+  doing parameter browseable = yes
+  doing parameter read only = no
+  doing parameter guest ok = yes
+  doing parameter create mask = 0666
+  doing parameter directory mask = 0777
+  doing parameter force user = nobody
+  doing parameter force group = nogroup
+[2026/05/20 14:25:11.063073,  4, pid=4000687, effective(0, 0), real(0, 0)] source3/param/loadparm.c:4039(lp_load_ex)
+  pm_process() returned Yes
+[2026/05/20 14:25:11.063105,  7, pid=4000687, effective(0, 0), real(0, 0)] source3/param/loadparm.c:4374(lp_servicenumber)
+  lp_servicenumber: couldn't find homes
+[2026/05/20 14:25:11.063126,  3, pid=4000687, effective(0, 0), real(0, 0)] source3/param/loadparm.c:1683(lp_add_ipc)
+  adding IPC service
+[2026/05/20 14:25:11.063164, 10, pid=4000687, effective(0, 0), real(0, 0), class=auth] auth/gensec/gensec.c:457(gensec_update_send)
+  gensec_update_send: ntlmssp[0x6087dc18ae40]: subreq: 0x6087dc14b2a0
+[2026/05/20 14:25:11.063186, 10, pid=4000687, effective(0, 0), real(0, 0), class=auth] auth/gensec/gensec.c:457(gensec_update_send)
+  gensec_update_send: spnego[0x6087dc189d40]: subreq: 0x6087dc18aa10
+[2026/05/20 14:25:11.063320, 10, pid=4000687, effective(0, 0), real(0, 0), class=auth] auth/ntlmssp/ntlmssp_server.c:988(ntlmssp_server_postauth)
+  ntlmssp_server_auth: Failed to create unmodified session key.
+[2026/05/20 14:25:11.063349, 10, pid=4000687, effective(0, 0), real(0, 0), class=auth] auth/gensec/gensec.c:549(gensec_update_done)
+  gensec_update_done: ntlmssp[0x6087dc18ae40]: NT_STATUS_OK tevent_req[0x6087dc14b2a0/auth/ntlmssp/ntlmssp.c:180]: state[2] error[0 (0x0)]  state[struct gensec_ntlmssp_update_state (0x6087dc14b480)] timer[(nil)] finish[auth/ntlmssp/ntlmssp.c:244]
+[2026/05/20 14:25:11.063375, 10, pid=4000687, effective(0, 0), real(0, 0), class=auth] auth/gensec/gensec.c:549(gensec_update_done)
+  gensec_update_done: spnego[0x6087dc189d40]: NT_STATUS_OK tevent_req[0x6087dc18aa10/auth/gensec/spnego.c:1631]: state[2] error[0 (0x0)]  state[struct gensec_spnego_update_state (0x6087dc18abf0)] timer[(nil)] finish[auth/gensec/spnego.c:2116]
+[2026/05/20 14:25:11.063417,  4, pid=4000687, effective(0, 0), real(0, 0)] source3/smbd/sec_ctx.c:443(pop_sec_ctx)
+  pop_sec_ctx (0, 0) - sec_ctx_stack_ndx = 0
+[2026/05/20 14:25:11.063473,  4, pid=4000687, effective(0, 0), real(0, 0), class=auth_audit] auth/auth_log.c:967(log_successful_authz_event_human_readable)
+  Successful AuthZ: [SMB,NTLMSSP] user [AWS-MMNS-GENERIC]\[nobody] [S-1-5-21-2342536155-1022706741-2866312864-501] at [Wed, 20 May 2026 14:25:11.063460 JST] Remote host [ipv4:10.254.254.9:47642] local host [ipv4:10.1.6.1:445]
+  {"timestamp": "2026-05-20T14:25:11.063524+0900", "type": "Authorization", "Authorization": {"version": {"major": 1, "minor": 2}, "localAddress": "ipv4:10.1.6.1:445", "remoteAddress": "ipv4:10.254.254.9:47642", "serviceDescription": "SMB", "authType": "NTLMSSP", "domain": "AWS-MMNS-GENERIC", "account": "nobody", "sid": "S-1-5-21-2342536155-1022706741-2866312864-501", "sessionId": "b2f52bf7-b012-443a-9ff6-5c22ed3cc36a", "logonServer": null, "transportProtection": "SMB", "accountFlags": "0x00000000", "clientPolicyAccessCheck": null, "serverPolicyAccessCheck": null}}
+[2026/05/20 14:25:11.063569,  5, pid=4000687, effective(0, 0), real(0, 0)] lib/dbwrap/dbwrap.c:172(dbwrap_lock_order_lock)
+  dbwrap_lock_order_lock: check lock order 1 for /run/samba/smbXsrv_session_global.tdb
+[2026/05/20 14:25:11.063587, 10, pid=4000687, effective(0, 0), real(0, 0)] lib/dbwrap/dbwrap.c:157(debug_lock_order)
+  lock order:  1:/run/samba/smbXsrv_session_global.tdb 2:<none> 3:<none> 4:<none>
+[2026/05/20 14:25:11.063609, 10, pid=4000687, effective(0, 0), real(0, 0)] lib/dbwrap/dbwrap_tdb.c:60(db_tdb_log_key)
+  db_tdb_log_key: Locking key 89B2A959
+[2026/05/20 14:25:11.063629, 10, pid=4000687, effective(0, 0), real(0, 0)] lib/dbwrap/dbwrap_tdb.c:153(db_tdb_fetch_locked_internal)
+  db_tdb_fetch_locked_internal: Allocated locked data 0x6087dc148590
+[2026/05/20 14:25:11.063662, 10, pid=4000687, effective(0, 0), real(0, 0)] source3/lib/dbwrap/dbwrap_watch.c:507(dbwrap_watched_record_prepare_wakeup)
+  dbwrap_watched_record_prepare_wakeup: No watchers
+[2026/05/20 14:25:11.063706, 10, pid=4000687, effective(0, 0), real(0, 0)] source3/smbd/smbXsrv_session.c:974(smbXsrv_session_global_store)
+  smbXsrv_session_global_store: smbXsrv_session_global_store: key '89B2A959' stored
+[2026/05/20 14:25:11.063725,  1, pid=4000687, effective(0, 0), real(0, 0), class=rpc_parse] source3/smbd/smbXsrv_session.c:976(smbXsrv_session_global_store)
+       &global_blob: struct smbXsrv_session_globalB
+          version                  : SMBXSRV_VERSION_0 (0)
+          seqnum                   : 0x00000003 (3)
+          info                     : union smbXsrv_session_globalU(case 0)
+          info0                    : *
+              info0: struct smbXsrv_session_global0
+                  db_rec                   : *
+                  session_global_id        : 0x89b2a959 (2310187353)
+                  session_wire_id          : 0x000000000000ab35 (43829)
+                  creation_time            : Wed May 20 02:25:11 PM 2026 JST
+                  expiration_time          : Thu Sep 14 11:48:05 AM 30828 JST
+                  auth_time                : Wed May 20 02:25:11 PM 2026 JST
+                  auth_session_info_seqnum : 0x00000001 (1)
+                  auth_session_info        : *
+                      auth_session_info: struct auth_session_info
+                          security_token           : *
+                              security_token: struct security_token
+                                  num_sids                 : 0x00000007 (7)
+                                  sids: ARRAY(7)
+                                      sids                     : S-1-5-21-2342536155-1022706741-2866312864-501
+                                      sids                     : S-1-5-21-2342536155-1022706741-2866312864-514
+                                      sids                     : S-1-22-2-65534
+                                      sids                     : S-1-1-0
+                                      sids                     : S-1-5-2
+                                      sids                     : S-1-5-32-546
+                                      sids                     : S-1-22-1-65534
+                                  privilege_mask           : 0x0000000000000000 (0)
+                                         0: SEC_PRIV_MACHINE_ACCOUNT_BIT
+                                         0: SEC_PRIV_PRINT_OPERATOR_BIT
+                                         0: SEC_PRIV_ADD_USERS_BIT   
+                                         0: SEC_PRIV_DISK_OPERATOR_BIT
+                                         0: SEC_PRIV_REMOTE_SHUTDOWN_BIT
+                                         0: SEC_PRIV_BACKUP_BIT      
+                                         0: SEC_PRIV_RESTORE_BIT     
+                                         0: SEC_PRIV_TAKE_OWNERSHIP_BIT
+                                         0: SEC_PRIV_INCREASE_QUOTA_BIT
+                                         0: SEC_PRIV_SECURITY_BIT    
+                                         0: SEC_PRIV_LOAD_DRIVER_BIT 
+                                         0: SEC_PRIV_SYSTEM_PROFILE_BIT
+                                         0: SEC_PRIV_SYSTEMTIME_BIT  
+                                         0: SEC_PRIV_PROFILE_SINGLE_PROCESS_BIT
+                                         0: SEC_PRIV_INCREASE_BASE_PRIORITY_BIT
+                                         0: SEC_PRIV_CREATE_PAGEFILE_BIT
+                                         0: SEC_PRIV_SHUTDOWN_BIT    
+                                         0: SEC_PRIV_DEBUG_BIT       
+                                         0: SEC_PRIV_SYSTEM_ENVIRONMENT_BIT
+                                         0: SEC_PRIV_CHANGE_NOTIFY_BIT
+                                         0: SEC_PRIV_UNDOCK_BIT      
+                                         0: SEC_PRIV_ENABLE_DELEGATION_BIT
+                                         0: SEC_PRIV_MANAGE_VOLUME_BIT
+                                         0: SEC_PRIV_IMPERSONATE_BIT 
+                                         0: SEC_PRIV_CREATE_GLOBAL_BIT
+                                  rights_mask              : 0x00000000 (0)
+                                         0: LSA_POLICY_MODE_INTERACTIVE
+                                         0: LSA_POLICY_MODE_NETWORK  
+                                         0: LSA_POLICY_MODE_BATCH    
+                                         0: LSA_POLICY_MODE_SERVICE  
+                                         0: LSA_POLICY_MODE_PROXY    
+                                         0: LSA_POLICY_MODE_DENY_INTERACTIVE
+                                         0: LSA_POLICY_MODE_DENY_NETWORK
+                                         0: LSA_POLICY_MODE_DENY_BATCH
+                                         0: LSA_POLICY_MODE_DENY_SERVICE
+                                         0: LSA_POLICY_MODE_REMOTE_INTERACTIVE
+                                         0: LSA_POLICY_MODE_DENY_REMOTE_INTERACTIVE
+                                      0x00: LSA_POLICY_MODE_ALL       (0)
+                                      0x00: LSA_POLICY_MODE_ALL_NT4   (0)
+                          unix_token               : *
+                              unix_token: struct security_unix_token
+                                  uid                      : 0x000000000000fffe (65534)
+                                  gid                      : 0x000000000000fffe (65534)
+                                  ngroups                  : 0x00000001 (1)
+                                  groups: ARRAY(1)
+                                      groups                   : 0x000000000000fffe (65534)
+                          info                     : *
+                              info: struct auth_user_info
+                                  account_name             : *
+                                      account_name             : 'nobody'
+                                  user_principal_name      : NULL
+                                  user_principal_constructed: 0x00 (0)
+                                  domain_name              : *
+                                      domain_name              : 'AWS-MMNS-GENERIC'
+                                  dns_domain_name          : NULL
+                                  full_name                : NULL
+                                  logon_script             : NULL
+                                  profile_path             : NULL
+                                  home_directory           : NULL
+                                  home_drive               : NULL
+                                  logon_server             : NULL
+                                  last_logon               : NTTIME(0)
+                                  last_logoff              : NTTIME(0)
+                                  acct_expiry              : NTTIME(0)
+                                  last_password_change     : NTTIME(0)
+                                  allow_password_change    : NTTIME(0)
+                                  force_password_change    : NTTIME(0)
+                                  logon_count              : 0x0000 (0)
+                                  bad_password_count       : 0x0000 (0)
+                                  acct_flags               : 0x00000000 (0)
+                                  user_flags               : 0x00000001 (1)
+                          unix_info                : *
+                              unix_info: struct auth_user_info_unix
+                                  unix_name                : *
+                                      unix_name                : 'nobody'
+                                  sanitized_username       : *
+                                      sanitized_username       : 'guest'
+                          torture                  : NULL
+                          credentials              : NULL
+                          unique_session_token     : b2f52bf7-b012-443a-9ff6-5c22ed3cc36a
+                          ticket_type              : TICKET_TYPE_UNKNOWN (0)
+                  connection_dialect       : 0x0000 (0)
+                  signing_flags            : 0x00 (0)
+                         0: SMBXSRV_SIGNING_REQUIRED 
+                         0: SMBXSRV_PROCESSED_SIGNED_PACKET
+                         0: SMBXSRV_PROCESSED_UNSIGNED_PACKET
+                  signing_algo             : 0xfffe (65534)
+                  encryption_flags         : 0x08 (8)
+                         0: SMBXSRV_ENCRYPTION_REQUIRED
+                         0: SMBXSRV_ENCRYPTION_DESIRED
+                         0: SMBXSRV_PROCESSED_ENCRYPTED_PACKET
+                         1: SMBXSRV_PROCESSED_UNENCRYPTED_PACKET
+                  encryption_cipher        : 0x0000 (0)
+                  signing_key              : NULL
+                  encryption_key           : NULL
+                  decryption_key           : NULL
+                  application_key          : NULL
+                  num_channels             : 0x00000001 (1)
+                  channels: ARRAY(1)
+                      channels: struct smbXsrv_channel_global0
+                          server_id: struct server_id
+                              pid                      : 0x00000000003d0baf (4000687)
+                              task_id                  : 0x00000000 (0)
+                              vnn                      : 0xffffffff (4294967295)
+                              unique_id                : 0x3f9493830e290ceb (4581448912030207211)
+                          channel_id               : 0x0000000000000001 (1)
+                          creation_time            : Wed May 20 02:25:11 PM 2026 JST
+                          local_address            : 'ipv4:10.1.6.1:445'
+                          remote_address           : 'ipv4:10.254.254.9:47642'
+                          remote_name              : '10.254.254.9'
+                          signing_key              : NULL
+                          auth_session_info_seqnum : 0x00000001 (1)
+                          connection               : *
+                          signing_algo             : 0xfffe (65534)
+                          encryption_cipher        : 0x0000 (0)
+[2026/05/20 14:25:11.064706,  5, pid=4000687, effective(0, 0), real(0, 0)] lib/dbwrap/dbwrap.c:204(dbwrap_lock_order_unlock)
+  dbwrap_lock_order_unlock: release lock order 1 for /run/samba/smbXsrv_session_global.tdb
+[2026/05/20 14:25:11.064726, 10, pid=4000687, effective(0, 0), real(0, 0)] lib/dbwrap/dbwrap_tdb.c:60(db_tdb_log_key)
+  db_tdb_log_key: Unlocking key 89B2A959
+[2026/05/20 14:25:11.064744, 10, pid=4000687, effective(0, 0), real(0, 0)] source3/lib/dbwrap/dbwrap_watch.c:550(dbwrap_watched_trigger_wakeup)
+  dbwrap_watched_trigger_wakeup: No one to wakeup
+[2026/05/20 14:25:11.064774, 10, pid=4000687, effective(0, 0), real(0, 0)] source3/smbd/smbXsrv_session.c:1507(smbXsrv_session_update)
+  smbXsrv_session_update: smbXsrv_session_update: global_id (0x89b2a959) stored
+[2026/05/20 14:25:11.064791,  1, pid=4000687, effective(0, 0), real(0, 0), class=rpc_parse] source3/smbd/smbXsrv_session.c:1509(smbXsrv_session_update)
+       &session_blob: struct smbXsrv_sessionB
+          version                  : SMBXSRV_VERSION_0 (0)
+          reserved                 : 0x00000000 (0)
+          info                     : union smbXsrv_sessionU(case 0)
+          info0                    : *
+              info0: struct smbXsrv_session
+                  table                    : *
+                  db_rec                   : NULL
+                  client                   : *
+                  local_id                 : 0x0000ab35 (43829)
+                  global                   : *
+                      global: struct smbXsrv_session_global0
+                          db_rec                   : NULL
+                          session_global_id        : 0x89b2a959 (2310187353)
+                          session_wire_id          : 0x000000000000ab35 (43829)
+                          creation_time            : Wed May 20 02:25:11 PM 2026 JST
+                          expiration_time          : Thu Sep 14 11:48:05 AM 30828 JST
+                          auth_time                : Wed May 20 02:25:11 PM 2026 JST
+                          auth_session_info_seqnum : 0x00000001 (1)
+                          auth_session_info        : *
+                              auth_session_info: struct auth_session_info
+                                  security_token           : *
+                                      security_token: struct security_token
+                                          num_sids                 : 0x00000007 (7)
+                                          sids: ARRAY(7)
+                                              sids                     : S-1-5-21-2342536155-1022706741-2866312864-501
+                                              sids                     : S-1-5-21-2342536155-1022706741-2866312864-514
+                                              sids                     : S-1-22-2-65534
+                                              sids                     : S-1-1-0
+                                              sids                     : S-1-5-2
+                                              sids                     : S-1-5-32-546
+                                              sids                     : S-1-22-1-65534
+                                          privilege_mask           : 0x0000000000000000 (0)
+                                                 0: SEC_PRIV_MACHINE_ACCOUNT_BIT
+                                                 0: SEC_PRIV_PRINT_OPERATOR_BIT
+                                                 0: SEC_PRIV_ADD_USERS_BIT   
+                                                 0: SEC_PRIV_DISK_OPERATOR_BIT
+                                                 0: SEC_PRIV_REMOTE_SHUTDOWN_BIT
+                                                 0: SEC_PRIV_BACKUP_BIT      
+                                                 0: SEC_PRIV_RESTORE_BIT     
+                                                 0: SEC_PRIV_TAKE_OWNERSHIP_BIT
+                                                 0: SEC_PRIV_INCREASE_QUOTA_BIT
+                                                 0: SEC_PRIV_SECURITY_BIT    
+                                                 0: SEC_PRIV_LOAD_DRIVER_BIT 
+                                                 0: SEC_PRIV_SYSTEM_PROFILE_BIT
+                                                 0: SEC_PRIV_SYSTEMTIME_BIT  
+                                                 0: SEC_PRIV_PROFILE_SINGLE_PROCESS_BIT
+                                                 0: SEC_PRIV_INCREASE_BASE_PRIORITY_BIT
+                                                 0: SEC_PRIV_CREATE_PAGEFILE_BIT
+                                                 0: SEC_PRIV_SHUTDOWN_BIT    
+                                                 0: SEC_PRIV_DEBUG_BIT       
+                                                 0: SEC_PRIV_SYSTEM_ENVIRONMENT_BIT
+                                                 0: SEC_PRIV_CHANGE_NOTIFY_BIT
+                                                 0: SEC_PRIV_UNDOCK_BIT      
+                                                 0: SEC_PRIV_ENABLE_DELEGATION_BIT
+                                                 0: SEC_PRIV_MANAGE_VOLUME_BIT
+                                                 0: SEC_PRIV_IMPERSONATE_BIT 
+                                                 0: SEC_PRIV_CREATE_GLOBAL_BIT
+                                          rights_mask              : 0x00000000 (0)
+                                                 0: LSA_POLICY_MODE_INTERACTIVE
+                                                 0: LSA_POLICY_MODE_NETWORK  
+                                                 0: LSA_POLICY_MODE_BATCH    
+                                                 0: LSA_POLICY_MODE_SERVICE  
+                                                 0: LSA_POLICY_MODE_PROXY    
+                                                 0: LSA_POLICY_MODE_DENY_INTERACTIVE
+                                                 0: LSA_POLICY_MODE_DENY_NETWORK
+                                                 0: LSA_POLICY_MODE_DENY_BATCH
+                                                 0: LSA_POLICY_MODE_DENY_SERVICE
+                                                 0: LSA_POLICY_MODE_REMOTE_INTERACTIVE
+                                                 0: LSA_POLICY_MODE_DENY_REMOTE_INTERACTIVE
+                                              0x00: LSA_POLICY_MODE_ALL       (0)
+                                              0x00: LSA_POLICY_MODE_ALL_NT4   (0)
+                                  unix_token               : *
+                                      unix_token: struct security_unix_token
+                                          uid                      : 0x000000000000fffe (65534)
+                                          gid                      : 0x000000000000fffe (65534)
+                                          ngroups                  : 0x00000001 (1)
+                                          groups: ARRAY(1)
+                                              groups                   : 0x000000000000fffe (65534)
+                                  info                     : *
+                                      info: struct auth_user_info
+                                          account_name             : *
+                                              account_name             : 'nobody'
+                                          user_principal_name      : NULL
+                                          user_principal_constructed: 0x00 (0)
+                                          domain_name              : *
+                                              domain_name              : 'AWS-MMNS-GENERIC'
+                                          dns_domain_name          : NULL
+                                          full_name                : NULL
+                                          logon_script             : NULL
+                                          profile_path             : NULL
+                                          home_directory           : NULL
+                                          home_drive               : NULL
+                                          logon_server             : NULL
+                                          last_logon               : NTTIME(0)
+                                          last_logoff              : NTTIME(0)
+                                          acct_expiry              : NTTIME(0)
+                                          last_password_change     : NTTIME(0)
+                                          allow_password_change    : NTTIME(0)
+                                          force_password_change    : NTTIME(0)
+                                          logon_count              : 0x0000 (0)
+                                          bad_password_count       : 0x0000 (0)
+                                          acct_flags               : 0x00000000 (0)
+                                          user_flags               : 0x00000001 (1)
+                                  unix_info                : *
+                                      unix_info: struct auth_user_info_unix
+                                          unix_name                : *
+                                              unix_name                : 'nobody'
+                                          sanitized_username       : *
+                                              sanitized_username       : 'guest'
+                                  torture                  : NULL
+                                  credentials              : NULL
+                                  unique_session_token     : b2f52bf7-b012-443a-9ff6-5c22ed3cc36a
+                                  ticket_type              : TICKET_TYPE_UNKNOWN (0)
+                          connection_dialect       : 0x0000 (0)
+                          signing_flags            : 0x00 (0)
+                                 0: SMBXSRV_SIGNING_REQUIRED 
+                                 0: SMBXSRV_PROCESSED_SIGNED_PACKET
+                                 0: SMBXSRV_PROCESSED_UNSIGNED_PACKET
+                          signing_algo             : 0xfffe (65534)
+                          encryption_flags         : 0x08 (8)
+                                 0: SMBXSRV_ENCRYPTION_REQUIRED
+                                 0: SMBXSRV_ENCRYPTION_DESIRED
+                                 0: SMBXSRV_PROCESSED_ENCRYPTED_PACKET
+                                 1: SMBXSRV_PROCESSED_UNENCRYPTED_PACKET
+                          encryption_cipher        : 0x0000 (0)
+                          signing_key              : NULL
+                          encryption_key           : NULL
+                          decryption_key           : NULL
+                          application_key          : NULL
+                          num_channels             : 0x00000001 (1)
+                          channels: ARRAY(1)
+                              channels: struct smbXsrv_channel_global0
+                                  server_id: struct server_id
+                                      pid                      : 0x00000000003d0baf (4000687)
+                                      task_id                  : 0x00000000 (0)
+                                      vnn                      : 0xffffffff (4294967295)
+                                      unique_id                : 0x3f9493830e290ceb (4581448912030207211)
+                                  channel_id               : 0x0000000000000001 (1)
+                                  creation_time            : Wed May 20 02:25:11 PM 2026 JST
+                                  local_address            : 'ipv4:10.1.6.1:445'
+                                  remote_address           : 'ipv4:10.254.254.9:47642'
+                                  remote_name              : '10.254.254.9'
+                                  signing_key              : NULL
+                                  auth_session_info_seqnum : 0x00000001 (1)
+                                  connection               : *
+                                  signing_algo             : 0xfffe (65534)
+                                  encryption_cipher        : 0x0000 (0)
+                  status                   : NT_STATUS_OK
+                  idle_time                : Wed May 20 02:25:11 PM 2026 JST
+                  nonce_high_random        : 0x0000000000000000 (0)
+                  nonce_high_max           : 0x0000000000000000 (0)
+                  nonce_high               : 0x0000000000000000 (0)
+                  nonce_low                : 0x0000000000000000 (0)
+                  tcon_table               : NULL
+                  homes_snum               : 0xffffffff (4294967295)
+                  pending_auth             : *
+                      pending_auth: struct smbXsrv_session_auth0
+                          prev                     : *
+                          next                     : NULL
+                          session                  : *
+                          connection               : *
+                          gensec                   : *
+                          preauth                  : NULL
+                          in_flags                 : 0x00 (0)
+                          in_security_mode         : 0x00 (0)
+                          creation_time            : Wed May 20 02:25:11 PM 2026 JST
+                          idle_time                : Wed May 20 02:25:11 PM 2026 JST
+                          channel_id               : 0x0000000000000001 (1)

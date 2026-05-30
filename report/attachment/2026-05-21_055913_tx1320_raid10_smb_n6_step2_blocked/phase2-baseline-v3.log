@@ -1,0 +1,25 @@
+=== Phase 2 v3 (post VM-restart): trigger fresh attach + tcpdump ===
+[1/6] start tcpdump (5 min, no port filter — capture everything from iRMC)
+[2/6] re-PATCH (re-issue config to provoke fresh attach)
+    config done
+[3/6] watch Members + tcpdump packet count every 30s for 5 min
+[t=30s] Members=0 pcap_bytes=24 smbd_log_bytes=0
+[t=60s] Members=0 pcap_bytes=24 smbd_log_bytes=0
+[t=90s] Members=0 pcap_bytes=24 smbd_log_bytes=0
+[t=120s] Members=0 pcap_bytes=24 smbd_log_bytes=0
+[t=150s] Members=0 pcap_bytes=24 smbd_log_bytes=0
+[t=180s] Members=0 pcap_bytes=24 smbd_log_bytes=0
+[t=210s] Members=0 pcap_bytes=24 smbd_log_bytes=0
+[t=240s] Members=0 pcap_bytes=24 smbd_log_bytes=0
+[t=270s] Members=0 pcap_bytes=24 smbd_log_bytes=0
+[t=300s] Members=0 pcap_bytes=24 smbd_log_bytes=0
+[4/6] stop tcpdump
+-rw-r--r-- 1 tcpdump tcpdump 24 May 20 19:51 /tmp/smb-irmc.pcap
+[5/6] check Samba log for SMB queries
+---grep level/INVALID---
+(no matches)
+---log.smbd head---
+[6/6] tcpdump summary
+===packet count===
+0
+=== Phase 2 v3 done ===

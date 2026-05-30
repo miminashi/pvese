@@ -1,0 +1,45 @@
+[1] PATCH iRMC -> 10.1.6.1 with new ImageName (debian-test-attach-1779315077.iso) to force fresh init
+    log.smbd line count BEFORE: 2878
+    config done at 07:11:35
+
+[2] verify config persisted
+CDImage.Server=10.1.6.1
+CDImage.ShareName=public
+CDImage.ImageName=debian-test-attach-1779315077.iso
+RemoteMountEnabled=true
+
+[3] monitor local samba log + Members for 4 min
+[t=15s] log_lines=2878 new_conns_from_iRMC=0
+0 Members=0
+[t=30s] log_lines=2878 new_conns_from_iRMC=0
+0 Members=0
+[t=45s] log_lines=2878 new_conns_from_iRMC=0
+0 Members=0
+[t=60s] log_lines=2878 new_conns_from_iRMC=0
+0 Members=0
+[t=75s] log_lines=2878 new_conns_from_iRMC=0
+0 Members=0
+[t=90s] log_lines=2878 new_conns_from_iRMC=0
+0 Members=0
+[t=105s] log_lines=2878 new_conns_from_iRMC=0
+0 Members=0
+[t=120s] log_lines=2878 new_conns_from_iRMC=0
+0 Members=0
+[t=135s] log_lines=2878 new_conns_from_iRMC=0
+0 Members=0
+[t=150s] log_lines=2878 new_conns_from_iRMC=0
+0 Members=0
+[t=165s] log_lines=2878 new_conns_from_iRMC=0
+0 Members=0
+[t=180s] log_lines=2878 new_conns_from_iRMC=0
+0 Members=0
+[t=195s] log_lines=2878 new_conns_from_iRMC=0
+0 Members=0
+[t=210s] log_lines=2878 new_conns_from_iRMC=0
+0 Members=0
+[t=225s] log_lines=2878 new_conns_from_iRMC=0
+0 Members=0
+[t=240s] log_lines=2878 new_conns_from_iRMC=0
+0 Members=0
+
+[4] new log entries from iRMC (last 30 lines after BEFORE)

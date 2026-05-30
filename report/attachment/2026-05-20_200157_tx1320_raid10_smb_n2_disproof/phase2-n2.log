@@ -1,0 +1,80 @@
+==== Phase 2: N2 trigger ====
+Start: 16:45:05
+-- step 1: smb.conf 切替 (log level=10) --
+   diff:
+70a71
+>    log level = 10
+-- step 2: Samba log truncate --
+-- step 3: smbcontrol reload + close-share --
+-- step 4: DisconnectCD --
+DisconnectCD HTTP=400
+{
+  "error":{
+    "@Message.ExtendedInfo":[
+      {
+        "@odata.type":"\/redfish\/v1\/$metadata#Message.1_0_0.Message",
+        "MessageId":"Fujitsu.1.0.ActionParameterValueNotInList",
+        "Message":"The value DisconnectCD for the parameter VirtualMediaAction is not in the list of acceptable values.",
+        "Severity":"Warning",
+        "Resolution":"Choose a value from the enumeration list that the implementation can support and resubmit the request if the operation has failed."
+      }
+    ],
+    "code":"Fujitsu.1.0.ActionParameterValueNotInList",
+    "message":"The value DisconnectCD for the parameter VirtualMediaAction is not in the list of acceptable values."
+  }
+}
+
+-- step 5: 10s 待機 --
+-- step 6: ISO 切替 config --
+PATCH payload: {"CDImage":{"Server":"10.1.6.1","UserName":"guest","Password":"guest","UserDomain":"","ShareType":"SMB","ShareName":"public","ImageName":"debian-13.3.0-amd64-netinst.iso"},"RemoteMountEnabled":true}
+{
+  "@odata.context":"\/redfish\/v1\/$metadata#Systems\/Members\/0\/Oem\/ts_fujitsu\/VirtualMedia(Name,FDImage,CDImage,HDImage,RemoteMountEnabled,UsbAttachMode)",
+  "@odata.id":"\/redfish\/v1\/Systems\/0\/Oem\/ts_fujitsu\/VirtualMedia",
+  "@odata.type":"http:\/\/ts.fujitsu.com\/redfish-schemas\/v1\/FTSSchema.v1_0_0#FTSVirtualMedia.v1_0_0.FTSVirtualMedia",
+  "Name":"Virtual Media Configuration",
+  "FDImage":{
+    "Server":"",
+    "UserName":"",
+    "Password":null,
+    "UserDomain":"",
+    "ShareType":"SMB",
+    "ShareName":"",
+    "ImageName":"",
+    "MaximumNumberOfDevices":0
+  },
+  "CDImage":{
+    "Server":"10.1.6.1",
+    "UserName":"guest",
+    "Password":null,
+    "UserDomain":"",
+    "ShareType":"SMB",
+    "ShareName":"public",
+    "ImageName":"debian-13.3.0-amd64-netinst.iso",
+    "MaximumNumberOfDevices":2
+  },
+  "HDImage":{
+    "Server":"",
+    "UserName":"",
+    "Password":null,
+    "UserDomain":"",
+    "ShareType":"SMB",
+    "ShareName":"",
+    "ImageName":"",
+    "MaximumNumberOfDevices":0
+  },
+  "RemoteMountEnabled":true,
+  "UsbAttachMode":"AutoAttach",
+  "@Redfish.Copyright":"Copyright 2017 FUJITSU LIMITED",
+  "@odata.etag":"1779296339"
+}
+
+HTTP 200
+-- step 6b: status 確認 --
+CDImage.Server=10.1.6.1
+CDImage.ShareName=public
+CDImage.ImageName=debian-13.3.0-amd64-netinst.iso
+RemoteMountEnabled=true
+-- step 7: ConnectCD --
+ConnectCD HTTP=204
+
+End: 16:45:29

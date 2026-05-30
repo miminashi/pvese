@@ -1,0 +1,10 @@
+Volume id    : 'Debian 13.3.0 amd64 n'
+xorriso : UPDATE :       1 files restored ( 11822k) in 1 seconds = 8.7xD
+Extracted from ISO image: file '/install.amd/vmlinuz'='/output/local-vmlinuz'
+Volume id    : 'Debian 13.3.0 amd64 n'
+xorriso : UPDATE :       1 files restored ( 23654k) in 1 seconds = 17.5xD
+Extracted from ISO image: file '/install.amd/initrd.gz'='/output/local-initrd.gz'
+/output/local-vmlinuz 12105664
+/output/local-initrd.gz 24221603
+6a6419fde155bc1be12f9d2555ad18876cdff111d80c2887c6aa2c5d6cb250ac  /output/local-vmlinuz
+54fd7dc635631eeade5a092e9b8593de8b8266085078762c93ee2a0656f4d18d  /output/local-initrd.gz

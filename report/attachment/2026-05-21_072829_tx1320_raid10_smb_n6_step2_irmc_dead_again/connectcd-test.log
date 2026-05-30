@@ -1,0 +1,37 @@
+[1] Take snapshot of local samba log line count
+    BEFORE=2878
+
+[2] POST ConnectCD action
+
+HTTP 204
+
+[3] sleep 5 then verify state
+VirtualMediaAction AllowableValues: ['ConnectCD']
+
+[4] monitor local samba + Members for 3 min
+[t=15s] log_lines=2878 new_conns=0
+0 Members=0
+[t=30s] log_lines=2878 new_conns=0
+0 Members=0
+[t=45s] log_lines=2878 new_conns=0
+0 Members=0
+[t=60s] log_lines=2878 new_conns=0
+0 Members=0
+[t=75s] log_lines=2878 new_conns=0
+0 Members=0
+[t=90s] log_lines=2878 new_conns=0
+0 Members=0
+[t=105s] log_lines=2878 new_conns=0
+0 Members=0
+[t=120s] log_lines=2878 new_conns=0
+0 Members=0
+[t=135s] log_lines=2878 new_conns=0
+0 Members=0
+[t=150s] log_lines=2878 new_conns=0
+0 Members=0
+[t=165s] log_lines=2878 new_conns=0
+0 Members=0
+[t=180s] log_lines=2878 new_conns=0
+0 Members=0
+
+[5] New log entries from iRMC after ConnectCD

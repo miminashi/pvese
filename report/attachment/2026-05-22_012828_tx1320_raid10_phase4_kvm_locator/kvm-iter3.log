@@ -1,0 +1,23 @@
+[01:20:29] modes: capture=locator focus=hittest key=playwright
+[01:20:30] Logging in to iRMC at 10.254.254.9
+[01:20:44] Login successful (SID: 4fhBwq3e...)
+[01:20:44] Opening viewer: https://10.254.254.9/viewer.html?ms=0&lang=0&sid=4fhBwq3evLfPfxV6
+[01:20:54] Canvas: 800x600 alive=True
+[01:20:55] step: wait('30')
+[01:21:25] step: screenshot('tmp/b0cc9d4d/kvm-t030.png')
+[01:21:25] Saved tmp/b0cc9d4d/kvm-t030.png (12833 bytes, locator)
+[01:21:25] step: wait('30')
+[01:21:55] step: screenshot('tmp/b0cc9d4d/kvm-t060.png')
+[01:21:56] Saved tmp/b0cc9d4d/kvm-t060.png (12833 bytes, locator)
+[01:21:56] step: wait('30')
+[01:22:26] step: screenshot('tmp/b0cc9d4d/kvm-t090.png')
+[01:22:26] Saved tmp/b0cc9d4d/kvm-t090.png (12833 bytes, locator)
+[01:22:26] step: wait('30')
+[01:22:56] step: screenshot('tmp/b0cc9d4d/kvm-t120.png')
+[01:22:56] Saved tmp/b0cc9d4d/kvm-t120.png (12833 bytes, locator)
+[01:22:56] step: wait('60')
+[01:23:56] step: screenshot('tmp/b0cc9d4d/kvm-t180.png')
+[01:23:56] Saved tmp/b0cc9d4d/kvm-t180.png (4489 bytes, locator)
+[01:23:56] step: wait('120')
+[01:25:56] step: screenshot('tmp/b0cc9d4d/kvm-t300.png')
+[01:25:56] Saved tmp/b0cc9d4d/kvm-t300.png (4489 bytes, locator)

@@ -1,0 +1,1 @@
+30a44ed071c09a1e6ef3df41cc858fef6710afba5ff46103f3c26ec091c0e005  /var/samba/public/debian-training-tx1320-raid10.iso

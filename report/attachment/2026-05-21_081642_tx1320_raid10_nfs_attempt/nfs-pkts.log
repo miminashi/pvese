@@ -1,0 +1,146 @@
+23:09:53.152975 IP 10.254.254.9.987 > 10.1.6.6.2049: Flags [S], seq 3936283089, win 29200, options [mss 1317,sackOK,TS val 512442 ecr 0,nop,wscale 5], length 0
+23:09:53.153015 IP 10.1.6.6.2049 > 10.254.254.9.987: Flags [S.], seq 3007972692, ack 3936283090, win 65160, options [mss 1460,sackOK,TS val 567343298 ecr 512442,nop,wscale 7], length 0
+23:09:53.473116 IP 10.254.254.9.987 > 10.1.6.6.2049: Flags [.], ack 1, win 913, options [nop,nop,TS val 512508 ecr 567343298], length 0
+23:09:53.473116 IP 10.254.254.9.987 > 10.1.6.6.2049: Flags [P.], seq 1:45, ack 1, win 913, options [nop,nop,TS val 512508 ecr 567343298], length 44: NFS request xid 106699585 40 null
+23:09:53.473185 IP 10.1.6.6.2049 > 10.254.254.9.987: Flags [.], ack 45, win 509, options [nop,nop,TS val 567343619 ecr 512508], length 0
+23:09:53.473270 IP 10.1.6.6.2049 > 10.254.254.9.987: Flags [P.], seq 1:29, ack 45, win 509, options [nop,nop,TS val 567343619 ecr 512508], length 28: NFS reply xid 106699585 reply ok 24 null
+23:09:53.793272 IP 10.254.254.9.987 > 10.1.6.6.2049: Flags [.], ack 29, win 913, options [nop,nop,TS val 512540 ecr 567343619], length 0
+23:09:53.793272 IP 10.254.254.9.987 > 10.1.6.6.2049: Flags [P.], seq 45:229, ack 29, win 913, options [nop,nop,TS val 512542 ecr 567343619], length 184: NFS request xid 123476801 180 getattr fh 0,0/35
+23:09:53.793668 IP 10.1.6.6.2049 > 10.254.254.9.987: Flags [P.], seq 29:93, ack 229, win 508, options [nop,nop,TS val 567343939 ecr 512542], length 64: NFS reply xid 123476801 reply ok 60 getattr NON 1 ids 0/742264426 sz 2331741539
+23:09:54.112767 IP 10.254.254.9.987 > 10.1.6.6.2049: Flags [P.], seq 229:337, ack 93, win 913, options [nop,nop,TS val 512572 ecr 567343939], length 108: NFS request xid 140254017 104 getattr fh 0,0/36
+23:09:54.112966 IP 10.1.6.6.2049 > 10.254.254.9.987: Flags [P.], seq 93:141, ack 337, win 508, options [nop,nop,TS val 567344258 ecr 512572], length 48: NFS reply xid 140254017 reply ok 44 getattr [|nfs]
+23:09:54.433516 IP 10.254.254.9.987 > 10.1.6.6.2049: Flags [.], ack 141, win 913, options [nop,nop,TS val 512608 ecr 567344258], length 0
+23:09:55.078377 IP 10.254.254.9.987 > 10.1.6.6.2049: Flags [P.], seq 337:449, ack 141, win 913, options [nop,nop,TS val 512685 ecr 567344258], length 112: NFS request xid 157031233 108 getattr fh 0,0/24
+23:09:55.078778 IP 10.1.6.6.2049 > 10.254.254.9.987: Flags [P.], seq 141:353, ack 449, win 508, options [nop,nop,TS val 567345224 ecr 512685], length 212: NFS reply xid 157031233 reply ok 208 getattr NON 3 ids 0/10 sz 0
+23:09:55.393208 IP 10.254.254.9.987 > 10.1.6.6.2049: Flags [.], ack 353, win 946, options [nop,nop,TS val 512700 ecr 567345224], length 0
+23:09:55.393240 IP 10.254.254.9.987 > 10.1.6.6.2049: Flags [P.], seq 449:565, ack 353, win 946, options [nop,nop,TS val 512700 ecr 567345224], length 116: NFS request xid 173808449 112 getattr fh 0,0/22
+23:09:55.393369 IP 10.1.6.6.2049 > 10.254.254.9.987: Flags [P.], seq 353:449, ack 565, win 508, options [nop,nop,TS val 567345539 ecr 512700], length 96: NFS reply xid 173808449 reply ok 92 getattr NON 2 ids 0/9 sz 0
+23:09:55.713425 IP 10.254.254.9.987 > 10.1.6.6.2049: Flags [P.], seq 565:685, ack 449, win 946, options [nop,nop,TS val 512732 ecr 567345539], length 120: NFS request xid 190585665 116 getattr fh 0,0/22
+23:09:55.713529 IP 10.1.6.6.2049 > 10.254.254.9.987: Flags [P.], seq 449:561, ack 685, win 508, options [nop,nop,TS val 567345859 ecr 512732], length 112: NFS reply xid 190585665 reply ok 108 getattr NON 2 ids 0/9 sz 0
+23:09:56.033030 IP 10.254.254.9.987 > 10.1.6.6.2049: Flags [P.], seq 685:801, ack 561, win 946, options [nop,nop,TS val 512764 ecr 567345859], length 116: NFS request xid 207362881 112 getattr fh 0,0/22
+23:09:56.033138 IP 10.1.6.6.2049 > 10.254.254.9.987: Flags [P.], seq 561:657, ack 801, win 508, options [nop,nop,TS val 567346179 ecr 512764], length 96: NFS reply xid 207362881 reply ok 92 getattr NON 2 ids 0/9 sz 0
+23:09:56.353237 IP 10.254.254.9.987 > 10.1.6.6.2049: Flags [P.], seq 801:921, ack 657, win 946, options [nop,nop,TS val 512796 ecr 567346179], length 120: NFS request xid 224140097 116 getattr fh 0,0/22
+23:09:56.353409 IP 10.1.6.6.2049 > 10.254.254.9.987: Flags [P.], seq 657:769, ack 921, win 508, options [nop,nop,TS val 567346499 ecr 512796], length 112: NFS reply xid 224140097 reply ok 108 getattr NON 2 ids 0/9 sz 0
+23:09:56.672633 IP 10.254.254.9.987 > 10.1.6.6.2049: Flags [P.], seq 921:1037, ack 769, win 946, options [nop,nop,TS val 512829 ecr 567346499], length 116: NFS request xid 240917313 112 getattr fh 0,0/22
+23:09:56.672811 IP 10.1.6.6.2049 > 10.254.254.9.987: Flags [P.], seq 769:845, ack 1037, win 508, options [nop,nop,TS val 567346818 ecr 512829], length 76: NFS reply xid 240917313 reply ok 72 getattr NON 2 ids 0/9 sz 0
+23:09:56.993746 IP 10.254.254.9.987 > 10.1.6.6.2049: Flags [P.], seq 1037:1153, ack 845, win 946, options [nop,nop,TS val 512860 ecr 567346818], length 116: NFS request xid 257694529 112 getattr fh 0,0/22
+23:09:56.993931 IP 10.1.6.6.2049 > 10.254.254.9.987: Flags [P.], seq 845:941, ack 1153, win 508, options [nop,nop,TS val 567347139 ecr 512860], length 96: NFS reply xid 257694529 reply ok 92 getattr NON 2 ids 0/9 sz 0
+23:09:57.312909 IP 10.254.254.9.987 > 10.1.6.6.2049: Flags [P.], seq 1153:1273, ack 941, win 946, options [nop,nop,TS val 512892 ecr 567347139], length 120: NFS request xid 274471745 116 getattr fh 0,0/22
+23:09:57.313080 IP 10.1.6.6.2049 > 10.254.254.9.987: Flags [P.], seq 941:1133, ack 1273, win 508, options [nop,nop,TS val 567347459 ecr 512892], length 192: NFS reply xid 274471745 reply ok 188 getattr NON 2 ids 0/9 sz 0
+23:09:57.633124 IP 10.254.254.9.987 > 10.1.6.6.2049: Flags [P.], seq 1273:1401, ack 1133, win 980, options [nop,nop,TS val 512925 ecr 567347459], length 128: NFS request xid 291248961 124 getattr fh 0,0/22
+23:09:57.633259 IP 10.1.6.6.2049 > 10.254.254.9.987: Flags [P.], seq 1133:1261, ack 1401, win 507, options [nop,nop,TS val 567347779 ecr 512925], length 128: NFS reply xid 291248961 reply ok 124 getattr NON 3 ids 0/3 sz 0
+23:09:57.953262 IP 10.254.254.9.987 > 10.1.6.6.2049: Flags [P.], seq 1401:1537, ack 1261, win 1013, options [nop,nop,TS val 512956 ecr 567347779], length 136: NFS request xid 308026177 132 getattr fh 0,0/22
+23:09:57.953642 IP 10.1.6.6.2049 > 10.254.254.9.987: Flags [P.], seq 1261:1501, ack 1537, win 506, options [nop,nop,TS val 567348099 ecr 512956], length 240: NFS reply xid 308026177 reply ok 236 getattr NON 4 ids 0/15 sz 0
+23:09:58.272804 IP 10.254.254.9.987 > 10.1.6.6.2049: Flags [P.], seq 1537:1673, ack 1501, win 1047, options [nop,nop,TS val 512988 ecr 567348099], length 136: NFS request xid 324803393 132 getattr fh 0,0/22
+23:09:58.273032 IP 10.1.6.6.2049 > 10.254.254.9.987: Flags [P.], seq 1501:1741, ack 1673, win 505, options [nop,nop,TS val 567348418 ecr 512988], length 240: NFS reply xid 324803393 reply ok 236 getattr NON 4 ids 0/15 sz 0
+23:09:58.593375 IP 10.254.254.9.987 > 10.1.6.6.2049: Flags [P.], seq 1673:1789, ack 1741, win 1080, options [nop,nop,TS val 513021 ecr 567348418], length 116: NFS request xid 341580609 112 getattr fh 0,0/22
+23:09:58.593477 IP 10.1.6.6.2049 > 10.254.254.9.987: Flags [P.], seq 1741:1805, ack 1789, win 505, options [nop,nop,TS val 567348739 ecr 513021], length 64: NFS reply xid 341580609 reply ok 60 getattr NON 2 ids 0/33 sz 0
+23:09:58.923138 IP 10.254.254.9.987 > 10.1.6.6.2049: Flags [P.], seq 1789:1925, ack 1805, win 1080, options [nop,nop,TS val 513052 ecr 567348739], length 136: NFS request xid 358357825 132 getattr fh 0,0/22
+23:09:58.923439 IP 10.1.6.6.2049 > 10.254.254.9.987: Flags [P.], seq 1805:1901, ack 1925, win 504, options [nop,nop,TS val 567349069 ecr 513052], length 96: NFS reply xid 358357825 reply ok 92 getattr NON 2 ids 0/9 sz 0
+23:09:59.233189 IP 10.254.254.9.987 > 10.1.6.6.2049: Flags [P.], seq 1925:2065, ack 1901, win 1080, options [nop,nop,TS val 513085 ecr 567349069], length 140: NFS request xid 375135041 136 getattr fh 0,0/22
+23:09:59.233269 IP 10.1.6.6.2049 > 10.254.254.9.987: Flags [P.], seq 1901:2013, ack 2065, win 503, options [nop,nop,TS val 567349379 ecr 513085], length 112: NFS reply xid 375135041 reply ok 108 getattr NON 2 ids 0/9 sz 0
+23:09:59.553261 IP 10.254.254.9.987 > 10.1.6.6.2049: Flags [P.], seq 2065:2201, ack 2013, win 1080, options [nop,nop,TS val 513116 ecr 567349379], length 136: NFS request xid 391912257 132 getattr fh 0,0/22
+23:09:59.553446 IP 10.1.6.6.2049 > 10.254.254.9.987: Flags [P.], seq 2013:2089, ack 2201, win 502, options [nop,nop,TS val 567349699 ecr 513116], length 76: NFS reply xid 391912257 reply ok 72 getattr NON 2 ids 0/9 sz 0
+23:09:59.873486 IP 10.254.254.9.987 > 10.1.6.6.2049: Flags [P.], seq 2201:2337, ack 2089, win 1080, options [nop,nop,TS val 513148 ecr 567349699], length 136: NFS request xid 408689473 132 getattr fh 0,0/22
+23:09:59.873652 IP 10.1.6.6.2049 > 10.254.254.9.987: Flags [P.], seq 2089:2185, ack 2337, win 501, options [nop,nop,TS val 567350019 ecr 513148], length 96: NFS reply xid 408689473 reply ok 92 getattr NON 2 ids 0/9 sz 0
+23:10:00.193649 IP 10.254.254.9.987 > 10.1.6.6.2049: Flags [P.], seq 2337:2477, ack 2185, win 1080, options [nop,nop,TS val 513180 ecr 567350019], length 140: NFS request xid 425466689 136 getattr fh 0,0/22
+23:10:00.193777 IP 10.1.6.6.2049 > 10.254.254.9.987: Flags [P.], seq 2185:2377, ack 2477, win 501, options [nop,nop,TS val 567350339 ecr 513180], length 192: NFS reply xid 425466689 reply ok 188 getattr NON 2 ids 0/9 sz 0
+23:10:00.513079 IP 10.254.254.9.987 > 10.1.6.6.2049: Flags [P.], seq 2477:2625, ack 2377, win 1114, options [nop,nop,TS val 513212 ecr 567350339], length 148: NFS request xid 442243905 144 getattr fh 0,0/22
+23:10:00.513260 IP 10.1.6.6.2049 > 10.254.254.9.987: Flags [P.], seq 2377:2505, ack 2625, win 501, options [nop,nop,TS val 567350659 ecr 513212], length 128: NFS reply xid 442243905 reply ok 124 getattr NON 3 ids 0/3 sz 0
+23:10:00.833235 IP 10.254.254.9.987 > 10.1.6.6.2049: Flags [P.], seq 2625:2785, ack 2505, win 1147, options [nop,nop,TS val 513244 ecr 567350659], length 160: NFS request xid 459021121 156 getattr fh 0,0/22
+23:10:00.833646 IP 10.1.6.6.2049 > 10.254.254.9.987: Flags [P.], seq 2505:2745, ack 2785, win 501, options [nop,nop,TS val 567350979 ecr 513244], length 240: NFS reply xid 459021121 reply ok 236 getattr NON 4 ids 0/15 sz 0
+23:10:01.152785 IP 10.254.254.9.987 > 10.1.6.6.2049: Flags [P.], seq 2785:2945, ack 2745, win 1181, options [nop,nop,TS val 513276 ecr 567350979], length 160: NFS request xid 475798337 156 getattr fh 0,0/22
+23:10:01.153140 IP 10.1.6.6.2049 > 10.254.254.9.987: Flags [P.], seq 2745:2985, ack 2945, win 501, options [nop,nop,TS val 567351299 ecr 513276], length 240: NFS reply xid 475798337 reply ok 236 getattr NON 4 ids 0/15 sz 0
+23:10:01.473517 IP 10.254.254.9.987 > 10.1.6.6.2049: Flags [P.], seq 2945:3085, ack 2985, win 1214, options [nop,nop,TS val 513308 ecr 567351299], length 140: NFS request xid 492575553 136 getattr fh 0,0/22
+23:10:01.473640 IP 10.1.6.6.2049 > 10.254.254.9.987: Flags [P.], seq 2985:3049, ack 3085, win 501, options [nop,nop,TS val 567351619 ecr 513308], length 64: NFS reply xid 492575553 reply ok 60 getattr NON 2 ids 0/33 sz 0
+23:10:01.793158 IP 10.254.254.9.987 > 10.1.6.6.2049: Flags [P.], seq 3085:3221, ack 3049, win 1214, options [nop,nop,TS val 513341 ecr 567351619], length 136: NFS request xid 509352769 132 getattr fh 0,0/22
+23:10:01.793586 IP 10.1.6.6.2049 > 10.254.254.9.987: Flags [P.], seq 3049:3145, ack 3221, win 501, options [nop,nop,TS val 567351939 ecr 513341], length 96: NFS reply xid 509352769 reply ok 92 getattr NON 2 ids 0/9 sz 0
+23:10:02.113195 IP 10.254.254.9.987 > 10.1.6.6.2049: Flags [P.], seq 3221:3361, ack 3145, win 1214, options [nop,nop,TS val 513372 ecr 567351939], length 140: NFS request xid 526129985 136 getattr fh 0,0/22
+23:10:02.113321 IP 10.1.6.6.2049 > 10.254.254.9.987: Flags [P.], seq 3145:3257, ack 3361, win 501, options [nop,nop,TS val 567352259 ecr 513372], length 112: NFS reply xid 526129985 reply ok 108 getattr NON 2 ids 0/9 sz 0
+23:10:02.433209 IP 10.254.254.9.987 > 10.1.6.6.2049: Flags [P.], seq 3361:3497, ack 3257, win 1214, options [nop,nop,TS val 513404 ecr 567352259], length 136: NFS request xid 542907201 132 getattr fh 0,0/22
+23:10:02.433387 IP 10.1.6.6.2049 > 10.254.254.9.987: Flags [P.], seq 3257:3333, ack 3497, win 501, options [nop,nop,TS val 567352579 ecr 513404], length 76: NFS reply xid 542907201 reply ok 72 getattr NON 2 ids 0/9 sz 0
+23:10:02.753340 IP 10.254.254.9.987 > 10.1.6.6.2049: Flags [P.], seq 3497:3633, ack 3333, win 1214, options [nop,nop,TS val 513436 ecr 567352579], length 136: NFS request xid 559684417 132 getattr fh 0,0/22
+23:10:02.753440 IP 10.1.6.6.2049 > 10.254.254.9.987: Flags [P.], seq 3333:3429, ack 3633, win 501, options [nop,nop,TS val 567352899 ecr 513436], length 96: NFS reply xid 559684417 reply ok 92 getattr NON 2 ids 0/9 sz 0
+23:10:03.073949 IP 10.254.254.9.987 > 10.1.6.6.2049: Flags [P.], seq 3633:3773, ack 3429, win 1214, options [nop,nop,TS val 513468 ecr 567352899], length 140: NFS request xid 576461633 136 getattr fh 0,0/22
+23:10:03.074069 IP 10.1.6.6.2049 > 10.254.254.9.987: Flags [P.], seq 3429:3621, ack 3773, win 501, options [nop,nop,TS val 567353220 ecr 513468], length 192: NFS reply xid 576461633 reply ok 188 getattr NON 2 ids 0/9 sz 0
+23:10:03.393689 IP 10.254.254.9.987 > 10.1.6.6.2049: Flags [P.], seq 3773:3921, ack 3621, win 1248, options [nop,nop,TS val 513500 ecr 567353220], length 148: NFS request xid 593238849 144 getattr fh 0,0/22
+23:10:03.393882 IP 10.1.6.6.2049 > 10.254.254.9.987: Flags [P.], seq 3621:3749, ack 3921, win 501, options [nop,nop,TS val 567353539 ecr 513500], length 128: NFS reply xid 593238849 reply ok 124 getattr NON 3 ids 0/3 sz 0
+23:10:03.713892 IP 10.254.254.9.987 > 10.1.6.6.2049: Flags [P.], seq 3921:4081, ack 3749, win 1281, options [nop,nop,TS val 513532 ecr 567353539], length 160: NFS request xid 610016065 156 getattr fh 0,0/22
+23:10:03.714070 IP 10.1.6.6.2049 > 10.254.254.9.987: Flags [P.], seq 3749:3989, ack 4081, win 501, options [nop,nop,TS val 567353860 ecr 513532], length 240: NFS reply xid 610016065 reply ok 236 getattr NON 4 ids 0/15 sz 0
+23:10:04.033353 IP 10.254.254.9.987 > 10.1.6.6.2049: Flags [P.], seq 4081:4241, ack 3989, win 1315, options [nop,nop,TS val 513564 ecr 567353860], length 160: NFS request xid 626793281 156 getattr fh 0,0/22
+23:10:04.033446 IP 10.1.6.6.2049 > 10.254.254.9.987: Flags [P.], seq 3989:4229, ack 4241, win 501, options [nop,nop,TS val 567354179 ecr 513564], length 240: NFS reply xid 626793281 reply ok 236 getattr NON 4 ids 0/15 sz 0
+23:10:04.353402 IP 10.254.254.9.987 > 10.1.6.6.2049: Flags [P.], seq 4241:4381, ack 4229, win 1348, options [nop,nop,TS val 513596 ecr 567354179], length 140: NFS request xid 643570497 136 getattr fh 0,0/22
+23:10:04.353480 IP 10.1.6.6.2049 > 10.254.254.9.987: Flags [P.], seq 4229:4293, ack 4381, win 501, options [nop,nop,TS val 567354499 ecr 513596], length 64: NFS reply xid 643570497 reply ok 60 getattr NON 2 ids 0/33 sz 0
+23:10:04.673112 IP 10.254.254.9.987 > 10.1.6.6.2049: Flags [F.], seq 4381, ack 4229, win 1348, options [nop,nop,TS val 513646 ecr 567354179], length 0
+23:10:04.673155 IP 10.1.6.6.2049 > 10.254.254.9.987: Flags [F.], seq 4293, ack 4382, win 501, options [nop,nop,TS val 567354819 ecr 513646], length 0
+23:10:04.733690 IP 10.254.254.9.987 > 10.1.6.6.2049: Flags [.], ack 4293, win 1348, options [nop,nop,TS val 513657 ecr 567354499], length 0
+23:10:04.793390 IP 10.254.254.9.987 > 10.1.6.6.2049: Flags [.], ack 4294, win 1348, options [nop,nop,TS val 513663 ecr 567354819], length 0
+23:10:04.793390 IP 10.254.254.9.987 > 10.1.6.6.2049: Flags [S], seq 3936353008, win 28960, options [mss 1317,sackOK,TS val 513663 ecr 567354819,nop,wscale 5], length 0
+23:10:04.793426 IP 10.1.6.6.2049 > 10.254.254.9.987: Flags [S.], seq 3189854182, ack 3936353009, win 65160, options [mss 1460,sackOK,TS val 567354939 ecr 513663,nop,wscale 7], length 0
+23:10:04.993692 IP 10.254.254.9.987 > 10.1.6.6.2049: Flags [.], ack 1, win 905, options [nop,nop,TS val 513672 ecr 567354939], length 0
+23:10:04.993692 IP 10.254.254.9.987 > 10.1.6.6.2049: Flags [P.], seq 1:137, ack 1, win 905, options [nop,nop,TS val 513672 ecr 567354939], length 136: NFS request xid 660347713 132 getattr fh 0,0/22
+23:10:04.993728 IP 10.1.6.6.2049 > 10.254.254.9.987: Flags [.], ack 137, win 508, options [nop,nop,TS val 567355139 ecr 513672], length 0
+23:10:04.993803 IP 10.1.6.6.2049 > 10.254.254.9.987: Flags [P.], seq 1:97, ack 137, win 508, options [nop,nop,TS val 567355139 ecr 513672], length 96: NFS reply xid 660347713 reply ok 92 getattr NON 2 ids 0/9 sz 0
+23:10:05.313368 IP 10.254.254.9.987 > 10.1.6.6.2049: Flags [.], ack 97, win 905, options [nop,nop,TS val 513693 ecr 567355139], length 0
+23:10:05.313391 IP 10.254.254.9.987 > 10.1.6.6.2049: Flags [P.], seq 137:277, ack 97, win 905, options [nop,nop,TS val 513693 ecr 567355139], length 140: NFS request xid 677124929 136 getattr fh 0,0/22
+23:10:05.313453 IP 10.1.6.6.2049 > 10.254.254.9.987: Flags [P.], seq 97:209, ack 277, win 507, options [nop,nop,TS val 567355459 ecr 513693], length 112: NFS reply xid 677124929 reply ok 108 getattr NON 2 ids 0/9 sz 0
+23:10:05.633408 IP 10.254.254.9.987 > 10.1.6.6.2049: Flags [P.], seq 277:413, ack 209, win 905, options [nop,nop,TS val 513724 ecr 567355459], length 136: NFS request xid 693902145 132 getattr fh 0,0/22
+23:10:05.633537 IP 10.1.6.6.2049 > 10.254.254.9.987: Flags [P.], seq 209:285, ack 413, win 506, options [nop,nop,TS val 567355779 ecr 513724], length 76: NFS reply xid 693902145 reply ok 72 getattr NON 2 ids 0/9 sz 0
+23:10:05.953123 IP 10.254.254.9.987 > 10.1.6.6.2049: Flags [P.], seq 413:549, ack 285, win 905, options [nop,nop,TS val 513756 ecr 567355779], length 136: NFS request xid 710679361 132 getattr fh 0,0/22
+23:10:05.953303 IP 10.1.6.6.2049 > 10.254.254.9.987: Flags [P.], seq 285:381, ack 549, win 505, options [nop,nop,TS val 567356099 ecr 513756], length 96: NFS reply xid 710679361 reply ok 92 getattr NON 2 ids 0/9 sz 0
+23:10:06.281582 IP 10.254.254.9.987 > 10.1.6.6.2049: Flags [P.], seq 549:689, ack 381, win 905, options [nop,nop,TS val 513788 ecr 567356099], length 140: NFS request xid 727456577 136 getattr fh 0,0/22
+23:10:06.281795 IP 10.1.6.6.2049 > 10.254.254.9.987: Flags [P.], seq 381:573, ack 689, win 504, options [nop,nop,TS val 567356427 ecr 513788], length 192: NFS reply xid 727456577 reply ok 188 getattr NON 2 ids 0/9 sz 0
+23:10:06.593284 IP 10.254.254.9.987 > 10.1.6.6.2049: Flags [.], ack 573, win 939, options [nop,nop,TS val 513825 ecr 567356427], length 0
+23:10:06.593285 IP 10.254.254.9.987 > 10.1.6.6.2049: Flags [P.], seq 689:837, ack 573, win 939, options [nop,nop,TS val 513829 ecr 567356427], length 148: NFS request xid 744233793 144 getattr fh 0,0/22
+23:10:06.593433 IP 10.1.6.6.2049 > 10.254.254.9.987: Flags [P.], seq 573:701, ack 837, win 503, options [nop,nop,TS val 567356739 ecr 513829], length 128: NFS reply xid 744233793 reply ok 124 getattr NON 3 ids 0/3 sz 0
+23:10:06.913430 IP 10.254.254.9.987 > 10.1.6.6.2049: Flags [.], ack 701, win 972, options [nop,nop,TS val 513852 ecr 567356739], length 0
+23:10:06.913430 IP 10.254.254.9.987 > 10.1.6.6.2049: Flags [P.], seq 837:1017, ack 701, win 972, options [nop,nop,TS val 513852 ecr 567356739], length 180: NFS request xid 761011009 176 getattr fh 0,0/22
+23:10:06.913563 IP 10.1.6.6.2049 > 10.254.254.9.987: Flags [P.], seq 701:949, ack 1017, win 502, options [nop,nop,TS val 567357059 ecr 513852], length 248: NFS reply xid 761011009 reply ok 244 getattr NON 4 ids 0/15 sz 0
+23:10:07.553736 IP 10.254.254.9.987 > 10.1.6.6.2049: Flags [F.], seq 1173, ack 949, win 1006, options [nop,nop,TS val 513938 ecr 567357059], length 0
+23:10:07.553759 IP 10.1.6.6.2049 > 10.254.254.9.987: Flags [.], ack 1017, win 502, options [nop,nop,TS val 567357699 ecr 513852,nop,nop,sack 1 {1173:1174}], length 0
+23:10:07.874310 IP 10.254.254.9.987 > 10.1.6.6.2049: Flags [P.], seq 1017:1173, ack 949, win 1006, options [nop,nop,TS val 513953 ecr 567357699], length 156: NFS request xid 777788225 152 getattr fh 0,0/22
+23:10:07.874331 IP 10.1.6.6.2049 > 10.254.254.9.987: Flags [.], ack 1174, win 501, options [nop,nop,TS val 567358020 ecr 513953], length 0
+23:10:07.874375 IP 10.1.6.6.2049 > 10.254.254.9.987: Flags [F.], seq 949, ack 1174, win 501, options [nop,nop,TS val 567358020 ecr 513953], length 0
+23:10:07.876073 IP 10.1.6.6.2049 > 10.254.254.9.987: Flags [R.], seq 950, ack 1174, win 501, options [nop,nop,TS val 567358022 ecr 513953], length 0
+23:10:08.193282 IP 10.254.254.9.987 > 10.1.6.6.2049: Flags [.], ack 950, win 1006, options [nop,nop,TS val 513980 ecr 567358020], length 0
+23:10:08.193282 IP 10.254.254.9.987 > 10.1.6.6.2049: Flags [S], seq 3936419344, win 29200, options [mss 1317,sackOK,TS val 513980 ecr 0,nop,wscale 5], length 0
+23:10:08.193342 IP 10.1.6.6.2049 > 10.254.254.9.987: Flags [R], seq 3189855132, win 0, length 0
+23:10:08.193360 IP 10.1.6.6.2049 > 10.254.254.9.987: Flags [S.], seq 3242978170, ack 3936419345, win 65160, options [mss 1460,sackOK,TS val 567358339 ecr 513980,nop,wscale 7], length 0
+23:10:08.513487 IP 10.254.254.9.987 > 10.1.6.6.2049: Flags [.], ack 1, win 913, options [nop,nop,TS val 514012 ecr 567358339], length 0
+23:10:08.513552 IP 10.254.254.9.987 > 10.1.6.6.2049: Flags [P.], seq 1:157, ack 1, win 913, options [nop,nop,TS val 514012 ecr 567358339], length 156: NFS request xid 777788225 152 getattr fh 0,0/22
+23:10:08.513560 IP 10.1.6.6.2049 > 10.254.254.9.987: Flags [.], ack 157, win 508, options [nop,nop,TS val 567358659 ecr 514012], length 0
+23:10:08.513836 IP 10.1.6.6.2049 > 10.254.254.9.987: Flags [P.], seq 1:129, ack 157, win 508, options [nop,nop,TS val 567358659 ecr 514012], length 128: NFS reply xid 777788225 reply ok 124 getattr NON 3 ids 0/3 sz 0
+23:10:08.833678 IP 10.254.254.9.987 > 10.1.6.6.2049: Flags [.], ack 129, win 946, options [nop,nop,TS val 514044 ecr 567358659], length 0
+23:10:08.833679 IP 10.254.254.9.987 > 10.1.6.6.2049: Flags [P.], seq 157:341, ack 129, win 946, options [nop,nop,TS val 514044 ecr 567358659], length 184: NFS request xid 794565441 180 getattr fh 0,0/35
+23:10:08.833973 IP 10.1.6.6.2049 > 10.254.254.9.987: Flags [P.], seq 129:193, ack 341, win 507, options [nop,nop,TS val 567358979 ecr 514044], length 64: NFS reply xid 794565441 reply ok 60 getattr NON 1 ids 0/742264426 sz 2331741539
+23:10:09.153791 IP 10.254.254.9.987 > 10.1.6.6.2049: Flags [P.], seq 341:449, ack 193, win 946, options [nop,nop,TS val 514076 ecr 567358979], length 108: NFS request xid 811342657 104 getattr fh 0,0/36
+23:10:09.154550 IP 10.1.6.6.2049 > 10.254.254.9.987: Flags [P.], seq 193:241, ack 449, win 507, options [nop,nop,TS val 567359300 ecr 514076], length 48: NFS reply xid 811342657 reply ok 44 getattr [|nfs]
+23:10:09.473434 IP 10.254.254.9.987 > 10.1.6.6.2049: Flags [P.], seq 449:693, ack 241, win 946, options [nop,nop,TS val 514108 ecr 567359300], length 244: NFS request xid 828119873 240 getattr fh 0,0/22
+23:10:09.473647 IP 10.1.6.6.2049 > 10.254.254.9.987: Flags [P.], seq 241:557, ack 693, win 506, options [nop,nop,TS val 567359619 ecr 514108], length 316: NFS reply xid 828119873 reply ok 312 getattr NON 5 ids 0/18 sz 0
+23:10:09.795007 IP 10.254.254.9.987 > 10.1.6.6.2049: Flags [P.], seq 693:849, ack 557, win 980, options [nop,nop,TS val 514140 ecr 567359619], length 156: NFS request xid 844897089 152 getattr fh 0,0/22
+23:10:09.835068 IP 10.1.6.6.2049 > 10.254.254.9.987: Flags [.], ack 849, win 505, options [nop,nop,TS val 567359981 ecr 514140], length 0
+23:10:09.925305 IP 10.1.6.6.2049 > 10.254.254.9.987: Flags [P.], seq 557:629, ack 849, win 505, options [nop,nop,TS val 567360071 ecr 514140], length 72: NFS reply xid 844897089 reply ok 68 getattr NON 2 ids 0/20 sz 0
+23:10:10.125299 IP 10.254.254.9.987 > 10.1.6.6.2049: Flags [P.], seq 849:1013, ack 629, win 980, options [nop,nop,TS val 514185 ecr 567360071], length 164: NFS request xid 861674305 160 getattr fh 0,0/22
+23:10:10.125317 IP 10.1.6.6.2049 > 10.254.254.9.987: Flags [.], ack 1013, win 504, options [nop,nop,TS val 567360271 ecr 514185], length 0
+23:10:10.125629 IP 10.1.6.6.2049 > 10.254.254.9.987: Flags [P.], seq 629:3239, ack 1013, win 504, options [nop,nop,TS val 567360271 ecr 514185], length 2610: NFS reply xid 861674305 reply ok 2606 getattr NON 2 ids 0/25 sz 0
+23:10:10.125641 IP 10.1.6.6.2049 > 10.254.254.9.987: Flags [P.], seq 3239:4789, ack 1013, win 504, options [nop,nop,TS val 567360271 ecr 514185], length 1550
+23:10:10.446490 IP 10.254.254.9.987 > 10.1.6.6.2049: Flags [.], ack 3239, win 1161, options [nop,nop,TS val 514205 ecr 567360271], length 0
+23:10:10.446543 IP 10.254.254.9.987 > 10.1.6.6.2049: Flags [.], ack 4789, win 1333, options [nop,nop,TS val 514205 ecr 567360271], length 0
+23:10:10.446571 IP 10.254.254.9.987 > 10.1.6.6.2049: Flags [P.], seq 1013:1185, ack 4789, win 1333, options [nop,nop,TS val 514205 ecr 567360271], length 172: NFS request xid 878451521 168 getattr fh 0,0/22
+23:10:10.446764 IP 10.1.6.6.2049 > 10.254.254.9.987: Flags [P.], seq 4789:4925, ack 1185, win 503, options [nop,nop,TS val 567360592 ecr 514205], length 136: NFS reply xid 878451521 reply ok 132 getattr NON 3 ids 0/4 sz 0
+23:10:10.753807 IP 10.254.254.9.987 > 10.1.6.6.2049: Flags [.], ack 4925, win 1415, options [nop,nop,TS val 514241 ecr 567360592], length 0
+23:10:38.285310 IP 10.254.254.9.987 > 10.1.6.6.2049: Flags [P.], seq 1185:1329, ack 4925, win 1415, options [nop,nop,TS val 517012 ecr 567360592], length 144: NFS request xid 895228737 140 getattr fh 0,0/22
+23:10:38.285498 IP 10.1.6.6.2049 > 10.254.254.9.987: Flags [P.], seq 4925:5045, ack 1329, win 502, options [nop,nop,TS val 567388431 ecr 517012], length 120: NFS reply xid 895228737 reply ok 116 getattr NON 2 ids 0/9 sz 0
+23:10:38.594048 IP 10.254.254.9.987 > 10.1.6.6.2049: Flags [.], ack 5045, win 1415, options [nop,nop,TS val 517021 ecr 567388431], length 0
+23:11:05.474127 IP 10.254.254.9.987 > 10.1.6.6.2049: Flags [P.], seq 1329:1429, ack 5045, win 1415, options [nop,nop,TS val 519712 ecr 567388431], length 100: NFS request xid 912005953 96 getattr [|nfs]
+23:11:05.474237 IP 10.1.6.6.2049 > 10.254.254.9.987: Flags [P.], seq 5045:5093, ack 1429, win 502, options [nop,nop,TS val 567415620 ecr 519712], length 48: NFS reply xid 912005953 reply ok 44 getattr [|nfs]
+23:11:05.794020 IP 10.254.254.9.987 > 10.1.6.6.2049: Flags [.], ack 5093, win 1415, options [nop,nop,TS val 519740 ecr 567415620], length 0
+23:12:05.642589 IP 10.254.254.9.987 > 10.1.6.6.2049: Flags [P.], seq 1429:1529, ack 5093, win 1415, options [nop,nop,TS val 525728 ecr 567415620], length 100: NFS request xid 928783169 96 getattr [|nfs]
+23:12:05.642773 IP 10.1.6.6.2049 > 10.254.254.9.987: Flags [P.], seq 5093:5141, ack 1529, win 502, options [nop,nop,TS val 567475788 ecr 525728], length 48: NFS reply xid 928783169 reply ok 44 getattr [|nfs]
+23:12:05.955379 IP 10.254.254.9.987 > 10.1.6.6.2049: Flags [.], ack 5141, win 1415, options [nop,nop,TS val 525757 ecr 567475788], length 0
+23:12:37.647249 IP 10.254.254.9.987 > 10.1.6.6.2049: Flags [P.], seq 1529:1673, ack 5141, win 1415, options [nop,nop,TS val 528935 ecr 567475788], length 144: NFS request xid 945560385 140 getattr fh 0,0/22
+23:12:37.647379 IP 10.1.6.6.2049 > 10.254.254.9.987: Flags [P.], seq 5141:5261, ack 1673, win 501, options [nop,nop,TS val 567507793 ecr 528935], length 120: NFS reply xid 945560385 reply ok 116 getattr NON 2 ids 0/9 sz 0
+23:12:37.962526 IP 10.254.254.9.987 > 10.1.6.6.2049: Flags [.], ack 5261, win 1415, options [nop,nop,TS val 528965 ecr 567507793], length 0
+23:13:05.795452 IP 10.254.254.9.987 > 10.1.6.6.2049: Flags [P.], seq 1673:1773, ack 5261, win 1415, options [nop,nop,TS val 531744 ecr 567507793], length 100: NFS request xid 962337601 96 getattr [|nfs]
+23:13:05.795571 IP 10.1.6.6.2049 > 10.254.254.9.987: Flags [P.], seq 5261:5309, ack 1773, win 501, options [nop,nop,TS val 567535941 ecr 531744], length 48: NFS reply xid 962337601 reply ok 44 getattr [|nfs]
+23:13:06.127254 IP 10.254.254.9.987 > 10.1.6.6.2049: Flags [.], ack 5309, win 1415, options [nop,nop,TS val 531777 ecr 567535941], length 0
