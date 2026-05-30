@@ -72,7 +72,10 @@ phase_pre_reboot() {
         printf '\nGRUB_TERMINAL="console serial"\nGRUB_SERIAL_COMMAND="serial --unit=%s --speed=115200 --word=8 --parity=no --stop=1"\n' "$serial_unit" >> /etc/default/grub
     fi
     if ! grep -q 'console=ttyS' /etc/default/grub; then
-        sed -i "s/^GRUB_CMDLINE_LINUX=.*/GRUB_CMDLINE_LINUX=\"console=tty0 console=ttyS${serial_unit},115200n8\"/" /etc/default/grub
+        # Phase 14 (2026-05-22): `console=tty0` を含めると D3373 + iRMC NFS UEFI 経路で
+        # VGA console init hang する (training-tx1320 で確認)。 全機種で削除しても
+        # VGA console は標準入出力として動作するため安全。
+        sed -i "s/^GRUB_CMDLINE_LINUX=.*/GRUB_CMDLINE_LINUX=\"console=ttyS${serial_unit},115200n8\"/" /etc/default/grub
     fi
     update-grub
 

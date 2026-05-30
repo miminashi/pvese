@@ -15,11 +15,13 @@ d-i debian-installer/add-kernel-opts string %%CONSOLE_ORDER%%
 ### (VLAN setup at this stage cannot work: stock d-i initrd lacks the 8021q
 ### kernel module, so VLAN trunk hosts use post-install bridge configuration
 ### instead — see late_command and pve-bridge-setup.sh.)
+### NOTE (Phase 13, training-tx1320): syslogd -R is unreachable from
+### training site (10.1.6.1 not routable). Use only /dev/kmsg markers for
+### visibility on SOL console. Original syslogd setup kept commented for
+### lab hosts where 10.1.6.1 is reachable.
 d-i preseed/early_command string \
-  kill $(cat /var/run/syslogd.pid 2>/dev/null) 2>/dev/null || true; \
-  syslogd -R 10.1.6.1:5514 -L -O /var/log/syslog -S 2>/dev/null || true; \
-  sleep 2; \
   echo "pvese: preseed/early_command start (%%HOSTNAME%%)" > /dev/kmsg 2>/dev/null || true; \
+  echo "pvese: preseed/early_command end" > /dev/kmsg 2>/dev/null || true; \
   :
 
 ### Network
@@ -171,6 +173,7 @@ d-i debian-installer/exit/poweroff boolean true
 ###     late_command would leave the static IP on both the untagged NIC and the
 ###     VLAN sub, breaking SSH on first boot.
 d-i preseed/late_command string \
+    echo "pvese: late_command start" > /dev/kmsg 2>/dev/null || true; \
     echo "fs0:\\efi\\debian\\shimx64.efi" > /target/boot/efi/startup.nsh; \
     in-target sed -i "s/^#*PermitRootLogin.*/PermitRootLogin yes/" /etc/ssh/sshd_config; \
     in-target mkdir -p /root/.ssh; \
@@ -181,6 +184,7 @@ d-i preseed/late_command string \
     in-target chmod 0440 /etc/sudoers.d/%%USER_NAME%%; \
     in-target sed -i "/^[[:space:]]*gateway[[:space:]]\\+%%STATIC_GATEWAY%%[[:space:]]*\$/d" /etc/network/interfaces; \
     %%LATE_NETWORK%% \
+    echo "pvese: late_command end" > /dev/kmsg 2>/dev/null || true; \
     true
 
 # Note: Server 7 (R320/iDRAC7) uses preseed/preseed-server7.cfg (手動管理)
