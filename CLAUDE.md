@@ -49,11 +49,13 @@ pvese (Proxmox VE Storage Evaluation) — Supermicro IPMI と Proxmox VE を操�
 | 13号機 | `10.10.10.33` | `10.10.10.213` | ayase-web-service-13 | `config/server13.yml` |
 | 14号機 | `10.10.10.34` (iDRAC8) | `10.10.10.214` | ayase-web-service-14 | `config/server14.yml` |
 | 15号機 | `10.10.10.35` (iDRAC8) | `10.10.10.215` | ayase-web-service-15 | `config/server15.yml` |
+| training | `10.254.254.9` (iRMC S4) | DHCP | training-tx1320 (未 install) | `config/training_tx1320.yml` |
 
 4-6号機共通: ユーザ名 `claude` / パスワード `Claude123` / マザーボード Supermicro X11DPU
 7-9号機: DELL PowerEdge R320 / iDRAC SSH 鍵認証 (`ssh/idrac_rsa`) / Web/IPMI は `claude` / `Claude123` / IPMI LAN 有効化済み / FW 2.65.65.65
 10-13号機共通: Supermicro X10DRT-P (Twin Server, Nutanix OEM) / ユーザ名 `claude` / パスワード `Claude123` / 別拠点設置 + VLAN trunk (1120/1083) 経由配信 / NIC は `eno1` のみ link up / LINSTOR 未参加 / 10号機: NX-1065-G5 (BMC FW 3.65 stock) / 11-12号機: NX-3060-G5 (BIOS G4G5T4.0、Redfish に末尾 `/` 必須 — `bmc-power.sh` は `-L` で対応済) / 13号機: NX-3060-G5 (BIOS G4G5T8.0 新版、Redfish 1.3.0)
 14-15号機共通: DELL PowerEdge R430 / iDRAC8 SSH 鍵認証 (`ssh/idrac_rsa`) / Web/IPMI は `claude` / `Claude123` (claude index = 3) / IPMI LAN 有効化済み / PERC H730/H730P Mini / 本拠点設置 (4-9号機と同じ 10.10.10.0/8 + 192.168.39.0/24 DHCP) / 14号機: iDRAC FW 2.63.60.61, BIOS 2.9.1, ServiceTag GLYHKF2 / 15号機: iDRAC FW 2.85.85.85, BIOS 2.15.0, ServiceTag 53221L2
+training-tx1320 (10.254.254.9): Fujitsu PRIMERGY TX1320 M3 / iRMC S4 FW 9.08F / Serial MABK035229 / claude index = 4 (Administrator) / **一時設置・クラスタ/LINSTOR 非参加** / 別拠点 (10.254.254.0/24 + 192.168.33.0/24 DHCP) / HW RAID10 (SAS HDD 900GB × 4 → 1.8 TB) / **Redfish は HTTPS + `--ciphers DEFAULT@SECLEVEL=0` 必須** (古い DH 鍵で plain HTTPS 失敗) / **電源 On は `POWER_ON_RESET_TYPE=On` で OK** (AllowableValues は PowerState で動的: Off→`["On"]` / On→`["ForceOff","ForceRestart","Nmi","PushPowerButton"]`) / **OEM Redfish PATCH の If-Match は quotes なし** (`If-Match: <etag>`、`"..."` で 412) / **SOL は事前に `ipmitool ... sol payload enable 2 4` が必要** / KVM + MEDIA ライセンスあり (eLCM なし → eLCM 経由 RAID 操作不可) / HTML5 KVM 自動操作対応 (`scripts/irmc-kvm-*.py` + `scripts/irmc-virtualmedia.sh`、login URL に SID パラメータ保持、canvas frame refresh は Control 単独キーで誘発) / config: `config/training_tx1320.yml` / skill: `irmc-bios-raid` / OS は次セッションで install 予定
 
 接続コマンド例:
 ```sh

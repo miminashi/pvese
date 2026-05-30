@@ -119,6 +119,19 @@ os-setup 自動化が対応済みのハードウェアプラットフォーム�
 | SOL | COM2 / ttyS1 (`serial_unit: 1` 想定、実機確認要) |
 | LINSTOR | 未参加 (IB 接続性確認後に別タスクで構成決定) |
 
+### Fujitsu PRIMERGY TX1320 M3 (training-tx1320, 一時設置)
+
+| 項目 | 仕様 |
+|------|------|
+| シャーシ | PRIMERGY TX1320 M3 (タワー、MainBoard D3373) |
+| ブートデバイス | HW RAID10 VD0 (SAS HDD 900GB × 4 → 実効 1.8 TB) |
+| BMC | Fujitsu iRMC S4 (FW 9.08F, Redfish 1.0.5 + Fujitsu OEM 拡張) |
+| プロトコル | Redfish (HTTPS, `--ciphers DEFAULT@SECLEVEL=0` 必須), IPMI LAN+, SOL |
+| ライセンス | KVM (Html5Enabled=true) + MEDIA (CDImage 2 スロット) — eLCM なし |
+| 自動化対応 | 電源操作 (`bmc-power.sh` + `BMC_SCHEME` / `BMC_CURL_OPTS`、`POWER_ON_RESET_TYPE=On`)、Virtual Media (`irmc-virtualmedia.sh` Redfish OEM PATCH + ETag quotes なし)、HTML5 KVM (`irmc-kvm-screenshot.py` / `irmc-kvm-interact.py` Playwright + form login + canvas)、`irmc-bios-raid` skill |
+| 用途 | トレーニング用、クラスタ・LINSTOR 非参加 |
+| OS | 未インストール（次セッションで Debian + PVE を Virtual Media 自動化と一緒に実施予定） |
+
 ### DELL PowerEdge R320 (7-9号機)
 
 | 項目 | 仕様 |
@@ -161,11 +174,13 @@ os-setup 自動化が対応済みのハードウェアプラットフォーム�
 | 13号機 | `10.10.10.33` | `10.10.10.213` | ayase-web-service-13 | Supermicro X10DRT-P |
 | 14号機 | `10.10.10.34` (iDRAC) | `10.10.10.214` | ayase-web-service-14 | DELL PowerEdge R430 |
 | 15号機 | `10.10.10.35` (iDRAC) | `10.10.10.215` | ayase-web-service-15 | DELL PowerEdge R430 |
+| training | `10.254.254.9` (iRMC S4) | DHCP (192.168.33.0/24 + 10.254.254.0/24) | training-tx1320 (未 install) | Fujitsu PRIMERGY TX1320 M3 (一時設置・クラスタ非参加) |
 
 - 4-6号機: Supermicro X11DPU / BMC: IPMI (Redfish + CGI API)
 - 7-9号機: DELL PowerEdge R320 / BMC: iDRAC7 SSH 鍵認証
 - 10-13号機: Supermicro X10DRT-P (Twin Server, Nutanix OEM) / BMC: IPMI (Redfish + CGI API) / 別拠点 + VLAN trunk (1120/1083) / LINSTOR 未参加
 - 14-15号機: DELL PowerEdge R430 / BMC: iDRAC8 SSH 鍵認証 / PERC H730/H730P Mini / 本拠点 / LINSTOR 未参加
+- training-tx1320 (10.254.254.9): Fujitsu PRIMERGY TX1320 M3 / BMC: iRMC S4 (Redfish HTTPS+SECLEVEL=0) / HW RAID10 (SAS HDD 900GB × 4) / **一時設置・クラスタ/LINSTOR 非参加** / 別拠点 (10.254.254.0/24 + 192.168.33.0/24 DHCP) / config: `config/training_tx1320.yml`
 - OS: Debian 13 (Trixie) + Proxmox VE 9
 - PVE クラスタ: 1リージョン1クラスタ構成 (Region A: 4+5+6号機, Region B: 7+8+9号機)
 
@@ -427,6 +442,7 @@ OS インストールは以下の 8 フェーズで段階的に実行される:
   - `linstor-migration` — LINSTOR マルチリージョン VM マイグレーション
   - `idrac7` — iDRAC7 基本操作 (racadm SSH)
   - `idrac7-fw-update` — iDRAC7 ファームウェアアップデート
+  - `irmc-bios-raid` — Fujitsu iRMC S4 BIOS / RAID 操作 (TX1320 M3 training-tx1320)
   - `dell-fw-download` — Dell ファームウェアダウンロード (Playwright)
   - `tftp-server` — Docker TFTP サーバ (FW アップデート用)
   - `playwright` — Playwright セットアップ・ブラウザ自動化
