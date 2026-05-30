@@ -1,6 +1,26 @@
 #!/bin/sh
 set -eu
 
+# Per-vendor overrides via environment variables. Default values keep existing
+# Supermicro / Dell behavior unchanged. Fujitsu iRMC S4 (e.g. TX1320 M3) needs:
+#   BMC_SCHEME=https
+#   BMC_CURL_OPTS="--ciphers DEFAULT@SECLEVEL=0"
+#   POWER_ON_RESET_TYPE=On (default, OK for iRMC too — only valid when power is Off)
+#   BMC_PATCH_REQUIRES_ETAG=1   # iRMC requires If-Match (quotes-less) for PATCH
+# iRMC AllowableValues are dynamic:
+#   PowerState=Off -> ["On"]
+#   PowerState=On  -> ["ForceOff", "ForceRestart", "Nmi", "PushPowerButton"]
+# So PushPowerButton is only usable when power is already On (pulse). For Off->On
+# transitions (cycle, cold boot), use "On".
+: "${BMC_SCHEME:=https}"
+: "${BMC_CURL_OPTS:=}"
+: "${POWER_ON_RESET_TYPE:=On}"
+: "${BMC_PATCH_REQUIRES_ETAG:=}"
+# iRMC has only ["Once", "Continuous"] in BootSourceOverrideEnabled
+# AllowableValues — no "Disabled". Set =1 to send Target=None + Enabled=Once
+# instead, which effectively cancels the override on iRMC.
+: "${BMC_BOOT_OVERRIDE_NO_DISABLED:=}"
+
 usage() {
     echo "Usage: bmc-power.sh <command> <bmc_ip> <user> <pass> [args...]"
     echo ""
@@ -16,6 +36,11 @@ usage() {
     echo "  find-boot-entry <bmc_ip> <user> <pass> <pattern>  Find Boot ID by DisplayName pattern"
     echo "  boot-override-reset <bmc_ip> <user> <pass>           Disable boot override"
     echo "  postcode      <bmc_ip> <user> <pass>                Get POST code (Supermicro)"
+    echo ""
+    echo "Environment overrides (per-vendor):"
+    echo "  BMC_SCHEME              URL scheme: https (default) or http"
+    echo "  BMC_CURL_OPTS           Extra curl options, e.g. \"--ciphers DEFAULT@SECLEVEL=0\""
+    echo "  POWER_ON_RESET_TYPE     ResetType for power-on (default: On; iRMC: also On)"
     exit 1
 }
 
@@ -25,7 +50,7 @@ redfish_get() {
     pass="$3"
     path="$4"
 
-    curl -skL -u "${user}:${pass}" "https://${bmc_ip}${path}"
+    curl -skL ${BMC_CURL_OPTS} -u "${user}:${pass}" "${BMC_SCHEME}://${bmc_ip}${path}"
 }
 
 redfish_post() {
@@ -35,8 +60,8 @@ redfish_post() {
     path="$4"
     data="$5"
 
-    curl -skL -u "${user}:${pass}" \
-        -X POST "https://${bmc_ip}${path}" \
+    curl -skL ${BMC_CURL_OPTS} -u "${user}:${pass}" \
+        -X POST "${BMC_SCHEME}://${bmc_ip}${path}" \
         -H "Content-Type: application/json" \
         -d "$data"
 }
@@ -48,10 +73,24 @@ redfish_patch() {
     path="$4"
     data="$5"
 
-    curl -skL -u "${user}:${pass}" \
-        -X PATCH "https://${bmc_ip}${path}" \
-        -H "Content-Type: application/json" \
-        -d "$data"
+    if [ -n "$BMC_PATCH_REQUIRES_ETAG" ]; then
+        # iRMC quirk: PATCH requires If-Match, and the ETag must be sent
+        # WITHOUT quotes (standard "If-Match: \"<etag>\"" yields HTTP 412).
+        etag=$(curl -skL ${BMC_CURL_OPTS} -u "${user}:${pass}" \
+            -D - -o /dev/null "${BMC_SCHEME}://${bmc_ip}${path}" \
+            | sed -n 's/^[Ee][Tt][Aa][Gg]:[[:space:]]*\(.*\)\r\?$/\1/p' \
+            | head -1 | tr -d '\r"')
+        curl -skL ${BMC_CURL_OPTS} -u "${user}:${pass}" \
+            -X PATCH "${BMC_SCHEME}://${bmc_ip}${path}" \
+            -H "Content-Type: application/json" \
+            -H "If-Match: ${etag}" \
+            -d "$data"
+    else
+        curl -skL ${BMC_CURL_OPTS} -u "${user}:${pass}" \
+            -X PATCH "${BMC_SCHEME}://${bmc_ip}${path}" \
+            -H "Content-Type: application/json" \
+            -d "$data"
+    fi
 }
 
 get_system_path() {
@@ -59,8 +98,10 @@ get_system_path() {
     user="$2"
     pass="$3"
 
-    members=$(redfish_get "$bmc_ip" "$user" "$pass" "/redfish/v1/Systems/")
-    path=$(echo "$members" | sed -n 's/.*"@odata.id"[[:space:]]*:[[:space:]]*"\(\/redfish\/v1\/Systems\/[^"]*\)".*/\1/p' | head -1)
+    # iRMC escapes JSON slashes ("\/redfish\/v1\/..."), Supermicro/iDRAC don't.
+    # Normalize by stripping backslashes before parsing.
+    members=$(redfish_get "$bmc_ip" "$user" "$pass" "/redfish/v1/Systems/" | tr -d '\\')
+    path=$(echo "$members" | sed -n 's|.*"@odata.id"[[:space:]]*:[[:space:]]*"\(/redfish/v1/Systems/[^"]*\)".*|\1|p' | head -1)
 
     if [ -z "$path" ]; then
         echo "/redfish/v1/Systems/1"
@@ -95,9 +136,9 @@ cmd_on() {
     sys_path=$(get_system_path "$bmc_ip" "$user" "$pass")
     redfish_post "$bmc_ip" "$user" "$pass" \
         "${sys_path}/Actions/ComputerSystem.Reset" \
-        '{"ResetType":"On"}'
+        "{\"ResetType\":\"${POWER_ON_RESET_TYPE}\"}"
     echo ""
-    echo "Power On requested"
+    echo "Power On requested (ResetType=${POWER_ON_RESET_TYPE})"
 }
 
 cmd_forceoff() {
@@ -133,9 +174,9 @@ cmd_cycle() {
     echo "Power On..."
     redfish_post "$bmc_ip" "$user" "$pass" \
         "${sys_path}/Actions/ComputerSystem.Reset" \
-        '{"ResetType":"On"}'
+        "{\"ResetType\":\"${POWER_ON_RESET_TYPE}\"}"
     echo ""
-    echo "Power cycle complete"
+    echo "Power cycle complete (ResetType=${POWER_ON_RESET_TYPE})"
 }
 
 cmd_boot_override() {
@@ -173,8 +214,14 @@ cmd_boot_override_reset() {
     pass="$3"
 
     sys_path=$(get_system_path "$bmc_ip" "$user" "$pass")
-    redfish_patch "$bmc_ip" "$user" "$pass" "$sys_path" \
-        '{"Boot":{"BootSourceOverrideEnabled":"Disabled"}}'
+    if [ -n "$BMC_BOOT_OVERRIDE_NO_DISABLED" ]; then
+        # iRMC: BootSourceOverrideEnabled has no "Disabled" — set Target=None
+        # with Enabled=Once which effectively cancels the override.
+        payload='{"Boot":{"BootSourceOverrideEnabled":"Once","BootSourceOverrideTarget":"None"}}'
+    else
+        payload='{"Boot":{"BootSourceOverrideEnabled":"Disabled"}}'
+    fi
+    redfish_patch "$bmc_ip" "$user" "$pass" "$sys_path" "$payload"
     echo ""
     echo "Boot override disabled"
 }
