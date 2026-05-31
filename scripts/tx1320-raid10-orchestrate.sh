@@ -152,7 +152,14 @@ build() {
     # return /dev/sr1 as a CD device on this hardware. See
     # report/2026-05-22_154033_tx1320_raid10_phase14_install_completed.md.
     export PVESE_PATCH_CDROM_DETECT=1
-    echo "[orchestrate] Phase 4: remaster ISO -> $OUTPUT_ISO (PVESE_PATCH_CDROM_DETECT=$PVESE_PATCH_CDROM_DETECT)"
+    # Phase vmnfs531 (2026-05-31): keep the original Debian signed shim+grub EFI
+    # boot image instead of rebuilding it with grub-mkstandalone. The unsigned
+    # standalone GRUB (loaded directly by firmware, no shim) triple-fault reset-
+    # loops at the kernel handoff on the TX1320 / iRMC S4 FW 9.69F with
+    # "start_image() returned 0x8000000000000001" (EFI_LOAD_ERROR). The shim
+    # chain reads our /boot/grub/grub.cfg, so serial console + auto-boot still work.
+    export PVESE_KEEP_ORIG_EFI=1
+    echo "[orchestrate] Phase 4: remaster ISO -> $OUTPUT_ISO (PVESE_PATCH_CDROM_DETECT=$PVESE_PATCH_CDROM_DETECT PVESE_KEEP_ORIG_EFI=$PVESE_KEEP_ORIG_EFI)"
     "${SCRIPT_DIR}/remaster-debian-iso.sh" \
         --serial-unit="$SERIAL_UNIT" \
         --include="$STORCLI_DEB_PATH" \

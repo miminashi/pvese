@@ -33,6 +33,57 @@ d-i ──→ preseed http://<playground>/preseed/...  (cross-site 小容量 12K
 install 後: boot-override=Hdd で disk boot ──→ eno2 闇ネット IP で claude 自力 SSH
 ```
 
+## iPXE-on-CD variant (Virtual Media 経由、OpenWrt TFTP 不要)
+
+firmware PXE-ROM boot は OpenWrt 側に **dnsmasq ローカル TFTP + `dhcp_boot=ipxe.efi`** の設定を要する。
+この OpenWrt 特別設定への依存を排除したい場合 (または PXE NIC が boot order に無い場合)、**同じ embed ipxe.efi を
+最小 UEFI ISO に焼いて BMC Virtual Media で起動**する。iPXE が起動した後は通常の PXE 経路と全く同じ
+(DHCP→IPv4 リテラル mirror から kernel/initrd→playground HTTP から preseed/storcli→iPXE loader で kernel 起動)。
+OpenWrt は **通常 DHCP リースを配るだけ** でよい。2026-05-31 (vmnfs531) に training-tx1320 で完遂
+([report](../../../report/2026-05-31_073936_tx1320_virtualmedia_ipxe_cd_install.md))。
+
+```
+BMC Virtual Media (NFS/SMB) ──→ ipxe-<host>.iso (bootx64.efi = embed ipxe.efi)
+                                  │ boot-override Cd → iPXE 起動 (firmware StartImage を使わない)
+                                  ▼   以降は上の「アーキテクチャ」と同一 (DHCP→mirror→preseed→install)
+```
+
+**なぜ full Debian ISO の Virtual Media boot ではダメか**: 古い UEFI firmware (例 Fujitsu D3373 BIOS R1.22.0 2018 /
+iRMC S4 FW 9.69F) では **GRUB 2.12 が Debian 13 の 6.12 kernel を起動できない**。GRUB は kernel を firmware の
+`StartImage` (LoadImage) 経由で起動しようとし、firmware が `start_image() returned 0x8000000000000001`
+(EFI_LOAD_ERROR) で拒否 → kernel printk ゼロのまま GRUB に戻る triple-fault reset loop。standalone grub も
+純正 shim 経由の grub も同じ (shim は無言で GRUB に戻る)。**iPXE は独自 loader で kernel を起動するため回避できる**
+(= PXE が成功する理由)。よって full-ISO Virtual Media は当該 firmware では dead end、iPXE-on-CD が正解。
+
+### 手順
+```sh
+# 1. embed ipxe.efi を最小 UEFI ISO に焼く (playground の ipxe.efi を取得して)
+scp playground:/var/www/html/ipxe.efi tmp/<sid>/ipxe.efi
+./scripts/build-ipxe-iso.sh tmp/<sid>/ipxe.efi tmp/<sid>/ipxe-<host>.iso
+# BMC が読む場所 (iRMC の NFS export = playground:/var/samba/public) に置く
+scp tmp/<sid>/ipxe-<host>.iso playground:/tmp/ && ssh playground "sudo mv /tmp/ipxe-<host>.iso /var/samba/public/"
+
+# 2. Virtual Media で attach + boot (config 駆動)
+./scripts/irmc-ipxe-cd-deploy.sh config/<host>.yml ipxe-<host>.iso
+# → DisconnectCD → config(NFS) → VirtualMediaServiceRestart → On → ConnectCD → ForceOff → boot-override Cd → On
+
+# 3. 監視 (PXE 経路と同じ。SOL kernel printk + nginx fetch が真の進捗)
+.venv/bin/python scripts/sol-monitor.py --bmc-ip <ip> --bmc-user claude --bmc-pass <pass> --log-file install.log --timeout 1800
+
+# 4. install 完遂後 disk boot
+export BMC_SCHEME=https BMC_CURL_OPTS="--ciphers DEFAULT@SECLEVEL=0" BMC_PATCH_REQUIRES_ETAG=1 BMC_BOOT_OVERRIDE_NO_DISABLED=1 POWER_ON_RESET_TYPE=On
+./scripts/bmc-power.sh boot-override <ip> claude <pass> Hdd UEFI ; ./scripts/bmc-power.sh on <ip> claude <pass>
+```
+
+### iRMC S4 FW 9.69F Virtual Media の落とし穴 (iPXE-on-CD でも full-ISO でも共通)
+- 🎯 **CD メディアが host に提示されない (USB redirector 劣化)**: Redfish は `ConnectCD` 204 + `IsAnyVirtualMediaActive:true`
+  を返すのに host 側 `/dev/sr0` は "No medium found"。対策 = `POST /redfish/v1/Managers/iRMC/Actions/Oem/FTSManager.VirtualMediaServiceRestart`
+  body `{"VirtualMediaType":"CD"}` で Virtual Media worker を再起動 (`irmc-ipxe-cd-deploy.sh` が自動実行)。
+- 🎯 **ConnectCD は `PowerState=On` 必須** (Off だと HTTP 400 `ActionParameterValueNotInList`)。接続済みなら allowable が `DisconnectCD`。接続は ForceOff をまたいで持続。
+- 🎯 **boot-override Cd は `PowerState=Off` で設定 → PowerOn** の順 (On 中設定 + cycle は内蔵ディスク起動に化ける)。
+- ISO 差し替え時は DisconnectCD → config → VirtualMediaServiceRestart → On → ConnectCD で fresh に張り直す (古いハンドルは stale)。
+- iRMC S4 は `/redfish/v1/Systems/0/BootOptions` 未提供 (boot-next で CD 直接指定不可、boot-override の class 指定のみ)。
+
 ## 前提・依存
 
 - **OpenWrt** (host の拠点 LAN gateway): dnsmasq でローカル TFTP 配信、 1.16 MB の ipxe.efi を `/tmp/tftp/` に置く (tmpfs、 OpenWrt 再起動で消えるので再配置必要)。 dnsmasq 設定: `enable_tftp=1`、 `tftp_root=/tmp/tftp`、 `dhcp_boot=ipxe.efi` (server 省略=dnsmasq 自身)

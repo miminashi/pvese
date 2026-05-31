@@ -72,6 +72,7 @@ docker run --rm --dns 8.8.8.8 \
     -e "INCLUDE_BASENAMES=$INCLUDE_BASENAMES" \
     -e "EXTRA_CMDLINE=${EXTRA_CMDLINE:-}" \
     -e "PVESE_PATCH_CDROM_DETECT=${PVESE_PATCH_CDROM_DETECT:-0}" \
+    -e "PVESE_KEEP_ORIG_EFI=${PVESE_KEEP_ORIG_EFI:-0}" \
     -v "$ORIG_ISO:/input.iso:ro" \
     -v "$PRESEED:/preseed.cfg:ro" \
     -v "$(dirname "$OUTPUT_ISO"):/output" \
@@ -222,6 +223,20 @@ cp /preseed.cfg "$WORK/mod/preseed.cfg"
 EFI_UPDATE_ARGS=""
 if [ "$LEGACY_ONLY" = "true" ]; then
     echo "--- Skipping EFI patch (--legacy-only mode) ---"
+elif [ "${PVESE_KEEP_ORIG_EFI:-0}" = "1" ]; then
+    # Keep the original Debian signed shim+grub EFI boot image untouched.
+    # The signed grubx64.efi (prefix=/EFI/debian) chains:
+    #   /EFI/debian/grub.cfg -> /boot/grub/${grub_cpu}-efi/grub.cfg -> /boot/grub/grub.cfg
+    # i.e. it sources the ISO /boot/grub/grub.cfg that we overwrite below, so the
+    # serial console + auto-boot menuentry take effect WITHOUT rebuilding the EFI
+    # image. Rebuilding it with grub-mkstandalone (Option B) produces an UNSIGNED
+    # GRUB loaded directly by firmware (no shim); on the Fujitsu D3373 / iRMC S4
+    # (BIOS R1.22.0 2018, iRMC FW 9.69F) that GRUB fails to start the kernel EFI
+    # image with "start_image() returned 0x8000000000000001" (EFI_LOAD_ERROR) and
+    # triple-fault reset-loops at the GRUB->kernel handoff. Keeping the shim chain
+    # fixes it. EFI_UPDATE_ARGS stays empty so xorriso preserves the original
+    # /boot/grub/efi.img. (2026-05-31 vmnfs531, TX1320 Virtual Media install.)
+    echo "--- Keeping original signed EFI boot image (shim chain); serial via /boot/grub/grub.cfg ---"
 else
     echo "--- Patching efi.img for serial console (Option A: mtools) ---"
     xorriso -osirrox on -indev /input.iso \

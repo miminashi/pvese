@@ -805,11 +805,11 @@ issues:
     description: ""
   - id: 71
     title: training-tx1320 NFS Virtual Media 本格統合 + OS install 完遂 (Phase 2)
-    status: blocked
-    owner: "silly-rocket"
+    status: verify
+    owner: "vmnfs531"
     created: "2026-05-20T23:51:51Z"
-    updated: "2026-05-22T06:08:50Z"
-    blocked_by: "Phase 13 完了。 Phase 14 でで partman/early_command rc=127 修正と orchestrate.sh playground 同期実装が必要"
+    updated: "2026-05-30T22:41:57Z"
+    blocked_by: ""
     report: ""
     labels:
       - infra
