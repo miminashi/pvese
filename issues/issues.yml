@@ -1,4 +1,4 @@
-next_id: 73
+next_id: 74
 issues:
   - id: 1
     title: Test issue
@@ -826,3 +826,13 @@ issues:
     labels:
       - infra
     description: Phase 13 で console=tty0 削除で kernel boot 成功、 d-i installer 起動まで確認。 Phase 14 では 4 課題 (a) orchestrate build playground 同期、 (b) storcli64 binary 直接 inject + dpkg 経路廃止、 (c) console=tty0 を installed system からも削除、 (d) static_ip を conflict-free な 10.254.254.250 に変更、 を実装して preseed 完走 + RAID10 install + SSH login までの完遂を目指す
+  - id: 73
+    title: TX1320 BIOS メニュー RAID 削除→再作成 10回試行 + スキル反映 (irmc-bios-raid ハードニング)
+    status: done
+    owner: "cosmic-aho"
+    created: "2026-05-31T08:25:49Z"
+    updated: "2026-05-31T23:30:32Z"
+    blocked_by: ""
+    report: "report/2026-06-01_065958_tx1320_bios_raid_delete_recreate.md"
+    labels: []
+    description: ""

@@ -368,6 +368,78 @@ CURSOR_Y_CREATE_VD_FORM = {
 
 **詳細**: 次セッション引き継ぎレポート `report/2026-05-17_HHMMSS_tx1320_raid10_dead_end.md` 参照
 
+### 🎯 2026-05-31 (cosmic-aho): FW 9.69F KVM ログイン修正 + HII モーダルダイアログ入力不能の確定
+
+FW **9.69F** で KVM 自動化を再開しようとして判明した 2 点 (実機 training-tx1320)。
+
+#### (1) FW 9.69F の KVM ログインは cookie ベース — 旧 `open_viewer` は必ず失敗する
+
+- 旧 `scripts/irmc-kvm-interact.py` / `tmp/iter/_util.py` の `open_viewer` は login 成功を `re.search(r'sid=', page.url)` で判定していたが、**FW 9.69F は SID を URL に入れず cookie (`sid`) に格納**する。`P99` (Login submit) クリック後の URL は `/systeminfo?ms=1&lang=0#login` のまま (ログインは成功している) → 旧コードは `Failed to login after 3 attempts` で必ず死ぬ。
+- **修正 3 点** (検証済み):
+  1. login 成功判定を `ctx.cookies()` に `sid` cookie 出現で行う
+  2. viewer は `viewer.html?ms=0&lang=0` を **sid パラメータなし**で開く (cookie セッションで認証)。Web UI の "Video Redirection (HTML5)" link href も `viewer.html?ms=1&lang=0` で sid なし
+  3. `canvas#kvm` の click は `#cursor_canvas` overlay が pointer を intercept するため **`click(force=True)` 必須** (旧コードの hit-test click は timeout)
+- KVM canvas locator screenshot (1024x768) は鮮明に判読可能。BIOS Setup メニュー画面の cursor_y マップ (`CURSOR_Y_ADVANCED_TAB` 等) は 9.69F でも有効。
+- 参考実装: `tmp/503d9361/kvmlib.py` の `open_viewer` (本セッションの作業コピー)。次回これを `scripts/irmc-kvm-interact.py` に移植すべき。
+
+#### (2) 🛑 Aptio HII モーダルダイアログ/ポップアップは KVM 入力 (キー・マウス) を一切受け付けない
+
+VD 削除を BIOS メニュー (Configuration Management → Clear Configuration) で試行したところ、**Clear Configuration 確認ダイアログがキーボード・マウスの両方を完全に無視**する。OEM Screenshot (真の VGA) で裏取り済み:
+
+- **Clear Config 確認ダイアログ** (`Confirm [Disabled]` / `Yes` / `► No`、初期カーソル No):
+  - ArrowUp/ArrowDown を **20 回連打しても ► は No から 1px も動かない** (OEM screenshot で確定、frame buffer 凍結ではない)
+  - Enter (No 上) も効かない (ダイアログが閉じない)
+  - Escape も効かない (General Help popup を F1 で開いた後 Escape で閉じられない)
+  - canvas マウスクリック (Confirm/Yes/No 行の座標) も無効 (Aptio HII はマウスを解さない、 2026-05-17 #4 既出を再確認)
+  - 一方 **F1 (General Help) は効く** — F1 は下層フォームが処理するグローバルホットキーのため。だが開いた Help popup 自体は Esc/Ok で閉じられない
+- **メニュー (Setup ページ) の矢印ナビゲーションは効く** — Main tab → Advanced tab → AVAGO row (ArrowDown 14)、Main Menu → Configuration Management → Clear Configuration への移動は成功。Enter でのサブメニュー/ダイアログ展開も成功。
+- **境界**: 「Setup ページ (左寄せメニュー項目リスト)」の ↑↓ は効くが、「モーダル確認ダイアログ/ポップアップ」の ↑↓/Enter/Esc/マウスは効かない。これは 2026-05-17 #3/#4 の「Create VD form の Select RAID Level 到達不可」「drives popup frame buffer 描画問題」と同根 (HII popup/form の入力レイヤが KVM では機能しない)。
+
+> ⚠️ **上記 (2) の「入力不能 / dead-end」結論は 2026-06-01 に覆った (下記参照)**。当初は「Confirm/Yes/No モーダルに synthesized input が一切届かない」と判断したが、真相は **「フォーカスカーソル ► が常に No に固定表示され実フォーカスを反映しないため、キーが効いていないように見えていた」** だけ。実際にはキーは届いており、正しいキーシーケンス + 1キーごとの screenshot 確認で **完全自動操作が可能**。
+
+### 🎉🎯 2026-06-01 (cosmic-aho 続き): 確認ダイアログ自動操作レシピ確立 — RAID 削除→再作成を完全自動化
+
+上記 (2) の訂正。`Confirm/Yes/No` モーダル (Clear Configuration 削除確認 / Save Configuration 作成確認 / drives popup ではない方) は **operable**。鍵は「► は静的でフォーカスを示さない」ことを理解し、**1キーごとに screenshot で状態遷移を確認しながら**進めること (盲目の連続送信は不可)。
+
+**確認ダイアログ commit レシピ (実証済み、削除・作成共通):**
+1. ダイアログ展開直後 (初期フォーカス=No、► は No 上に固定表示): **`ArrowUp` ×2 → `Enter`** → `Confirm` のドロップダウン (Disabled/Enabled) が開く (screenshot size ~11866 で確認。►×1 では不足)。
+2. ドロップダウンで **`ArrowDown` → `Enter`** → `Enabled` 選択。`Confirm [Enabled]` になり `Yes` が選択可能化。
+3. **`ArrowDown` → `Enter`** → `Yes` を選択して commit。**Confirm=Enabled 後は ► が実際に `Yes` (caret y~221) へ可視移動する**ので screenshot で確認できる。
+4. "The operation has been performed successfully / ►OK" ポップアップを **`Enter`** で閉じる (この左寄せ ►OK 型は Enter で閉じる)。
+
+**Create VD (RAID0) 全自動シーケンス (FW 9.69F、実証済み):**
+1. Main → `ArrowRight` (Advanced tab) → AVAGO row (cursor_y=393) → `Enter` → AVAGO dashboard。
+2. `Enter` (Main Menu) → `Enter` (Configuration Management) → `Enter` (Create Virtual Drive)。VD が無い時のみ Config Mgmt 先頭が Create Virtual Drive。RAID Level は **[RAID0] がデフォルト**で変更不要。
+3. フォームで `Select Drives` 行 (highlight y~147) へ → `Enter` → drives popup。
+4. drives popup で `Check All` 行 (y~412) → `Enter` → 全 drive [Enabled]。
+5. `Apply Changes` (上部 y~70 を `ArrowUp` で狙うのが確実。下部 y~450 への navy は all-Enabled 行の bright cluster で highlight 誤爆) → `Enter` → ►OK を `Enter` で閉 → フォームに戻る (VD Size に容量反映、例: 4×837GB RAID0 = 3.272 TB)。
+6. `Save Configuration` (フォーム最上部、cursor 初期位置) → `Enter` → 作成確認ダイアログ → 上記 commit レシピ。
+
+**Clear Configuration (削除) 全自動シーケンス:** AVAGO dashboard → `Enter` (Main Menu) → `Enter` (Config Mgmt) → `Clear Configuration` 行 → `Enter` → 削除確認ダイアログ → 上記 commit レシピ。
+
+**🚨 検証は必ず Virtual Drive Management で**: `AVAGO dashboard` の `Virtual Drives:`/`Drive Groups:` カウントと `Configuration Management` のメニュー項目は **stale でキャッシュされ、作成/削除直後に古い状態を表示する** (作成後も VD:0、削除後も「View Drive Group Properties/Clear Configuration」を表示し続ける)。実態は **Main Menu → Virtual Drive Management** が反映 (例: "Virtual Drive 0: RAID0, 3.272TB, Optimal")。
+
+これにより **iRMC S4 KVM (FW 9.69F) で BIOS メニュー経由の RAID 削除→再作成が (単一健全セッションで) 自動化可能**と確定 (2026-06-01、RAID0 で実証)。※ RAID10 の Create VD form 内 `Select RAID Level` への到達は依然 dead-end (2026-05-17 #4) だが、RAID0/1/5/6 はデフォルト or Profile-Based で作成可能。参考実装: `tmp/<sid>/kvm_server.py` (永続セッション + コマンドファイル駆動 + ► 不可視前提の per-key 検証)。
+
+#### 🚨 無人 N サイクル自動ループの落とし穴 (2026-06-01、9 回ループ試行中に判明)
+単発の削除/作成は自動化できたが、**無人で N サイクル回す**のは以下の脆さで非常に困難。harden するには下記を厳守:
+
+1. **制御テストに F1 (General Help) を使うな**。F1 が開く Help モーダルは Esc で**閉じないことがあり**、開いたまま残ると以降の全ナビゲーションキーをブロックする (caret が固定値に張り付き「キー不達」に見える = 過去「KVM 劣化」と誤診した症状の主因)。制御確認は **ArrowRight→ArrowLeft のタブ切替** (画面 size 変化で判定、popup を開かない) を使う。
+2. **BIOS 最上位タブ (Main/Advanced) で Esc を押すな**。「Exit Without Saving (Quit without saving? Yes/No)」モーダルが開き、これも synthesized 入力を受けず以降をブロックする。AVAGO サブメニュー内の Esc は安全 (上位へ戻るだけ)。
+3. **Advanced タブ下部の密集項目で AVAGO 行への正確な着地が困難**。iSCSI(caret y≈368) / AVAGO MegaRAID(≈393) / LSI Software RAID(≈406) が ~13px 間隔で、caret 検出 ±8px では 393 と 406 を区別しきれず LSI SW RAID 等に誤入する。要・狭 tol + 着地後の screenshot 文言確認 (「AVAGO MegaRAID」の文字)。
+4. **KVM master セッションは閉じると数分スロットが残存**。次の接続はスレーブ (キー無反応) になり再接続が要る。無人ループは **1 セッションを開いたまま全サイクル実行**し、開閉を繰り返さないこと。
+5. **詰まった modal / スレーブ状態からの確実な復旧 = host を ForceOff → BMC reboot (Manager.Reset) → host を BIOS に起動**。⚠️ **Manager.Reset は host が ON / BIOS 設定中だと `Fujitsu.1.0.ActionRelatedFeatureBlocked` で恒久ブロックされる。必ず先に host を ForceOff してから** Manager.Reset すると通る (2026-06-01 実証、ユーザ指摘)。BMC 復帰後に boot-override BiosSetup + power on で fresh な BIOS Main タブ + 健全 KVM + セッション無し状態になり、その「最初の接続」だけが master かつ健全。
+6. 状態確認は KVM セッションを消費しない **OEM Screenshot (`irmc-oem-screenshot.sh`)** を優先 (KVM master を奪わない)。
+7. **🚨 AVAGO のメニュー階層は入場ごとに見え方が変わる — caret_y やサイズで盲判定するな、必ず各画面の文字を読め**。確認された 2 形態: (A) フル dashboard = `Main Menu / Help / PROPERTIES: Status.. / ACTIONS: Configure..` (Virtual Drives 数が見える)、その Main Menu を Enter すると `Configuration Management / Controller Management / Virtual Drive Management / Drive Management / Hardware Components` の **5 項目**。(B) コンパクト = AVAGO 行 Enter 直後にいきなり `Controller Management / Virtual Drive Management / Drive Management` の **3 項目だけ** (Configuration Management が無い = Create/Clear に到達できない)。2026-06-01 の careful ラウンドは (B) に入ったのに (A) のつもりで操作し、Controller Management 内を delete/create と誤認して空振りした。**対策: AVAGO 進入後まず画面の文字を読み、`Configuration Management` 行が見える形態か確認する。無ければ一段 Esc して入り直す**。VD の有無は最終的に **Virtual Drive Management** ページの `Virtual Drive 0: RAIDx, ...` 行を OEM で読むのが唯一信頼できる (dashboard カウントは stale)。
+8. **per-key 駆動を徹底**: 1 キー送るたびに screenshot を撮り、その画像の文字を読んでから次を決める。複数キーを 1 つの cmd にまとめて送ると、メニュー階層の取り違え・silent drop で容易に道を見失う (2026-06-01 で複数回実証)。eff率化は手順が完全に固まってから。
+9. RAID 構成は **コントローラ NVRAM に永続**し、host 電源断・BMC reboot では消えない (2026-06-01、VD0 が複数回の cold reset を生き延びて確認)。クリーン状態に戻したい時も RAID は明示的に Clear Configuration しない限り残る。
+7. 推奨フロー: [host off → BMC reboot → host on(BIOS) → OEM で BIOS 到達確認 → 介在セッション無しで単一セッションを開き全サイクル実行]。それでも Advanced→AVAGO の初回ナビ精度が課題で、無人完走の信頼性は低い。**現実的には削除/作成の各 confirm を人手 (Web UI KVM) で行う協調方式が最も確実** (2026-06-01 で 1 サイクル実証済)。
+
+#### KVM セッション運用の知見 (本セッションで確立)
+- iRMC S4 は KVM master を 1 セッションのみ許可。**閉じた master セッションが数分間スロットを保持**し、その間に開いた新セッションは read-only スレーブ (キー silent drop)。スレーブは master 失効後も自動昇格しない (再接続が必要)。
+- → **単一の永続 KVM セッションを保持し続ける**運用が必須 (open/close を繰り返さない)。master 取得の確認は **F1 で General Help が開くか (screenshot size 変化 +3000 程度)** でテストできる。取れなければ close → 40s 待 → 再接続をリトライ。参考: `tmp/503d9361/kvm_server.py` (コマンドファイル駆動の永続セッションサーバ)。
+- viewer 再接続直後は `#cursor_canvas` overlay で canvas が一時 invisible になり screenshot が timeout することがある → bounding_box の width/height>100 を待つ。
+
 ### ⚠️ AVAGO HII の重大落とし穴 (2026-05-17 新発見)
 
 #### #28. RAID 10 は最低 2 span 必須
