@@ -105,6 +105,16 @@ screenshot を Read する」前提で書かれており、サブエージェン
 5. **`recover.sh` の Manager.Reset は非同期** — reset 受理後に BMC がすぐ落ちず、poll が即
    「応答あり」で抜けて次の Redfish 呼出が connection refused になるレースがあったため、
    reset 後に 90s の settle 待機 + boot-override のリトライを実装で追加 (commit 済)。
+6. **🆕🆕 サブメニューから Escape で戻るとカーソルが下方向にドリフトする** — VDM から Escape で
+   Main Menu に戻った直後、`ArrowUp×2` を送っても **2 回とも Configuration Management(1番目) でなく
+   Drive Management(4番目) に着地** (cmd 037 / 067 で再現)。結局 `ArrowUp×3` の追加補正が必要だった。
+   item 1 の「メニュー階層キーはダイアログ focus 喪失の影響を受けない」とは別ニュアンスで、
+   **画面遷移を伴う Escape 直後はカーソル位置が不定**。→ Escape 後は位置を固定送信せず、
+   右ヘルプ文言で現在行を確認してから ±補正する。
+7. **🆕 Create VD フォームの `Protect Virtual Drive` は非選択 (カーソルが止まらない) 表示行** —
+   `Select RAID Level` から **ArrowDown×2 がちょうど `Select Drives`** に着地する (Protect Virtual
+   Drive はスキップ)。ArrowDown×3 だと CONFIGURE ヘッダもスキップして `Virtual Drive Name` へ
+   行き過ぎる (→ ArrowUp×1 で戻す)。前検証の「×2〜3 で ±1 補正」を具体化: 既定は ×2。
 
 ## 再現方法
 

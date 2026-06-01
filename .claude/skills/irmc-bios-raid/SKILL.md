@@ -441,6 +441,8 @@ VD 削除を BIOS メニュー (Configuration Management → Clear Configuration
 - viewer 再接続直後は `#cursor_canvas` overlay で canvas が一時 invisible になり screenshot が timeout することがある → bounding_box の width/height>100 を待つ。
 - **🆕🆕 (2026-06-01 jiggly12 で実証) modal ダイアログを開くと canvas がキーボードフォーカスを失う**。Clear/Save Configuration の確認ダイアログ・Confirm ドロップダウン・OK メッセージボックスを開いた直後は、`press` した矢印キーが**全て silent drop** され、▶No 等の静的マーカーに騙されて「効いていない」と誤認する (実際は届いていない)。**対策: ダイアログを開いたら必ず実マウスクリック `mouse 512 384` を 1 回送ってフォーカスを再確立してから**ダイアログキーを送る (`focus` コマンド = force-click では不十分、`mouse` の実クリックが必要)。メニュー階層のキーはフォーカス喪失の影響を受けない (ダイアログ限定)。なお BIOS Aptio はマウスで選択を動かさないので `mouse 512 384` (画面中央の空白) はカーソル位置を壊さず安全。
 - **🆕🆕 ダイアログ内のカーソル位置は「Confirm ドロップダウンが開くか」で決定的に判定できる**。reverse-highlight は間欠的に非描画になり ▶No は静的なので画面から位置が読めないことが多い。`ArrowUp×2 → Enter` で **Confirm ドロップダウン (Disabled/Enabled) が開けば cursor は Confirm 行**にいた証拠 (開かず dialog が閉じれば No 上だった)。最終 commit の `ArrowDown→Enter` も**結果で分岐**してよい: 成功メッセージ=Yes 押下成功 / ドロップダウン再展開=Confirm 上 (Arrow drop) / メニュー復帰=No 上 — Yes 以外は全て非破壊なので安全にリトライできる。
+- **🆕🆕 (jiggly12) サブメニューから Escape で戻った直後はカーソル位置が不定 (下方向にドリフト)**。VDM → Escape → Main Menu の後に `ArrowUp×2` を送っても Configuration Management(1番目) でなく Drive Management(4番目) に着地する事例が 2 回再現。**Escape 後は行位置を固定送信せず、右ヘルプ文言で現在行を確認してから ±補正する**。「メニューキーはダイアログと違い影響なし」は同一画面内の話で、画面遷移 (Escape) はカーソルをずらす。
+- **🆕 Create VD フォームの `Protect Virtual Drive [Disabled]` は非選択 (カーソルが止まらない) 表示行**。`Select RAID Level` から **ArrowDown×2 がちょうど `Select Drives`** (Protect はスキップ)。×3 だと CONFIGURE ヘッダもスキップして `Virtual Drive Name` へ行き過ぎる (→ ArrowUp×1 で戻す)。
 
 ### 🆕 標準手順: スクリーンショット分析はサブエージェントに委任する
 
