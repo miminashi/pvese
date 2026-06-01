@@ -437,8 +437,47 @@ VD 削除を BIOS メニュー (Configuration Management → Clear Configuration
 
 #### KVM セッション運用の知見 (本セッションで確立)
 - iRMC S4 は KVM master を 1 セッションのみ許可。**閉じた master セッションが数分間スロットを保持**し、その間に開いた新セッションは read-only スレーブ (キー silent drop)。スレーブは master 失効後も自動昇格しない (再接続が必要)。
-- → **単一の永続 KVM セッションを保持し続ける**運用が必須 (open/close を繰り返さない)。master 取得の確認は **F1 で General Help が開くか (screenshot size 変化 +3000 程度)** でテストできる。取れなければ close → 40s 待 → 再接続をリトライ。参考: `tmp/503d9361/kvm_server.py` (コマンドファイル駆動の永続セッションサーバ)。
+- → **単一の永続 KVM セッションを保持し続ける**運用が必須 (open/close を繰り返さない)。master 取得の確認は **ArrowRight→ArrowLeft のタブ切替で画面 size が変化するか**でテストする (F1 General Help は Esc で閉じないことがあり制御テストには使わない、上記ハードニング 1 参照)。取れなければ close → 40s 待 → 再接続をリトライ。これは昇格済みの永続セッションサーバ `scripts/irmc-kvm/server.py` (コマンドファイル駆動、`gain_control` が ArrowRight 方式で master を確認) が実装済み。
 - viewer 再接続直後は `#cursor_canvas` overlay で canvas が一時 invisible になり screenshot が timeout することがある → bounding_box の width/height>100 を待つ。
+- **🆕🆕 (2026-06-01 jiggly12 で実証) modal ダイアログを開くと canvas がキーボードフォーカスを失う**。Clear/Save Configuration の確認ダイアログ・Confirm ドロップダウン・OK メッセージボックスを開いた直後は、`press` した矢印キーが**全て silent drop** され、▶No 等の静的マーカーに騙されて「効いていない」と誤認する (実際は届いていない)。**対策: ダイアログを開いたら必ず実マウスクリック `mouse 512 384` を 1 回送ってフォーカスを再確立してから**ダイアログキーを送る (`focus` コマンド = force-click では不十分、`mouse` の実クリックが必要)。メニュー階層のキーはフォーカス喪失の影響を受けない (ダイアログ限定)。なお BIOS Aptio はマウスで選択を動かさないので `mouse 512 384` (画面中央の空白) はカーソル位置を壊さず安全。
+- **🆕🆕 ダイアログ内のカーソル位置は「Confirm ドロップダウンが開くか」で決定的に判定できる**。reverse-highlight は間欠的に非描画になり ▶No は静的なので画面から位置が読めないことが多い。`ArrowUp×2 → Enter` で **Confirm ドロップダウン (Disabled/Enabled) が開けば cursor は Confirm 行**にいた証拠 (開かず dialog が閉じれば No 上だった)。最終 commit の `ArrowDown→Enter` も**結果で分岐**してよい: 成功メッセージ=Yes 押下成功 / ドロップダウン再展開=Confirm 上 (Arrow drop) / メニュー復帰=No 上 — Yes 以外は全て非破壊なので安全にリトライできる。
+
+### 🆕 標準手順: スクリーンショット分析はサブエージェントに委任する
+
+**per-key 操作の各 `shot` は、主エージェントが画像を直接 Read してはならない。general-purpose サブエージェント (Agent ツール) に screenshot の絶対パスを渡し、構造化報告だけを受け取って次キーを決める。** これは 2026-06-01 (503d9361) の 3 サイクル検証で確立した方式で、(1) per-key の状態確認が確実になり、(2) 主エージェントの context を画像で埋めずに済む (長い AVAGO HII セッションでは数十〜百枚の shot を撮るため必須)。
+
+運用ルール:
+
+- **1 shot = 1 サブエージェント呼び出し**。`scripts/irmc-kvm/server.py` の `shot <name>` で `<srv-dir>/shots/<name>` を生成 → そのパスを Agent に渡す。
+- 主エージェントは**サブエージェントの報告 (テキスト) だけで判断**し、画像そのものは読まない。判断に迷う時のみ自分で Read する (例外)。
+- サブエージェントには必ず**次の 6 項目を構造化報告**させる:
+  1. **選択中タブ** (Main / Advanced / Security / Boot / Save&Exit のどれがハイライトされているか)
+  2. **カーソル行のテキスト** — ▶ 静的マーカーではなく**反転背景 (白背景に暗い文字) の行**を読む。AVAGO の ▶No 等は実フォーカスを示さない
+  3. **右ヘルプペインの全文** (行の同定に最も信頼できる。例: `"Deletes all existing configurations..."` = Clear Configuration)
+  4. **ダイアログの有無と状態** (Confirm が [Disabled]/[Enabled] のどちらか、Yes/No のどちらが反転背景か)
+  5. **黒画・凍結の有無** (全黒 / 同一フレーム)。ただし KVM canvas 黒画は framebuffer artifact のことがあるので**黒画単独で hang 判定しない** (真実は OEM 真VGA と SOL)
+  6. **画面見出し** (例: `CONFIGURE VIRTUAL DRIVE PARAMETERS`, `Virtual Drive Management`)
+
+コピペ用サブエージェントプロンプト雛形 (Agent ツール, subagent_type=general-purpose):
+
+```
+次の iRMC KVM スクリーンショット画像を Read して、AVAGO MegaRAID HII / Aptio BIOS Setup の
+画面状態を構造化報告してください。判定は ▶ 等の静的マーカーではなく「反転背景 (白背景に暗い文字)
+のハイライト行」で行うこと。
+
+画像: /home/ubuntu/projects/pvese/tmp/<sid>/srv/shots/<name>.png
+
+以下を箇条書きで報告:
+1. 選択中タブ (Main/Advanced/Security/Boot/Save&Exit のどれが選択されているか。BIOS タブが見えなければ "なし")
+2. カーソル(反転背景ハイライト)が乗っている行のテキスト全文
+3. 右ヘルプペインの全文 (画面右側の説明。無ければ "なし")
+4. ダイアログ有無と状態 (Confirm=[Disabled]/[Enabled]、Yes/No のどちらが反転背景か。無ければ "ダイアログなし")
+5. 画面が全黒か / 凍結 (描画不全) しているか
+6. 画面の見出し・タイトル行のテキスト
+推測は避け、画像から読み取れた文字をそのまま引用すること。
+```
+
+> ⚠️ commit が不可逆な操作 (Save Configuration / Clear Configuration の Yes 押下) の直前は、サブエージェント報告で **項目4 の「Yes が反転背景」を確認してから** Enter を送ること。盲目送信は禁止。
 
 ### 🎯🎯🎯 2026-06-01 (503d9361): 削除→再作成 3 サイクル完遂 — レシピ反復再現性確定 + ハードニング知見
 
@@ -451,8 +490,8 @@ cosmic-aho 続きで確立した削除→再作成レシピを **3 サイクル�
 3. **🆕 Create VD form の Select Drives ナビは ArrowDown×2 が 1 手前に着地することがある** — キードロップで `Select Drives` (▶) でなく `Select Drives From [Unconfigured Capacity]` で止まる。右ヘルプ `Dynamically updates to display as Select Drives or Select Drive Group based on the selection made in Select Drives From.` が出る行が `Select Drives` (▶)。ズレたら `ArrowDown`/`ArrowUp` で **±1 キー補正**。**`CONFIGURE VIRTUAL DRIVE PARAMETERS` ヘッダ行はカーソルがスキップ**するので ArrowDown 1 で `Select Drives`→`Virtual Drive Name` へ飛ぶことに注意。
 4. **🆕 作成完了の 2 つ目メッセージは Escape、削除完了の OK は Enter** — 作成 commit 後の `"The operation has been performed successfully." (►OK)` を Enter で閉じると次に `"Virtual Drive creation was successful. All free configurable space has been used."` (OK ボタン無し) が出る → **Escape で閉じる**。一方削除 commit 後の `"The operation has been performed successfully." (►OK)` は **Enter 1 回**で Config Mgmt に戻る (2 つ目メッセージ無し)。
 5. **🆕 ArrowDown が稀に ArrowRight に誤登録**しタブ移動 (Advanced→Security 等) が起きる → 各操作後にタブ名を確認、ズレたら ArrowLeft で戻す。
-6. **🆕 アイドルタイムアウトからの復旧フローを実証** — `kvm_server.py` の idle timeout (7200s) で master を失った場合: `killall.sh` → `pw.sh forceoff` (host Off 確認) → `bmc-reset-retry.sh` (Manager.Reset、host Off なので通る) → `wait-bmc-boot.sh` (boot-override BiosSetup + power on) → `wait-post-snap.sh` (POST 待ち + OEM で BIOS 到達確認) → `kvm_server.py` を再起動し `=== KVM server READY ===` を待つ。**復旧後 master は attempt 数回でクリーン取得でき、RAID は NVRAM 永続なので無影響**。復旧後は BIOS Main タブから AVAGO へ再ナビ (Main→ArrowRight→Advanced→ArrowDown×14→AVAGO 行)。
-7. **🆕 画像分析はサブエージェントに委任** — 各 screenshot を general-purpose サブエージェントに Read させ「選択タブ / カーソル行 / 右ヘルプ / 反転背景の位置 / 黒画有無」を構造化報告させると、per-key の状態確認が確実かつ context 消費を抑えられる。
+6. **🆕 アイドルタイムアウトからの復旧フローを実証 (1 スクリプトに昇格済)** — `server.py` の idle timeout (既定 7200s) で master を失った場合は **`./scripts/irmc-kvm-recover.sh config/training_tx1320.yml`** 1 本で復旧する (kill → host ForceOff → Manager.Reset リトライ → BMC 復帰 poll → boot-override BiosSetup + power on → POST 待ち → OEM で BIOS 到達確認)。完了後に `scripts/irmc-kvm/server.py` を再起動し `=== KVM server READY ===` を待つ。**復旧後 master は attempt 数回でクリーン取得でき、RAID は NVRAM 永続なので無影響**。復旧後は BIOS Main タブから AVAGO へ再ナビ (Main→ArrowRight→Advanced→ArrowDown×14→AVAGO 行)。
+7. **🆕 画像分析はサブエージェントに委任 (標準手順へ昇格済)** — per-key の各 screenshot 判読は主エージェントが直接 Read せず general-purpose サブエージェントに委任する。確実かつ context 消費を抑えられる。具体手順・報告 6 項目・プロンプト雛形は上記「🆕 標準手順: スクリーンショット分析はサブエージェントに委任する」節を参照。
 
 **運用ニュアンス (頻度・等価性):**
 
@@ -462,7 +501,44 @@ cosmic-aho 続きで確立した削除→再作成レシピを **3 サイクル�
 11. **Config Management メニューは VD 有無で項目数が変わる + stale は非決定的** — VD あり時の正常 = `View Drive Group Properties / Clear Configuration` (2項目)、VD なし時の正常 = `Create Virtual Drive / Create Profile Based Virtual Drive / Clear Configuration` (3項目)。操作直後は前状態の構成を残す (stale) ことがあるが**回によって stale になったりならなかったり**する。→ Clear Configuration の行位置は構成で変わる (2項目なら ArrowDown 1、3項目なら ArrowDown 2) ので**行位置を固定送信せず、行テキスト + 右ヘルプ `"Deletes all existing configurations..."` を確認してから Enter**。VD 有無の最終判定は常に Virtual Drive Management で。
 12. **🆕 KVM セッションは正常終了 (close/quit) させてから切ると次の master 取得が速い** — idle timeout で `exit 0` 正常終了した後の復旧では lingering master が残らず初回接続で即 master 取得できた (cosmic-aho の「BMC reset 直後 slave 着地リトライ要」と対照的)。無人運用で session を畳む時は強制 kill より quit を優先。
 
-> 確立済みツール群 (`tmp/503d9361/`): `kvm_server.py` (永続セッション + コマンドファイル駆動、idle timeout 7200s)、`kvmlib.py` (FW 9.69F cookie ログイン open_viewer)、`pw.sh` (config から env export して bmc-power.sh 呼出)、`snap.sh` (OEM 真VGA screenshot)、`bmc-reset-retry.sh` / `wait-bmc-boot.sh` / `wait-post-snap.sh` / `killall.sh` (復旧フロー)。次回これらを scripts/ に正式昇格する価値あり (今回は時間優先で tmp に温存)。詳細な per-key ログ + 確立レシピ = `tmp/503d9361/CYCLE_LOG.md`。
+> 検証に使ったツールは **`scripts/` に正式昇格済** (2026-06-01 issue #73、下記「昇格済みツール (scripts/) と使い方」節)。詳細な per-key ログ + 確立レシピは `tmp/503d9361/CYCLE_LOG.md` (コピー元として温存)。
+
+#### 昇格済みツール (scripts/) と使い方
+
+3 サイクル検証で機能した KVM 駆動・復旧フローを `scripts/` に昇格した (旧 `tmp/503d9361/` 使い捨て版から: 認証情報を引数化、session dir をパラメータ化、復旧フローを 1 スクリプトに集約)。
+
+| スクリプト | 役割 |
+|-----------|------|
+| `scripts/irmc-kvm/server.py` | 永続 KVM セッションサーバ (FW 9.69F)。master 制御を 1 セッションで保持し、コマンドファイル駆動で per-key 操作 |
+| `scripts/irmc-kvm/kvmlib.py` | FW 9.69F cookie ログイン `open_viewer` (`sid` cookie 方式)。`_util.py` のナビ/検出ヘルパーを再エクスポート |
+| `scripts/irmc-kvm/_util.py` + `fingerprints.json` | ナビ/検出エンジン (shot/press/nav_cursor_to_y/detect_*) + AVAGO 画面 size 指紋。`tmp/iter/` から昇格 |
+| `scripts/irmc-bmc-reset-retry.sh` | Manager.Reset を "Blocked" の間リトライ (host Off で通る) |
+| `scripts/irmc-kvm-recover.sh` | BIOS Setup + KVM 取得可状態への復旧フロー (config 駆動、上記ハードニング 6) |
+
+> 昇格しなかったもの: `cycle_runner.py` (caret 盲信欠陥で NIC 画面誤入する自律ループ — 非推奨)、`pw.sh`/`snap.sh` (既存 `bmc-power.sh`/`irmc-oem-screenshot.sh` の薄ラッパー)。
+
+**永続 KVM サーバの起動** (`run_in_background` で起動し `=== KVM server READY ===` を待つ):
+
+```sh
+BMC_IP=$(./bin/yq '.bmc_ip' config/training_tx1320.yml)
+BMC_USER=$(./bin/yq '.bmc_user' config/training_tx1320.yml)
+BMC_PASS=$(./bin/yq '.bmc_pass' config/training_tx1320.yml)
+.venv/bin/python scripts/irmc-kvm/server.py \
+    --bmc-ip "$BMC_IP" --bmc-user "$BMC_USER" --bmc-pass "$BMC_PASS" \
+    --srv-dir tmp/<session-id>/srv
+```
+
+**コマンドファイル駆動**: `<srv-dir>/in/NNN.cmd` (連番、1 行 1 コマンド) を投入 → `NNN.done` への rename を待つ → `<srv-dir>/shots/<name>` を**サブエージェントで判読** (上記標準手順)。コマンド:
+
+| コマンド | 意味 |
+|---------|------|
+| `press <key> [ms]` | キー押下 (既定 700ms 待ち)。stale フレーム回避に `press` 後 `sleep 2.5` 推奨 |
+| `keyrepeat <key> <n> [ms]` | n 回押下 |
+| `shot <name>` | `shots/<name>` に screenshot + caret_y/hl_y をログ |
+| `navy <y> [caret\|highlight] [maxpress] [settle_ms]` | カーソルを Y 座標まで移動 |
+| `sleep <s>` / `note <text>` / `quit` | 待機 / メモ / 終了 |
+
+**復旧** (master 喪失・idle timeout 時): `./scripts/irmc-kvm-recover.sh config/training_tx1320.yml` → server.py 再起動。
 
 ### ⚠️ AVAGO HII の重大落とし穴 (2026-05-17 新発見)
 

@@ -1,0 +1,342 @@
+{
+  "_comment": "AVAGO HII screen fingerprints \u2014 locator.screenshot() PNG size in bytes. Tolerance \u00b1200B.",
+  "_source": "tmp/golden/v6-v14 PNG files (2026-05-17 golden-candle session)",
+  "avago_main_vds0": {
+    "size": 17735,
+    "src": "v6_04_avago_main.png",
+    "desc": "AVAGO Main, cursor on Main Menu, VDs=0 Drives=4"
+  },
+  "main_menu_submenu_cfg_mgmt": {
+    "size": 14440,
+    "src": "v6_05_main_menu.png",
+    "desc": "Main Menu submenu, cursor on Configuration Management"
+  },
+  "create_vd_form_top_raid0": {
+    "size": 22065,
+    "src": "v8_04_create_vd_form.png",
+    "desc": "Create VD form, RAID Level=[RAID0], cursor on Select RAID Level"
+  },
+  "raid_popup_open_raid0": {
+    "size": 23280,
+    "src": "v9_02_raid_popup.png",
+    "desc": "RAID Level popup, cursor on RAID0"
+  },
+  "raid10_highlighted": {
+    "size": 23278,
+    "src": "v10_06_raid10_highlighted.png",
+    "desc": "RAID Level popup, cursor on RAID10 (after ArrowDown 5)"
+  },
+  "form_save_top_after_raid10": {
+    "size": 22764,
+    "src": "v10_07_after_raid_select.png",
+    "desc": "Create VD form, RAID Level=[RAID10] selected, cursor on Save Configuration TOP"
+  },
+  "form_at_select_drives": {
+    "size": 17660,
+    "src": "v10_08_at_select_drives.png",
+    "desc": "Create VD form, cursor on Select Drives (Span 0)"
+  },
+  "drives_popup_apply_top_all_disabled": {
+    "size": 16411,
+    "src": "v10_09_drives_popup.png",
+    "desc": "Drives popup, 4 drives all [Disabled], cursor on Apply Changes (top)"
+  },
+  "drives_popup_at_check_all": {
+    "size": 16105,
+    "src": "v10_10_at_check_all.png",
+    "desc": "Drives popup, cursor on Check All row"
+  },
+  "drives_popup_all_enabled_at_check_all": {
+    "size": 16126,
+    "src": "v10_11_after_check_all.png",
+    "desc": "Drives popup, 4 drives all [Enabled], cursor on Check All"
+  },
+  "drives_popup_at_apply_bottom": {
+    "size": 16383,
+    "src": "v10_12_at_apply.png",
+    "desc": "Drives popup, cursor on Apply Changes (bottom)"
+  },
+  "apply_ok_dialog": {
+    "size": 9462,
+    "src": "v10_13_after_apply.png",
+    "desc": "Operation successful dialog, cursor on OK"
+  },
+  "form_after_wake_save_top": {
+    "size": 18872,
+    "src": "v13_03_down_8.png",
+    "desc": "Create VD form (after some state), cursor on Save Configuration TOP. Same as v13_08."
+  },
+  "form_position_1": {
+    "size": 18928,
+    "src": "v13_03_down_1.png",
+    "desc": "Create VD form cycle position 1 from save top"
+  },
+  "form_position_2": {
+    "size": 19153,
+    "src": "v13_03_down_2.png",
+    "desc": "Create VD form cycle position 2"
+  },
+  "form_position_3": {
+    "size": 18854,
+    "src": "v13_03_down_3.png",
+    "desc": "Create VD form cycle position 3"
+  },
+  "form_position_4": {
+    "size": 21740,
+    "src": "v13_03_down_4.png",
+    "desc": "Create VD form cycle position 4"
+  },
+  "form_position_5": {
+    "size": 20347,
+    "src": "v13_03_down_5.png",
+    "desc": "Create VD form cycle position 5"
+  },
+  "form_position_6": {
+    "size": 18993,
+    "src": "v13_03_down_6.png",
+    "desc": "Create VD form cycle position 6"
+  },
+  "form_position_7": {
+    "size": 18878,
+    "src": "v13_03_down_7.png",
+    "desc": "Create VD form cycle position 7"
+  },
+  "more_than_one_span_error": {
+    "size": 11080,
+    "src": "v13_04_save_confirm_dialog.png",
+    "desc": "ERROR dialog: 'more than one span and equal Drives in each span is required', cursor on OK"
+  },
+  "form_post_form_state_alt": {
+    "size": 24468,
+    "src": "v13_02_after_enter.png",
+    "desc": "Form after F1+Enter wake (cursor undefined)"
+  },
+  "advanced_avago_row": {
+    "size": 18091,
+    "src": "tmp/iter/probe/00_after_open.png",
+    "desc": "BIOS Setup Advanced tab, 16 items + AVAGO + LSI + 2 NIC + Driver Health, cursor on AVAGO MegaRAID row. Updated 2026-05-17 (report's 8782 was inaccurate). Also matches 18003."
+  },
+  "bios_advanced_tab_onboard_devices_cursor": {
+    "size": 17919,
+    "src": "tmp/iter/iter02_run/safe_at_advanced.png",
+    "desc": "BIOS Advanced tab, cursor on Onboard Devices Configuration (top item). Initial state when first switching to Advanced."
+  },
+  "partial_access_dialog": {
+    "size": 25595,
+    "src": "tmp/iter/iter01_run/nav_avago_t1_advanced.png",
+    "desc": "iRMC HTML overlay dialog: 'Partial access privilege to virtual console received because master session is currently reconnecting.' Triggered when new viewer opens while old session is still master. Click the Ok button or wait ~3-5 min for master timeout."
+  },
+  "exit_without_saving_dialog_yes": {
+    "size": 18003,
+    "src": "tmp/iter/iter02_run/00_initial.png",
+    "desc": "Security tab BG + 'Exit Without Saving \u2014 Quit without saving? [Yes] No' canvas dialog overlay, cursor on Yes. Pressing Enter exits BIOS. Press 'n' or ArrowRight+Enter to stay."
+  },
+  "exit_dialog_on_main": {
+    "size": 15636,
+    "src": "tmp/iter/iter02_run/safe_esc_03.png",
+    "desc": "BIOS Main tab BG + Exit Without Saving dialog. Press 'n' to dismiss."
+  },
+  "exit_dialog_on_main_v2": {
+    "size": 15631,
+    "src": "tmp/iter/iter02_run/safe_esc_05.png",
+    "desc": "Same as exit_dialog_on_main (size jitter, time visible)"
+  },
+  "exit_dialog_on_main_v3": {
+    "size": 15634,
+    "src": "tmp/iter/iter02_run/safe_esc_07.png",
+    "desc": "Same \u2014 size jitter due to System Time display"
+  },
+  "exit_dialog_on_main_v4": {
+    "size": 15650,
+    "src": "tmp/iter/iter02_run/safe_at_main.png",
+    "desc": "Same \u2014 Main+exit dialog after ArrowLeft cycle"
+  },
+  "exit_dialog_on_main_v5": {
+    "size": 15654,
+    "src": "tmp/iter/iter02_run/safe_at_advanced.png",
+    "desc": "Same \u2014 Main+exit dialog after ArrowRight (didn't actually go to Advanced since dialog blocked input)"
+  },
+  "bios_security_tab_secure_boot_cursor": {
+    "size": 17001,
+    "src": "tmp/iter/iter02_run/01_avago_main.png",
+    "desc": "BIOS Security tab, cursor on Secure Boot Configuration"
+  },
+  "bios_main_tab_system_info_cursor": {
+    "size": 14616,
+    "src": "tmp/iter/iter02_run/02_main_menu_sub.png",
+    "desc": "BIOS Main tab, cursor on System Information"
+  },
+  "bios_main_tab_system_info_form": {
+    "size": 19607,
+    "src": "tmp/iter/iter02_run/04_create_vd_form.png",
+    "desc": "BIOS Main tab \u2192 System Information submenu, cursor on Board GS or similar"
+  },
+  "_predicted_unknown": "Below are predicted states that need actual measurements in iter 1-7. Update as observed.",
+  "save_confirm_dialog_disabled": {
+    "size": null,
+    "src": "TBD",
+    "desc": "Real Save confirm dialog with Confirm=[Disabled] (after 2-span valid construction)"
+  },
+  "save_confirm_dialog_enabled": {
+    "size": null,
+    "src": "TBD",
+    "desc": "Save confirm dialog with Confirm=[Enabled] (after '+')"
+  },
+  "save_confirm_yes_cursor": {
+    "size": null,
+    "src": "TBD",
+    "desc": "Save confirm dialog, cursor on Yes"
+  },
+  "save_success_dialog": {
+    "size": null,
+    "src": "TBD",
+    "desc": "Save successful dialog after Save commit"
+  },
+  "_clear_config_states": "Clear Configuration flow states",
+  "cfg_mgmt_submenu_create_vd_top": {
+    "size": null,
+    "src": "TBD",
+    "desc": "Cfg Mgmt submenu, cursor on Create Virtual Drive (top item)"
+  },
+  "cfg_mgmt_clear_config_row": {
+    "size": null,
+    "src": "TBD",
+    "desc": "Cfg Mgmt submenu, cursor on Clear Configuration"
+  },
+  "clear_config_dialog": {
+    "size": null,
+    "src": "TBD",
+    "desc": "Clear Config confirm dialog, Confirm=[Disabled], cursor on Confirm"
+  },
+  "clear_config_dialog_enabled": {
+    "size": null,
+    "src": "TBD",
+    "desc": "Clear Config confirm dialog, Confirm=[Enabled]"
+  },
+  "clear_config_success": {
+    "size": null,
+    "src": "TBD",
+    "desc": "Clear Config success dialog"
+  },
+  "_danger_states": "DANGER states that should trigger emergency Esc out",
+  "drive_mgmt_form": {
+    "size": null,
+    "src": "TBD",
+    "desc": "Drive Management individual drive form (Hardware Vendor/Model/Operation field visible)"
+  },
+  "make_unconfigured_bad_pending": {
+    "size": null,
+    "src": "TBD",
+    "desc": "Drive Mgmt form with Operation=[Make Unconfigured Bad] selected (pending Go)"
+  },
+  "drive_erase_pending": {
+    "size": null,
+    "src": "TBD",
+    "desc": "Drive Mgmt form with Operation=[Drive Erase] selected (pending Go)"
+  },
+  "factory_default_dialog": {
+    "size": null,
+    "src": "TBD",
+    "desc": "Factory Default reset confirm dialog"
+  },
+  "discard_changes_dialog": {
+    "size": null,
+    "src": "TBD",
+    "desc": "Esc-out 'Discard changes? Y/N' dialog"
+  },
+  "advanced_tab_item_00": {
+    "size": 17919,
+    "src": "tmp/iter/iter03_run/scan_00.png",
+    "desc": "Advanced tab ArrowDown 0 (Onboard Devices Configuration (top))"
+  },
+  "advanced_tab_item_01": {
+    "size": 18276,
+    "src": "tmp/iter/iter03_run/scan_01.png",
+    "desc": "Advanced tab ArrowDown 1 (item_1)"
+  },
+  "advanced_tab_item_02": {
+    "size": 18058,
+    "src": "tmp/iter/iter03_run/scan_02.png",
+    "desc": "Advanced tab ArrowDown 2 (item_2)"
+  },
+  "advanced_tab_item_03": {
+    "size": 17907,
+    "src": "tmp/iter/iter03_run/scan_03.png",
+    "desc": "Advanced tab ArrowDown 3 (item_3)"
+  },
+  "advanced_tab_item_04": {
+    "size": 18279,
+    "src": "tmp/iter/iter03_run/scan_04.png",
+    "desc": "Advanced tab ArrowDown 4 (item_4)"
+  },
+  "advanced_tab_item_05": {
+    "size": 17946,
+    "src": "tmp/iter/iter03_run/scan_05.png",
+    "desc": "Advanced tab ArrowDown 5 (item_5)"
+  },
+  "advanced_tab_item_06": {
+    "size": 18453,
+    "src": "tmp/iter/iter03_run/scan_06.png",
+    "desc": "Advanced tab ArrowDown 6 (item_6)"
+  },
+  "advanced_tab_item_07": {
+    "size": 17943,
+    "src": "tmp/iter/iter03_run/scan_07.png",
+    "desc": "Advanced tab ArrowDown 7 (item_7)"
+  },
+  "advanced_tab_item_08": {
+    "size": 17938,
+    "src": "tmp/iter/iter03_run/scan_08.png",
+    "desc": "Advanced tab ArrowDown 8 (item_8)"
+  },
+  "advanced_tab_item_09": {
+    "size": 17995,
+    "src": "tmp/iter/iter03_run/scan_09.png",
+    "desc": "Advanced tab ArrowDown 9 (item_9)"
+  },
+  "advanced_tab_item_10": {
+    "size": 17889,
+    "src": "tmp/iter/iter03_run/scan_10.png",
+    "desc": "Advanced tab ArrowDown 10 (item_10)"
+  },
+  "advanced_tab_item_11": {
+    "size": 18327,
+    "src": "tmp/iter/iter03_run/scan_11.png",
+    "desc": "Advanced tab ArrowDown 11 (item_11)"
+  },
+  "advanced_tab_item_12": {
+    "size": 18021,
+    "src": "tmp/iter/iter03_run/scan_12.png",
+    "desc": "Advanced tab ArrowDown 12 (item_12)"
+  },
+  "advanced_tab_item_13": {
+    "size": 17963,
+    "src": "tmp/iter/iter03_run/scan_13.png",
+    "desc": "Advanced tab ArrowDown 13 (item_13)"
+  },
+  "advanced_tab_item_14": {
+    "size": 18051,
+    "src": "tmp/iter/iter03_run/scan_14.png",
+    "desc": "Advanced tab ArrowDown 14 (item_14)"
+  },
+  "advanced_tab_item_15": {
+    "size": 18068,
+    "src": "tmp/iter/iter03_run/scan_15.png",
+    "desc": "Advanced tab ArrowDown 15 (item_15)"
+  },
+  "advanced_tab_item_16": {
+    "size": 18245,
+    "src": "tmp/iter/iter03_run/scan_16.png",
+    "desc": "Advanced tab ArrowDown 16 (item_16)"
+  },
+  "advanced_tab_item_17": {
+    "size": 18261,
+    "src": "tmp/iter/iter03_run/scan_17.png",
+    "desc": "Advanced tab ArrowDown 17 (item_17)"
+  },
+  "advanced_tab_item_18": {
+    "size": 18233,
+    "src": "tmp/iter/iter03_run/scan_18.png",
+    "desc": "Advanced tab ArrowDown 18 (item_18)"
+  }
+}
