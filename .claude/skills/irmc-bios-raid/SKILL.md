@@ -440,6 +440,30 @@ VD 削除を BIOS メニュー (Configuration Management → Clear Configuration
 - → **単一の永続 KVM セッションを保持し続ける**運用が必須 (open/close を繰り返さない)。master 取得の確認は **F1 で General Help が開くか (screenshot size 変化 +3000 程度)** でテストできる。取れなければ close → 40s 待 → 再接続をリトライ。参考: `tmp/503d9361/kvm_server.py` (コマンドファイル駆動の永続セッションサーバ)。
 - viewer 再接続直後は `#cursor_canvas` overlay で canvas が一時 invisible になり screenshot が timeout することがある → bounding_box の width/height>100 を待つ。
 
+### 🎯🎯🎯 2026-06-01 (503d9361): 削除→再作成 3 サイクル完遂 — レシピ反復再現性確定 + ハードニング知見
+
+cosmic-aho 続きで確立した削除→再作成レシピを **3 サイクル連続で完遂し、反復再現性を確定** (issue #73)。構成: ベースライン作成 + 3×(削除→検証→再作成→検証) = **削除レシピ ×3 + 作成レシピ ×4 を全て KVM canvas + OEM 真VGA で二重裏取り**。最終状態 VD0 RAID0 3.272TB Optimal。
+
+このセッションで上記レシピ (確認ダイアログ commit / Create VD / Clear Configuration) はそのまま安定動作し、信頼できると確定。ただし無人完走には以下の per-key ハードニングが必須:
+
+1. **🆕 KVM canvas にスクリーンショット遅延がある** — press が実際には登録済でも、直後に撮った shot が **1 つ前の stale フレーム**を返す。ArrowLeft を 2 回送って「1 回目が効いてない」と誤認したが、実際は両方効いており shot が遅れていただけだった (Security→Advanced→Main と 2 タブ動いていた)。→ **press 後に `sleep 2.5` を挟んでから shot を撮る**。盲目で「効いてない」と判断して再送するとオーバーシュートする。
+2. **🆕 コミット確認ダイアログは 2 段階に分けて裏取りする** — 確認レシピ (ArrowUp×2→Enter→ArrowDown→Enter→ArrowDown→Enter) を盲目で一括送信せず: **(段階1)** `ArrowUp×2→Enter→ArrowDown→Enter` まで送り **Confirm が [Enabled] になったか** screenshot 確認 → **(段階2)** `ArrowDown` を送り **Yes の反転背景 (ハイライト) を確認**してから最後の `Enter` (commit)。commit は不可逆なので Yes ハイライトの目視確認は必須。**▶No は静的マーカーで実フォーカスを示さない** — 判定は必ず「反転背景 (白背景に暗い文字)」で行う。
+3. **🆕 Create VD form の Select Drives ナビは ArrowDown×2 が 1 手前に着地することがある** — キードロップで `Select Drives` (▶) でなく `Select Drives From [Unconfigured Capacity]` で止まる。右ヘルプ `Dynamically updates to display as Select Drives or Select Drive Group based on the selection made in Select Drives From.` が出る行が `Select Drives` (▶)。ズレたら `ArrowDown`/`ArrowUp` で **±1 キー補正**。**`CONFIGURE VIRTUAL DRIVE PARAMETERS` ヘッダ行はカーソルがスキップ**するので ArrowDown 1 で `Select Drives`→`Virtual Drive Name` へ飛ぶことに注意。
+4. **🆕 作成完了の 2 つ目メッセージは Escape、削除完了の OK は Enter** — 作成 commit 後の `"The operation has been performed successfully." (►OK)` を Enter で閉じると次に `"Virtual Drive creation was successful. All free configurable space has been used."` (OK ボタン無し) が出る → **Escape で閉じる**。一方削除 commit 後の `"The operation has been performed successfully." (►OK)` は **Enter 1 回**で Config Mgmt に戻る (2 つ目メッセージ無し)。
+5. **🆕 ArrowDown が稀に ArrowRight に誤登録**しタブ移動 (Advanced→Security 等) が起きる → 各操作後にタブ名を確認、ズレたら ArrowLeft で戻す。
+6. **🆕 アイドルタイムアウトからの復旧フローを実証** — `kvm_server.py` の idle timeout (7200s) で master を失った場合: `killall.sh` → `pw.sh forceoff` (host Off 確認) → `bmc-reset-retry.sh` (Manager.Reset、host Off なので通る) → `wait-bmc-boot.sh` (boot-override BiosSetup + power on) → `wait-post-snap.sh` (POST 待ち + OEM で BIOS 到達確認) → `kvm_server.py` を再起動し `=== KVM server READY ===` を待つ。**復旧後 master は attempt 数回でクリーン取得でき、RAID は NVRAM 永続なので無影響**。復旧後は BIOS Main タブから AVAGO へ再ナビ (Main→ArrowRight→Advanced→ArrowDown×14→AVAGO 行)。
+7. **🆕 画像分析はサブエージェントに委任** — 各 screenshot を general-purpose サブエージェントに Read させ「選択タブ / カーソル行 / 右ヘルプ / 反転背景の位置 / 黒画有無」を構造化報告させると、per-key の状態確認が確実かつ context 消費を抑えられる。
+
+**運用ニュアンス (頻度・等価性):**
+
+8. **drives popup の Apply Changes は上部/下部どちらでも等価** — Check All の後 `ArrowDown×2` が wrap して「上部 Apply Changes」に着地することがあるが、上部・下部とも右ヘルプは `"Submits the changes made to the entire form."` で機能同一。どちらに着地しても Enter でよい (どちらかに固執して補正し過ぎない)。
+9. **Select Drives ナビのキードロップは散発** — `ArrowDown×2` での Select Drives 着地は 3 サイクル中ほぼピタリで、1 手前 (Select Drives From) に止まるのは散発 (4回中1回)。毎回ズレる訳ではないので、まず ×2 を送って右ヘルプで確認し、ズレた時だけ ±1 補正すればよい。
+10. **OEM 真VGA スクショは初回空振り→retry することがある** — `irmc-oem-screenshot.sh` は健全時でも `Preview not available after 12s, retrying` で 1 回目空振り→2 回目成功になることがある (frame buffer 詰まりとは別)。retry 機構が吸収するので失敗扱いせず待つ。
+11. **Config Management メニューは VD 有無で項目数が変わる + stale は非決定的** — VD あり時の正常 = `View Drive Group Properties / Clear Configuration` (2項目)、VD なし時の正常 = `Create Virtual Drive / Create Profile Based Virtual Drive / Clear Configuration` (3項目)。操作直後は前状態の構成を残す (stale) ことがあるが**回によって stale になったりならなかったり**する。→ Clear Configuration の行位置は構成で変わる (2項目なら ArrowDown 1、3項目なら ArrowDown 2) ので**行位置を固定送信せず、行テキスト + 右ヘルプ `"Deletes all existing configurations..."` を確認してから Enter**。VD 有無の最終判定は常に Virtual Drive Management で。
+12. **🆕 KVM セッションは正常終了 (close/quit) させてから切ると次の master 取得が速い** — idle timeout で `exit 0` 正常終了した後の復旧では lingering master が残らず初回接続で即 master 取得できた (cosmic-aho の「BMC reset 直後 slave 着地リトライ要」と対照的)。無人運用で session を畳む時は強制 kill より quit を優先。
+
+> 確立済みツール群 (`tmp/503d9361/`): `kvm_server.py` (永続セッション + コマンドファイル駆動、idle timeout 7200s)、`kvmlib.py` (FW 9.69F cookie ログイン open_viewer)、`pw.sh` (config から env export して bmc-power.sh 呼出)、`snap.sh` (OEM 真VGA screenshot)、`bmc-reset-retry.sh` / `wait-bmc-boot.sh` / `wait-post-snap.sh` / `killall.sh` (復旧フロー)。次回これらを scripts/ に正式昇格する価値あり (今回は時間優先で tmp に温存)。詳細な per-key ログ + 確立レシピ = `tmp/503d9361/CYCLE_LOG.md`。
+
 ### ⚠️ AVAGO HII の重大落とし穴 (2026-05-17 新発見)
 
 #### #28. RAID 10 は最低 2 span 必須

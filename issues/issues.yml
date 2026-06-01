@@ -829,10 +829,10 @@ issues:
   - id: 73
     title: TX1320 BIOS メニュー RAID 削除→再作成 10回試行 + スキル反映 (irmc-bios-raid ハードニング)
     status: done
-    owner: "cosmic-aho"
+    owner: "crystalline-bengio"
     created: "2026-05-31T08:25:49Z"
-    updated: "2026-05-31T23:30:32Z"
+    updated: "2026-06-01T11:49:52Z"
     blocked_by: ""
-    report: "report/2026-06-01_065958_tx1320_bios_raid_delete_recreate.md"
+    report: "report/2026-06-01_204658_tx1320_bios_raid_3cycle_validation.md"
     labels: []
     description: ""
