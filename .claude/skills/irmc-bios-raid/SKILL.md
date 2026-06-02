@@ -498,6 +498,29 @@ size が一致すれば画面遷移は成功。ずれたら投入をやり直す
 
 > ⚠️ **`server.py` の `--idle-timeout` 内に必ずコマンドを投入すること**。投入が遅れて idle-timeout (既定 3600s) に達するとセッションが終了し、再起動 (relaunch) が必要になる (r10hiicd run09 で発生、host は BIOS Setup に留まるため害はないが時間ロス)。
 
+#### 🚨🆕 (2026-06-02 session 6d0368bf): 単一ファイル recipe は先頭 ArrowRight ドロップに脆弱 — 検証付き Clear が堅牢
+
+RAID→PVE 通し 3試行検証で、上記の単一ファイル `clear-all.cmd` 投入が **試行1は成功・試行2は失敗**した。
+失敗時は **先頭 `press ArrowRight` (Main→Advanced タブ切替) が高 latency でドロップ**し、Main タブのまま
+`keyrepeat ArrowDown 14` して System Time 行に着地 → 以降の Enter/dialog が全て誤画面で実行され、
+指紋が総崩れ (c1=14584 caret_y=292、c3==c4 で commit 不発、RAID 未クリア)。c1 を読むと BIOS **Main** タブ
+だった。**r10hiicd の 10/10 はタブ切替が運良く毎回通っただけ**で、決定論ではない (ping 36-340ms の拠点)。
+
+**→ 堅牢な「検証付き Clear」手順 (試行2で実証、推奨):**
+1. `press ArrowRight 2000` + `shot tab.png` → **画像で Advanced タブ着地を確認**。Main のままなら ArrowRight 再送 (リトライ)。
+2. `navy 393 caret 25 1500` + `shot avago_row.png` → AVAGO 行へ **adaptive 着地** (`nav_cursor_to_y` が
+   ArrowDown silent drop を自己補正。blind な `keyrepeat ArrowDown 14` より確実)。size=18051/caret_y=393 で確認。
+3. `press Enter 2500`×3 + `press ArrowDown 1600` + `shot clearrow.png` → 右ヘルプ "Deletes all existing
+   configurations" + "Clear Configuration" ハイライトを確認 (VD 有り時は Config Mgmt が 2 項目: View Drive
+   Group Properties / Clear Configuration、Clear は ArrowDown 1)。
+4. modal commit を **1 ファイル**で投入 (`press Enter 3000` でダイアログ → `mouse 80 240` → `ArrowDown→Enter`
+   ×3 で No→Confirm→Enabled→Yes → commit → `Enter` (►OK) → `Escape` → `keyrepeat ArrowDown 2` → `Enter`
+   → `shot vdm.png`)。vdm.png size=**9758** = "no Virtual Drives currently available" = クリア成功。
+
+要点: **タブ切替は必ず shot で検証 (ドロップ時リトライ)、AVAGO 着地は navy で adaptive に**。指紋は最終 vdm.png
+(9758) のみが信頼でき、中間 (committed.png 等) は投入経路で size がぶれる。コマンドファイル例:
+`tmp/6d0368bf/{c-tab,c-avago,c-descend,c-commit}.cmd`。
+
 #### 🚨 無人 N サイクル自動ループの落とし穴 (2026-06-01、9 回ループ試行中に判明)
 単発の削除/作成は自動化できたが、**無人で N サイクル回す**のは以下の脆さで非常に困難。harden するには下記を厳守:
 

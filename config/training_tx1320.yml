@@ -2,7 +2,11 @@
 # 一時設置・トレーニング用。クラスタ・LINSTOR 非参加。
 #
 # 本セッション (2026-05-16) で対応機種登録 + RAID10 構成まで完了。
-# OS インストール (Debian + PVE) は次セッションで Virtual Media 自動化と一緒に実施予定。
+# 2026-06-02 (session 6d0368bf): RAID初期化→Debian→PVE 通しセットアップを iPXE-CD 経路で 3/3 実証。
+#   標準経路: ① BIOS HII KVM で RAID Clear → ② ./scripts/irmc-ipxe-cd-deploy.sh <cfg> ipxe-tx1320.iso
+#   → ③ scripts/sol-monitor.py (install 中に storcli が RAID10 作成) → ④ bmc-power.sh boot-override Hdd
+#   UEFI + on → ⑤ eno2 MAC で IP 特定 → ⑥ ./scripts/tx1320-pve-setup.sh <cfg> <ip> → pveversion/8006。
+#   詳細は pxe-deploy / irmc-bios-raid skill。
 
 hostname: training-tx1320
 domain: local
@@ -30,6 +34,10 @@ static_iface: eno1
 # was observed on 192.168.33.x (site LAN, behind OpenWrt NAT, unreachable
 # remotely); eno2 is the dark-net candidate.
 dhcp_secondary_iface: eno2
+# eno2 (dark-net) MAC — used by scripts/tx1320-pve-setup.sh to re-discover the
+# target IP from the local neighbour table when the DHCP lease changes across
+# the two PVE-setup reboots (memory #12: eno2 IP can vary).
+eno2_mac: "4c:52:62:14:de:f0"
 # Phase 14 (2026-05-22 linear-mountain): Phase 13 で使った 10.254.254.99 は
 # pvese ローカルマシン (ens19) と ARP 衝突するため SSH 到達不能だった。
 # 同 /24 内で conflict-free な 10.254.254.250 に変更 (gateway は変更不要)。

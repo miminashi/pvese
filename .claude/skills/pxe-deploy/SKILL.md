@@ -165,6 +165,40 @@ ssh playground "ip neigh | grep <eno2-MAC>"   # 闇ネット IP を特定
 ssh -F ssh/config -i ssh/id_ed25519 root@<dark-net-IP> "lsblk; /usr/local/bin/storcli64 /c0/vall show || (wget -O /usr/local/bin/storcli64 http://<playground>/firmware/storcli64.bin && chmod +x /usr/local/bin/storcli64 && /usr/local/bin/storcli64 /c0/vall show)"
 ```
 
+### Step 8: PVE セットアップ (RAID→PVE 通し) — `scripts/tx1320-pve-setup.sh`
+
+install が入れるのは **Debian + RAID10 まで**。PVE は post-install の SSH ステップ
+(`pve-setup-remote.sh` の pre-reboot/post-reboot) で入れる。これを 1 コマンド化したラッパー:
+
+```sh
+./oplog.sh ./scripts/tx1320-pve-setup.sh config/training_tx1320.yml <dark-net-IP>
+# pre-reboot(PVE repo+kernel) → reboot → post-reboot(proxmox-ve) → reboot → verify
+# 検証: pveversion / pveproxy・pvedaemon・pve-cluster active / https://<ip>:8006 = HTTP 200
+```
+
+**通し検証で確定した PVE ステップの落とし穴 (2026-06-02 session 6d0368bf、3試行)**:
+- 🚨 **実 hostname は `tx1320`** (config の `training-tx1320` ではない)。PVE は自 `hostname` を
+  /etc/hosts で非ループバック IP に解決できないと **pve-cluster が起動しない**。ラッパーは
+  `ssh root@ip hostname` で **live hostname を取得して** `pve-setup-remote.sh --hostname` に渡す
+  (config 値を盲信しない)。これで pve-cluster active を確認。
+- 🚨 **eno2 dark-net の DHCP リースは reboot をまたいで変わる** (memory #12、実測 .15→.16)。
+  PVE setup は 2 回 reboot するので、固定 IP で ssh-wait すると取り逃す。ラッパーの `wait_ssh` は
+  timeout 後に **`/24 ping-sweep で neigh を populate → eno2 MAC で再 discovery`** して IP を差し替える
+  (config の `eno2_mac` を使用)。**`ip neigh | grep` だけでは ping-sweep なしだと neigh が stale/空で
+  発見できない** — 必ず先に ping-sweep する。
+- apt はインターネット必須。`default via 192.168.33.1 dev eno1` (拠点 LAN) が生きていれば OK。
+  `pve-setup-remote.sh` の `z-fix-default-route` フックは本拠点 GW (10.10.10.1/192.168.39.1) を
+  ハードコードするが、**既に default route がある限り `if no default` ガードで発火せず無害**。
+- dark-net IP は使い回され `ssh/known_hosts` に stale entry が残る → host key 警告。
+  `ssh-keygen -f ssh/known_hosts -R <ip>` で掃除 (SSH 自体は StrictHostKeyChecking=no で接続可)。
+- timing 目安 (cross-site): PVE setup ~15-20min (pve-firmware 231MB + PVE kernel 131MB の取得が支配的)。
+
+> **RAID→PVE 通しの全体像**: ① BIOS HII KVM Clear (irmc-bios-raid skill、繰り返しテスト時の確実な
+> RAID 初期化) → ② `irmc-ipxe-cd-deploy.sh ... ipxe-tx1320.iso` (deploy) → ③ sol-monitor (install) →
+> ④ `bmc-power.sh boot-override Hdd UEFI` + on (disk boot) → ⑤ eno2 MAC で IP discovery →
+> ⑥ `tx1320-pve-setup.sh` (PVE) → ⑦ pveversion/8006 検証。**deploy ISO basename は `ipxe-tx1320.iso`
+> を明示指定**(既定 `ipxe-<hostname>.iso` ではない)。
+
 ## Phase 19 で突破した 9 つの壁 (再利用知見)
 
 | # | 壁 | 真因 | 対策 |

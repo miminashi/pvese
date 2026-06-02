@@ -1,4 +1,4 @@
-next_id: 74
+next_id: 75
 issues:
   - id: 1
     title: Test issue
@@ -835,4 +835,16 @@ issues:
     blocked_by: ""
     report: "report/2026-06-01_204658_tx1320_bios_raid_3cycle_validation.md"
     labels: []
+    description: ""
+  - id: 74
+    title: training-tx1320 RAID初期化〜PVE通し3試行検証 + iPXE-CD標準経路化
+    status: done
+    owner: "6d0368bf"
+    created: "2026-06-02T10:22:43Z"
+    updated: "2026-06-02T15:04:56Z"
+    blocked_by: ""
+    report: "report/2026-06-03_000306_tx1320_raid_pve_e2e_3trials.md"
+    labels:
+      - infra
+      - script
     description: ""
