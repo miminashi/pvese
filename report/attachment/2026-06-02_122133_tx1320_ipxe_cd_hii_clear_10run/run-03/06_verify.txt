@@ -1,0 +1,6 @@
+Run 03 — installed-system verification (ssh root@10.254.254.6)
+uname: Linux tx1320 6.12.86+deb13-amd64, Debian 13.5
+storcli /c0/vall: 0/0 RAID10 Optl RW ... 1.635 TB ; root /dev/mapper/tx1320--vg-root 1.6T (LVM)
+eno2 UP 10.254.254.6/8 (dark-net reachable)
+nginx: preseed 04:30:08 -> storcli 04:31:35 -> phonehome-setup 04:38:27 -> auto-poweroff
+RESULT: SUCCESS. Consolidated single-file BIOS HII Clear (5 checkpoints all signature-identical to runs 01-02). No #15. deploy retries 0.

@@ -1,0 +1,5 @@
+Run 07 — verification (ssh root@10.254.254.11)
+Debian 13.5, kernel 6.12.86; storcli /c0/vall: 0/0 RAID10 Optl 1.635 TB; root LVM 1.6T
+eno2 UP 10.254.254.11/8 (reachable)
+nginx: preseed 06:02:29 -> storcli 06:03:59 -> poweroff
+RESULT: SUCCESS. Consolidated Clear (5 sig-identical checkpoints). No #15. deploy retries 0.

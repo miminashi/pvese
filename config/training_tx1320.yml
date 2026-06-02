@@ -88,15 +88,18 @@ irmc_licenses:
   - MEDIA     # Permanent — Virtual Media 利用可能 (CDImage 2 スロット)
 # eLCM ライセンスなし → eLCM 経由の RAID 操作不可。RAID は BIOS RAID Util を KVM 経由で操作
 
-# RAID setup — KVM HII 経路は 2026-05-17 #4 dead-end 確定 (Select RAID Level y=128 到達不能、
-# Profile-Based VD は RAID 0/1/5/6 のみで RAID 10 不在)。
-# 2026-05-17 #5 で **storcli + preseed 経路**に転換。 KVM 操作なしで RAID10 + Debian install 完結。
-# 詳細: .claude/skills/irmc-bios-raid/SKILL.md「RAID10 storcli + preseed 経路」セクション
-#       および report/2026-05-17_*_tx1320_raid10_*.md
-# 使い方: ./scripts/tx1320-raid10-orchestrate.sh apply config/training_tx1320.yml
-# 以下の raid_setup.* (avago_arrowdown 等) は KVM 経路用の DEPRECATED 値、 storcli 経路では未使用
+# RAID setup — 2 経路あり (どちらも RAID10 実証済み):
+#  (A) BIOS HII KVM 経路: 2026-06-02 (d0a59391, issue #69) に RAID10 作成成功。
+#      かつての「2026-05-17 #4 dead-end (Select RAID Level y=128 到達不能、Profile に RAID10 不在)」は
+#      偽陰性であり覆った (旧 FW/旧ツール/カーソル誤検出の複合アーティファクト)。FW 9.69F + ハードニング済み
+#      ツール (scripts/irmc-kvm/server.py) で Select RAID Level ドロップダウンに RAID10 が並ぶことを確認。
+#      手順→ .claude/skills/irmc-bios-raid/SKILL.md「2026-06-02 ... RAID10 dead end は覆った」節。
+#  (B) storcli + preseed 経路: 2026-05-17 #5 で確立。OS install 中に RAID10 を作る用途の第一候補。
+#      使い方: ./scripts/tx1320-raid10-orchestrate.sh apply config/training_tx1320.yml
+# 以下の raid_setup.* (avago_arrowdown 等) は旧 KVM 経路のキー数カウント値で DEPRECATED
+# (現行 HII 手順は per-key 画像分析駆動、storcli 経路では未使用)
 raid_setup:
-  avago_arrowdown: 14         # DEPRECATED (KVM 経路、 dead-end)
+  avago_arrowdown: 14         # DEPRECATED (旧キー数カウント値。現行 HII 経路は per-key 画像分析駆動)
   cfgmgmt_arrowdown: 0        # DEPRECATED
   createvd_arrowdown: 0       # DEPRECATED
   raid10_arrowdown: 5         # DEPRECATED

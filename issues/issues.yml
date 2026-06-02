@@ -781,12 +781,12 @@ issues:
     description: "前セッション (Issue #67) の後続作業。\n\n未完了タスク:\n1. RAID10 実構成 (Playwright + HTML5 KVM 自動化)\n2. irmc-virtualmedia.sh 新規 (Redfish OEM)\n3. irmc-kvm-screenshot.py / irmc-kvm-interact.py 新規\n4. os-setup スキル + generate-preseed.sh の iRMC 対応\n5. Debian 13 + Proxmox VE 9 の OS インストール (standalone)\n6. ssh/config に Host tx1320 追記、config の disk/raid_controller フィールド更新\n\nplan: /home/ubuntu/.claude/plans/report-2026-05-16-095827-tx1320-m3-add-m-harmonic-thimble.md"
   - id: 69
     title: TX1320 M3 RAID10 自動構成 (KVM リトライ路線 + BMC Manager Reset)
-    status: blocked
-    owner: "silly-token"
+    status: done
+    owner: "r10-hii-revisit"
     created: "2026-05-16T04:42:26Z"
-    updated: "2026-05-20T22:31:55Z"
-    blocked_by: "\U0001F6A8\U0001F6A8 物理電源切離後も iRMC SMB worker 復活せず確認 (本セッション silly-token、 2026-05-21 16:30 JST)。 試行: Manager.Reset / VM-restart / RemoteMountEnabled toggle / 新規 ImageName での再 PATCH / host power-cycle / OEM Action ConnectCD (HTTP 204 だが silent no-op) すべて無効。 iRMC InternalEventLog も 4 日間更新停止 (logging 自体壊れている)。 次手段: (1) ユーザに iRMC Web UI 手動 ConnectCD 依頼 (過去成功例あり)、 失敗時は (2) FW 9.08F 再 reflash、 (3) factory default reset。 SMB worker 復活後の deploy 先は 10.1.6.1 限定 (10.1.6.6 は iRMC から L2 unreachable 疑い)。 patched smbd artifact は report/attachment/2026-05-21_055913_.../ に保全済。 詳細→ report/2026-05-21_072829_tx1320_raid10_smb_n6_step2_irmc_dead_again.md"
-    report: "report/2026-05-16_141200_tx1320_raid10_kvm.md"
+    updated: "2026-06-01T17:09:43Z"
+    blocked_by: ""
+    report: "report/2026-06-02_020652_tx1320_raid10_bios_hii_success.md"
     labels:
       - infra
       - script

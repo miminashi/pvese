@@ -1,0 +1,25 @@
+Run 01 — installed-system verification (ssh -F ssh/config root@10.254.254.4)
+
+=== uname ===
+Linux tx1320 6.12.86+deb13-amd64 #1 SMP PREEMPT_DYNAMIC Debian 6.12.86-1 (2026-05-08) x86_64 GNU/Linux
+=== debian_version ===
+13.5
+=== lsblk (disks) ===
+NAME  SIZE TYPE MODEL
+sda   1.6T disk PRAID EP400i
+sr0  1024M rom  HL-DT-ST DVDROM DUD0N
+sr1   5.5M rom  Virtual CDROM0
+sr2  1024M rom  Virtual CDROM1
+=== root fs ===
+/dev/mapper/tx1320--vg-root  1.6T  964M  1.6T   1% /
+=== storcli /c0/vall ===
+DG/VD TYPE   State Access Consist Cache Cac sCC     Size
+0/0   RAID10 Optl  RW     No      RWTD  -   OFF 1.635 TB
+=== ip ===
+eno1  UP  192.168.33.11/24
+eno2  UP  10.254.254.4/8   (dark-net, reachable from claude host)
+
+Timeline: preseed GET 03:37:27 -> storcli GET 03:38:57 -> phonehome-setup GET 03:46:05
+          -> auto-poweroff ~03:50 -> firstboot phonehome 03:50:31 (eno2 still 169.254 APIPA at that instant)
+          -> disk boot -> eno2 got 10.254.254.4 -> SSH OK 03:52
+RESULT: SUCCESS. BIOS HII Clear (single-file commit recipe, 1st try) + iPXE-CD + storcli RAID10. No #15 netcfg stuck.

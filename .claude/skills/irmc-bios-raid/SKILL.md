@@ -304,7 +304,38 @@ ArrowDown を 14 回押すと wrap-around。 silent drop (同じ y 連続) は s
 
 詳細→ [report/2026-05-17_092256_tx1320_raid10_active_cursor.md](../../../report/2026-05-17_092256_tx1320_raid10_active_cursor.md)
 
-### 🛑 2026-05-17 #4: RAID10 自動化 dead end 確定 (a-goofy-graham セッション)
+### 🎉🎯🎯🎯 2026-06-02 (d0a59391, issue #69): RAID10 dead end は **覆った** — BIOS HII KVM から RAID10 作成成功
+
+**2026-05-17 #4 の「RAID10 は AVAGO HII KVM 経路では不可能」結論は誤り (偽陰性) だった**。FW 9.69F + ハードニング済みツール (`scripts/irmc-kvm/server.py`) + per-key サブエージェント画像分析で、BIOS Setup HII から **RAID10 VD を作成し `Virtual Drive 0: RAID10, 1.636TB, Optimal` を KVM + OEM 真VGA の両方で裏取り**した (4×900GB SAS → 2 span ミラー+ストライプ = 全容量 3.272TB の半分 1.636TB)。report `2026-06-02_*_tx1320_raid10_bios_hii_success.md`。
+
+**dead end が偽陰性だった理由**:
+- FW 9.69F の Create VD フォームは **開いた瞬間カーソルが `Select RAID Level` 行に乗っている** (2026-05-17 の「Save Config top から ArrowDown で y=128 を skip」は旧 FW/旧ツール/`[RAID0]` cluster 誤検出の複合アーティファクト)。
+- `Select RAID Level` の Enter で開くドロップダウンに **`RAID0 / RAID1 / RAID5 / RAID6 / RAID00 / RAID10`** が並ぶ (RAID50/60 は "if supported" で 4 ドライブ時は非表示)。**RAID10 は 0 ドライブ選択時点でも出る**。右ヘルプも "0, 1, 5, 6 (if supported), 00, 10, 50, and 60 (if supported)" と明記。
+- RAID10 選択でフォームが **`SELECT SPAN(S): / Span 0: / Select Drives / Add More Spans`** に変化 (spanned 構成 UI)。
+
+**RAID10 作成 全手順 (FW 9.69F、実証済み)**:
+1. 既存 VD があれば Clear Configuration (下記 commit レシピ)。クリア後 Config Mgmt 再進入で `Create Virtual Drive` が出る (Config Mgmt メニューは stale なので一段 Escape→再進入でリフレッシュ)。
+2. Config Mgmt → `Create Virtual Drive` → Enter。フォームはカーソルが `Select RAID Level [RAID0]` に乗って開く。Enter → ドロップダウン → `ArrowDown×5` で `RAID10` → Enter。
+3. `Span 0:` 配下の `Select Drives` へ移動 (Select RAID Level から ArrowDown: Protect スキップ→Select Drives From→SELECT SPAN(S)/Span0 ヘッダスキップ→Select Drives) → Enter → drive popup。
+4. drive popup で **2 台だけ** Enabled にする (各ドライブ: Enter で Disabled/Enabled ドロップダウン→`mouse 230 384` でポップアップにフォーカス→ArrowDown→Enter)。上部 `Apply Changes` (ArrowUp で到達) → Enter → ►OK を Enter。
+5. フォームに戻り `Add More Spans` → Enter (Span 1 生成)。`Span 1:` 配下の `Select Drives` → Enter → drive popup には**残り 2 台のみ表示**されるので `Check All` → Enter → `Apply Changes` → Enter → ►OK。
+6. フォームに `Span 0:` + `Span 1:` + `Virtual Drive Size 1.636 TB` が出る。`Save Configuration` (フォーム最上部) → Enter → 作成確認ダイアログ → commit レシピ → 1st ►OK を Enter → **2nd msg ("Virtual Drive creation was successful...") は Escape**。
+7. 裏取り: Main Menu → Virtual Drive Management → `Virtual Drive 0: RAID10, 1.636TB, Optimal`。VD0 Enter で `Raid Level [RAID10] / Status [Optimal] / Size 1.636 TB` も確認可。
+
+**🆕🆕🆕 今回確立した重大ハードニング知見 (上記レシピ成立の鍵)**:
+- **🚨 `keyrepeat` は高 latency 拠点 (training-tx1320, ping 60-340ms) で多重登録する** (800ms 間隔で 4 press → 約 6 行移動 = 1.5x)。**間隔 ≥1600ms にすると 1:1 になる**。精密ナビは `keyrepeat <key> <n> 1600` か単発 `press` を使う。単発 press (コマンドファイル 1 つ 1 キー) は確実に 1:1。
+- **🚨 commit/ドロップダウン確認ダイアログの操作は 1 つのコマンドファイルに全部入れる**。ダイアログを開く Enter とその後の `mouse→ArrowDown→Enter` を別コマンドファイルに分けると、その間にフォーカスが失われ矢印が drop され ►No に当たって dialog がキャンセルされる (058/059 で実証)。`press Enter (open) → sleep 3 → mouse <items> → sleep → ArrowDown → Enter` を 1 ファイルで送る (060 で成功)。
+- **🚨 フォーカス確立クリックは「項目の上」を狙う。画面中央 (512 384) は不可**。確認ダイアログ (Confirm/Yes/No) は開いた直後に `mouse 80 240` (左の項目帯)。中央 (512 384) はダイアログ項目が左上にあるため空白部に当たり、矢印が drop される。
+  - **Confirm の Disabled/Enabled ドロップダウンには別途クリック不要**。ダイアログ冒頭の `mouse 80 240` で得たフォーカスがそのまま引き継がれ、ArrowDown→Enter で直接操作できる (commit レシピを 1 コマンドファイルにまとめる前提)。
+  - **ドライブの Disabled/Enabled ドロップダウンは `mouse 230 384` (ポップアップ箱の上) が必須**。ドライブ行へナビ後に別コマンドで開くためフォーカスが切れており、再クリックしないと ArrowDown が drop する。
+- **ArrowDown は No から Confirm に wrap する** (No→ArrowDown→Confirm)。`ArrowUp×2` より `ArrowDown×1 wrap` が 1 キーで確実。
+- **ドライブの Disabled/Enabled ドロップダウンは `mouse 230 384` フォーカス必須**。これ無しの ArrowDown は drop、NumpadAdd 直接トグルも drop (036 で実証)。
+- **重い画面遷移 (メニュー→フォーム) は 2.5s sleep でも stale スクショになる**ことがある → 同じ前画面が写ったら追加 sleep + 再 shot (024→025 で実証)。
+- 作成 2nd msg は **Escape**、削除/作成 1st ►OK は **Enter** (挙動差、SKILL 既出を再確認)。
+
+---
+
+### 🛑 [SUPERSEDED — 2026-06-02 に覆った、上記参照] 2026-05-17 #4: RAID10 自動化 dead end 確定 (a-goofy-graham セッション)
 
 `tmp/iter/_util.py` に `identify_form_cursor_by_probe(vp, sdir, label, expected_y)` + `detect_popup_cursor_row(...)` + `PROBE_FORBIDDEN_Y` / `PROBE_SAFE_Y` / `CURSOR_Y_CREATE_VD_FORM` を追加。 静的検証 (既存 PNG) で `_rowwise_diff_y` が cursor 行を確実に特定可能なことを実証 (size delta -38 でも `_rowwise_diff_y` は y=148 を pin pointer 検出、 期待 y=147 と一致)。
 
@@ -419,7 +450,53 @@ VD 削除を BIOS メニュー (Configuration Management → Clear Configuration
 
 **🚨 検証は必ず Virtual Drive Management で**: `AVAGO dashboard` の `Virtual Drives:`/`Drive Groups:` カウントと `Configuration Management` のメニュー項目は **stale でキャッシュされ、作成/削除直後に古い状態を表示する** (作成後も VD:0、削除後も「View Drive Group Properties/Clear Configuration」を表示し続ける)。実態は **Main Menu → Virtual Drive Management** が反映 (例: "Virtual Drive 0: RAID0, 3.272TB, Optimal")。
 
-これにより **iRMC S4 KVM (FW 9.69F) で BIOS メニュー経由の RAID 削除→再作成が (単一健全セッションで) 自動化可能**と確定 (2026-06-01、RAID0 で実証)。※ RAID10 の Create VD form 内 `Select RAID Level` への到達は依然 dead-end (2026-05-17 #4) だが、RAID0/1/5/6 はデフォルト or Profile-Based で作成可能。参考実装: `tmp/<sid>/kvm_server.py` (永続セッション + コマンドファイル駆動 + ► 不可視前提の per-key 検証)。
+これにより **iRMC S4 KVM (FW 9.69F) で BIOS メニュー経由の RAID 削除→再作成が (単一健全セッションで) 自動化可能**と確定 (2026-06-01、RAID0 で実証)。**RAID10 の Create VD form 内 `Select RAID Level` への到達も 2026-06-02 (d0a59391, issue #69) に実証され、`Select RAID Level` ドロップダウンに RAID10 が並ぶことを確認 → RAID10 を含む全レベルが HII KVM で作成可能と確定**（旧「Select RAID Level dead-end」判定は覆った。上記「🎉🎯🎯🎯 2026-06-02 ... RAID10 dead end は覆った」節を参照）。参考実装: `tmp/<sid>/kvm_server.py` (永続セッション + コマンドファイル駆動 + ► 不可視前提の per-key 検証)。
+
+### 🎯🎯🎯 2026-06-02 (r10hiicd): Clear Configuration は **単一コマンドファイルで完全自動化可能** — 10/10 決定論再現
+
+OS install 10 回反復 (各 install 前に BIOS HII で RAID 構成を Clear) で、**Clear Configuration の全工程を 1 つのコマンドファイルにまとめて投入し 10/10 で成功**。per-key の対話的フィードバックは不要 (recipe が決定論的)。`scripts/irmc-kvm/server.py` の永続セッションへ以下 1 ファイルを投入するだけ:
+
+```
+press ArrowRight 1800           # Main -> Advanced
+keyrepeat ArrowDown 14 1600     # -> AVAGO MegaRAID 行 (1600ms で 1:1、高 latency でも過剰登録なし)
+shot c1_avago.png
+press Enter 2500                # -> AVAGO dashboard (cursor=Main Menu)
+press Enter 2500                # -> Main Menu (cursor=Configuration Management)
+press Enter 2500                # -> Config Mgmt (cursor=View Drive Group Properties)
+press ArrowDown 1600            # -> Clear Configuration 行
+shot c2_clear_row.png
+press Enter 3000                # Clear 確認ダイアログを開く
+shot c3_dialog.png
+mouse 80 240                    # ダイアログ項目帯にフォーカス確立 (中央 512,384 は不可)
+sleep 1
+press ArrowDown 1800            # No -> wrap -> Confirm
+press Enter 1800                # Confirm [Disabled/Enabled] ドロップダウンを開く
+press ArrowDown 1800            # Disabled -> Enabled
+press Enter 1800                # Enabled 選択 (フォーカス継続のため別クリック不要)
+press ArrowDown 1800            # Confirm -> Yes
+press Enter 2000                # commit
+shot c4_committed.png           # "The operation has been performed successfully" + ►OK
+press Enter 2500                # ►OK を閉じる
+press Escape 2500               # -> Main Menu
+keyrepeat ArrowDown 2 1600      # -> Virtual Drive Management
+press Enter 2500
+shot c5_vdm_verify.png          # "no Virtual Drives currently available" = Clear 成功
+quit
+```
+
+**🔑 検証は KVM canvas PNG の byte size を指紋として使える** (10 run 全て同一値、locator capture mode):
+
+| チェックポイント | PNG size | caret_y | 意味 |
+|---|---|---|---|
+| c1_avago | 18051 | 393 | AVAGO MegaRAID 行 highlight |
+| c2_clear_row | 10135 | 83/90 | Clear Configuration 行 highlight (help="Deletes all existing configurations") |
+| c3_dialog | 11383 | 259 | Clear 確認ダイアログ (Confirm[Disabled]/Yes/►No) |
+| c4_committed | 9462 | 102 | "operation performed successfully / ►OK" |
+| c5_vdm_verify | 9758 | None | "no Virtual Drives currently available" |
+
+size が一致すれば画面遷移は成功。ずれたら投入をやり直す (本 10 run では一度もずれなかった)。BIOS POST 後 `server.py` の `server_ready.png` は BIOS Main で size≈14600 / caret_y=178。コマンドファイル例: `tmp/r10hiicd/clear-all.cmd`。RAID10 作成 (storcli) は OS install の preseed `partman/early_command` が担当 (Clear 後の `delete force` は no-op、create が効く)。
+
+> ⚠️ **`server.py` の `--idle-timeout` 内に必ずコマンドを投入すること**。投入が遅れて idle-timeout (既定 3600s) に達するとセッションが終了し、再起動 (relaunch) が必要になる (r10hiicd run09 で発生、host は BIOS Setup に留まるため害はないが時間ロス)。
 
 #### 🚨 無人 N サイクル自動ループの落とし穴 (2026-06-01、9 回ループ試行中に判明)
 単発の削除/作成は自動化できたが、**無人で N サイクル回す**のは以下の脆さで非常に困難。harden するには下記を厳守:
@@ -644,12 +721,14 @@ ipmitool -I lanplus -H 10.254.254.9 -U claude -P Claude123 sol deactivate
 
 ## RAID10 storcli + preseed 経路 (2026-05-17 #5 d-eager-island で確立)
 
-KVM HII 経路 (`raid create-r10` の自動化試行) は 2026-05-17 #4 で **dead end 確定**:
-- Aptio HII Create VD form の "Select RAID Level" (y=128) に ArrowDown/Up/Tab/Click/Home/End/PageUp/PageDown の全 9 経路で navigation 不能
-- Profile-Based VD は Generic RAID 0/1/5/6 のみで RAID 10 不在
+> ⚠️ **2026-06-02 (d0a59391, issue #69) 更新**: かつて KVM HII 経路は 2026-05-17 #4 で「dead end 確定」とされたが、これは **偽陰性であり覆った**。FW 9.69F + ハードニング済みツールで `Select RAID Level` に到達でき、RAID10 を含む全レベルが HII KVM で作成可能（上記「🎉🎯🎯🎯 2026-06-02 ... RAID10 dead end は覆った」節）。以下の旧「dead end」記述は **歴史的経緯**として残す。storcli + preseed 経路は HII KVM 経路とは独立した有効な代替であり、OS install 中に RAID10 を作る用途では引き続き第一候補。
+
+旧判定 (2026-05-17 #4、**現在は覆った**):
+- Aptio HII Create VD form の "Select RAID Level" (y=128) に ArrowDown/Up/Tab/Click/Home/End/PageUp/PageDown の全 9 経路で navigation 不能（と当時は判断 → 旧 FW/旧ツール/カーソル誤検出の複合アーティファクトだった）
+- Profile-Based VD は Generic RAID 0/1/5/6 のみで RAID 10 不在（→ Profile 経路に依らず通常の Create Virtual Drive で RAID10 を直接選択可能と判明）
 - 詳細: [report/2026-05-17_101536_tx1320_raid10_dead_end.md](../../../report/2026-05-17_101536_tx1320_raid10_dead_end.md)
 
-新方針: **Debian preseed `partman/early_command` で storcli64 を実行して RAID10 を作成 → そのまま OS install へ続行**。
+storcli 経路の方針: **Debian preseed `partman/early_command` で storcli64 を実行して RAID10 を作成 → そのまま OS install へ続行**。
 KVM 操作を一切使わずに RAID10 + Debian + 必要パッケージまで 1 ISO・1 boot で完結する。
 
 Web 版 Claude の知見:

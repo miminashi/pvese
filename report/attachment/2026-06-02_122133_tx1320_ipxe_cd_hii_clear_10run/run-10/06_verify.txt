@@ -1,0 +1,5 @@
+Run 10 — verification (ssh root@10.254.254.14)
+Debian 13.5, kernel 6.12.86; storcli /c0/vall: 0/0 RAID10 Optl 1.635 TB; root LVM 1.6T
+eno2 UP 10.254.254.14/8 (reachable)
+RESULT: SUCCESS. Consolidated Clear (5 sig-identical checkpoints). No #15. deploy retries 0.
+=== 10/10 RUNS COMPLETE — 100% SUCCESS ===

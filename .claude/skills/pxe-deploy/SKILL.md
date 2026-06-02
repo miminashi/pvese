@@ -84,6 +84,14 @@ export BMC_SCHEME=https BMC_CURL_OPTS="--ciphers DEFAULT@SECLEVEL=0" BMC_PATCH_R
 - ISO 差し替え時は DisconnectCD → config → VirtualMediaServiceRestart → On → ConnectCD で fresh に張り直す (古いハンドルは stale)。
 - iRMC S4 は `/redfish/v1/Systems/0/BootOptions` 未提供 (boot-next で CD 直接指定不可、boot-override の class 指定のみ)。
 
+### iPXE-on-CD 10-run 堅牢性検証 (2026-06-02 r10hiicd、各 install 前に BIOS HII で RAID Clear)
+
+training-tx1320 に対し「BIOS HII Clear Configuration → iPXE-CD deploy → preseed+storcli RAID10 → 検証」を **10 回連続ре反復し 10/10 成功** (RAID10 Optl 1.635TB を全 run で SSH 裏取り、 report `2026-06-02_122133_tx1320_ipxe_cd_hii_clear_10run`)。観察:
+- **deploy 再試行 0/10** — `irmc-ipxe-cd-deploy.sh` の VirtualMediaServiceRestart で USB redirector 劣化を毎回回避。10 連続 deploy で CD 提示失敗ゼロ (Phase 15-18 の劣化問題は本経路では再現せず)。
+- **`interface=auto` のままでも #15 (d-i netcfg stuck) は 0/10** — 本検証で使った embed ipxe.efi は旧 `interface=auto` 版だったが netcfg stuck は一度も起きなかった。これは #15 が **タイミング依存の非決定的事象** (eno2 link-up が netcfg と重なるか) であることを裏付ける。PXE-TFTP 経路の 10-run では同じ `interface=auto` で 30% 発生したのと対照的。**ただし `interface=eno1` 固定 (決定論的解消) は引き続き推奨** — 0/10 は「起きなかった」であって「起きない」ではない。
+- 各 install ~8-10min (preseed GET → phonehome → auto-poweroff)、 総時間 ~25-30min/run (BIOS Clear + POST + install + disk boot + 検証)。
+- install 中は kernel cmdline `console=ttyS0` のため **VGA はブランク** (d-i は SOL に出る)。OEM screenshot で d-i は撮れない → 進捗は SOL log + playground nginx access.log (preseed/storcli/phonehome GET) が一次情報。installed system は VGA tty1 に getty が出る (login プロンプト撮影可)。
+
 ## 前提・依存
 
 - **OpenWrt** (host の拠点 LAN gateway): dnsmasq でローカル TFTP 配信、 1.16 MB の ipxe.efi を `/tmp/tftp/` に置く (tmpfs、 OpenWrt 再起動で消えるので再配置必要)。 dnsmasq 設定: `enable_tftp=1`、 `tftp_root=/tmp/tftp`、 `dhcp_boot=ipxe.efi` (server 省略=dnsmasq 自身)

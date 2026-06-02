@@ -56,7 +56,9 @@ log "enumerating physical drives:"
 EID_SLOTS=$("$SCLI" /c0/eall/sall show | awk '/HDD|SSD/ {print $1}' | head -4)
 COUNT=$(echo "$EID_SLOTS" | grep -c ':')
 log "found drives: $COUNT"
-echo "$EID_SLOTS" | tee -a "$LOG" >&2
+# busybox in the d-i environment has no `tee`; append to LOG and echo to stderr separately.
+echo "$EID_SLOTS" >> "$LOG"
+echo "$EID_SLOTS" >&2
 
 if [ "$COUNT" -lt 4 ]; then
     log "FATAL: need 4 drives for RAID10, got $COUNT"
@@ -71,7 +73,10 @@ log "creating RAID10 with drives=$DRIVES pdperarray=2"
 }
 
 log "post-create VD list:"
-"$SCLI" /c0/vall show all | tee -a "$LOG" >&2
+# tee-free (busybox d-i has no `tee`): capture once, write to LOG and stderr.
+VD_SHOW=$("$SCLI" /c0/vall show all)
+echo "$VD_SHOW" >> "$LOG"
+echo "$VD_SHOW" >&2
 
 if ! "$SCLI" /c0/vall show | grep -E 'RAID-?10'; then
     log "FATAL: RAID10 not found in VD list"

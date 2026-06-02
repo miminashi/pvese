@@ -1,0 +1,5 @@
+Run 09 — verification (ssh root@10.254.254.13)
+Debian 13.5, kernel 6.12.86; storcli /c0/vall: 0/0 RAID10 Optl 1.635 TB; root LVM 1.6T
+eno2 UP 10.254.254.13/8 (reachable)
+RESULT: SUCCESS. Consolidated Clear (5 sig-identical checkpoints). No #15. deploy retries 0.
+Note: prior run09 KVM session expired at idle-timeout (3600s) due to malformed cp tool calls delaying command submission ~1h; relaunched KVM (run09b) and Clear succeeded. Host stayed safely at BIOS Setup meanwhile.

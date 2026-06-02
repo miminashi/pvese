@@ -1,0 +1,19 @@
+Run 01 — d-i partman/early_command storcli RAID10 creation (SOL excerpt)
+(VGA is blank during install because kernel cmdline uses console=ttyS0; d-i runs on serial.)
+
+[ 143.135765] pvese: raid10-setup deleting existing VDs (best effort)
+[ 143.151190] pvese: raid10-setup enumerating physical drives:
+[ 143.175549] pvese: raid10-setup found drives: 4
+[ 143.183131] pvese: raid10-setup creating RAID10 with drives=252:0,252:1,252:2,252:3 pdperarray=2
+[ 143.956668] sd 1:2:0:0: [sda] 3514171392 512-byte logical blocks: (1.80 TB/1.64 TiB)
+[ 144.065242] sd 1:2:0:0: [sda] Attached SCSI disk
+[ 144.965898] pvese: raid10-setup OK: RAID10 created
+[ 144.971394] pvese: partman/early_command end (rc=0)
+[ 144.977464] /tmp/setup-raid10-storcli.sh: line 59: tee: not found  (non-fatal cosmetic; RAID10 still OK)
+[ 144.978208] 0/0   RAID10 Optl  RW     No      RWTD  -   OFF 1.635 TB
+d-i window: (1*installer) — partitioner started on /dev/sda (sda1 sda2 sda3)
+
+nginx access.log (true progress, host site-LAN 10.1.5.1):
+  GET /preseed/training-tx1320.cfg      200 12011    (netcfg OK — NO #15 stuck)
+  GET /firmware/storcli64.bin           200 8212480
+  GET /firmware/setup-raid10-storcli.sh 200 2719

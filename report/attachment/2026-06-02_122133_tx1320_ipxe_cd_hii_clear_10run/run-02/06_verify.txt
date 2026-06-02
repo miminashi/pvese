@@ -1,0 +1,8 @@
+Run 02 — installed-system verification (ssh root@10.254.254.5)
+uname: Linux tx1320 6.12.86+deb13-amd64, Debian 13.5
+lsblk: sda 1.6T PRAID EP400i ; root /dev/mapper/tx1320--vg-root 1.6T (LVM)
+storcli /c0/vall: 0/0 RAID10 Optl RW ... 1.635 TB
+eno1 UP 192.168.33.11/24 ; eno2 UP 10.254.254.5/8 (dark-net reachable)
+
+nginx timeline: preseed 04:06:06 -> storcli 04:07:32 -> phonehome-setup 04:14:41 -> auto-poweroff
+RESULT: SUCCESS. Streamlined BIOS HII Clear (4 cmd files, signatures identical to run01) + iPXE-CD + storcli RAID10. No #15. deploy retries 0.
