@@ -850,12 +850,12 @@ issues:
     description: ""
   - id: 75
     title: training-tx1320 通常セットアップ(deploy→PVE)の sonnet エージェント自律化 + 反復ハードニング(最低10最大100試行)
-    status: verify
+    status: done
     owner: "4dbf313d"
     created: "2026-06-03T00:57:17Z"
-    updated: "2026-06-03T15:37:48Z"
+    updated: "2026-06-05T16:56:15Z"
     blocked_by: ""
-    report: ""
+    report: "report/2026-06-04_003431_tx1320_sonnet_e2e_10run.md"
     labels:
       - infra
       - script
