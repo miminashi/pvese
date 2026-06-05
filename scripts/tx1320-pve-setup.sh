@@ -37,7 +37,13 @@ IN_LINSTOR=$("$YQ" '.in_linstor // false' "$CONFIG")
 ENO2_MAC=$("$YQ" '.eno2_mac // ""' "$CONFIG")
 [ "$ENO2_MAC" = "null" ] && ENO2_MAC=""
 
-SSH_OPTS="-F $SSH_CONFIG -o StrictHostKeyChecking=no -o ConnectTimeout=10"
+# The eno2 dark-net DHCP pool reuses IPs across reinstalls, so a previously
+# learned host key for the same IP belongs to a now-wiped system. With only
+# StrictHostKeyChecking=no, ssh still REFUSES the connection on a key MISMATCH
+# ("REMOTE HOST IDENTIFICATION HAS CHANGED"). UserKnownHostsFile=/dev/null makes
+# ssh ignore/forget host keys entirely, which is correct for these throwaway
+# dark-net leases (trial 2 hit this: setup stalled until a manual ssh-keygen -R).
+SSH_OPTS="-F $SSH_CONFIG -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o ConnectTimeout=10"
 
 # shellcheck disable=SC2086
 ssh_t() { ssh $SSH_OPTS "root@${TARGET_IP}" "$@"; }
@@ -57,26 +63,33 @@ discover_by_mac() {
     ip neigh | grep -i "$ENO2_MAC" | awk '{print $1}' | grep -E '^10\.254\.254\.' | head -1
 }
 
-# Wait for SSH; if the known IP stops answering (e.g. eno2 DHCP lease changed
-# across a reboot, memory #12), re-discover via the eno2 MAC and switch TARGET_IP
-# (persists in this shell). Retries the sweep a few times for a slow-booting host.
+# Wait for SSH. The eno2 DHCP lease changes across reboots (memory #12), and the
+# new lease appears on a DIFFERENT IP while the old one stops answering. Rather
+# than block the full timeout on the dead old IP and only THEN re-discover (which
+# wasted ~420s per IP-changing reboot, trial 5), interleave both each cycle: try
+# the current TARGET_IP, and also re-discover by eno2 MAC. Whichever answers SSH
+# first wins. Converges in ~boot-time regardless of whether the IP changed.
 wait_ssh() {
     _timeout="${1:-420}"
-    if "${SCRIPT_DIR}/ssh-wait.sh" "$TARGET_IP" --timeout "$_timeout" --interval 10; then
-        return 0
-    fi
-    echo "[pve-setup] ssh-wait timed out on $TARGET_IP — re-discovering by MAC $ENO2_MAC"
-    _try=0
-    while [ "$_try" -lt 12 ]; do
+    _cycles=$(( _timeout / 15 ))
+    [ "$_cycles" -lt 1 ] && _cycles=1
+    _c=0
+    while [ "$_c" -lt "$_cycles" ]; do
+        # (1) current known IP
+        if ssh $SSH_OPTS -o BatchMode=yes "root@${TARGET_IP}" true 2>/dev/null; then
+            return 0
+        fi
+        # (2) MAC re-discovery (ping-sweep populates neigh first)
         _new_ip=$(discover_by_mac || true)
-        if [ -n "$_new_ip" ] && ssh $SSH_OPTS -o BatchMode=yes "root@${_new_ip}" true 2>/dev/null; then
-            [ "$_new_ip" != "$TARGET_IP" ] && echo "[pve-setup] eno2 lease changed: $TARGET_IP -> $_new_ip"
+        if [ -n "$_new_ip" ] && [ "$_new_ip" != "$TARGET_IP" ] && \
+           ssh $SSH_OPTS -o BatchMode=yes "root@${_new_ip}" true 2>/dev/null; then
+            echo "[pve-setup] eno2 lease changed: $TARGET_IP -> $_new_ip"
             TARGET_IP="$_new_ip"
             echo "[pve-setup] reconnected on $TARGET_IP"
             return 0
         fi
-        echo "[pve-setup] discover attempt $_try: ${_new_ip:-none} not ready, retry in 15s"
-        _try=$((_try + 1))
+        _c=$(( _c + 1 ))
+        echo "[pve-setup] wait_ssh cycle $_c/$_cycles: $TARGET_IP not ready (disc=${_new_ip:-none}), retry in 15s"
         sleep 15
     done
     echo "ERROR: target not reachable and MAC-based re-discovery failed" >&2
@@ -147,7 +160,12 @@ ssh_t systemctl is-active pveproxy pvedaemon pve-cluster || true
 echo "--- block devices ---"
 ssh_t lsblk -o NAME,SIZE,TYPE,FSTYPE,MOUNTPOINT || true
 echo "--- storcli RAID state ---"
-ssh_t /usr/local/bin/storcli64 /c0/vall show 2>/dev/null || ssh_t storcli64 /c0/vall show 2>/dev/null || echo "(storcli not found on target — RAID check skipped)"
+# storcli64 is not part of the base install; fetch it from the playground over
+# the dark-net (same source the installer used) so the RAID10 "Optimal" state is
+# read directly here instead of being skipped (trial 1/2 needed a separate
+# verify-raid.sh). Override the URL with STORCLI_URL if the playground differs.
+STORCLI_URL="${STORCLI_URL:-http://10.1.6.6/firmware/storcli64.bin}"
+ssh_t "test -x /usr/local/bin/storcli64 || (wget -q -O /usr/local/bin/storcli64 $STORCLI_URL && chmod +x /usr/local/bin/storcli64); /usr/local/bin/storcli64 /c0/vall show" 2>/dev/null || echo "(storcli unavailable — RAID check skipped)"
 echo "--- PVE web UI ---"
 curl -sk --max-time 15 "https://${TARGET_IP}:8006" -o /dev/null -w "PVE web UI HTTP %{http_code}\n" || echo "WARN: web UI probe failed"
 

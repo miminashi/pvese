@@ -1,4 +1,4 @@
-next_id: 75
+next_id: 76
 issues:
   - id: 1
     title: Test issue
@@ -844,6 +844,18 @@ issues:
     updated: "2026-06-02T15:04:56Z"
     blocked_by: ""
     report: "report/2026-06-03_000306_tx1320_raid_pve_e2e_3trials.md"
+    labels:
+      - infra
+      - script
+    description: ""
+  - id: 75
+    title: training-tx1320 通常セットアップ(deploy→PVE)の sonnet エージェント自律化 + 反復ハードニング(最低10最大100試行)
+    status: verify
+    owner: "4dbf313d"
+    created: "2026-06-03T00:57:17Z"
+    updated: "2026-06-03T15:37:48Z"
+    blocked_by: ""
+    report: ""
     labels:
       - infra
       - script

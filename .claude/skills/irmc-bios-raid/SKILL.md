@@ -521,6 +521,17 @@ RAID→PVE 通し 3試行検証で、上記の単一ファイル `clear-all.cmd`
 (9758) のみが信頼でき、中間 (committed.png 等) は投入経路で size がぶれる。コマンドファイル例:
 `tmp/6d0368bf/{c-tab,c-avago,c-descend,c-commit}.cmd`。
 
+> 🚨🆕 (2026-06-03 4dbf313d) **`server.py` READY は実際には常に Main タブに着地する。だが `server_ready.png`
+> の size 指紋は当てにならない** — 実測で READY が **size=17919 (Advanced の指紋) を出しても cursor は Main
+> にいた** (試行4: 17919/caret_y=102 表示なのに直後の navy initial cursor_y=178 で Main の短いリストを wrap し
+> 393 未到達 FAILED)。**対策: READY 後は size を見て分岐せず、常に単一 `press ArrowRight` を送って Main→Advanced
+> に入り**、`shot tab.png` で確認 (Advanced = size 17919 / caret_y=102) してから `navy 393` で AVAGO へ。
+> **`server_ready` が Advanced っぽい size でも ArrowRight をスキップしない** (試行4 はスキップして Main に
+> 居座り失敗)。⚠️ **タブ列は wrap する** (Main で ArrowLeft を押すと最右 Save & Exit に回り込む) ので、
+> "ArrowLeft で Main 強制" は逆効果 (試行5 で Save & Exit に着地)。**navy が 393 に到達せず 178/197/235/273/292
+> を巡回したら「Advanced でなく別タブにいる」サイン** → そのタブを subagent で読み、Advanced は左から 2 番目
+> (index1) なので現在 index c から `ArrowRight × ((1 - c) mod 7)` で到達できる。
+
 #### 🚨 無人 N サイクル自動ループの落とし穴 (2026-06-01、9 回ループ試行中に判明)
 単発の削除/作成は自動化できたが、**無人で N サイクル回す**のは以下の脆さで非常に困難。harden するには下記を厳守:
 

@@ -1,0 +1,11 @@
+trial,result,minutes,final_ip,install_retry,notes
+1,success,~52,10.254.254.16,1,#15 netcfg stuck 1回(ForceOff+retryで解消)/nginx access.log空/storcli verify-raid.shで直読OK
+2,success,~70,10.254.254.16,1,#15発生(retryで解消)/known_hosts stale key衝突でSSH拒否→手動ssh-keygen-R要(要スクリプト修正)
+3,success(opus補完),~30(PVEのみ),10.254.254.16,0,sonnet が sol-monitor を background化してyield→opus引継ぎ完遂。anti-yield対策をrunbook/promptに反映。storcli直読/known_hosts修正は機能
+4,success(自律),~67,10.254.254.16,0,anti-yield対策が機能(background化したがポーリングで完了待機、yieldせず)。install時間はcross-site link速度依存で10-22min幅
+5,success(自律),~78,10.254.254.16,0,Bash自動background化されたがReadポーリングで完遂(yieldせず)。最終reboot IP変動で wait_ssh が旧IPに420s無駄待ち→interleave化で改善
+6,success(自律),~70,10.254.254.16,1,#15発生(合計9.8minでForceOff→即解消)。anti-yield/wait_ssh/storcli全て機能。新規ブロッカーなし
+7,success(自律),~62,10.254.254.16,0,クリーン完走(改善提案なし)。BIOS Clear時ArrowRightドロップを再送で吸収。runbook無修正で完遂
+8,success(自律),~58,10.254.254.16,1,#15処理。初回PVE installでapt deferred trigger警告220万行(119MB,無害)→grep/tailで対処。runbookに巨大ログ注記
+9,success(自律/再実行),~35+,10.254.254.16,1,初回はAPI ConnectionRefused(インフラ)で中断→再spawn。再実行で #15×2 + ConnectCD HTTP500バグ発見(ForceOff後即deployでCD未接続→旧HDD GRUB起動のサイレント失敗)。sonnetは再deployで自己回復→deployスクリプトにConnectCD検証+リトライ追加
+10,success(自律),~57,10.254.254.16,0,クリーン完走(改善提案なし)。anti-yield/wait_ssh/storcli/ConnectCDリトライ全て機能。収束確認

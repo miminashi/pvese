@@ -61,6 +61,33 @@ vm_service_restart() {
         -d '{"VirtualMediaType":"CD"}' -w "\n  HTTP %{http_code}\n"
 }
 
+# ConnectCD can return HTTP 500 when issued right after a ForceOff (the iRMC CD
+# worker is left in an inconsistent state — seen on the #15 escape path where we
+# ForceOff and immediately re-deploy, trial 9). The bare "connect-cd || true"
+# then silently leaves the CD UNattached while boot-override Cd is still set, so
+# the host falls through to the leftover HDD GRUB (which fails because the RAID
+# was just cleared) — a silent deploy failure. Retry with a fresh media worker
+# (VirtualMediaServiceRestart) until ConnectCD returns 204, then confirm via
+# verify (AllowableValues flips to "DisconnectCD" once the CD is attached).
+connect_cd_with_retry() {
+    _n=0
+    while [ "$_n" -lt 4 ]; do
+        out=$("${SCRIPT_DIR}/irmc-virtualmedia.sh" connect-cd "$BMC_IP" "$BMC_USER" "$BMC_PASS" 2>&1 || true)
+        echo "$out"
+        # HTTP 204 = ConnectCD accepted. (Already-attached also returns 204 / the
+        # OEM action drops to DisconnectCD-only — treat any non-error 204 as ok.)
+        case "$out" in
+            *"HTTP 204"*) echo "[ipxe-cd]   ConnectCD ok (204)"; return 0 ;;
+        esac
+        _n=$((_n + 1))
+        echo "[ipxe-cd]   ConnectCD failed (attempt $_n/4, likely HTTP 500 after ForceOff) — VirtualMediaServiceRestart + retry"
+        vm_service_restart
+        sleep "$SETTLE_WAIT"
+    done
+    echo "ERROR: ConnectCD did not return 204 after retries — aborting deploy to avoid silent HDD fall-through" >&2
+    return 1
+}
+
 poll_off() {
     i=0
     while [ "$i" -lt 24 ]; do
@@ -92,8 +119,8 @@ echo "[ipxe-cd] 4. PowerOn (ConnectCD requires PowerState=On)"
 "${SCRIPT_DIR}/bmc-power.sh" on "$BMC_IP" "$BMC_USER" "$BMC_PASS" || true
 sleep "$SETTLE_WAIT"
 
-echo "[ipxe-cd] 5. ConnectCD"
-"${SCRIPT_DIR}/irmc-virtualmedia.sh" connect-cd "$BMC_IP" "$BMC_USER" "$BMC_PASS" || true
+echo "[ipxe-cd] 5. ConnectCD (verify + retry on HTTP 500)"
+connect_cd_with_retry
 sleep 8
 
 echo "[ipxe-cd] 6. ForceOff -> wait Off"

@@ -8,6 +8,196 @@ argument-hint: "<config_file>"
 
 BMC VirtualMedia (CD/USB redirector) を使わずに **PXE/netboot** で OS install する経路。 BMC USB redirector の累積劣化 (`os-setup` 経路が失敗する機種) や、 host が cross-site 拠点にあって install ISO の大容量 cross-site 転送が間欠 loss で失敗するケースに使う。 Phase 19 で training-tx1320 にて完遂、 **claude が物理操作なしで自力 SSH 到達**まで達成 (commit `dbb936a`、 [phase19 総括](../../../report/2026-05-30_053607_tx1320_raid10_overview_phase1-19_summary.md))。
 
+## 🤖 sonnet エージェント自律実行 runbook (通常セットアップ: deploy → PVE)
+
+> **この節だけを上から順に実行すれば training-tx1320 の通常 OS install + PVE が完遂する。**
+> sonnet サブエージェントはまずこの節を実行し、詳細・背景が必要なときだけ下の該当節を参照する。
+> 対象は **ステップ2〜6 (deploy → install監視 → disk boot → IP特定 → PVE通し)**。
+> ステップ1 (BIOS HII KVM RAID Clear) は呼出元 (opus) が実施済みの前提。install 中の preseed
+> `partman/early_command` で storcli が RAID10 を delete+create するため、RAID 再構築は install が行う。
+>
+> 確立: 2026-06-03 (本 runbook 化) / 基盤の 3 試行実証は
+> [e2e report](../../../report/2026-06-03_000306_tx1320_raid_pve_e2e_3trials.md)。
+
+### 固定パラメータ (training-tx1320)
+| 項目 | 値 |
+|------|-----|
+| config | `config/training_tx1320.yml` |
+| BMC (iRMC) | `10.254.254.9` / `claude` / `Claude123` |
+| deploy ISO basename | `ipxe-tx1320.iso` (playground NFS export `/var/samba/public` に配置済み) |
+| playground | `10.1.6.6` (nginx access.log = `/var/log/nginx/access.log`、firmware/preseed 配信) |
+| eno2 MAC (dark-net、SSH 用) | `4c:52:62:14:de:f0` |
+| storcli64 取得元 | `http://10.1.6.6/firmware/storcli64.bin` |
+
+### Step 0: session tmp + preflight (検証のみ。失敗したら opus にエスカレーション)
+```sh
+mkdir -p tmp/<sid>            # <sid> = Claude Code セッション UUID 先頭8桁
+ping -c3 -W2 10.254.254.9     # iRMC 疎通 (latency 高めだが loss 0 を確認)
+ping -c3 -W2 10.1.6.6         # playground 疎通
+ssh -F ssh/config ubuntu@10.1.6.6 ls -l /var/www/html/preseed /var/www/html/firmware /var/samba/public
+# 期待: preseed/training-tx1320.cfg, firmware/{storcli64.bin,setup-raid10-storcli.sh,phonehome-setup.sh},
+#       /var/samba/public/ipxe-tx1320.iso が存在すること
+```
+
+### Step 1: BMC env を export (bmc-power.sh / sol-monitor が iRMC TLS で必須)
+```sh
+export BMC_SCHEME=https BMC_CURL_OPTS="--ciphers DEFAULT@SECLEVEL=0"
+export BMC_PATCH_REQUIRES_ETAG=1 BMC_BOOT_OVERRIDE_NO_DISABLED=1 POWER_ON_RESET_TYPE=On
+```
+> 未 export だと `bmc-power.sh` が rc=52 (empty reply、cipher なしで TLS 失敗、落とし穴 #10)。
+> `irmc-ipxe-cd-deploy.sh` は内部で自前 export するが、自分で叩く bmc-power.sh のために export しておく。
+
+### Step 2: iPXE-CD deploy
+```sh
+./oplog.sh ./scripts/irmc-ipxe-cd-deploy.sh config/training_tx1320.yml ipxe-tx1320.iso
+```
+> DisconnectCD → CDImage(NFS)設定 → VirtualMediaServiceRestart (USB redirector 劣化リセット) →
+> On → ConnectCD(検証+リトライ) → ForceOff → boot-override Cd UEFI (Off で設定) → On。deploy 中の
+> `disconnect-cd` HTTP400 / PowerOn `ActionParameterValueNotInList` は `|| true` ガード済みで無害。
+> 🐛 **ConnectCD は ForceOff 直後の即再 deploy で HTTP 500 を返すことがある** (iRMC CD worker 不整合、
+> 試行9)。放置すると CD 未接続のまま boot-override Cd が設定され**旧 HDD GRUB から起動するサイレント
+> 失敗**になる → スクリプトは ConnectCD が 204 を返すまで VirtualMediaServiceRestart + リトライ (最大4回)、
+> ダメなら deploy を abort する (試行9 で対策)。deploy が `ConnectCD did not return 204` で abort したら
+> そのまま Step 2 をもう一度実行する。
+
+### Step 3: install 監視 (+ #15 netcfg stuck エスケープ)
+```sh
+.venv/bin/python scripts/sol-monitor.py --bmc-ip 10.254.254.9 --bmc-user claude \
+    --bmc-pass Claude123 --log-file tmp/<sid>/install.log --timeout 2400 --powerstate-interval 30
+```
+- **完遂 = sol-monitor が rc=0 (POWER_DOWN → PowerState Off を二重確認)**。これが正典。
+- **進捗の一次情報は sol-monitor.py が表示する d-i stage** (DETECTING_NETWORK → CONFIGURING_APT →
+  INSTALLING_SOFTWARE → INSTALLING_GRUB → POWER_DOWN)。**正常なら deploy から ~3-4min で
+  CONFIGURING_APT 以降へ進む**。
+- ⚠️ **playground nginx access.log は当てにしない** (試行1で空のまま install 完遂を確認 = d-i の取得が
+  記録されないことがある。e2e 補足B のクロックずれも併発)。進捗判定は **sol-monitor の stage** で行う。
+- 🚨 **#15 エスケープ**: `interface=eno1` 固定で恒久対策済みだが、タイミング依存で再発しうる
+  (実測発生率 ~30-50%、試行1/2/6 で発生)。**deploy(電源 On)から合計 ~10min 経っても
+  CONFIGURING_APT に進まず DETECTING_NETWORK 等で停滞**なら d-i netcfg stuck と判断
+  (= DETECTING_NETWORK 突入後 ~6-7min 動かない状態)。`./scripts/bmc-power.sh forceoff 10.254.254.9 claude Claude123`
+  → Step 2 から再 deploy。2 回目 attempt は +3〜4min で CONFIGURING_APT 到達 = 即解消する
+  (試行1で実証)。10min は安全な閾値 (15min まで待つ必要はない)。
+  - ℹ️ **#15 で ForceOff すると、その deploy の `sol-monitor.py` は rc=4 (false positive) で返る** — POWER_DOWN
+    でなく途中打ち切りのため (試行9 で観測)。これは異常ではなく ForceOff した結果なので無視してよい。
+    **完遂判定は再 deploy 後の sol-monitor が rc=0** になることで行う。
+- ⚠️ **install 完遂前に手動 ForceOff を撃たない** (#15 判定時を除く)。finish-install の sync を中断し
+  authorized_keys 等の遅延書込みを失わせる。
+
+### Step 4: disk boot
+```sh
+./oplog.sh ./scripts/bmc-power.sh boot-override 10.254.254.9 claude Claude123 Hdd UEFI
+./oplog.sh ./scripts/bmc-power.sh on 10.254.254.9 claude Claude123
+```
+
+### Step 5: eno2 dark-net IP 特定 (毎回変動。ping-sweep で neigh を populate してから grep)
+```sh
+sh tmp/<sid>/find-ip.sh     # 下記内容のスクリプトを Write してから実行 (パイプ/$()は分割禁止のため)
+```
+`tmp/<sid>/find-ip.sh` の内容 (1〜254 を ping して ARP 充填 → eno2 MAC で IP 抽出):
+```sh
+#!/bin/sh
+j=1; while [ "$j" -lt 255 ]; do ping -c1 -W1 "10.254.254.${j}" >/dev/null 2>&1 & j=$((j+1)); done; wait
+ip neigh | grep -i '4c:52:62:14:de:f0' | awk '{print $1}' | grep -E '^10\.254\.254\.' | head -1
+```
+> disk boot 後 eno2 DHCP は通常 +2〜4min で取得 (`auto eno2` 化で #14 解消済み)。出なければ 1〜2 分
+> 待って再実行。`tx1320-pve-setup.sh` も内部で同じ MAC 再 discovery を行うので、ここで未取得でも
+> 概ね進められるが、初期 IP は渡す必要がある。
+
+### Step 6: PVE 通しセットアップ (1 コマンド)
+```sh
+./oplog.sh ./scripts/tx1320-pve-setup.sh config/training_tx1320.yml <ip>
+```
+> ⚠️ **このコマンドの出力 (background task の .output) は巨大になりうる** — 初回 PVE install の
+> `Processing triggers` で `W: Tried to start delayed item ceph-common ...` 警告が**百万行単位**出ること
+> がある (試行8 で 119MB、無害)。**ログ全体を Read しない** — `grep -v "W: Tried"` や末尾 `tail` 相当を
+> スクリプト経由で抽出して `DONE. Final reachable IP` 行と検証ブロックだけ確認する。
+> known_hosts の stale key 掃除は不要 — スクリプトが `-o UserKnownHostsFile=/dev/null` を使うため
+> IP 使い回し時の鍵不一致 ("REMOTE HOST IDENTIFICATION HAS CHANGED") は起きない (試行2 で対策済み。
+> `StrictHostKeyChecking=no` だけでは鍵 MISMATCH は拒否される点に注意)。
+> SSH待ち → **live hostname (`tx1320`) を /etc/hosts に採用** (config の `training-tx1320` を盲信しない、
+> でないと pve-cluster 不起動) → pre-reboot(PVE repo+kernel) → reboot → post-reboot(proxmox-ve) →
+> reboot → 検証。eno2 lease が reboot で変わっても `discover_by_mac` (MAC 再 discovery) で追従する。
+
+### Step 7: 完遂検証 (すべて満たして成功)
+```sh
+ssh -F ssh/config -o StrictHostKeyChecking=no root@<ip> pveversion                 # PVE 9.x
+ssh -F ssh/config -o StrictHostKeyChecking=no root@<ip> systemctl is-active pveproxy pvedaemon pve-cluster  # 全 active
+curl -sk --max-time 15 https://<ip>:8006 -o /dev/null -w '%{http_code}\n'          # 200
+```
+RAID10 Optimal の**直読**: `tx1320-pve-setup.sh` の検証ステップが storcli64 を playground から自動取得
+して `/c0/vall show` を出力する (試行2 で組込み)。その出力に `RAID10 ... Optl ... 1.6xx TB` が出れば OK。
+出ない/フォールバックしたい場合のみ下記を手動実行:
+```sh
+sh tmp/<sid>/verify-raid.sh   # 下記を Write してから実行
+```
+`tmp/<sid>/verify-raid.sh`:
+```sh
+#!/bin/sh
+ssh -F ssh/config -o StrictHostKeyChecking=no "root@<ip>" "test -x /usr/local/bin/storcli64 || (wget -q -O /usr/local/bin/storcli64 http://10.1.6.6/firmware/storcli64.bin && chmod +x /usr/local/bin/storcli64); /usr/local/bin/storcli64 /c0/vall show"
+```
+> 期待: `RAID10 ... Optl ... 1.6xx TB`。`lsblk` で sda 1.6T 単一ディスク + LVM (`tx1320-vg`) も傍証。
+
+### 報告テンプレ (sonnet → opus、構造化して返す)
+```
+- 試行番号: N
+- 結果: 成功 / 失敗 (どのステップで)
+- 所要時間: deploy→SSH 到達 ~XX min
+- 最終 IP (eno2): 10.254.254.X
+- install retry: 0/1 回 (#15 発生有無)
+- 踏んだ落とし穴 / 想定外: ...
+- 検証結果: pveversion=... / services=... / web UI=HTTP ... / RAID10=Optl ... TB
+- runbook の曖昧点・改善提案: ... (opus が次試行に反映する。無ければ「なし」)
+```
+
+### sonnet 実行上の制約 (重要)
+- 🚨🚨 **`sol-monitor.py` は必ず Bash の foreground (ブロッキング) で実行する。`run_in_background:true`
+  を使わない**。背景実行して「通知を待つ」とターンを終えてしまうと、サブエージェントは
+  install 完了通知を受け取れず**作業が途中で止まる** (試行3 で実際に発生)。foreground なら
+  Bash 呼び出しが install 完遂まで (最大 timeout) ブロックして返る — それを待つのが正しい。
+- 🚨 **最終報告ブロックを返すまで絶対にターンを終えない**。「あとで通知が来るので待つ」と言って
+  制御を返さないこと。長い待ち (install ~11min, PVE setup ~30min) も foreground のまま待ち切る。
+  - ℹ️ harness が長時間 Bash を**自動で background 化**することがある (試行5)。その場合でも yield せず、
+    **出力ファイルを Read で定期ポーリングして完了 (rc/POWER_DOWN) を待ち切る**。background 化自体は問題ない
+    — 問題なのは「通知待ち」と言ってターンを返すこと。
+- **Monitor ツールは使わない** (親への中間応答が止まる)。
+- 一時ファイル・ログ・スクリプトは **`tmp/<sid>/` のみ** (`/tmp/` 禁止)。
+- パイプ/`$()`/`;` 複合・`<` リダイレクトを含むコマンドは**スクリプトファイルに書いて `sh tmp/<sid>/x.sh`**。
+- 状態変更操作は `./oplog.sh` 経由。スクリプトは必ず `./` 付き相対パスで実行。
+
+### sonnet 反復ハードニング試行ログ (2026-06-03〜, opus=BIOS Clear / sonnet=deploy→PVE)
+各試行前に opus が BIOS HII KVM Clear (RAID 空に) → sonnet が上記 runbook で通常セットアップを自律実行。
+
+| 試行 | 結果 | install retry (#15) | 最終 eno2 IP | PVE | web UI | RAID10 | sonnet が踏んだ点 / runbook 改善 |
+|---|---|---|---|---|---|---|---|
+| 1 | ✅ 自律成功 | 1 (DETECTING_NETWORK ~10min 停滞→ForceOff+retry で +3min 解消) | .16 | 9.2.3 | 200 | Optl 1.635TB | nginx access.log が空 = 進捗判定は sol-monitor stage に一本化 (runbook 反映済)。storcli は target に無く verify-raid.sh の wget 取得で直読 (runbook 記載どおり動作)。最終 reboot で IP 変動 (#12、MAC rediscovery で追従) |
+| 2 | ✅ 自律成功 | 1 (#15 再発→runbook 通り ForceOff+retry で解消) | .16 | 9.2.3 | 200 | Optl 1.635TB | 🐛 **known_hosts stale key 衝突で SSH 拒否** (IP 使い回しで旧鍵が残り `StrictHostKeyChecking=no` でも MISMATCH 拒否)。sonnet は手動 `ssh-keygen -R` で回避 → **`tx1320-pve-setup.sh` に `-o UserKnownHostsFile=/dev/null` を追加して恒久対策**。併せて検証ステップに storcli64 自動取得+直読を組込み |
+| 3 | ⚠️ opus 補完 (sonnet yield) | 0 (#15 なし) | .16 | 9.2.3 | 200 | Optl 1.635TB | 🚨 **sonnet が `sol-monitor.py` を `run_in_background:true` で起動し「通知を待つ」とターンを終えて install 監視中に停止** (制御を opus に返した)。install 自体は健全で opus が disk boot 以降を引き継ぎ完遂 → **runbook/プロンプトに「sol-monitor は foreground 必須・最終報告まで絶対 yield しない」を明記**。storcli 直読・UserKnownHostsFile 修正の効果は本試行で確認 (スクリプトが RAID10 Optl を直接出力、鍵警告は /dev/null 行きで無害) |
+
+| 4 | ✅ 自律成功 | 0 (#15 なし) | .16 | 9.2.3 | 200 | Optl 1.635TB | **anti-yield 対策の効果を確認** — sonnet は sol-monitor を background 起動したが**出力を定期 Read して完了 (exit 0) を待ち、yield しなかった** (試行3 の失敗モードを克服)。install 21.5min と長め = cross-site link 速度依存 (kernel DL ~5min)。install 時間は **10〜25min の幅**がある (mirror/link 速度依存) |
+| 5 | ✅ 自律成功 | 0 (#15 なし) | .16 | 9.2.3 | 200 | Optl 1.635TB | harness が sol-monitor を自動 background 化したが Read ポーリングで完遂 (yield せず)。最終 reboot で IP `.23→.16` 変動時、`wait_ssh` が死んだ旧 IP に 420s 無駄待ち → **`wait_ssh` を「既知 IP と MAC 再 discovery を毎サイクル交互」にインターリーブ化**して無駄待ちを解消 |
+| 6 | ✅ 自律成功 | 1 (#15、合計 9.8min で ForceOff→即解消) | .16 | 9.2.3 | 200 | Optl 1.635TB | 新規ブロッカーなし。#15 を runbook 閾値手順どおり処理。anti-yield / wait_ssh interleave / storcli 直読すべて機能。#15 閾値を「deploy から合計 ~10min」と明確化 |
+| 7 | ✅ 自律成功 | 0 (#15 なし) | .16 | 9.2.3 | 200 | Optl 1.635TB | **クリーン完走・改善提案なし (収束)**。runbook 無修正で完遂。opus 側 BIOS Clear で ArrowRight ドロップ (Main 居残り) → shot 検証 + 再送で吸収 (手順の堅牢性を実証) |
+| 8 | ✅ 自律成功 | 1 (#15、10.3min で ForceOff→5.2min 解消) | .16 | 9.2.3 | 200 | Optl 1.635TB | 初回 PVE install で apt deferred trigger 警告 `W: Tried to start delayed item` が **~220万行 (119MB)** 出力 (無害)。sonnet は grep/tail で対処 → **runbook に「PVE setup ログは巨大化しうる・全 Read 禁止」注記**。BIOS Clear は再び ArrowRight ドロップ→再送で吸収 |
+| 9 | ✅ 自律成功 (再実行) | 1+ (#15×2 + ConnectCD500) | .16 | 9.2.3 | 200 | Optl 1.635TB | 初回エージェントが **API ConnectionRefused (インフラ)** で中断 → 再 spawn。🐛 **ConnectCD HTTP500 バグ発見** — ForceOff 直後の即再 deploy で iRMC CD worker 不整合 → `\|\| true` で握り潰され CD 未接続のまま boot-override Cd 設定 → **旧 HDD GRUB 起動のサイレント失敗** (RAID clear 済で initramfs ループ)。sonnet は再 deploy で自己回復 → **`irmc-ipxe-cd-deploy.sh` の ConnectCD を「204 まで VirtualMediaServiceRestart+リトライ、ダメなら abort」に強化** |
+| 10 | ✅ 自律成功 | 0 (#15 なし) | .16 | 9.2.3 | 200 | Optl 1.635TB | **クリーン完走・改善提案なし (収束)**。anti-yield / wait_ssh interleave / storcli 直読 / ConnectCD リトライすべて機能 |
+
+**10 試行サマリ (2026-06-03〜04, session 4dbf313d)**: 全 10/10 が PVE 9.2.3 + web UI 200 + RAID10 Optl 1.635TB を達成。
+**9/10 が完全 sonnet 自律** (試行3 のみ sonnet の途中 yield で opus 補完 → 対策後は再発せず、試行4-10 で 7 連続自律成功)。
+試行9 初回の中断は API ConnectionRefused = インフラ起因 (再 spawn で成功)。判明・恒久対策した点 (すべて
+runbook/スクリプトに反映済み): 進捗判定 = sol-monitor stage (nginx 不可) / #15 は deploy から合計 ~10min 停滞で
+ForceOff→retry / sol-monitor は foreground・最終報告まで yield 禁止 / `UserKnownHostsFile=/dev/null` で鍵不一致回避 /
+`wait_ssh` interleave で IP 変動追従 / storcli 自動取得で RAID10 直読 / ConnectCD 500 リトライで HDD fall-through 防止 /
+PVE setup ログ巨大化は grep/tail。**通常セットアップ (deploy→PVE) は sonnet が runbook 参照のみで自律完遂可能と確定**。
+
+> sonnet 自律実行の成立を試行1-2で確認、試行4 で再確認 (3/4 が完全自律、試行3 のみ opus 補完)。
+> 試行3 で**最大の落とし穴 = sonnet の途中 yield** が判明し対策 → 試行4 で克服を確認。判明した
+> 恒久対策: (a) 進捗判定は nginx でなく sol-monitor stage、(b) #15 は sol-monitor 停滞 ~10min を閾値に
+> ForceOff→retry、(c) **known_hosts 鍵不一致 → `UserKnownHostsFile=/dev/null`** (試行2)、(d) **sol-monitor は
+> foreground 実行・最終報告まで yield 禁止** (試行3-4、runbook「sonnet 実行上の制約」+ プロンプトに明記)。
+> install 所要は 10〜25min (cross-site link 速度依存)、PVE setup は ~30-55min。
+
+---
+
 ## 適用判断 (os-setup との使い分け)
 
 | 状況 | 推奨経路 |
