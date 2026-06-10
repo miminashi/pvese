@@ -1,6 +1,6 @@
 ---
 name: irmc-bios-raid
-description: "Fujitsu iRMC S4 (TX1320 M3 等) の電源・BIOS・RAID 操作。Redfish (HTTPS + SECLEVEL=0) 経由の電源/ブート操作 + iRMC Web UI 経由の手動 BIOS/RAID 操作手順。training-tx1320 対応。"
+description: "Fujitsu iRMC S4 (TX1320 M3 等) の電源・BIOS・RAID 操作 + BIOS 設定リファレンス。Redfish (HTTPS + SECLEVEL=0) 経由の電源/ブート操作 + iRMC Web UI/KVM 経由の手動 BIOS/RAID 操作手順 + 全 BIOS 設定項目の網羅リファレンス (bios/)。training-tx1320 対応。"
 argument-hint: "<subcommand: power|bios|raid|info> [args...]"
 ---
 
@@ -30,6 +30,15 @@ Fujitsu PRIMERGY サーバの iRMC S4 BMC を Redfish (HTTPS + 古い DH 鍵対�
 | `raid delete <config> <vd>` | VD 削除 | **手動 (同上)** |
 
 詳細プロトコル・落とし穴・スクリーンショットは [reference.md](reference.md) を参照。
+
+## BIOS 設定リファレンス (bios/)
+
+TX1320 M3 (D3373-B1x) の **全 BIOS 設定項目 (91 設定 + 各タブ/サブメニュー)** を、選択肢・デフォルト・
+現在値・ヘルプ・リスクまで網羅したリファレンスを [bios/index.md](bios/index.md) に置く (タブ単位で分割)。
+値は実機 WinSCU XML 由来、タブ所属と存在は KVM 確認で確定する。各タブ: [main](bios/main.md) /
+[advanced](bios/advanced.md) / [security](bios/security.md) / [power](bios/power.md) /
+[server-mgmt](bios/server-mgmt.md) / [boot](bios/boot.md) / [save-exit](bios/save-exit.md) /
+[RAID HII](bios/raid-avago-hii.md)。再生成・KVM 確認手順は [bios/_capture-runbook.md](bios/_capture-runbook.md)。
 
 ## 前提条件
 

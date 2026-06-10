@@ -251,6 +251,7 @@ curl -sS -k --ciphers DEFAULT@SECLEVEL=0 -u claude:Claude123 \
 
 ## 関連ドキュメント
 
+- [bios/index.md](bios/index.md) — **TX1320 M3 (D3373-B1x) BIOS 全設定項目の網羅リファレンス** (タブ単位分割、WinSCU XML 由来 + KVM 確認)
 - [config/training_tx1320.yml](../../../config/training_tx1320.yml) — config
 - [memory/training_tx1320.md](memory) — マシン固有メモリ
 - [scripts/bmc-power.sh](../../../scripts/bmc-power.sh) — `BMC_SCHEME`/`BMC_CURL_OPTS`/`POWER_ON_RESET_TYPE` 対応済
