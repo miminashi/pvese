@@ -107,6 +107,17 @@ phase_post_reboot() {
     DEBIAN_FRONTEND=noninteractive apt-get -y remove linux-image-amd64 'linux-image-6.*' 2>/dev/null || true
     update-grub
 
+    echo "--- Suppressing subscription nag ---"
+    # ラボ環境のため web UI の "No valid subscription" nag を抑制する。
+    # proxmox-widget-toolkit が apt 更新で proxmoxlib.js を上書きしても nag が復活しないよう
+    # DPkg::Post-Invoke フックで再適用を自動化する (dpkg -V で未改変=再適用、改変済み=skip の冪等設計)。
+    cat > /etc/apt/apt.conf.d/no-nag-script << 'NAG_EOF'
+DPkg::Post-Invoke { "dpkg -V proxmox-widget-toolkit | grep -q '/proxmoxlib\.js$'; if [ $? -eq 1 ]; then { echo 'Removing subscription nag from UI...'; sed -i '/.*data.status.toLowerCase() !== .active./{s/\!//;s/active/NoMoreNagging/}' /usr/share/javascript/proxmox-widget-toolkit/proxmoxlib.js; }; fi"; };
+NAG_EOF
+    sed -i "/.*data.status.toLowerCase() !== .active./{s/\!//;s/active/NoMoreNagging/}" /usr/share/javascript/proxmox-widget-toolkit/proxmoxlib.js
+    systemctl restart pveproxy || true
+    echo "Subscription nag suppressed (apt hook installed at /etc/apt/apt.conf.d/no-nag-script)"
+
     echo "--- Installing durable default-route fix hook ---"
     mkdir -p /etc/network/if-up.d
     cat > /etc/network/if-up.d/z-fix-default-route << 'HOOK_EOF'
