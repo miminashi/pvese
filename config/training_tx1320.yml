@@ -37,7 +37,23 @@ dhcp_secondary_iface: eno2
 # eno2 (dark-net) MAC — used by scripts/tx1320-pve-setup.sh to re-discover the
 # target IP from the local neighbour table when the DHCP lease changes across
 # the two PVE-setup reboots (memory #12: eno2 IP can vary).
+# NOTE: with bridge_setup below, eno2 is enslaved into vmbr1 with a STATIC
+# address, so the lease no longer varies and MAC re-discovery is unused (the
+# fixed secondary_bridge_address is reachable directly). Kept for reference.
 eno2_mac: "4c:52:62:14:de:f0"
+
+# Installed-system bridge layout (PVE). When bridge_setup is true the dhcp-mode
+# late_command builds Linux bridges instead of flat NICs:
+#   vmbr0 = static_iface (eno1, site LAN 192.168.33.0/24) — DHCP
+#   vmbr1 = dhcp_secondary_iface (eno2, dark-net 10.0.0.0/8) — static
+# vmbr1 gets a fixed address so the box is reachable at a stable IP from first
+# disk boot (the claude host's ens19 is 10.1.6.1/8 with 10.0.0.0/8 scope-link,
+# so 10.1.4.16/8 ARPs directly over the dark-net L2). bridge-utils is added to
+# the preseed pkgsel so the bridges come up before PVE/ifupdown2 is installed.
+bridge_setup: true
+# vmbr1 (eno2 / dark-net) static address with CIDR. Empty -> vmbr1 falls back to
+# DHCP. Must be a conflict-free address in 10.0.0.0/8 (10.1.4.16 verified free).
+secondary_bridge_address: "10.1.4.16/8"
 # Phase 14 (2026-05-22 linear-mountain): Phase 13 で使った 10.254.254.99 は
 # pvese ローカルマシン (ens19) と ARP 衝突するため SSH 到達不能だった。
 # 同 /24 内で conflict-free な 10.254.254.250 に変更 (gateway は変更不要)。

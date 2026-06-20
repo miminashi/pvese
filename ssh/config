@@ -131,19 +131,18 @@ Host playground 10.1.6.6
   IdentityFile /home/ubuntu/projects/pvese/ssh/id_ed25519
   IdentitiesOnly yes
 
-# --- training-tx1320 (Phase 19 PXE install 完遂、 Debian 13 + RAID10) ---
-# eno2 が dark-net (10.0.0.0/8) 側で DHCP 取得した IP。 DHCP のため再起動で変動しうる
-# (変動時は playground / local の `ip neigh | grep 4c:52:62:14:de:f0` で再特定)。
-# eno1 は 192.168.33.11 (site LAN、 OpenWrt NAT 背後で local からは不達)。
-Host training-tx1320 10.254.254.4
-  HostName 10.254.254.4
+# --- training-tx1320 (Debian 13 + PVE + RAID10、 vmbr0/vmbr1 bridge 構成) ---
+# 管理 IP は固定: vmbr1 (eno2 / dark-net) = 10.1.4.16/8 (static、 config の
+# secondary_bridge_address)。 local の ens19 (10.1.6.1/8, 10.0.0.0/8 scope-link)
+# から直接到達可能。 vmbr0 (eno1 / site LAN) = 192.168.33.x (DHCP、 OpenWrt NAT
+# 背後で local からは不達) なので SSH/管理は必ず 10.1.4.16 を使う。
+Host training-tx1320 10.1.4.16
+  HostName 10.1.4.16
   User root
   IdentityFile /home/ubuntu/projects/pvese/ssh/id_ed25519
   IdentitiesOnly yes
-  # eno2 dark-net DHCP IP varies per reboot (Phase 19: 10.254.254.4, Run 1: 10.254.254.6)
-  # Use `ip neigh | grep 4c:52:62:14:de:f0` to find current IP
 
-# training-tx1320 dark-net DHCP range (any 10.254.254.x)
+# training-tx1320 dark-net legacy DHCP range (旧 DHCP 経路 / fallback、 any 10.254.254.x)
 Host 10.254.254.*
   User root
   IdentityFile /home/ubuntu/projects/pvese/ssh/id_ed25519

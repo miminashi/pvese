@@ -28,6 +28,16 @@ BMC VirtualMedia (CD/USB redirector) を使わずに **PXE/netboot** で OS inst
 | playground | `10.1.6.6` (nginx access.log = `/var/log/nginx/access.log`、firmware/preseed 配信) |
 | eno2 MAC (dark-net、SSH 用) | `4c:52:62:14:de:f0` |
 | storcli64 取得元 | `http://10.1.6.6/firmware/storcli64.bin` |
+| **管理 IP (固定)** | **`10.1.4.16` (vmbr1=eno2 dark-net static)** |
+
+> 🆕 **2026-06-19: bridge 構成 + 固定 IP 化**。`config/training_tx1320.yml` に `bridge_setup: true` +
+> `secondary_bridge_address: "10.1.4.16/8"` を追加し、install 後の `/etc/network/interfaces` が
+> **vmbr0 (eno1=site LAN, DHCP) + vmbr1 (eno2=dark-net, static `10.1.4.16/8`)** の PVE ブリッジ構成に
+> なった (`generate-preseed.sh` の dhcp+bridge_setup ブランチが生成、pkgsel に `bridge-utils` 追加で
+> 初回ブートから ifupdown で起動)。**管理/SSH は固定 `10.1.4.16` を使う** → 下記 Step 5 の eno2 DHCP
+> IP 特定 (ping-sweep + `ip neigh | grep MAC`) は **不要** になり、`tx1320-pve-setup.sh config/... 10.1.4.16`
+> を直接渡せる (reboot を跨いでも IP 不変、#12 解消)。ssh/config に `Host training-tx1320 10.1.4.16` 追加済。
+> 旧 DHCP 経路 (eno2 が 10.254.254.x lease) を使いたい場合は config の `bridge_setup` を外す。
 
 ### Step 0: session tmp + preflight (検証のみ。失敗したら opus にエスカレーション)
 ```sh

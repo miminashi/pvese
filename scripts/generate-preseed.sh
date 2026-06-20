@@ -82,6 +82,16 @@ network_mode=$("$YQ" '.network_mode' "$CONFIG")
 dhcp_secondary_iface=$("$YQ" '.dhcp_secondary_iface' "$CONFIG")
 [ "$dhcp_secondary_iface" = "null" ] && dhcp_secondary_iface=""
 
+# Optional Linux-bridge layout for the installed system (PVE). When bridge_setup
+# is true (dhcp mode only), the late_command writes vmbr0/vmbr1 bridges instead
+# of flat NICs: vmbr0 = static_iface (DHCP), vmbr1 = dhcp_secondary_iface. vmbr1
+# uses secondary_bridge_address (CIDR) when set, else DHCP. bridge-utils is added
+# to pkgsel so the bridges come up at first boot before ifupdown2 (from PVE).
+bridge_setup=$("$YQ" '.bridge_setup // false' "$CONFIG")
+[ "$bridge_setup" = "null" ] && bridge_setup="false"
+secondary_bridge_address=$("$YQ" '.secondary_bridge_address // ""' "$CONFIG")
+[ "$secondary_bridge_address" = "null" ] && secondary_bridge_address=""
+
 # Optional explicit gateway (defaults to the standard 10.0.0.0/8 GW). Used
 # only by the netcfg static-IP fallback prompt; the actual gateway routing
 # comes from DHCP on the internet VLAN at runtime.
@@ -235,10 +245,57 @@ else
     # The mgmt static IP must end up on $static_iface (eno2np1 on X11DPU) so
     # that SSH on 10.10.10.x is reachable at first boot. d-i netcfg only wrote
     # config for the DHCP-up interface it auto-picked, so we OVERWRITE the
-    # whole interfaces file with: lo + DHCP block for the auto-picked NIC +
-    # static block for $static_iface. pre-pve-setup.sh / pve-setup-remote.sh
-    # convert these into vmbr0 / vmbr1 bridges at first boot.
-    if [ "$network_mode" = "dhcp" ]; then
+    # whole interfaces file with our own definition (lo + the NIC blocks below).
+    if [ "$network_mode" = "dhcp" ] && [ "$bridge_setup" = "true" ]; then
+        # PVE bridge layout (training-tx1320): vmbr0 bridges the primary NIC
+        # (site LAN, DHCP) and vmbr1 bridges the secondary NIC (dark-net). vmbr1
+        # uses a STATIC address when secondary_bridge_address is set, so the box
+        # is reachable at a stable IP from first disk boot (no DHCP-lease drift,
+        # memory #12). The bridges must come up before PVE installs ifupdown2,
+        # so bridge-utils is pulled in via pkgsel for the first-boot ifupdown.
+        pkgsel_include="$pkgsel_include bridge-utils"
+        late_network="echo 'source /etc/network/interfaces.d/*' > ${NWFILE}; \
+echo '' >> ${NWFILE}; \
+echo 'auto lo' >> ${NWFILE}; \
+echo 'iface lo inet loopback' >> ${NWFILE}; \
+echo '' >> ${NWFILE}; \
+echo 'iface ${static_iface} inet manual' >> ${NWFILE}; \
+echo '' >> ${NWFILE}; \
+echo 'auto vmbr0' >> ${NWFILE}; \
+echo 'iface vmbr0 inet dhcp' >> ${NWFILE}; \
+echo '    bridge-ports ${static_iface}' >> ${NWFILE}; \
+echo '    bridge-stp off' >> ${NWFILE}; \
+echo '    bridge-fd 0' >> ${NWFILE};"
+        if [ -n "$dhcp_secondary_iface" ]; then
+            late_network="${late_network} \
+echo '' >> ${NWFILE}; \
+echo 'iface ${dhcp_secondary_iface} inet manual' >> ${NWFILE}; \
+echo '' >> ${NWFILE}; \
+echo 'auto vmbr1' >> ${NWFILE};"
+            if [ -n "$secondary_bridge_address" ]; then
+                late_network="${late_network} \
+echo 'iface vmbr1 inet static' >> ${NWFILE}; \
+echo '    address ${secondary_bridge_address}' >> ${NWFILE}; \
+echo '    bridge-ports ${dhcp_secondary_iface}' >> ${NWFILE}; \
+echo '    bridge-stp off' >> ${NWFILE}; \
+echo '    bridge-fd 0' >> ${NWFILE};"
+            else
+                late_network="${late_network} \
+echo 'iface vmbr1 inet dhcp' >> ${NWFILE}; \
+echo '    bridge-ports ${dhcp_secondary_iface}' >> ${NWFILE}; \
+echo '    bridge-stp off' >> ${NWFILE}; \
+echo '    bridge-fd 0' >> ${NWFILE};"
+            fi
+        fi
+        if [ "$PXE_MODE" = "1" ]; then
+            # First-boot phone-home (same as the flat-dhcp branch): report the
+            # obtained IPs to the playground. Non-critical here (vmbr1 is a known
+            # static address) but kept for parity with the PXE deploy flow.
+            # Avoid '&' in this value (awk esc() limitation, see flat branch).
+            late_network="${late_network} \
+in-target sh -c 'wget -q -O /tmp/phonehome-setup.sh ${PXE_BASE_URL}/firmware/phonehome-setup.sh; sh /tmp/phonehome-setup.sh' || true;"
+        fi
+    elif [ "$network_mode" = "dhcp" ]; then
         late_network="echo 'source /etc/network/interfaces.d/*' > ${NWFILE}; \
 echo '' >> ${NWFILE}; \
 echo 'auto lo' >> ${NWFILE}; \
