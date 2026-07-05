@@ -4,6 +4,10 @@ Supermicro IPMI と Proxmox VE を操作して、分散ストレージの比較�
 
 Claude Code (AI エージェント) がローカルマシンから SSH 経由で物理サーバを操作し、OS インストールからストレージベンチマーク、LINSTOR/DRBD によるマルチリージョン VM マイグレーションまでを自動化する。
 
+![足立区綾瀬に設置されている操作対象のラック](docs/images/rack.jpg)
+
+*足立区綾瀬に設置されている操作対象のラック*
+
 ## 特徴
 
 - **BMC VirtualMedia による OS 自動インストール** — Redfish API / CGI API / iDRAC racadm で ISO マウント、preseed による無人インストール
